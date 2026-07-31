@@ -13,6 +13,8 @@ export interface ProInputProps {
 	required?: boolean
 	disabled?: boolean
 	autoComplete?: string
+	/** -1 takes a field out of the tab order — used for the honeypot. */
+	tabIndex?: number
 	className?: string
 }
 
@@ -25,6 +27,7 @@ export const ProInput = ({
 	required,
 	disabled,
 	autoComplete,
+	tabIndex,
 	className,
 }: ProInputProps) => {
 	const { control } = useFormContext()
@@ -49,6 +52,7 @@ export const ProInput = ({
 						placeholder={placeholder}
 						disabled={disabled}
 						autoComplete={autoComplete}
+						tabIndex={tabIndex}
 						aria-invalid={!!error}
 						aria-describedby={error ? `${name}-error` : description ? `${name}-description` : undefined}
 						// `?? ""` keeps the input controlled from the first render.

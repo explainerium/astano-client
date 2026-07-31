@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import AuthShell from "@/components/auth/AuthShell"
+import { Link } from "@/i18n/navigation"
 import LoginForm from "./LoginForm"
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -18,7 +19,18 @@ export default async function LoginPage() {
 	const t = await getTranslations("auth")
 
 	return (
-		<AuthShell title={t("signIn")} subtitle={t("signInSubtitle")}>
+		<AuthShell
+			title={t("signIn")}
+			subtitle={t("signInSubtitle")}
+			footer={
+				<p>
+					{t("noAccount")}{" "}
+					<Link href="/register" className="text-foreground underline underline-offset-4">
+						{t("createAccount")}
+					</Link>
+				</p>
+			}
+		>
 			{/* LoginForm reads ?redirect= with useSearchParams, which has to be
 			    inside a Suspense boundary. */}
 			<Suspense>

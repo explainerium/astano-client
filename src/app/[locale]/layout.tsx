@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import { notFound } from "next/navigation"
 import { Lato, Mulish, Poppins } from "next/font/google"
 import { NextIntlClientProvider } from "next-intl"
-import { getMessages } from "next-intl/server"
+import { getMessages, getTranslations } from "next-intl/server"
 import { locales, routing, type Locale } from "@/i18n/routing"
 import Providers from "@/lib/providers/Providers"
 import "../globals.css"
@@ -37,13 +37,32 @@ export function generateStaticParams() {
 	return routing.locales.map((locale) => ({ locale }))
 }
 
-export const metadata: Metadata = {
-	metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-	title: {
-		default: "astano®",
-		template: "%s · astano®",
-	},
-	description: "Custom stainless-steel baking hardware, made in Germany.",
+/**
+ * Per-locale metadata. A static `metadata` export cannot read the locale, which
+ * is how the German pages ended up advertising an English description to search
+ * engines.
+ */
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const t = await getTranslations({ locale, namespace: "site" })
+
+	return {
+		metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+		title: {
+			default: t("title"),
+			template: `%s · ${t("title")}`,
+		},
+		description: t("description"),
+		// No `alternates.languages` here on purpose. next-intl's middleware
+		// already emits per-page hreflang Link headers — and correctly, pointing
+		// at the translated slug (/register ↔ /de/registrieren) plus x-default.
+		// Declaring them in the layout would apply one set to every page and
+		// claim the German alternate of any page is /de, which is false.
+	}
 }
 
 export default async function LocaleLayout({
