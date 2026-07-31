@@ -1,8 +1,6 @@
-import type { FieldValues } from "react-hook-form"
-import type { IApiResponse, AuthResult } from "@/types"
+import type { AuthResult, IApiResponse } from "@/types"
 import { storeUserInfo } from "../auth.services"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1"
+import apiFetch from "./apiFetch"
 
 /**
  * Self-registration. The API only ever produces B2C / ACTIVE from this route —
@@ -13,16 +11,13 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1
  * land in the user's browser.
  */
 export const registerUser = async (
-	payload: FieldValues
+	payload: Record<string, unknown>
 ): Promise<IApiResponse<AuthResult>> => {
-	const res = await fetch(`${API_URL}/auth/register`, {
+	const result = await apiFetch<AuthResult>("/auth/register", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify(payload),
-		credentials: "include",
 	})
-
-	const result: IApiResponse<AuthResult> = await res.json()
 
 	if (result?.data?.accessToken) {
 		storeUserInfo({ accessToken: result.data.accessToken })

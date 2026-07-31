@@ -1,6 +1,5 @@
 import { removeUser } from "../auth.services"
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1"
+import apiFetch from "./apiFetch"
 
 /**
  * Signs out on both sides.
@@ -9,15 +8,15 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1
  * be resumed from another device. Clearing the local cookie alone would leave a
  * usable refresh token sitting in the database.
  *
- * A failed API call still clears the local cookie — a user who clicks "sign
- * out" must end up signed out even if the network is down.
+ * Failures are swallowed on purpose. A user who clicks "sign out" must end up
+ * signed out even if the server is unreachable — leaving them apparently
+ * logged in on a shared machine is the worse outcome.
  */
 export const logoutUser = async (): Promise<void> => {
 	try {
-		await fetch(`${API_URL}/auth/logout`, {
-			method: "POST",
-			credentials: "include",
-		})
+		await apiFetch("/auth/logout", { method: "POST" })
+	} catch {
+		// Intentionally ignored — see above.
 	} finally {
 		removeUser()
 	}

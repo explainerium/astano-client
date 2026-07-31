@@ -103,6 +103,7 @@
     "notFoundTitle": "Page not found",
     "notFoundBody": "The page you were looking for does not exist.",
     "genericTitle": "Something went wrong",
+    "network": "We could not reach the server. Please check your connection and try again.",
     "tryAgain": "Try again"
   }
 }

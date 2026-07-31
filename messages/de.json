@@ -103,6 +103,7 @@
     "notFoundTitle": "Seite nicht gefunden",
     "notFoundBody": "Die gesuchte Seite existiert nicht.",
     "genericTitle": "Etwas ist schiefgelaufen",
+    "network": "Der Server ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "tryAgain": "Erneut versuchen"
   }
 }
