@@ -9,6 +9,8 @@ export interface ToolbarProps {
 	searchValue?: string
 	onSearchChange?: (value: string) => void
 	searchPlaceholder?: string
+	/** Dropdowns that narrow the list — status, kind, and so on. */
+	filters?: ReactNode
 	/** 0 hides the selection block without removing the row. */
 	selectedCount?: number
 	onClearSelection?: () => void
@@ -31,6 +33,7 @@ export const Toolbar = ({
 	searchValue,
 	onSearchChange,
 	searchPlaceholder = "Search…",
+	filters,
 	selectedCount = 0,
 	onClearSelection,
 	selectionActions,
@@ -49,6 +52,8 @@ export const Toolbar = ({
 				/>
 			</div>
 		)}
+
+		{filters}
 
 		<div className="ml-auto flex flex-wrap items-center gap-2">
 			{selectedCount > 0 && (
