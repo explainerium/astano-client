@@ -12,26 +12,54 @@
 
 # testing
 /coverage
+/test-results
+/playwright-report
 
 # next.js
 /.next/
 /out/
+.turbo/
 
 # production
 /build
 
 # misc
 .DS_Store
-*.pem
+Thumbs.db
+desktop.ini
 
 # debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# env — every variant is private. Only the template is committed, so the
+# negation must stay below the patterns it re-includes.
+.env
+.env.*
+!.env.example
+
+# secrets & certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# customer-owned material — design files (PDF/EPS/AI/STL/STP), generated
+# invoices, data exports. None of this may ever reach the repository (R12).
+/uploads/
+/public/uploads/
+/private/
+invoice-*.pdf
+
+# editors & local tooling
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/settings.local.json
 
 # vercel
 .vercel
