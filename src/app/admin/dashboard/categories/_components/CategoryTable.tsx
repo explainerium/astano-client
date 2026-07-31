@@ -1,15 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import {
-	CornerDownRight,
-	ExternalLink,
-	Pencil,
-	Plus,
-	Search,
-	Trash2,
-	X,
-} from "lucide-react"
+import { CornerDownRight, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -24,7 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
+import Toolbar from "@/components/dashboard/shell/Toolbar"
 import {
 	Table,
 	TableBody,
@@ -150,45 +142,29 @@ export const CategoryTable = ({
 
 	return (
 		<>
-			{/* Always rendered, so selecting a row cannot push the table down. */}
-			<div className="flex flex-wrap items-center gap-3">
-				<div className="relative min-w-56 flex-1 sm:max-w-xs">
-					<Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-					<Input
-						value={query}
-						onChange={(event) => setQuery(event.target.value)}
-						placeholder="Search categories…"
-						className="pl-9"
-						aria-label="Search categories"
-					/>
-				</div>
-
-				<div className="ml-auto flex items-center gap-2">
-					{selected.size > 0 && (
-						<>
-							<Button
-								variant="destructive"
-								size="lg"
-								onClick={() =>
-									setPending(tree.filter((row) => selected.has(row.id)))
-								}
-							>
-								<Trash2 />
-								Delete ({selected.size})
-							</Button>
-							<Button variant="ghost" size="lg" onClick={() => setSelected(new Set())}>
-								<X />
-								Clear
-							</Button>
-						</>
-					)}
-
+			<Toolbar
+				searchValue={query}
+				onSearchChange={setQuery}
+				searchPlaceholder="Search categories…"
+				selectedCount={selected.size}
+				onClearSelection={() => setSelected(new Set())}
+				selectionActions={
+					<Button
+						variant="destructive"
+						size="lg"
+						onClick={() => setPending(tree.filter((row) => selected.has(row.id)))}
+					>
+						<Trash2 />
+						Delete
+					</Button>
+				}
+				primaryAction={
 					<Button size="lg" onClick={onCreate}>
 						<Plus />
 						New category
 					</Button>
-				</div>
-			</div>
+				}
+			/>
 
 			<div className="bg-card overflow-hidden rounded-lg border">
 				<div className="overflow-x-auto">
