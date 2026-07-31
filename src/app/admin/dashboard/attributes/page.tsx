@@ -1,0 +1,61 @@
+"use client"
+
+import { useState } from "react"
+import { Loader2 } from "lucide-react"
+import { useAdminAttributesQuery } from "@/redux/api/attributeApi"
+import type { AdminAttribute } from "@/types/attribute"
+import AttributeFormDialog from "./_components/AttributeFormDialog"
+import AttributeTable from "./_components/AttributeTable"
+
+export default function AttributesPage() {
+	const { data: attributes, isLoading, isError, error } = useAdminAttributesQuery()
+
+	const [dialogOpen, setDialogOpen] = useState(false)
+	const [editing, setEditing] = useState<AdminAttribute | undefined>()
+
+	const openCreate = () => {
+		setEditing(undefined)
+		setDialogOpen(true)
+	}
+
+	const openEdit = (attribute: AdminAttribute) => {
+		setEditing(attribute)
+		setDialogOpen(true)
+	}
+
+	return (
+		<div className="space-y-4">
+			{isLoading && (
+				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
+					<Loader2 className="size-4 animate-spin" />
+					Loading attributes…
+				</div>
+			)}
+
+			{isError && (
+				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
+					{(error as { data?: { message?: string } })?.data?.message ??
+						"Could not load attributes."}
+				</div>
+			)}
+
+			{attributes && (
+				<AttributeTable
+					attributes={attributes}
+					onEdit={openEdit}
+					onCreate={openCreate}
+				/>
+			)}
+
+			{/* Mounted only while open so the form rebuilds per attribute — useForm
+			    reads defaultValues once. */}
+			{dialogOpen && (
+				<AttributeFormDialog
+					open={dialogOpen}
+					onOpenChange={setDialogOpen}
+					attribute={editing}
+				/>
+			)}
+		</div>
+	)
+}
