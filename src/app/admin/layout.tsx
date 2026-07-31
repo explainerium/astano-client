@@ -34,7 +34,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 	return (
 		<html
 			lang="en"
-			className={`${mulish.variable} ${poppins.variable} h-full antialiased`}
+			// admin-theme carries the dashboard's own tokens — orange accent,
+			// rounded cards, grey canvas. Scoped here so the storefront's §6.1
+			// identity is unaffected.
+			className={`admin-theme ${mulish.variable} ${poppins.variable} h-full antialiased`}
 			suppressHydrationWarning
 		>
 			<body className="flex min-h-full flex-col">
