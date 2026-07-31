@@ -7,9 +7,12 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  /* The three families from spec §6.1, bound to the next/font variables set
+     on <html>. Mulish is body and navigation, Poppins is every heading, Lato
+     is the secondary face. */
+  --font-sans: var(--font-mulish);
+  --font-heading: var(--font-poppins);
+  --font-secondary: var(--font-lato);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);

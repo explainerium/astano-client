@@ -1,0 +1,108 @@
+{
+  "common": {
+    "loading": "Wird geladen…",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Anlegen",
+    "search": "Suchen",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "confirm": "Bestätigen",
+    "somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+  },
+  "nav": {
+    "home": "Startseite",
+    "products": "Produkte",
+    "cart": "Warenkorb",
+    "checkout": "Kasse",
+    "quoteBasket": "Angebotsanfrage",
+    "wishlist": "Wunschliste",
+    "account": "Mein Konto",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "register": "Konto erstellen",
+    "dealerRegistration": "Händler werden",
+    "language": "Sprache"
+  },
+  "auth": {
+    "signIn": "Anmelden",
+    "signInSubtitle": "Melden Sie sich an, um Ihre Preise und Bestellungen zu sehen.",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "currentPassword": "Aktuelles Passwort",
+    "newPassword": "Neues Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "forgotPassword": "Passwort vergessen?",
+    "resetPassword": "Passwort zurücksetzen",
+    "noAccount": "Noch kein Konto?",
+    "hasAccount": "Sie haben bereits ein Konto?",
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "company": "Firma",
+    "phone": "Telefon",
+    "vatNumber": "USt-IdNr.",
+    "pendingTitle": "Ihr Antrag wird geprüft",
+    "pendingBody": "Jeder Händlerantrag wird von uns persönlich geprüft. Bis zur Freigabe können Sie sich anmelden, Händlerpreise und Ihr Kundenkonto bleiben jedoch gesperrt.",
+    "rejectedTitle": "Ihr Antrag wurde nicht freigegeben",
+    "rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt."
+  },
+  "shop": {
+    "addToCart": "In den Warenkorb",
+    "addToQuote": "Zur Angebotsanfrage",
+    "priceOnRequest": "Preis auf Anfrage",
+    "quantity": "Menge",
+    "minimumOrder": "Mindestbestellmenge: {quantity}",
+    "inStock": "Auf Lager",
+    "outOfStock": "Nicht auf Lager",
+    "sku": "Artikelnummer",
+    "buyMoreSaveMore": "Mehr kaufen, mehr sparen",
+    "from": "ab {price}",
+    "noProducts": "Keine Produkte gefunden."
+  },
+  "cart": {
+    "title": "Ihr Warenkorb",
+    "empty": "Ihr Warenkorb ist leer.",
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "tax": "MwSt.",
+    "total": "Gesamt",
+    "proceedToCheckout": "Zur Kasse",
+    "continueShopping": "Weiter einkaufen",
+    "remove": "Entfernen",
+    "quantityRaised": "Die Menge wurde auf die Mindestbestellmenge von {quantity} erhöht."
+  },
+  "quote": {
+    "title": "Angebotsanfrage",
+    "empty": "Ihre Angebotsanfrage ist leer.",
+    "submit": "Anfrage senden",
+    "contactName": "Ihr Name",
+    "contactEmail": "E-Mail-Adresse",
+    "message": "Nachricht",
+    "submitted": "Vielen Dank — wir melden uns in Kürze bei Ihnen."
+  },
+  "account": {
+    "title": "Mein Konto",
+    "profile": "Profil",
+    "addresses": "Adressen",
+    "orders": "Bestellungen",
+    "quotes": "Angebotsanfragen",
+    "wishlist": "Wunschliste",
+    "noOrders": "Sie haben noch keine Bestellung aufgegeben."
+  },
+  "validation": {
+    "required": "Dieses Feld ist erforderlich.",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "minLength": "Muss mindestens {count} Zeichen lang sein.",
+    "passwordMismatch": "Die Passwörter stimmen nicht überein."
+  },
+  "error": {
+    "notFoundTitle": "Seite nicht gefunden",
+    "notFoundBody": "Die gesuchte Seite existiert nicht.",
+    "genericTitle": "Etwas ist schiefgelaufen",
+    "tryAgain": "Erneut versuchen"
+  }
+}
