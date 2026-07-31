@@ -32,8 +32,8 @@ export const UserMenu = () => {
 
 	return (
 		<DropdownMenu.Root>
-			<DropdownMenu.Trigger className="hover:bg-muted flex items-center gap-2.5 rounded-full py-1 pr-2 pl-1 transition-colors outline-none">
-				<span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-full text-sm font-semibold">
+			<DropdownMenu.Trigger className="hover:bg-muted flex items-center gap-2.5 rounded-lg py-1 pr-2 pl-1 transition-colors outline-none">
+				<span className="bg-primary/10 text-primary flex size-9 items-center justify-center rounded-lg text-sm font-semibold">
 					{initial}
 				</span>
 				<span className="hidden text-left leading-tight sm:block">
@@ -47,7 +47,7 @@ export const UserMenu = () => {
 				<DropdownMenu.Content
 					align="end"
 					sideOffset={8}
-					className="bg-card border-border z-50 min-w-52 rounded-xl border p-1.5 shadow-lg"
+					className="bg-card border-border z-50 min-w-52 rounded-lg border p-1.5 shadow-lg"
 				>
 					<div className="px-2.5 py-2">
 						<p className="truncate text-sm font-medium">{name}</p>

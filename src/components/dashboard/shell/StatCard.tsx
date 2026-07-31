@@ -22,7 +22,7 @@ export const StatCard = ({
 }: StatCardProps) => (
 	<div
 		className={cn(
-			"rounded-2xl border p-5",
+			"rounded-lg border p-5",
 			highlighted
 				? "bg-accent-soft-strong border-transparent"
 				: "bg-card border-border"

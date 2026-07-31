@@ -16,7 +16,7 @@ export const Panel = ({
 	className?: string
 	children?: ReactNode
 }) => (
-	<section className={cn("bg-card border-border rounded-2xl border p-5", className)}>
+	<section className={cn("bg-card border-border rounded-lg border p-5", className)}>
 		{(title || action) && (
 			<header className="mb-4 flex items-center justify-between gap-3">
 				{typeof title === "string" ? (

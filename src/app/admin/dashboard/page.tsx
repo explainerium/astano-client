@@ -41,7 +41,7 @@ const PLACEHOLDER_STATS = [
 ]
 
 const Awaiting = ({ what }: { what: string }) => (
-	<div className="text-muted-foreground flex h-56 items-center justify-center rounded-xl border border-dashed text-center text-sm">
+	<div className="text-muted-foreground flex h-56 items-center justify-center rounded-lg border border-dashed text-center text-sm">
 		<p className="max-w-[22ch]">{what}</p>
 	</div>
 )

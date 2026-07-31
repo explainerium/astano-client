@@ -17,7 +17,7 @@ export const Sidebar = () => {
 				<span className="bg-primary flex size-7 items-center justify-center rounded-lg">
 					<span className="grid grid-cols-2 gap-[3px]">
 						{Array.from({ length: 4 }, (_, i) => (
-							<span key={i} className="bg-primary-foreground size-[5px] rounded-[1.5px]" />
+							<span key={i} className="bg-primary-foreground size-[5px]" />
 						))}
 					</span>
 				</span>
@@ -44,7 +44,7 @@ export const Sidebar = () => {
 									href={item.href}
 									aria-current={isActive ? "page" : undefined}
 									className={cn(
-										"flex items-center gap-3 rounded-[10px] px-3 py-2.5 text-[15px] transition-colors",
+										"flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] transition-colors",
 										isActive
 											? "bg-primary text-primary-foreground font-medium"
 											: "text-foreground/80 hover:bg-muted"

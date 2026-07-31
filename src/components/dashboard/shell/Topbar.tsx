@@ -18,7 +18,7 @@ export const Topbar = () => {
 			<h1 className="font-heading truncate text-2xl font-semibold tracking-tight">{title}</h1>
 
 			<div className="ml-auto flex items-center gap-2 lg:gap-4">
-				<label className="bg-muted/70 hidden items-center gap-2 rounded-full px-4 py-2.5 md:flex">
+				<label className="bg-muted/70 border-input hidden items-center gap-2 rounded-lg border px-4 py-2.5 md:flex">
 					<span className="sr-only">Search</span>
 					<input
 						type="search"
@@ -31,7 +31,7 @@ export const Topbar = () => {
 				<button
 					type="button"
 					aria-label="Messages"
-					className="hover:bg-muted text-muted-foreground hidden size-10 items-center justify-center rounded-full transition-colors sm:flex"
+					className="hover:bg-muted text-muted-foreground hidden size-10 items-center justify-center rounded-lg transition-colors sm:flex"
 				>
 					<MessageSquare className="size-5" strokeWidth={1.75} />
 				</button>
@@ -39,7 +39,7 @@ export const Topbar = () => {
 				<button
 					type="button"
 					aria-label="Notifications"
-					className="hover:bg-muted text-muted-foreground relative hidden size-10 items-center justify-center rounded-full transition-colors sm:flex"
+					className="hover:bg-muted text-muted-foreground relative hidden size-10 items-center justify-center rounded-lg transition-colors sm:flex"
 				>
 					<Bell className="size-5" strokeWidth={1.75} />
 					<span className="bg-negative absolute top-2 right-2.5 size-2 rounded-full" />

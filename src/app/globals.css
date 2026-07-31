@@ -156,9 +156,19 @@
   --negative: #dc2626;
   --negative-soft: #fee2e2;
 
-  /* The reference design is rounded throughout — cards 14px, controls 10px.
-     Deliberately not the storefront's 0. */
-  --radius: 0.875rem;
+  /*
+   * A 5px corner — nearly square, but not hard.
+   *
+   * Fully square read too severe next to the orange accent. The storefront
+   * stays at 0 per spec §6.1; the dashboard keeps just enough softening to sit
+   * comfortably without looking like a different product.
+   *
+   * This one value drives the whole --radius-sm…4xl scale, so every card,
+   * button, input, dialog and badge follows it. Components use `rounded-lg`
+   * (= exactly this value) rather than the larger steps, so the whole admin
+   * lands on one radius instead of a spread.
+   */
+  --radius: 5px;
 }
 
 @theme inline {
@@ -173,6 +183,26 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  /*
+   * Tailwind v4 dropped the preflight rule that gave buttons a pointer cursor,
+   * so every button in the app reverts to the default arrow. Restored here
+   * rather than on each component: a rule that has to be remembered per button
+   * is a rule that gets forgotten.
+   */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"],
+  a[href],
+  label[for],
+  summary {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
   }
   body {
     @apply bg-background text-foreground;
