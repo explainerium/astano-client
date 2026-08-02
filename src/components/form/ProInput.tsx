@@ -15,6 +15,12 @@ export interface ProInputProps {
 	autoComplete?: string
 	/** -1 takes a field out of the tab order — used for the honeypot. */
 	tabIndex?: number
+	/**
+	 * Runs after the field's own onBlur. For work that would be disruptive on
+	 * every keystroke — re-sorting a list of rows, say, which would move the
+	 * field out from under the cursor mid-typing.
+	 */
+	onBlurExtra?: () => void
 	className?: string
 }
 
@@ -28,6 +34,7 @@ export const ProInput = ({
 	disabled,
 	autoComplete,
 	tabIndex,
+	onBlurExtra,
 	className,
 }: ProInputProps) => {
 	const { control } = useFormContext()
@@ -53,6 +60,10 @@ export const ProInput = ({
 						disabled={disabled}
 						autoComplete={autoComplete}
 						tabIndex={tabIndex}
+						onBlur={() => {
+							field.onBlur()
+							onBlurExtra?.()
+						}}
 						aria-invalid={!!error}
 						aria-describedby={error ? `${name}-error` : description ? `${name}-description` : undefined}
 						// `?? ""` keeps the input controlled from the first render.

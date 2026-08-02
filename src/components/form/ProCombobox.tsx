@@ -26,6 +26,11 @@ export interface ProComboboxProps {
 	description?: string
 	required?: boolean
 	disabled?: boolean
+	/**
+	 * Select several. The field value becomes a string[], the popover stays open
+	 * between picks, and the trigger summarises the selection.
+	 */
+	multiple?: boolean
 	className?: string
 }
 
@@ -62,6 +67,7 @@ export const ProCombobox = ({
 	description,
 	required,
 	disabled,
+	multiple = false,
 	className,
 }: ProComboboxProps) => {
 	const { control } = useFormContext()
@@ -104,14 +110,47 @@ export const ProCombobox = ({
 			control={control}
 			name={name}
 			render={({ field, fieldState: { error } }) => {
-				const selected = options.find((option) => option.value === field.value)
+				const values: string[] = multiple
+					? Array.isArray(field.value)
+						? field.value
+						: []
+					: []
+				const selected = multiple
+					? undefined
+					: options.find((option) => option.value === field.value)
+
+				const isChosen = (option: ProComboboxOption) =>
+					multiple ? values.includes(option.value) : option.value === field.value
 
 				const choose = (option: ProComboboxOption) => {
 					if (option.disabled) return
+
+					if (multiple) {
+						// Stay open — picking several categories one at a time through
+						// a popover that closes on every click is punishing.
+						field.onChange(
+							values.includes(option.value)
+								? values.filter((v) => v !== option.value)
+								: [...values, option.value]
+						)
+						return
+					}
+
 					field.onChange(option.value)
 					setOpen(false)
 					setQuery("")
 				}
+
+				const triggerLabel = multiple
+					? values.length === 0
+						? (placeholder ?? t("select"))
+						: values.length <= 2
+							? options
+									.filter((o) => values.includes(o.value))
+									.map((o) => o.label)
+									.join(", ")
+							: `${values.length} selected`
+					: (selected?.label ?? placeholder ?? t("select"))
 
 				const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 					if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -154,7 +193,7 @@ export const ProCombobox = ({
 								if (!next) setQuery("")
 								else {
 									// Open on the current choice rather than the top.
-									const index = filtered.findIndex((o) => o.value === field.value)
+									const index = filtered.findIndex((o) => isChosen(o))
 									setActiveIndex(index >= 0 ? index : 0)
 								}
 							}}
@@ -172,10 +211,14 @@ export const ProCombobox = ({
 									onBlur={field.onBlur}
 									className={cn(
 										"w-full justify-between font-normal",
-										!selected && "text-muted-foreground"
+										// Muted only while nothing is chosen — in multi mode
+										// `selected` is always undefined, so testing it alone
+										// would grey out a filled field.
+										(multiple ? values.length === 0 : !selected) &&
+											"text-muted-foreground"
 									)}
 								>
-									{selected?.label ?? placeholder ?? t("select")}
+									{triggerLabel}
 									<ChevronsUpDownIcon className="opacity-50" />
 								</Button>
 							</PopoverTrigger>
@@ -216,11 +259,12 @@ export const ProCombobox = ({
 									id={listId}
 									role="listbox"
 									aria-label={label}
+									aria-multiselectable={multiple || undefined}
 									className="max-h-64 overflow-y-auto p-1"
 								>
 									{filtered.map((option, index) => {
 										const isActive = index === activeIndex
-										const isSelected = option.value === field.value
+										const isSelected = isChosen(option)
 
 										return (
 											<li
