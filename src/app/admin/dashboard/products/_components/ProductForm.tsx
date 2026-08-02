@@ -29,6 +29,7 @@ import type {
 import AttributesTab from "./AttributesTab"
 import MoqField from "./MoqField"
 import OptionsTab from "./OptionsTab"
+import ProductImages from "./ProductImages"
 import QuantityPricing from "./QuantityPricing"
 import {
 	buildTree,
@@ -112,6 +113,11 @@ const schema = z.object({
 	moq: z.number({ message: "Enter a number" }).int().min(0),
 	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
 	categoryIds: z.array(z.string()),
+
+	// Media. Ids only — the thumbnails to draw them with live in the panel's
+	// own state, because the API takes ids and nothing else.
+	featuredAssetId: z.string().nullable(),
+	assetIds: z.array(z.string()),
 
 	// Inventory — the API requires at least one variant, and SKU is mandatory on
 	// it, so a product cannot be created without these two.
@@ -286,6 +292,8 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 		moq: product?.moq ?? 0,
 		sortOrder: product?.sortOrder ?? 0,
 		categoryIds: product?.categoryIds ?? [],
+		featuredAssetId: product?.featuredAssetId ?? null,
+		assetIds: product?.assetIds ?? [],
 		sku: variant?.sku ?? "",
 		manageStock: variant?.manageStock ?? true,
 		stock: variant?.stock ?? 0,
@@ -437,6 +445,8 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			moq: form.moq,
 			sortOrder: form.sortOrder,
 			categoryIds: form.categoryIds,
+			featuredAssetId: form.featuredAssetId,
+			assetIds: form.assetIds,
 			translations,
 			prices,
 			tiers,
@@ -765,6 +775,15 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								options={categoryOptions}
 								placeholder="No categories"
 							/>
+						</div>
+					</section>
+
+					<section className="bg-card rounded-lg border">
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">
+							Images
+						</h2>
+						<div className="p-4">
+							<ProductImages product={product} />
 						</div>
 					</section>
 

@@ -6,7 +6,7 @@ import { CloudUpload, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useUploadImageMutation } from "@/redux/api/mediaApi"
 import { cn } from "@/lib/utils"
-import { UNFILED } from "@/types/media"
+import { UNFILED, type MediaAsset } from "@/types/media"
 
 /** Mirrors the API's allow-list; anything else is rejected before a request. */
 const ACCEPTED = {
@@ -22,10 +22,17 @@ const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 export const UploadDropzone = ({
 	folderId,
 	folderName,
+	onUploaded,
 }: {
 	/** The folder currently open. UNFILED and "All media" both upload unfiled. */
 	folderId: string | undefined
 	folderName: string
+	/**
+	 * Called once per successful upload. The picker uses it to select what was
+	 * just added — uploading an image and then having to find it in the grid is
+	 * the step everyone forgets.
+	 */
+	onUploaded?: (asset: MediaAsset) => void
 }) => {
 	const [uploadImage] = useUploadImageMutation()
 	const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
@@ -47,7 +54,8 @@ export const UploadDropzone = ({
 			// while making the progress count meaningless.
 			for (const [index, file] of accepted.entries()) {
 				try {
-					await uploadImage({ file, folderId: targetFolder }).unwrap()
+					const created = await uploadImage({ file, folderId: targetFolder }).unwrap()
+					onUploaded?.(created)
 				} catch (error) {
 					failed++
 					const message = (error as { data?: { message?: string } })?.data?.message
@@ -66,7 +74,7 @@ export const UploadDropzone = ({
 				)
 			}
 		},
-		[uploadImage, targetFolder, folderName]
+		[uploadImage, targetFolder, folderName, onUploaded]
 	)
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({

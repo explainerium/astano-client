@@ -24,6 +24,19 @@ export interface ProductTranslation {
 	metaDescription?: string
 }
 
+/**
+ * An image as the API hands it over — ready-to-use URLs, never storage keys.
+ * Which bucket or CDN is behind them is the storage driver's business.
+ */
+export interface ProductImage {
+	id: string
+	url: string
+	width: number | null
+	height: number | null
+	/** thumb · grid · detail · zoom */
+	srcset: Record<string, string>
+}
+
 export interface ProductPrice {
 	role: PriceRole
 	/** Decimal(12,4) — carried as a string so no cent is lost to a float. */
@@ -114,6 +127,9 @@ export interface AdminProduct {
 	categoryIds: string[]
 	featuredAssetId: string | null
 	assetIds: string[]
+	/** The same two, resolved — what the editor draws thumbnails from. */
+	featuredImage: ProductImage | null
+	images: ProductImage[]
 	attributes: ProductAttributeInput[]
 	prices: ProductPrice[]
 	tiers: ProductTier[]

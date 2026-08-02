@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react"
+import { ExternalLink, ImageOff, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -14,6 +14,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -36,13 +37,7 @@ import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
 import { useDeleteProductMutation } from "@/redux/api/productApi"
 import { cn } from "@/lib/utils"
-import type {
-	AdminProduct,
-	ProductKind,
-	ProductStatus,
-	ProductVisibility,
-	StockStatus,
-} from "@/types/product"
+import type { AdminProduct, ProductKind, ProductStatus, StockStatus } from "@/types/product"
 
 const ANY = "__any__"
 
@@ -65,13 +60,48 @@ const displayPrice = (product: AdminProduct): string | null => {
 	return row ? money.format(Number(row.basePrice)) : null
 }
 
-/** Shown in the storefront column so the admin can see what a shopper would. */
-const VISIBILITY_LABEL: Record<ProductVisibility, string> = {
-	SHOP_AND_SEARCH: "Shop and search",
-	SHOP_ONLY: "Shop only",
-	SEARCH_ONLY: "Search only",
-	HIDDEN: "Hidden",
+/**
+ * The smallest derivative that exists — never the original, for a 40px cell.
+ *
+ * Deliberately the featured image only, with no fall back to the first gallery
+ * image: this column should show what a shopper sees in a listing, and a
+ * product with no featured image shows a placeholder there too.
+ */
+const thumbnailOf = (product: AdminProduct): string | null => {
+	const image = product.featuredImage
+	if (!image) return null
+	return image.srcset.thumb ?? image.srcset.grid ?? image.url
 }
+
+/**
+ * Colour carries state, not taxonomy.
+ *
+ * Green means live and findable, red means shoppers cannot see it, grey means
+ * it is not in circulation. Someone scanning the column should be able to tell
+ * "fine" from "needs a look" without reading a single word — so the palette
+ * stops at three meanings and the rest stays quiet.
+ *
+ * All four use the admin theme's own tokens rather than raw palette colours, so
+ * a change to the theme carries through here.
+ */
+const STATUS_CHIP: Record<ProductStatus, { label: string; className: string }> = {
+	PUBLISHED: { label: "Published", className: "border-transparent bg-positive-soft text-positive" },
+	DRAFT: { label: "Draft", className: "border-transparent bg-muted text-foreground" },
+	// Outline kept, so retired reads fainter than merely unpublished.
+	ARCHIVED: { label: "Archived", className: "text-muted-foreground" },
+}
+
+/** Shoppers cannot find it. The one genuine warning in this column. */
+const HIDDEN_CHIP = "border-transparent bg-negative-soft text-negative"
+
+/**
+ * A configurator component rather than something you would shop for — roughly
+ * two in five of the catalogue (§2.1), so it is worth spotting. The brand
+ * accent rather than a state colour, because it says *what this is*, not
+ * whether anything is wrong. The strong tint, so it stays legible on a selected
+ * row, which is tinted with the soft one.
+ */
+const OPTION_CHIP = "border-transparent bg-accent-soft-strong text-primary"
 
 export interface ProductFilters {
 	search: string
@@ -146,6 +176,17 @@ export const ProductTable = ({
 
 	const defaultVariant = (product: AdminProduct) =>
 		product.variants.find((v) => v.isDefault) ?? product.variants[0]
+
+	/**
+	 * Names for the ids the product carries.
+	 *
+	 * Walked in `categories` order rather than the product's, so every row lists
+	 * them in the same catalogue-tree order instead of whatever order the join
+	 * came back in. The list is already here for the filter dropdown, so this
+	 * costs no extra request.
+	 */
+	const categoryNamesFor = (product: AdminProduct) =>
+		categories.filter((c) => product.categoryIds.includes(c.id)).map((c) => c.name)
 
 	return (
 		<>
@@ -266,6 +307,9 @@ export const ProductTable = ({
 										disabled={!products.length}
 									/>
 								</TableHead>
+								<TableHead className="w-16">
+									<span className="sr-only">Image</span>
+								</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 									Product
 								</TableHead>
@@ -276,7 +320,10 @@ export const ProductTable = ({
 									Price
 								</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Storefront
+									Categories
+								</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+									Status
 								</TableHead>
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									MOQ
@@ -291,7 +338,7 @@ export const ProductTable = ({
 						<TableBody>
 							{!products.length && (
 								<TableRow className="hover:bg-transparent">
-									<TableCell colSpan={8} className="h-40 text-center">
+									<TableCell colSpan={10} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{filters.search || filters.status || filters.kind
 												? "Nothing matches these filters."
@@ -305,6 +352,9 @@ export const ProductTable = ({
 								const isSelected = selected.has(product.id)
 								const variant = defaultVariant(product)
 								const en = product.translations.find((t) => t.locale === "en")
+								const thumbnail = thumbnailOf(product)
+								const productCategories = categoryNamesFor(product)
+								const status = STATUS_CHIP[product.status]
 
 								return (
 									<TableRow
@@ -321,41 +371,51 @@ export const ProductTable = ({
 										</TableCell>
 
 										<TableCell>
-											<div className="flex flex-wrap items-center gap-1.5">
-												{en?.slug ? (
-													<Link
-														href={getPathname({
-															href: {
-																pathname: "/products/[slug]",
-																params: { slug: en.slug },
-															},
-															locale: "en",
-														})}
-														target="_blank"
-														rel="noopener noreferrer"
-														className="group inline-flex items-center gap-1.5 font-medium hover:underline"
-													>
-														{product.name}
-														<ExternalLink className="text-muted-foreground size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-													</Link>
+											{/* Decorative: the name is in the very next cell, so
+											    announcing the image again is noise. */}
+											<div className="bg-muted size-10 overflow-hidden rounded-md border">
+												{thumbnail ? (
+													// Plain img, not next/image: already a sized WebP
+													// derivative, so re-optimising gains nothing.
+													// eslint-disable-next-line @next/next/no-img-element
+													<img
+														src={thumbnail}
+														alt=""
+														loading="lazy"
+														className="size-full object-cover"
+													/>
 												) : (
-													<span className="font-medium">{product.name}</span>
-												)}
-
-												{/* Status is shown only when it is not the norm, the
-												    way WordPress appends "— Draft". Repeating
-												    "Published" on every row says nothing. */}
-												{product.status !== "PUBLISHED" && (
-													<span className="text-muted-foreground text-sm">
-														— {product.status === "DRAFT" ? "Draft" : "Archived"}
-													</span>
-												)}
-												{/* kind is a dashboard label only and must never reach
-												    a public payload (§1B decision 4b). */}
-												{product.kind === "OPTION" && (
-													<span className="text-muted-foreground text-sm">— Option</span>
+													<div className="text-muted-foreground flex size-full items-center justify-center">
+														<ImageOff className="size-4" />
+													</div>
 												)}
 											</div>
+										</TableCell>
+
+										{/* Name only. Status, kind and visibility moved to their
+										    own columns, where they line up down the page and can
+										    be compared at a glance instead of trailing off after
+										    names of wildly different lengths. */}
+										<TableCell>
+											{en?.slug ? (
+												<Link
+													href={getPathname({
+														href: {
+															pathname: "/products/[slug]",
+															params: { slug: en.slug },
+														},
+														locale: "en",
+													})}
+													target="_blank"
+													rel="noopener noreferrer"
+													className="group inline-flex items-center gap-1.5 font-medium hover:underline"
+												>
+													{product.name}
+													<ExternalLink className="text-muted-foreground size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+												</Link>
+											) : (
+												<span className="font-medium">{product.name}</span>
+											)}
 										</TableCell>
 
 										<TableCell className="text-muted-foreground font-mono text-xs">
@@ -377,8 +437,46 @@ export const ProductTable = ({
 											)}
 										</TableCell>
 
-										<TableCell className="text-muted-foreground text-xs">
-											{VISIBILITY_LABEL[product.visibility]}
+										<TableCell className="text-muted-foreground max-w-56 text-xs">
+											{productCategories.length ? (
+												productCategories.join(", ")
+											) : (
+												<span>Uncategorised</span>
+											)}
+										</TableCell>
+
+										{/*
+										 * One column, up to three chips: the state, then whatever
+										 * is unusual about it.
+										 *
+										 * Merging is what lets "Main" disappear. Under a column
+										 * headed "Type" a blank cell reads as missing data, so the
+										 * norm had to be spelled out on every row; under one headed
+										 * "Status" nothing promises a type, so only Option — the
+										 * exception — needs saying. One fewer column and one fewer
+										 * chip per row.
+										 */}
+										<TableCell>
+											<div className="flex flex-wrap items-center gap-1">
+												<Badge variant="outline" className={status.className}>
+													{status.label}
+												</Badge>
+
+												{/* Orthogonal to status — a product can be published
+												    and still invisible to shoppers, which is exactly
+												    the combination worth catching. */}
+												{product.visibility === "HIDDEN" && (
+													<Badge variant="outline" className={HIDDEN_CHIP}>
+														Hidden
+													</Badge>
+												)}
+
+												{product.kind === "OPTION" && (
+													<Badge variant="outline" className={OPTION_CHIP}>
+														Option
+													</Badge>
+												)}
+											</div>
 										</TableCell>
 
 										<TableCell className="text-right tabular-nums">

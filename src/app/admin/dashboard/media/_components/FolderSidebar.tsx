@@ -40,6 +40,61 @@ const buildFolderTree = (folders: MediaFolder[]): MediaFolderNode[] => {
 const flatten = (nodes: MediaFolderNode[]): MediaFolderNode[] =>
 	nodes.flatMap((n) => [n, ...flatten(n.children)])
 
+/**
+ * One row. Defined here rather than inside FolderSidebar: a component created
+ * during render is a new type on every render, so React would unmount and
+ * remount the whole folder list on each keystroke in the new-folder input.
+ */
+const Item = ({
+	active,
+	icon: Icon,
+	label,
+	count,
+	depth = 0,
+	onClick,
+	onDelete,
+}: {
+	active: boolean
+	icon: typeof FolderIcon
+	label: string
+	count: number
+	depth?: number
+	onClick: () => void
+	onDelete?: () => void
+}) => (
+	<div
+		className={cn(
+			// pr-2 rather than pr-1 so the count and delete icon are not pressed
+			// against the panel edge.
+			"group flex items-center gap-2 rounded-lg pr-2 text-sm transition-colors",
+			active ? "bg-primary text-primary-foreground font-medium" : "hover:bg-muted"
+		)}
+		style={{ paddingLeft: `${8 + depth * 14}px` }}
+	>
+		<button type="button" onClick={onClick} className="flex flex-1 items-center gap-2 py-2 text-left">
+			<Icon className={cn("size-4 shrink-0", !active && "text-muted-foreground")} />
+			<span className="truncate">{label}</span>
+			<span className={cn("ml-auto text-xs tabular-nums", !active && "text-muted-foreground")}>
+				{count}
+			</span>
+		</button>
+
+		{onDelete && (
+			<button
+				type="button"
+				aria-label={`Delete folder ${label}`}
+				onClick={onDelete}
+				className={cn(
+					"opacity-0 transition-opacity group-hover:opacity-100",
+					active ? "text-primary-foreground" : "text-muted-foreground hover:text-destructive"
+				)}
+			>
+				<Trash2 className="size-3.5" />
+			</button>
+		)}
+	</div>
+)
+
 export const FolderSidebar = ({
 	folders,
 	selected,
@@ -86,56 +141,6 @@ export const FolderSidebar = ({
 			toast.error(message ?? "Could not delete the folder.")
 		}
 	}
-
-	const Item = ({
-		active,
-		icon: Icon,
-		label,
-		count,
-		depth = 0,
-		onClick,
-		onDelete,
-	}: {
-		active: boolean
-		icon: typeof FolderIcon
-		label: string
-		count: number
-		depth?: number
-		onClick: () => void
-		onDelete?: () => void
-	}) => (
-		<div
-			className={cn(
-				// pr-2 rather than pr-1 so the count and delete icon are not pressed
-				// against the panel edge.
-				"group flex items-center gap-2 rounded-lg pr-2 text-sm transition-colors",
-				active ? "bg-primary text-primary-foreground font-medium" : "hover:bg-muted"
-			)}
-			style={{ paddingLeft: `${8 + depth * 14}px` }}
-		>
-			<button type="button" onClick={onClick} className="flex flex-1 items-center gap-2 py-2 text-left">
-				<Icon className={cn("size-4 shrink-0", !active && "text-muted-foreground")} />
-				<span className="truncate">{label}</span>
-				<span className={cn("ml-auto text-xs tabular-nums", !active && "text-muted-foreground")}>
-					{count}
-				</span>
-			</button>
-
-			{onDelete && (
-				<button
-					type="button"
-					aria-label={`Delete folder ${label}`}
-					onClick={onDelete}
-					className={cn(
-						"opacity-0 transition-opacity group-hover:opacity-100",
-						active ? "text-primary-foreground" : "text-muted-foreground hover:text-destructive"
-					)}
-				>
-					<Trash2 className="size-3.5" />
-				</button>
-			)}
-		</div>
-	)
 
 	return (
 		<aside className="bg-card w-56 shrink-0 space-y-1 rounded-lg border p-2">
