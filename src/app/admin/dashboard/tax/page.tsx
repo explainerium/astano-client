@@ -1,15 +1,97 @@
-import ComingSoon from "@/components/dashboard/shell/ComingSoon"
+"use client"
+
+import { useState } from "react"
+import { Loader2, Plus, TriangleAlert } from "lucide-react"
+import Toolbar from "@/components/dashboard/shell/Toolbar"
+import { Button } from "@/components/ui/button"
+import { useTaxClassesQuery } from "@/redux/api/taxApi"
+import type { TaxClass } from "@/types/tax"
+import TaxClassCard from "./_components/TaxClassCard"
+import TaxClassDialog from "./_components/TaxClassDialog"
 
 export default function TaxPage() {
+	const { data: classes, isLoading, isError, error } = useTaxClassesQuery()
+
+	const [dialogOpen, setDialogOpen] = useState(false)
+	const [editing, setEditing] = useState<TaxClass | undefined>()
+
+	const openCreate = () => {
+		setEditing(undefined)
+		setDialogOpen(true)
+	}
+
+	const openEdit = (taxClass: TaxClass) => {
+		setEditing(taxClass)
+		setDialogOpen(true)
+	}
+
+	// A product with no class of its own falls back to the default. Without one,
+	// those products are simply untaxed — silently, and only visible on an
+	// invoice that has already gone out.
+	const hasDefault = classes?.some((c) => c.isDefault)
+
 	return (
-		<ComingSoon
-			title="Tax"
-			description="Tax configuration is not built yet. Checkout refuses to work until at least one class and rate exist, which is deliberate."
-			willInclude={[
-				"Tax classes, one marked default",
-				"Rates per country: 19% EU, 0% Switzerland",
-				"Reverse charge for validated EU VAT numbers",
-			]}
-		/>
+		<div className="space-y-4">
+			<Toolbar
+				primaryAction={
+					<Button size="lg" onClick={openCreate}>
+						<Plus />
+						New tax class
+					</Button>
+				}
+			/>
+
+			{isLoading && (
+				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
+					<Loader2 className="size-4 animate-spin" />
+					Loading tax classes…
+				</div>
+			)}
+
+			{isError && (
+				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
+					{(error as { data?: { message?: string } })?.data?.message ??
+						"Could not load tax classes."}
+				</div>
+			)}
+
+			{classes && classes.length > 0 && !hasDefault && (
+				<div className="bg-accent-soft flex items-start gap-3 rounded-lg border p-4 text-sm">
+					<TriangleAlert className="text-primary mt-0.5 size-4 shrink-0" />
+					<p>
+						<strong>No default class.</strong> Any product that has not picked a
+						class of its own is charged no tax at all. Mark one class as the
+						default.
+					</p>
+				</div>
+			)}
+
+			{classes?.length === 0 && (
+				<div className="bg-card space-y-3 rounded-lg border border-dashed p-16 text-center">
+					<p className="text-muted-foreground text-sm">
+						No tax classes yet. Checkout cannot work out what to charge until one
+						class and one matching rate exist.
+					</p>
+					<Button onClick={openCreate}>
+						<Plus />
+						New tax class
+					</Button>
+				</div>
+			)}
+
+			{classes?.map((taxClass) => (
+				<TaxClassCard
+					key={taxClass.id}
+					taxClass={taxClass}
+					onEdit={() => openEdit(taxClass)}
+				/>
+			))}
+
+			{/* Mounted only while open so the form rebuilds per class — useForm reads
+			    defaultValues once. */}
+			{dialogOpen && (
+				<TaxClassDialog open onOpenChange={setDialogOpen} taxClass={editing} />
+			)}
+		</div>
 	)
 }

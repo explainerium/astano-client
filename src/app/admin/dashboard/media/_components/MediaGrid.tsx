@@ -1,7 +1,6 @@
 "use client"
 
-import { FileLock2 } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Check, FileLock2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { MediaAsset } from "@/types/media"
 
@@ -71,19 +70,26 @@ export const MediaGrid = ({
 							)}
 						</div>
 
-						<div
+						{/*
+						 * A styled span, not the Checkbox component: shadcn's Checkbox
+						 * renders a <button>, and the whole tile is already a <button>.
+						 * Nesting them is invalid HTML and throws a hydration error.
+						 *
+						 * Purely decorative — the tile carries the click handler and the
+						 * aria-pressed state, so this is hidden from assistive tech
+						 * rather than announced a second time.
+						 */}
+						<span
+							aria-hidden
 							className={cn(
-								"absolute top-2 left-2 transition-opacity",
-								isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+								"absolute top-2 left-2 flex size-4 items-center justify-center rounded-[4px] border shadow-xs transition-opacity",
+								isSelected
+									? "bg-primary border-primary text-primary-foreground opacity-100"
+									: "bg-card opacity-0 group-hover:opacity-100"
 							)}
 						>
-							<Checkbox
-								checked={isSelected}
-								aria-label={`Select ${asset.originalName}`}
-								className="bg-card"
-								tabIndex={-1}
-							/>
-						</div>
+							{isSelected && <Check className="size-3" />}
+						</span>
 
 						<div className="space-y-0.5 p-2">
 							<p className="truncate text-xs font-medium" title={asset.originalName}>

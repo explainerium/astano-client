@@ -73,8 +73,14 @@ instance.interceptors.response.use(
 	(response) => {
 		// Deliberately reshaped: callers get { data, meta } and never have to
 		// reach through the API envelope themselves.
+		//
+		// `?? null` matters: a DELETE answers with an envelope carrying no `data`
+		// key, which would make this `undefined` — and RTK Query treats a base
+		// query result whose `data` is undefined as neither success nor failure,
+		// logging "returned an object containing neither a valid error and
+		// result" on every delete in the app. Null is a value; undefined is not.
 		const unwrapped: ResponseSuccessType = {
-			data: response.data?.data,
+			data: response.data?.data ?? null,
 			meta: response.data?.meta,
 		}
 		return unwrapped as unknown as AxiosResponse

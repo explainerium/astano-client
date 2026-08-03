@@ -1,6 +1,6 @@
 "use client"
 
-import { useFormContext } from "react-hook-form"
+import { useFormContext, useWatch } from "react-hook-form"
 import ProInput from "@/components/form/ProInput"
 import { Button } from "@/components/ui/button"
 
@@ -16,8 +16,12 @@ const PRESETS = [10, 50, 100, 500, 1000]
  * one variant has nothing to override.
  */
 export const MoqField = () => {
-	const { setValue, watch } = useFormContext()
-	const current = watch("moq") as number | undefined
+	const { control, setValue } = useFormContext()
+
+	// useWatch, not `watch()` — the latter re-renders ProForm rather than this
+	// component, so the highlight would never follow the value. Same trap as
+	// ProductImages.
+	const current = useWatch({ control, name: "moq" }) as number | undefined
 
 	const set = (value: number) =>
 		setValue("moq", value, { shouldDirty: true, shouldValidate: true })

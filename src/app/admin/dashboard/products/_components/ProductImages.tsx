@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useFormContext } from "react-hook-form"
+import { useFormContext, useWatch } from "react-hook-form"
 import { ChevronLeft, ChevronRight, ImagePlus, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { MediaAsset } from "@/types/media"
@@ -43,10 +43,22 @@ const seedThumbs = (product?: AdminProduct) => {
  * so nothing is ever re-fetched just to show a picture the page already has.
  */
 export const ProductImages = ({ product }: { product?: AdminProduct }) => {
-	const { watch, setValue } = useFormContext()
+	const { control, setValue } = useFormContext()
 
-	const featuredAssetId = watch("featuredAssetId") as string | null
-	const assetIds = (watch("assetIds") ?? []) as string[]
+	/**
+	 * useWatch, never `watch()` from useFormContext.
+	 *
+	 * `watch()` re-renders whichever component owns the `useForm` instance —
+	 * here that is ProForm, several levels up. Its children are stable element
+	 * references created by ProductForm, so React bails out of re-rendering them
+	 * and this panel never sees the new value: the picker would set an image,
+	 * the form would save it correctly, and the tile would never appear.
+	 * useWatch subscribes at *this* component instead.
+	 */
+	const featuredAssetId = (useWatch({ control, name: "featuredAssetId" }) ?? null) as
+		| string
+		| null
+	const assetIds = (useWatch({ control, name: "assetIds" }) ?? []) as string[]
 
 	const [thumbs, setThumbs] = useState<Record<string, string>>(() => seedThumbs(product))
 	const [picking, setPicking] = useState<"featured" | "gallery" | null>(null)
