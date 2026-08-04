@@ -1,0 +1,106 @@
+/** Mirrors the backend order module's `view()`. Money arrives pre-formatted to 2dp. */
+
+export type OrderStatus =
+	/** Placed, awaiting payment — bank transfer sits here. */
+	| "PENDING"
+	/** Paid or approved for fulfilment. */
+	| "PROCESSING"
+	/** Paused — stock, a query, a manual check. */
+	| "ON_HOLD"
+	| "COMPLETED"
+	| "CANCELLED"
+	| "REFUNDED"
+	| "FAILED"
+
+export type PaymentStatus = "UNPAID" | "PAID" | "PARTIALLY_REFUNDED" | "REFUNDED" | "FAILED"
+
+export interface OrderAddress {
+	firstName: string | null
+	lastName: string | null
+	company: string | null
+	street1: string | null
+	street2: string | null
+	city: string | null
+	state: string | null
+	postcode: string | null
+	countryCode: string | null
+	phone: string | null
+	email: string | null
+}
+
+export interface OrderOptionLine {
+	id: string
+	sku: string
+	name: string
+	quantity: number
+	unitPrice: string
+	lineTotal: string
+}
+
+export interface OrderItem {
+	id: string
+	sku: string
+	name: string
+	attributes: unknown
+	quantity: number
+	unitPrice: string
+	lineTotal: string
+	/** Configurator lines, priced and counted separately (§4.6). */
+	options: OrderOptionLine[]
+}
+
+export interface OrderTaxLine {
+	name: string
+	ratePercent: string
+	taxableBase: string
+	amount: string
+}
+
+export interface OrderStatusChange {
+	from: OrderStatus | null
+	to: OrderStatus
+	note: string | null
+	at: string
+}
+
+export interface Order {
+	id: string
+	orderNumber: string
+	status: OrderStatus
+	paymentStatus: PaymentStatus
+	locale: string
+	currency: string
+	subtotal: string
+	shippingTotal: string
+	taxTotal: string
+	discountTotal: string
+	grandTotal: string
+	totalWeightKg: string | null
+	shippingMethod: { code: string | null; title: string } | null
+	paymentMethod: { code: string | null; title: string; instructions: string | null } | null
+	vatNumber: string | null
+	/** EU reverse charge applied — tax lines are recorded at 0 (R10). */
+	reverseCharged: boolean
+	customerNote: string | null
+	/** Staff-only; never present on a customer's own view of the order. */
+	internalNote?: string | null
+	placedAt: string
+	paidAt: string | null
+	addresses: { billing?: OrderAddress; shipping?: OrderAddress }
+	items: OrderItem[]
+	taxLines: OrderTaxLine[]
+	statusHistory?: OrderStatusChange[]
+}
+
+export interface AdminOrderListParams {
+	status?: OrderStatus
+	search?: string
+	page?: number
+	limit?: number
+}
+
+export interface OrderStatusPayload {
+	status: OrderStatus
+	paymentStatus?: PaymentStatus
+	note?: string
+}
