@@ -1,0 +1,66 @@
+"use client"
+
+import { useLocale, useTranslations } from "next-intl"
+import ProInput from "@/components/form/ProInput"
+import ProSelect from "@/components/form/ProSelect"
+import { SHIPPING_COUNTRIES } from "@/lib/countries"
+
+/**
+ * One address block, used for both billing and delivery.
+ *
+ * `prefix` makes the field names nested paths ("billing.city"), which is what
+ * react-hook-form does with dots — here that is exactly what we want, since
+ * the API takes a nested address object.
+ *
+ * The country is a select of ISO codes, never free text. The old shop replaced
+ * its country select with a text field holding labels like "Deutschland", and
+ * both tax and shipping resolution broke on it.
+ */
+export const AddressFields = ({ prefix }: { prefix: "billing" | "shipping" }) => {
+	const t = useTranslations("checkout")
+	const locale = useLocale()
+
+	const countries = SHIPPING_COUNTRIES.map((country) => ({
+		value: country.code,
+		label: locale === "de" ? country.de : country.en,
+	}))
+
+	return (
+		<div className="grid gap-5 sm:grid-cols-2">
+			<ProInput name={`${prefix}.firstName`} label={t("firstName")} autoComplete="given-name" required />
+			<ProInput name={`${prefix}.lastName`} label={t("lastName")} autoComplete="family-name" required />
+
+			<div className="sm:col-span-2">
+				<ProInput name={`${prefix}.company`} label={t("company")} autoComplete="organization" />
+			</div>
+
+			<div className="sm:col-span-2">
+				<ProInput
+					name={`${prefix}.street1`}
+					label={t("street1")}
+					autoComplete="address-line1"
+					required
+				/>
+			</div>
+			<div className="sm:col-span-2">
+				<ProInput name={`${prefix}.street2`} label={t("street2")} autoComplete="address-line2" />
+			</div>
+
+			<ProInput name={`${prefix}.postcode`} label={t("postcode")} autoComplete="postal-code" required />
+			<ProInput name={`${prefix}.city`} label={t("city")} autoComplete="address-level2" required />
+
+			<ProSelect
+				name={`${prefix}.countryCode`}
+				label={t("country")}
+				options={countries}
+				required
+			/>
+			<ProInput name={`${prefix}.state`} label={t("state")} autoComplete="address-level1" />
+
+			<ProInput name={`${prefix}.phone`} type="tel" label={t("phone")} autoComplete="tel" />
+			<ProInput name={`${prefix}.email`} type="email" label={t("email")} autoComplete="email" />
+		</div>
+	)
+}
+
+export default AddressFields

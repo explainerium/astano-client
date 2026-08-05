@@ -33,6 +33,233 @@ export interface PublicProduct {
 	priceTo: string | null
 }
 
+/** One purchasable line. The API resolves its price for the caller's role. */
+export interface PublicVariant {
+	id: string
+	sku: string | null
+	isDefault: boolean
+	description: string | null
+	/** Already resolved against the product's MOQ — use this, not product.moq. */
+	moq: number
+	inStock: boolean
+	/** Null when the variant does not manage stock. */
+	stock: number | null
+	weightKg: string | null
+	image: PublicImage | null
+	attributes: { id: string; label: string }[]
+	/** Null when quote-only, or when this role has no price at all. */
+	unitPrice: string | null
+	/** The struck-through price when onSale. */
+	listPrice: string | null
+	onSale: boolean
+	lineTotal: string | null
+	/** The "buy more, save more" ladder for the role that actually resolved. */
+	tiers: { minQuantity: number; unitPrice: string | null }[]
+}
+
+/** An add-on sold alongside a main product (§4.6). */
+export interface PublicOption {
+	id: string
+	name: string
+	slug: string
+	groupLabel: string | null
+	preselected: boolean
+	moq: number
+	/** Options start at their own MOQ, not at 1. */
+	startQuantity: number
+	discountPercent: string | null
+	image: PublicImage | null
+	unitPrice: string | null
+}
+
+/**
+ * What /products/:slug adds on top of the listing shape.
+ *
+ * The list endpoint happens to return these too, but nothing on a listing
+ * should depend on that — the narrower type keeps card code honest.
+ */
+export interface PublicProductDetail extends PublicProduct {
+	description: string | null
+	metaTitle: string | null
+	metaDescription: string | null
+	variants: PublicVariant[]
+	options: PublicOption[]
+}
+
+/** Why a basket cannot proceed. The API sends codes, not sentences. */
+export type BasketIssue = "BELOW_MOQ" | "OUT_OF_STOCK"
+
+export interface CartLine {
+	id: string
+	variantId: string
+	productId: string
+	sku: string | null
+	name: string
+	slug: string
+	attributes: { id: string; label: string }[]
+	image: { id: string; url: string } | null
+	quantity: number
+	moq: number
+	belowMoq: boolean
+	inStock: boolean
+	availableStock: number | null
+	unitPrice: string | null
+	listPrice: string | null
+	onSale: boolean
+	lineTotal: string | null
+	/** Add-ons attached to this line (§4.6). Never present on an option itself. */
+	options?: Omit<CartLine, "options">[]
+}
+
+export interface CartView {
+	id: string
+	items: CartLine[]
+	/** Units across every line; `lineCount` is the number of lines. */
+	itemCount: number
+	lineCount: number
+	subtotal: string
+	currency: string
+	issues: BasketIssue[]
+	checkoutReady: boolean
+}
+
+/**
+ * The inquiry basket. Deliberately priceless — a quote is a request, and the
+ * figures only exist once staff answer it (R2).
+ */
+export interface QuoteBasketLine {
+	id: string
+	variantId: string
+	sku: string | null
+	name: string
+	slug: string
+	attributes: { id: string; label: string }[]
+	image: { id: string; url: string } | null
+	quantity: number
+	note: string | null
+	moq: number
+	belowMoq: boolean
+	quoteOnly: boolean
+}
+
+export interface QuoteBasketView {
+	id: string
+	items: QuoteBasketLine[]
+	itemCount: number
+	lineCount: number
+	issues: BasketIssue[]
+	submitReady: boolean
+}
+
+export interface QuoteSubmission {
+	title: string
+	message?: string
+	contactName?: string
+	contactEmail?: string
+	contactPhone?: string
+	contactCompany?: string
+}
+
+export interface CheckoutAddress {
+	firstName: string
+	lastName: string
+	company?: string
+	street1: string
+	street2?: string
+	city: string
+	state?: string
+	postcode: string
+	/** ISO 3166-1 alpha-2. Never a display name — tax and shipping key off this. */
+	countryCode: string
+	phone?: string
+	email?: string
+}
+
+export interface SavedAddress extends CheckoutAddress {
+	id: string
+	label: string | null
+	isDefaultBilling: boolean
+	isDefaultShipping: boolean
+}
+
+export interface TaxLine {
+	name: string
+	ratePercent: string
+	taxableBase: string
+	amount: string
+}
+
+export interface ShippingOption {
+	methodId: string
+	code: string
+	name: string
+	cost: string
+	taxable: boolean
+	unavailableReason?: "NO_MATCHING_BAND" | "BELOW_FREE_THRESHOLD" | "NOT_CONFIGURED"
+}
+
+export interface CheckoutPaymentMethod {
+	id: string
+	code: string
+	title: string
+	description: string | null
+	eligible: boolean
+	/** e.g. NOT_ENOUGH_ORDER_HISTORY — why this method is closed to this customer. */
+	reason?: string
+}
+
+/**
+ * Totals for a prospective order.
+ *
+ * Recomputed by the server for every address and delivery method, because
+ * shipping is taxable: choosing a method changes the tax, not just the
+ * shipping line.
+ */
+export interface CheckoutPreview {
+	subtotal: string
+	shippingTotal: string
+	taxTotal: string
+	grandTotal: string
+	totalWeightKg: string
+	currency: string
+	/** R10: a rate matched but was zeroed against a validated EU VAT ID. */
+	reverseCharged: boolean
+	/** No rate configured for this destination at all — 0% by omission, not by rule. */
+	taxUnconfigured: boolean
+	taxLines: TaxLine[]
+	shippingOptions: ShippingOption[]
+	paymentMethods: CheckoutPaymentMethod[]
+}
+
+export interface PlaceOrderPayload {
+	billingAddress: CheckoutAddress
+	shippingAddress?: CheckoutAddress
+	shippingMethodId: string
+	paymentMethodId: string
+	customerNote?: string
+	vatNumber?: string
+}
+
+export interface PlacedOrder {
+	id: string
+	orderNumber: string
+	status: string
+	paymentStatus: string
+	currency: string
+	subtotal: string
+	shippingTotal: string
+	taxTotal: string
+	discountTotal: string
+	grandTotal: string
+	shippingMethod: { code: string; title: string } | null
+	paymentMethod: { code: string; title: string; instructions?: string | null } | null
+	reverseCharged: boolean
+	customerNote: string | null
+	placedAt: string
+	addresses: { billing: CheckoutAddress; shipping: CheckoutAddress }
+	taxLines: TaxLine[]
+}
+
 export interface PublicCategory {
 	id: string
 	slug: string

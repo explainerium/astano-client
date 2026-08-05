@@ -1,5 +1,12 @@
-import PagePlaceholder from "@/components/shared/PagePlaceholder"
+import { getTranslations } from "next-intl/server"
+import CheckoutView from "./_components/CheckoutView"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+	const { locale } = await params
+	const t = await getTranslations({ locale, namespace: "checkout" })
+	return { title: t("title"), robots: { index: false, follow: false } }
+}
 
 export default function CheckoutPage() {
-	return <PagePlaceholder title="Checkout" note="Checkout is not built yet, and needs tax, shipping and payment configured first." />
+	return <CheckoutView />
 }

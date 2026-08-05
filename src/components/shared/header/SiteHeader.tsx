@@ -4,7 +4,11 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { ChevronDown, FileText, Heart, Menu, ShoppingCart, User } from "lucide-react"
 import { Link, usePathname } from "@/i18n/navigation"
-import { useShopCategoriesQuery } from "@/redux/api/storefrontApi"
+import {
+	useCartQuery,
+	useQuoteBasketQuery,
+	useShopCategoriesQuery,
+} from "@/redux/api/storefrontApi"
 import { cn } from "@/lib/utils"
 
 /**
@@ -84,6 +88,17 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 
 	const { data: categories = [] } = useShopCategoriesQuery({ tree: true })
 
+	/**
+	 * Both baskets are shared with the storefront pages through the same cache
+	 * tags, so adding an item anywhere updates these counters without either
+	 * side knowing about the other.
+	 *
+	 * The badges count lines, not units — "3" next to a cart holding 500 cookie
+	 * cutters would be read as three products, not three of anything.
+	 */
+	const { data: cart } = useCartQuery()
+	const { data: quoteBasket } = useQuoteBasketQuery()
+
 	return (
 		<header className="relative z-40">
 			{/* Black promo bar — the dealer registration CTA. */}
@@ -120,13 +135,13 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 							<User className="size-5" strokeWidth={1.5} />
 						</IconLink>
 						<span className="text-border hidden sm:inline">|</span>
-						<IconLink href="/quote-basket" label="Quote basket" count={0}>
+						<IconLink href="/quote-basket" label="Quote basket" count={quoteBasket?.lineCount ?? 0}>
 							<FileText className="size-5" strokeWidth={1.5} />
 						</IconLink>
 						<IconLink href="/account/wishlist" label="Wishlist">
 							<Heart className="size-5" strokeWidth={1.5} />
 						</IconLink>
-						<IconLink href="/cart" label="Cart" count={0}>
+						<IconLink href="/cart" label="Cart" count={cart?.lineCount ?? 0}>
 							<ShoppingCart className="size-5" strokeWidth={1.5} />
 						</IconLink>
 					</div>
