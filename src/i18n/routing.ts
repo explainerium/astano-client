@@ -37,6 +37,23 @@ export const pathnames = {
 		en: "/categories/[slug]",
 		de: "/produkt-kategorie/[slug]",
 	},
+	"/contact": { en: "/contact", de: "/kontakt" },
+	"/faqs": { en: "/faqs", de: "/faqs" },
+	// The German slug carries no umlaut — that is the live WordPress slug and
+	// changing it would drop the page's existing rankings.
+	"/about": { en: "/about-us", de: "/uber-uns" },
+	"/quality": { en: "/quality", de: "/qualitat" },
+	"/custom": { en: "/custom-orders", de: "/sonderanfertigungen" },
+	"/payment-shipping": { en: "/payment-shipping", de: "/zahlung-versand" },
+	"/dealers": { en: "/dealers", de: "/haendler" },
+
+	// ─── Legal ─────────────────────────────────────────────────────────────
+	// German slugs are the live WordPress ones. The English terms page is
+	// served at /terms-and-conditions rather than WordPress's
+	// /geschaeftsbedingungen, which is a German slug on an English page.
+	"/imprint": { en: "/imprint", de: "/impressum" },
+	"/privacy": { en: "/privacy-policy", de: "/datenschutz" },
+	"/terms": { en: "/terms-and-conditions", de: "/agb" },
 	"/cart": { en: "/cart", de: "/warenkorb" },
 	"/checkout": { en: "/checkout", de: "/kasse" },
 	"/quote-basket": { en: "/quote-request", de: "/angebotsanfrage" },

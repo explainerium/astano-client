@@ -1,41 +1,48 @@
-import { useTranslations } from "next-intl"
-import { Link } from "@/i18n/navigation"
+import SiteFooter from "@/components/shared/footer/SiteFooter"
+import SiteHeader from "@/components/shared/header/SiteHeader"
+import CategoryGrid from "./_components/CategoryGrid"
+import CustomMade from "./_components/CustomMade"
+import FeatureTiles from "./_components/FeatureTiles"
+import Hero from "./_components/Hero"
+import NewsletterSignup from "./_components/NewsletterSignup"
+import PopularProducts from "./_components/PopularProducts"
 
 /**
- * Placeholder home page. Exists so the routing layer is verifiable end to end:
- * the copy comes from the message catalogue and the links resolve to the
- * translated pathname for the active locale (/cart in English, /warenkorb in
- * German) without this file knowing which locale it is rendering.
+ * The home page, rebuilt from the live WordPress front page (post 62 DE /
+ * 2299 EN) section for section.
+ *
+ * Every string comes from the message catalogue, so the German page carries the
+ * copy WordPress actually has and the English page is its own translation
+ * rather than a machine rendering of the German. The two genuinely diverge in
+ * places — the four banner tiles say different things in each language on the
+ * live site — and that divergence is preserved rather than tidied away.
+ *
+ * The catalogue sections fetch from our own API, so they show whatever is
+ * really published. They will look thin until the real 56 products are entered
+ * through the admin; that is expected, not something to paper over with
+ * fixtures.
+ *
+ * Header and footer render here rather than in the locale layout on purpose:
+ * the auth pages already have their own shell, so hoisting these would put two
+ * headers on /login. They move up as soon as a shop layout exists.
  */
-export default function HomePage() {
-	const t = useTranslations("nav")
+export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
+	const { locale } = await params
 
 	return (
-		<main className="mx-auto flex w-full max-w-[1400px] flex-1 flex-col justify-center gap-8 px-6 py-24">
-			<div className="space-y-3">
-				<h1 className="font-heading text-4xl font-semibold tracking-tight">astano®</h1>
-				<p className="text-muted-foreground max-w-prose">
-					Custom stainless-steel baking hardware, made in Germany.
-				</p>
-			</div>
+		<>
+			<SiteHeader locale={locale} />
 
-			<nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-				<Link className="underline underline-offset-4" href="/products">
-					{t("products")}
-				</Link>
-				<Link className="underline underline-offset-4" href="/cart">
-					{t("cart")}
-				</Link>
-				<Link className="underline underline-offset-4" href="/quote-basket">
-					{t("quoteBasket")}
-				</Link>
-				<Link className="underline underline-offset-4" href="/account">
-					{t("account")}
-				</Link>
-				<Link className="underline underline-offset-4" href="/login">
-					{t("login")}
-				</Link>
-			</nav>
-		</main>
+			<main className="flex-1">
+				<Hero />
+				<FeatureTiles />
+				<CategoryGrid />
+				<PopularProducts />
+				<CustomMade />
+				<NewsletterSignup />
+			</main>
+
+			<SiteFooter locale={locale} />
+		</>
 	)
 }

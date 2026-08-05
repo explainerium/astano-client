@@ -36,7 +36,8 @@
     "logout": "Sign out",
     "register": "Create account",
     "dealerRegistration": "Become a dealer",
-    "language": "Language"
+    "language": "Language",
+    "contact": "Contact"
   },
   "auth": {
     "signIn": "Sign in",
@@ -95,7 +96,10 @@
     "sku": "SKU",
     "buyMoreSaveMore": "Buy more, save more",
     "from": "from {price}",
-    "noProducts": "No products found."
+    "noProducts": "No products found.",
+    "noImage": "No image",
+    "exclVat": "excl. VAT",
+    "viewCategory": "View category"
   },
   "cart": {
     "title": "Your cart",
@@ -139,5 +143,359 @@
     "genericTitle": "Something went wrong",
     "network": "We could not reach the server. Please check your connection and try again.",
     "tryAgain": "Try again"
+  },
+  "home": {
+    "topBar": "Click here to register as a dealer or reseller.",
+    "hero": {
+      "cta": "Discover now",
+      "slides": [
+        {
+          "title": "Stainless Steel Straws",
+          "body": "Stainless steel straws are a durable, eco-friendly alternative to plastic straws. They are designed for years of reuse without losing quality. Plus, they are easy to clean, stylish, and ideal for reducing daily waste while enjoying your favorite beverages."
+        },
+        {
+          "title": "The whole world of cookie cutters",
+          "body": "Custom design or choose one of our 400 standard designs."
+        },
+        {
+          "title": "Stainless Steel Ice Cubes",
+          "body": "Stainless steel ice cubes keep your drinks perfectly chilled without diluting them, preserving the full flavor from the first sip to the last. Reusable and elegant, they are a premium upgrade for cocktails, juices, and everyday beverages."
+        }
+      ]
+    },
+    "tiles": [
+      {
+        "title": "Custom Manufacturing",
+        "body": "We produce standard and custom designs to your specifications."
+      },
+      {
+        "title": "Food-Safe Materials",
+        "body": "Made from high-quality stainless steel and certified materials."
+      },
+      {
+        "title": "B2C and B2B Solutions",
+        "body": "Perfect for individuals, bakeries, and resellers."
+      },
+      {
+        "title": "Reliable EU Shipping",
+        "body": "Fast and secure delivery across Germany and Europe."
+      }
+    ],
+    "categories": {
+      "heading": "Find the right product for your needs"
+    },
+    "popular": {
+      "heading": "Our most popular products",
+      "cta": "View all products",
+      "empty": "No products published yet."
+    },
+    "custom": {
+      "heading": "Custom-Made Products",
+      "intro": "Your ideas deserve to be implemented exactly as you imagine them. Our custom manufacturing service allows you to choose style, functions, and finish, making your product truly unique. Whether it is a unique design or a custom solution, we transform your vision into reality with precision and care.",
+      "cards": [
+        {
+          "title": "Every detail counts",
+          "body": "Built with longevity in mind, our products are designed to withstand daily use while retaining a premium look and feel."
+        },
+        {
+          "title": "High-Quality Material",
+          "body": "We use only the highest quality materials to guarantee first-class performance and a finish that stands apart."
+        },
+        {
+          "title": "Where craftsmanship meets perfection",
+          "body": "Built with a focus on durability, our products are made to withstand daily use while preserving a premium look and feel."
+        },
+        {
+          "title": "Custom-Made to Your Requirements",
+          "body": "Every detail is carefully crafted by experienced hands, combining artistry and precision in each piece to meet your exact requirements."
+        }
+      ]
+    },
+    "newsletter": {
+      "heading": "Subscribe and be the first to know",
+      "note": "Your data is used in accordance with our privacy policy.",
+      "email": "E-mail",
+      "placeholder": "name@example.com",
+      "submit": "Sign up"
+    },
+    "footer": {
+      "about": "At astano we manufacture high-quality products designed for precision and longevity. Our focus is on individualised products for the kitchen, cooking, baking, eating and drinking. Individual because they carry your brand and your message. With us you will find appealing promotional gifts, on-packs and merchandising articles.",
+      "quicklinks": "Quicklinks",
+      "legal": "Legal pages",
+      "contactHeading": "Store information",
+      "designedBy": "Designed by Explainerium",
+      "copyright": "Copyright {year} - ASSCA GmbH"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "intro": "We're happy to help! Whether you have questions about our products, need assistance with an order, or would like to inquire about custom designs, our team is always available to assist you.",
+    "emailLabel": "Email:",
+    "phoneLabel": "Phone:",
+    "addressLabel": "Shop Information:",
+    "formHeading": "Get in touch",
+    "formSubtitle": "Send us a message",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "subject": "Subject",
+      "message": "Message"
+    },
+    "submit": "Submit",
+    "sending": "Sending…",
+    "success": "Thank you — your message is with us and we will reply shortly.",
+    "error": "Your message could not be sent. Please try again."
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "intro": "In our FAQ section, you'll find clear answers to the most common questions about astano®, from product care and customization options to shipping, payment, and returns.",
+    "groups": [
+      {
+        "title": "General Questions",
+        "items": [
+          {
+            "q": "What is astano®?",
+            "a": "astano® specializes in high-quality kitchen gadgets, baking accessories, and custom-designed items. We offer both ready-made products and personalized solutions for hobby bakers and businesses."
+          },
+          {
+            "q": "Where are astano® products manufactured?",
+            "a": "Our products are carefully designed and manufactured from high-quality materials and meet strict quality standards. Many items are manufactured in Europe to ensure durability and precision."
+          },
+          {
+            "q": "How can I contact astano® to ask questions or get support?",
+            "a": "You can reach us via the contact form on our website, by email, or by phone. Our customer service team will be happy to help you with any questions about products, orders, or custom designs."
+          }
+        ]
+      },
+      {
+        "title": "Orders & Shipping",
+        "items": [
+          {
+            "q": "How long does it take to receive my order?",
+            "a": "Standard shipping within Germany usually takes 3–7 business days. International orders may take longer depending on the destination. Custom orders may require additional production time."
+          },
+          {
+            "q": "Can I track my order?",
+            "a": "Yes! Once your order has been shipped, you will receive a tracking number by email, which you can use to track the delivery status."
+          },
+          {
+            "q": "Do you offer international shipping?",
+            "a": "Yes, astano® ships worldwide. Shipping costs and delivery times may vary depending on the destination."
+          }
+        ]
+      },
+      {
+        "title": "Products & Customization",
+        "items": [
+          {
+            "q": "Are astano® products safe to use?",
+            "a": "Absolutely. We only use food-safe, high-quality materials such as stainless steel and approved plastics. All products undergo strict quality controls to ensure safety and durability."
+          },
+          {
+            "q": "Can I customize a cookie cutter or baking tool?",
+            "a": "Yes! We offer custom designs, including logos, shapes, and sizes. Simply share your wishes with us and we will create a unique product that is tailored to your needs."
+          },
+          {
+            "q": "How do I care for my products?",
+            "a": "Most of our products can be easily cleaned by hand or in the dishwasher. To ensure their longevity, we recommend washing stainless steel items by hand and drying them immediately to avoid water spots."
+          }
+        ]
+      }
+    ]
+  },
+  "about": {
+    "title": "About Us – astano®",
+    "intro": "As a family business with over 20 years of experience, we at astano® manufacture high-quality stainless steel and silicone products for the kitchen, table, and bar. With a passion for precision and individual design, we turn your ideas into reality – whether for everyday use, as a gift, or for your brand marketing.",
+    "heroCta": "Discover now",
+    "craft": {
+      "title": "Carefully crafted – designed for everyday life",
+      "body": "At astano®, we combine decades of experience with a passion for sustainable, high-quality household goods. From stainless steel kitchen utensils to silicone accessories and versatile household items, our mission is to develop products that offer lasting value, safety, and timeless design."
+    },
+    "quality": {
+      "title": "Committed to quality, inspired by everyday life",
+      "body": "At astano®, we believe that the small moments in life deserve extraordinary products. That's why we develop household and kitchen utensils that combine modern craftsmanship, durable materials, and thoughtful functionality. Each product is designed to make everyday life easier and more enjoyable and is particularly durable – so you can feel the difference every time you use it.",
+      "cta": "Shop now"
+    },
+    "practical": {
+      "title": "Where craftsmanship meets practicality",
+      "body": "Our products are designed for everyday use, made from high-quality materials, and designed with great attention to detail – they combine style, durability, and customization in every single piece.",
+      "cta": "Shop now"
+    },
+    "cards": [
+      {
+        "title": "Built to last. Designed to impress.",
+        "body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel."
+      },
+      {
+        "title": "High-Quality Materials",
+        "body": "We only use high-quality materials to ensure peak performance and a finish that stands out from the rest."
+      },
+      {
+        "title": "Every detail counts",
+        "body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel."
+      },
+      {
+        "title": "Custom designs, specially designed for you",
+        "body": "Get a product that perfectly suits your needs. Each design is carefully tailored to your preferences and intended use."
+      }
+    ]
+  },
+  "quality": {
+    "title": "Quality at astano®",
+    "intro": "At astano®, quality is more than just a feature for us – it's a promise. Each of our products – from stainless steel cookie cutters to reusable straws, custom ice cube molds and baking utensils – meets the highest standards of durability, design and user-friendliness. We make every effort to deliver consistently excellent quality in every single product.",
+    "heroCta": "Discover now",
+    "meaning": {
+      "title": "What quality means to us",
+      "cards": [
+        {
+          "title": "Premium materials",
+          "body": "We use high-quality stainless steel, durable plastics or approved materials – selected for their durability, safety and performance. All products undergo strict quality controls to ensure that they meet or exceed our internal standards."
+        },
+        {
+          "title": "Precision and consistency",
+          "body": "Regardless of whether you choose one of our 400 standard cookie cutters or commission a custom-designed cookie cutter with a logo engraving – our manufacturing process ensures that every product is manufactured with the highest precision and attention to detail."
+        },
+        {
+          "title": "Functionality and user-friendliness",
+          "body": "Quality is not limited to appearance and technical data – it is reflected in everyday usability. The needs of the user are at the forefront of development: our baking utensils are designed to withstand frequent use, and our kitchen accessories are designed to be easy and safe to use."
+        }
+      ]
+    },
+    "process": {
+      "title": "Our quality assurance process",
+      "steps": [
+        {
+          "title": "Material selection and testing",
+          "body": "Each raw material is tested for safety, durability and suitability. Only trusted suppliers pass our selection process."
+        },
+        {
+          "title": "Final inspection and testing",
+          "body": "Before a product leaves our factory, it undergoes a rigorous inspection – including checks of structural integrity, surface quality and general usability."
+        },
+        {
+          "title": "Customer feedback and evaluation",
+          "body": "We value your experience. Your feedback after purchase helps us identify potential for improvement so that we can adapt and develop further."
+        },
+        {
+          "title": "Production monitoring",
+          "body": "Whether it is the production of standard articles or custom-designed individual pieces, we pay strict attention to compliance with specifications, tolerances and processing quality."
+        }
+      ],
+      "cta": "Discover now"
+    },
+    "promise": {
+      "title": "Our promise to you",
+      "body": "When you choose astano®, you are not just buying a product – you are investing in reliability, craftsmanship and long-term satisfaction. We commit to ensuring these standards every day, with every tool, bowl and cutter we manufacture.",
+      "cta": "Shop now"
+    }
+  },
+  "custom": {
+    "title": "Custom-Made Products",
+    "intro": "Turn your ideas into unique, high-quality creations. From custom cookie cutters to personalized baking utensils, astano® brings your designs to life with precision, premium materials, and fast turnaround.",
+    "lead": {
+      "title": "Bring your ideas to life with astano®",
+      "body": "At astano®, every great product starts with a great idea—yours. Whether you're a hobby baker, a brand, a bakery, or a business looking for custom shapes, logo cutters, or personalized kitchen tools, we'll turn your vision into a perfectly crafted, high-quality product."
+    },
+    "how": {
+      "title": "How it works",
+      "steps": [
+        {
+          "title": "Share your idea",
+          "body": "Upload your sketch, logo, or reference image. Even a simple drawing is enough—we'll optimize it."
+        },
+        {
+          "title": "Receive your design preview",
+          "body": "Our team turns your idea into a digital design for approval. You can request adjustments, shapes, or resizing."
+        },
+        {
+          "title": "Production begins"
+        },
+        {
+          "title": "Delivery to your doorstep",
+          "body": "Your custom-made product is securely packaged and shipped to you."
+        }
+      ]
+    },
+    "why": {
+      "title": "Why it works",
+      "cards": [
+        {
+          "title": "Precision-crafted designs",
+          "body": "From simple symbols to detailed logo shapes, we manufacture every cutter and tool with clean edges, precise lines, and consistent results."
+        },
+        {
+          "title": "High-quality, food-safe materials",
+          "body": "All custom orders are made from high-quality stainless steel or certified food-safe materials—durable, safe, and designed for long-term use."
+        },
+        {
+          "title": "Fast and hassle-free process",
+          "body": "Customization is easy with us. Share your idea, preview it, and we'll take care of production quickly and carefully."
+        },
+        {
+          "title": "Perfect for businesses and special occasions",
+          "body": "Custom-designed products are ideal for bakeries, corporate branding, weddings, themed parties, product launches, and more."
+        }
+      ]
+    },
+    "capabilities": {
+      "title": "What we can create",
+      "items": [
+        "Custom cookie cutters (any shape, any size)",
+        "Cookie cutters for logos and branding",
+        "Special event shapes",
+        "Personalized baking tools",
+        "Custom stainless steel products",
+        "Custom packaging solutions or private label options"
+      ]
+    },
+    "cta": {
+      "title": "Ready for your custom order?",
+      "body": "Send us your concept using the form below. Upload your image, describe your idea, and our team will get back to you with a quote and design proposal.",
+      "button": "Contact us"
+    }
+  },
+  "payment": {
+    "title": "Payment & Shipping",
+    "shipping": {
+      "title": "Shipping",
+      "intro": "The following terms apply:",
+      "countries": "We deliver within Germany and to the following countries: Austria, Belgium, Luxembourg, Latvia, Lithuania, Denmark, Sweden, Spain, France, Italy, Poland, Slovenia, Slovakia, Croatia, Hungary, Switzerland.",
+      "islands": "Delivery to German and foreign islands is excluded.",
+      "domesticLabel": "Delivery within Germany:",
+      "domestic": "We calculate shipping costs by shipping weight. Your individually calculated shipping costs are shown in the basket before you place your order.",
+      "abroadLabel": "Deliveries abroad:",
+      "abroad": "We calculate shipping costs by shipping weight. Your individually calculated shipping costs are shown in the basket before you place your order.",
+      "carriers": "Standard shipping is by parcel service. Bulky goods, and orders whose weight and volume are not suited to individual parcel shipping, are sent by freight forwarder on pallets. The shipping costs shown in the basket are always fixed. We choose the shipping route individually."
+    },
+    "terms": {
+      "title": "Payment terms",
+      "methodsTitle": "Accepted payment methods",
+      "methods": [
+        "Prepayment by bank transfer",
+        "Payment by invoice"
+      ],
+      "detailsTitle": "Further payment details",
+      "invoice": "Payment by invoice is available from your second order onwards. Customers who have already paid by invoice on earlier orders are switched to invoice automatically, even where a first order would otherwise require prepayment.",
+      "due": "Where payment is by invoice, the invoice amount is due within 14 days. International orders and first orders are only possible by prepayment. Exceptions: regular customers and dealers who have also paid by invoice in the past.",
+      "contact": "If you have any questions, our contact details are in the imprint, or you can use our contact form."
+    },
+    "times": {
+      "title": "Delivery & production times",
+      "custom": "The great majority of our products are custom-made or finished to your specifications. For that reason we cannot state general production and delivery times covering every article here. You will find the delivery time for each product in the product description on the product page, under the \"Additional information\" tab.",
+      "standard": "Standard transit times from dispatch are 2-3 working days within Germany (parcel) / 3-5 working days (freight), and 3-8 working days abroad (parcel) / 5-10 working days (freight)."
+    }
+  },
+  "dealers": {
+    "title": "Solutions for resellers & businesses",
+    "intro": "Benefit from tiered pricing, net prices with a VAT ID, and dedicated support for resellers and business customers.",
+    "cards": [
+      "Wholesale pricing",
+      "EU VAT (reverse charge procedure)",
+      "Custom manufacturing",
+      "Manual approval for quality control"
+    ],
+    "cta": "Become a reseller"
   }
 }

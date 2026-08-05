@@ -36,7 +36,8 @@
     "logout": "Abmelden",
     "register": "Konto erstellen",
     "dealerRegistration": "Händler werden",
-    "language": "Sprache"
+    "language": "Sprache",
+    "contact": "Kontakt"
   },
   "auth": {
     "signIn": "Anmelden",
@@ -86,7 +87,7 @@
   },
   "shop": {
     "addToCart": "In den Warenkorb",
-    "addToQuote": "Zur Angebotsanfrage",
+    "addToQuote": "In den Anfragekorb",
     "priceOnRequest": "Preis auf Anfrage",
     "quantity": "Menge",
     "minimumOrder": "Mindestbestellmenge: {quantity}",
@@ -95,7 +96,10 @@
     "sku": "Artikelnummer",
     "buyMoreSaveMore": "Mehr kaufen, mehr sparen",
     "from": "ab {price}",
-    "noProducts": "Keine Produkte gefunden."
+    "noProducts": "Keine Produkte gefunden.",
+    "noImage": "Kein Bild",
+    "exclVat": "zzgl. MwSt",
+    "viewCategory": "Kategorie ansehen"
   },
   "cart": {
     "title": "Ihr Warenkorb",
@@ -139,5 +143,360 @@
     "genericTitle": "Etwas ist schiefgelaufen",
     "network": "Der Server ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "tryAgain": "Erneut versuchen"
+  },
+  "home": {
+    "topBar": "Klicken Sie hier, um sich als Händler oder Wiederverkäufer zu registrieren.",
+    "hero": {
+      "cta": "Jetzt entdecken",
+      "slides": [
+        {
+          "title": "Edelstahl-Strohhalme",
+          "body": "Edelstahl-Strohhalme sind eine langlebige, umweltfreundliche Alternative zu Plastikstrohhalmen. Sie sind für den jahrelangen Wiedergebrauch konzipiert, ohne an Qualität zu verlieren. Zudem sind sie leicht zu reinigen, stilvoll und ideal, um täglichen Abfall zu reduzieren und dabei Ihre Lieblingsgetränke zu genießen. Auch beim Thema Sicherheit und Branding punkten sie gegenüber anderen Materialien."
+        },
+        {
+          "title": "Die ganze Welt der Ausstechformen",
+          "body": "Sie benötigen keine individuelle Form? Wählen Sie aus unseren mehr als 400 verschiedenen Standardmotiven für nahezu jedes Thema und viele Branchen. Mit Ihrem Logo veredelt und individuell verpackt – einzeln oder als Set. Alles ist möglich."
+        },
+        {
+          "title": "Edelstahl-Eiswürfel",
+          "body": "Edelstahl-Eiswürfel halten Ihre Getränke perfekt gekühlt, ohne sie zu verwässern, und bewahren den vollen Geschmack vom ersten bis zum letzten Schluck. Wiederverwendbar und elegant sind sie ein hochwertiges Upgrade für Cocktails, Säfte und Getränke im Alltag. Mit Ihrem Logo als edler Werbeträger."
+        }
+      ]
+    },
+    "tiles": [
+      {
+        "title": "Individuelle Fertigung",
+        "body": "Jedes unserer Produkte ist so einzigartig wie die Ideen unserer Kunden."
+      },
+      {
+        "title": "Qualität als Grundsatz",
+        "body": "Materialien und Verarbeitung liegen bei uns auf höchstem Niveau – für uns Standard."
+      },
+      {
+        "title": "Verpackungslösungen",
+        "body": "Wir liefern nicht nur ein Produkt – wir liefern Komplettpakete mit ansprechenden Verpackungslösungen."
+      },
+      {
+        "title": "Umfangreiche Beratung",
+        "body": "Die ausführliche und detailreiche Beratung ist uns wichtig auf dem Weg zu Ihrem perfekten Produkt von astano."
+      }
+    ],
+    "categories": {
+      "heading": "Finden Sie das passende Produkt für Ihre Bedürfnisse"
+    },
+    "popular": {
+      "heading": "Unsere beliebtesten Produkte",
+      "cta": "Alle Produkte anzeigen",
+      "empty": "Noch keine Produkte veröffentlicht."
+    },
+    "custom": {
+      "heading": "Sonderanfertigungen",
+      "intro": "Ihre Ideen verdienen es, genau so umgesetzt zu werden, wie Sie sie sich vorstellen. Unser Service für Sonderanfertigungen ermöglicht es Ihnen, Stil, Funktionen und Ausführung zu wählen, sodass Ihr Produkt wirklich einzigartig wird. Ob einzigartiges Design oder maßgeschneiderte Lösung – wir verwandeln Ihre Vision mit Präzision und Sorgfalt in die Realität.",
+      "cards": [
+        {
+          "title": "Jedes Detail zählt",
+          "body": "Mit Blick auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und dabei ein hochwertiges Aussehen und Gefühl zu bewahren."
+        },
+        {
+          "title": "Hochwertiges Material",
+          "body": "Wir verwenden ausschließlich Materialien höchster Qualität, um erstklassige Leistung und eine Verarbeitung zu gewährleisten, die sich von anderen abhebt."
+        },
+        {
+          "title": "Wo Handwerkskunst auf Perfektion trifft",
+          "body": "Mit Fokus auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und gleichzeitig ein hochwertiges Aussehen und Gefühl zu bewahren."
+        },
+        {
+          "title": "Maßgeschneidert nach Ihren Anforderungen",
+          "body": "Jedes Detail wird sorgfältig von erfahrenen Händen gefertigt und vereint Kunstfertigkeit und Präzision in jedem Stück, um Ihre genauen Anforderungen zu erfüllen."
+        }
+      ]
+    },
+    "newsletter": {
+      "heading": "Abonnieren Sie und erfahren Sie mehr",
+      "note": "Die Verwendung erfolgt gemäß unserer Datenschutzrichtlinie.",
+      "email": "E-Mail",
+      "placeholder": "name@example.com",
+      "submit": "Anmelden"
+    },
+    "footer": {
+      "about": "Bei astano fertigen wir hochwertige Produkte, die auf Präzision und Langlebigkeit ausgelegt sind. Dabei liegt unser Fokus auf individualisierten Produkten für Küche, Kochen, Backen, Essen & Trinken. Individuell weil sie Werbe- und Botschaftsträger sind. Bei uns finden Sie ansprechende Werbegeschenke, On-Packs und Merchandising Artikel.",
+      "quicklinks": "Quicklinks",
+      "legal": "Rechtliche Seiten",
+      "contactHeading": "Informationen Speichern",
+      "designedBy": "Designed by Explainerium",
+      "copyright": "Copyright {year} - ASSCA GmbH"
+    }
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "intro": "Wir helfen Ihnen gerne! Egal ob Fragen zu unseren Produkten, Unterstützung bei einer Bestellung, ein Angebot anfordern oder sonstige Anfragen – unser Team steht Ihnen jederzeit zur Verfügung.",
+    "emailLabel": "E-Mail:",
+    "phoneLabel": "Telefon:",
+    "addressLabel": "Anschrift:",
+    "formHeading": "Nehmen Sie Kontakt auf",
+    "formSubtitle": "Schreiben Sie uns",
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "company": "Firma",
+      "subject": "Betreff",
+      "message": "Nachricht"
+    },
+    "submit": "Einreichen",
+    "sending": "Wird gesendet…",
+    "success": "Vielen Dank – Ihre Nachricht ist bei uns eingegangen. Wir melden uns in Kürze.",
+    "error": "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "intro": "In unserem FAQ-Bereich finden Sie klare Antworten auf die häufigsten Fragen zu astano® – von Produktpflege und Individualisierungsmöglichkeiten bis hin zu Versand, Zahlung und Rückgabe.",
+    "groups": [
+      {
+        "title": "Allgemeine Fragen",
+        "items": [
+          {
+            "q": "Was ist astano®?",
+            "a": "astano® ist spezialisiert auf hochwertige Küchenhelfer, Backzubehör und individuell gestaltete Artikel. Wir bieten sowohl fertige Produkte als auch personalisierte Lösungen für Hobbybäcker und Unternehmen."
+          },
+          {
+            "q": "Wo werden astano®-Produkte hergestellt?",
+            "a": "Unsere Produkte werden sorgfältig aus hochwertigen Materialien entworfen und gefertigt und entsprechen strengen Qualitätsstandards. Viele Artikel werden in Europa hergestellt, um Langlebigkeit und Präzision zu gewährleisten."
+          },
+          {
+            "q": "Wie kann ich astano® kontaktieren, um Anfragen zu stellen oder Unterstützung zu erhalten?",
+            "a": "Sie erreichen uns über das Kontaktformular auf unserer Website, per E-Mail oder telefonisch. Unser Kundenservice-Team hilft Ihnen gerne bei Fragen zu Produkten, Bestellungen oder individuellen Anpassungen."
+          }
+        ]
+      },
+      {
+        "title": "Bestellungen & Versand",
+        "items": [
+          {
+            "q": "Wie lange dauert es, bis ich meine Bestellung erhalte?",
+            "a": "Der Standardversand innerhalb Deutschlands dauert in der Regel 3–7 Werktage. Internationale Bestellungen können je nach Bestimmungsort länger dauern. Sonderanfertigungen können zusätzliche Produktionszeit erfordern."
+          },
+          {
+            "q": "Kann ich meine Bestellung verfolgen?",
+            "a": "Ja! Sobald Ihre Bestellung versandt wurde, erhalten Sie per E-Mail eine Sendungsverfolgungsnummer, mit der Sie den Lieferstatus verfolgen können."
+          },
+          {
+            "q": "Bieten Sie internationalen Versand an?",
+            "a": "Ja, astano® liefert weltweit. Versandkosten und Lieferzeiten können je nach Bestimmungsort variieren."
+          }
+        ]
+      },
+      {
+        "title": "Produkte & Anpassung",
+        "items": [
+          {
+            "q": "Sind astano®-Produkte sicher in der Anwendung?",
+            "a": "Absolut. Wir verwenden ausschließlich lebensmittelechte, hochwertige Materialien wie Edelstahl und zugelassene Kunststoffe. Alle Produkte durchlaufen strenge Qualitätskontrollen, um Sicherheit und Langlebigkeit zu gewährleisten."
+          },
+          {
+            "q": "Kann ich einen Ausstecher oder ein Backwerkzeug individuell gestalten?",
+            "a": "Ja! Wir bieten individuelle Designs an, inklusive Logos, Formen und Größen. Teilen Sie uns einfach Ihre Wünsche mit, und wir erstellen ein einzigartiges Produkt, das genau auf Ihre Bedürfnisse zugeschnitten ist."
+          },
+          {
+            "q": "Wie pflege ich meine Produkte?",
+            "a": "Die meisten unserer Produkte lassen sich leicht von Hand oder in der Spülmaschine reinigen. Um ihre Langlebigkeit zu gewährleisten, empfehlen wir, Edelstahlartikel von Hand zu spülen und sofort abzutrocknen, um Wasserflecken zu vermeiden."
+          }
+        ]
+      }
+    ]
+  },
+  "about": {
+    "title": "Über uns – astano®",
+    "intro": "Seit über 20 Jahren steht astano® für hochwertige, individualisierbare Produkte rund um Küche, Kochen, Backen, Essen & Trinken. Was mit einer individuellen Ausstechform aus Kunststoff begann, hat sich zu einem vielseitigen Sortiment aus Edelstahl- und Silikonartikeln entwickelt – von Ausstechformen, Backformen und Keksstempeln bis hin zu Eiswürfelformen, Edelstahl-Eiswürfeln, Trinkhalmen und Lunchboxen. Unser Anspruch geht dabei weit über das Produkt hinaus: Wir individualisieren nahezu jeden Artikel – von der dezenten Logogravur bis zur kompletten kundenspezifischen Entwicklung inklusive passender, hochwertiger Verpackung. So entstehen Produkte, die nicht nur funktional überzeugen, sondern Marken sichtbar machen und Botschaften wirkungsvoll transportieren.",
+    "heroCta": "Jetzt entdecken",
+    "craft": {
+      "title": "Mit Sorgfalt gefertigt – individuell für Marke und Markt",
+      "body": "astano® entwickelt und fertigt Produkte nicht „von der Stange“, sondern mit Blick auf die Anforderungen unserer Kunden. Ob Werbeartikel, Merchandising, On-Pack-Aktion, OEM-Produktion oder Handelsware für den Einzelhandel – wir verbinden langjährige Erfahrung mit durchdachter Individualisierung und zuverlässiger Fertigungsqualität. Unsere Produkte entstehen überwiegend aus Edelstahl und Silikon – Materialien, die für Langlebigkeit, Funktionalität und eine hochwertige Anmutung stehen. So schaffen wir individuelle Lösungen, die im Alltag bestehen, die Marke unserer Kunden stärken und gleichzeitig preislich attraktiv bleiben."
+    },
+    "quality": {
+      "title": "Qualität, Erfahrung und Individualisierung aus einer Hand",
+      "body": "Bei astano® treffen Produktkompetenz, Fertigungserfahrung und Markenverständnis aufeinander. Wir wissen, worauf es bei individualisierten Produkten ankommt: eine saubere Umsetzung, überzeugende Materialqualität, ein stimmiges Design und ein Preis, der wirtschaftlich bleibt. Als Mitglied im Warenzeichenverband Edelstahl Rostfrei stehen wir zudem für einen besonders hohen Qualitätsanspruch bei der Verarbeitung unserer Edelstahlprodukte. Für unsere Kunden bedeutet das: verlässliche Materialien, hochwertige Ausführung und Produkte, die langfristig überzeugen – optisch wie funktional.",
+      "cta": "Qualität entdecken"
+    },
+    "practical": {
+      "title": "Wo Handwerkskunst auf Funktion und Markenwirkung trifft",
+      "body": "Unsere Produkte sollen mehr können als gut aussehen. Sie sollen im Alltag funktionieren, langlebig sein und gleichzeitig die Identität einer Marke transportieren. Genau deshalb entwickeln wir Lösungen, die praktischen Nutzen, hochwertige Verarbeitung und individuelle Gestaltung miteinander verbinden. Ob kleine Logogravur oder komplett neues Produkt nach Kundenvorgabe – astano® begleitet Projekte von der Idee bis zum fertigen Artikel. So entstehen Produkte, die nicht austauschbar wirken, sondern Wiedererkennung schaffen und einen bleibenden Eindruck hinterlassen.",
+      "cta": "Sonderanfertigungen entdecken"
+    },
+    "cards": [
+      {
+        "title": "Gebaut für langfristige Qualität. Entwickelt für starke Marken.",
+        "body": "Unsere Produkte sind für einen langlebigen Einsatz konzipiert. Hochwertige Materialien, sorgfältige Verarbeitung und ein durchdachtes Design sorgen dafür, dass sie auch bei häufiger Nutzung zuverlässig funktionieren und dabei einen hochwertigen Eindruck vermitteln."
+      },
+      {
+        "title": "Hochwertige Materialien",
+        "body": "Wir setzen überwiegend auf Edelstahl und Silikon, weil diese Materialien langlebig, funktional und für viele Anwendungen im Küchen- und Haushaltsbereich ideal geeignet sind. Das Ergebnis sind Produkte mit hoher Wertigkeit, angenehmer Haptik und überzeugender Alltagstauglichkeit."
+      },
+      {
+        "title": "Jedes Detail zählt",
+        "body": "Bei astano® fertigen wir hochwertige, individualisierbare Produkte für Küche, Kochen, Backen, Essen & Trinken. Unsere Artikel eignen sich als Werbegeschenke, Merchandising-Produkte, On-Pack-Lösungen, Handelsartikel oder OEM-Produkte für starke Marken. Über 20 Jahre Erfahrung, hochwertige Materialien, flexible Individualisierung und ein überzeugendes Preis-Leistungs-Verhältnis machen uns zu einem verlässlichen Partner."
+      },
+      {
+        "title": "Maßgeschneiderte Lösungen für Ihre Anforderungen",
+        "body": "Sie benötigen kein Standardprodukt, sondern eine individuelle Lösung? Wir realisieren Artikel nach Ihren Vorstellungen – von der einfachen Logoanbringung bis zur kompletten OEM- oder Sonderanfertigung inklusive individueller Verpackung für Handel, Promotion oder Markenkommunikation."
+      }
+    ]
+  },
+  "quality": {
+    "title": "Qualität bei astano®",
+    "intro": "Bei astano® ist Qualität für uns mehr als nur ein Merkmal – sie ist ein Versprechen. Jedes unserer Produkte – von Edelstahl-Ausstechformen über wiederverwendbare Strohhalme bis hin zu individuell gestaltbaren Eiswürfelformen und Backutensilien – erfüllt höchste Ansprüche an Langlebigkeit, Design und Benutzerfreundlichkeit. Wir setzen alles daran, in jedem einzelnen Produkt gleichbleibend exzellente Qualität zu liefern.",
+    "heroCta": "Jetzt entdecken",
+    "meaning": {
+      "title": "Was Qualität für uns bedeutet",
+      "cards": [
+        {
+          "title": "Premium-Materialien",
+          "body": "Wir verwenden hochwertigen Edelstahl, langlebige Kunststoffe und Premium Silikon – ausgewählt aufgrund ihrer Langlebigkeit, Sicherheit und Leistungsfähigkeit. Alle Produkte durchlaufen strenge Qualitätskontrollen, um sicherzustellen, dass sie unsere internen Standards erfüllen oder übertreffen."
+        },
+        {
+          "title": "Präzision und Konsistenz",
+          "body": "Egal, ob Sie sich für eine unserer über 400 Standard-Ausstechformen entscheiden oder eine individuell gestaltete Ausstechform mit Logogravur in Auftrag geben – unser Herstellungsprozess gewährleistet, dass jedes Produkt mit höchster Präzision und Liebe zum Detail gefertigt wird."
+        },
+        {
+          "title": "Funktionalität und Benutzerfreundlichkeit",
+          "body": "Qualität beschränkt sich nicht nur auf Aussehen und technische Daten – sie zeigt sich in der Alltagstauglichkeit. Bei der Entwicklung stehen die Bedürfnisse der Nutzer im Vordergrund: Unsere Produkte sollen häufigem Gebrauch standhalten, unsere Küchenaccessoires sollen einfach und sicher in der Anwendung sein."
+        }
+      ]
+    },
+    "process": {
+      "title": "Unser Qualitätssicherungsprozess",
+      "steps": [
+        {
+          "title": "Materialauswahl und -prüfung",
+          "body": "Jeder Rohstoff wird auf Sicherheit, Haltbarkeit und Eignung geprüft. Nur vertrauenswürdige Lieferanten bestehen unser Auswahlverfahren."
+        },
+        {
+          "title": "Mehrfache Korrekturdurchgänge",
+          "body": "Mehrfache Korrekturdurchgänge sorgen dafür, dass Sie schon vorab sehen was Sie später in den Händen halten. Zudem werden mögliche Fehlerquellen auf ein Minimum reduziert."
+        },
+        {
+          "title": "Kontrolle und Tests",
+          "body": "Jeder Artikel wird vor Auslieferung ausführlich geprüft. Hierbei werden Oberfläche, Detailverarbeitung und kundenspezifische Anforderungen in Augenschein genommen."
+        },
+        {
+          "title": "Kundenfeedback",
+          "body": "Wir schätzen Ihre Erfahrung. Ihr Feedback nach dem Kauf hilft uns, Verbesserungspotenzial zu erkennen, damit wir uns anpassen und weiterentwickeln können."
+        }
+      ],
+      "cta": "Jetzt entdecken"
+    },
+    "promise": {
+      "title": "Unser Versprechen an Sie",
+      "body": "Wenn Sie sich für astano® entscheiden, kaufen Sie nicht nur ein Produkt – Sie investieren in Zuverlässigkeit, handwerkliche Perfektion und langfristige Zufriedenheit. Wir verpflichten uns, diese Standards jeden Tag, bei jedem Werkzeug, jeder Form und jeder Verpackung, die wir herstellen, zu gewährleisten.",
+      "cta": "Jetzt einkaufen"
+    }
+  },
+  "custom": {
+    "title": "Sonderanfertigungen",
+    "intro": "Verwandeln Sie Ihre Ideen in einzigartige, hochwertige Kreationen. Von individuellen Ausstechformen bis hin zu personalisierten Backutensilien – astano® erweckt Ihre Designs mit Präzision, erstklassigen Materialien und schneller Fertigung zum Leben.",
+    "lead": {
+      "title": "Erwecken Sie Ihre Ideen zum Leben mit astano®",
+      "body": "Bei astano® beginnt jedes großartige Produkt mit einer großartigen Idee – Ihrer. Wir setzen Ihre individuellen Wünsche in Edelstahl, Silikon oder Kunststoff um. Eine durchgängige Begleitung von der ersten Beratung und Machbarkeitsprüfung über die Entwicklung des Produkts und der Verpackung bis hin zur Auslieferung. Bei uns erhalten Sie alles aus einer Hand. Sie müssen uns nur ansprechen."
+    },
+    "how": {
+      "title": "Wie es funktioniert",
+      "steps": [
+        {
+          "title": "Teilen Sie Ihre Idee",
+          "body": "Schicken Sie uns eine Email oder laden Sie Ihre Skizze, Ihr Logo oder ein Referenzbild hoch. Selbst eine einfache Zeichnung genügt – wir optimieren sie."
+        },
+        {
+          "title": "Prüfung und Angebot",
+          "body": "Wir prüfen Ihre Idee sorgfältig, beraten Sie und erstellen Ihnen ein maßgeschneidertes Angebot."
+        },
+        {
+          "title": "Entwurf und Produktion",
+          "body": "Nach Auftragsvergabe erstellen wir zunächst aussagekräftige Entwürfe und legen Ihnen diese zur Freigabe vor. In dieser Phase können nach Belieben Änderungen vorgenommen werden. Nach Freigabe starten wir die Produktion."
+        },
+        {
+          "title": "Lieferung und Logistik",
+          "body": "Ihr individuell angefertigtes Produkt wird sicher und nach Ihren Wünschen verpackt. Egal ob Lieferung an eine Adresse, Einzelaussendungen an verschiedene Adressen oder Lagerführung bei uns. Wir sorgen für eine reibungslose Logistik."
+        }
+      ]
+    },
+    "why": {
+      "title": "Warum es funktioniert",
+      "cards": [
+        {
+          "title": "Präzisionsgefertigte Designs",
+          "body": "Wir setzen Ihre Ideen und Vorstellung so präzise wie möglich um. Dabei nutzen wir alle zur Verfügung stehenden, technischen Möglichkeiten um das Produkt trotz hohem Qualitätsanspruch so effizient und kostengünstig wie möglich zur realisieren."
+        },
+        {
+          "title": "Hochwertige, lebensmittelechte Materialien",
+          "body": "Alle Sonderanfertigungen werden aus hochwertigem, rostfreiem Edelstahl oder zertifizierten lebensmittelechten Materialien hergestellt – langlebig, sicher und für den Langzeitgebrauch konzipiert. Nicht umnsonst sind wir Mitglied im Warenzeichenverband Edelstahl Rostfrei."
+        },
+        {
+          "title": "Erfahrung die Begeistert",
+          "body": "Mit mehr als 20 Jahren Erfahrung im Bereich individuell produzierter Produkte haben Sie mit uns einen starken Partner. Wir sind ehrlich und beraten Sie auch in Puncto Nutzen und Funktion Ihrer Idee. Wenn etwas nicht funktioniert oder es Verbesserungsmöglichkeiten gibt, sagen wir das ganz offen. Denn wir möchten, dass Sie ein rundum zufriedenstellendes Produkt erhalten."
+        },
+        {
+          "title": "Perfekt für Ihr Unternehmen und Ihre Marke",
+          "body": "Individuelle Produkte zeugen nicht nur von Kreativität, sie begeistern auch den Endverbraucher. Ein durchdachtes Produkt in hoher Qualität steigert das Ansehen Ihres Unternehmens und Ihrer Marke. Mit astano haben Sie den richtigen Partner für erfolgreiche Produkte an Ihrer Seite."
+        }
+      ]
+    },
+    "capabilities": {
+      "title": "Was können wir?",
+      "items": [
+        "Individuelle Haushalts- und Küchenartikel aus Edelstahl",
+        "Individuelle Haushalts- und Küchenartikel aus Silikon",
+        "Individuelle Haushalts- und Küchenartikel aus Kunststoffen",
+        "Individuelle Verpackungslösungen",
+        "Serien- und Zulieferatikel aus Edelstahl",
+        "Serien- und Zulieferartikel aus Kunststoffen und Silikon"
+      ]
+    },
+    "cta": {
+      "title": "Bereit für Ihre individuelle Produktreise?",
+      "body": "Senden Sie uns Ihr Konzept über das untenstehende Formular. Laden Sie Ihr Bild hoch, beschreiben Sie Ihre Idee, und unser Team meldet sich mit einem Angebot und einem Designvorschlag bei Ihnen.",
+      "button": "Kontaktieren Sie uns"
+    }
+  },
+  "payment": {
+    "title": "Zahlung & Versand",
+    "shipping": {
+      "title": "Versand",
+      "intro": "Es gelten folgende Bedingungen:",
+      "countries": "Die Lieferung erfolgt im Inland (Deutschland) und in die nachstehenden Länder: Österreich, Belgien, Luxemburg, Lettland, Litauen, Dänemark, Schweden, Spanien, Frankreich, Italien, Polen, Slowenien, Slowakei, Kroatien, Ungarn, Schweiz.",
+      "islands": "Der Versand auf deutsche und ausländische Inseln ist ausgeschlossen.",
+      "domesticLabel": "Lieferung innerhalb Deutschlands:",
+      "domestic": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
+      "abroadLabel": "Lieferungen ins Ausland:",
+      "abroad": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
+      "carriers": "Der Standardversand erfolgt per Paketdienst. Sperrige Güter und Bestellungen, deren Gewicht und Volumen sich nicht für den einzelnen Paketversand eignen versenden wir per Spedition auf Paletten. Die Versandkosten im Warenkorb sind immer fest. Der Versandweg wird von uns individuell gewählt."
+    },
+    "terms": {
+      "title": "Zahlungsbedingungen",
+      "methodsTitle": "Akzeptierte Zahlungsmöglichkeiten",
+      "methods": [
+        "Vorkasse per Überweisung",
+        "Zahlung per Rechnung"
+      ],
+      "detailsTitle": "Weitere Einzelheiten zur Zahlung",
+      "invoice": "Die Zahlung auf Rechnung ist ab der 2. Bestellung möglich. Kunden die bereits bei früheren Bestellungen per Rechnung bezahlt haben werden trotz Erstbestellung mit Vorkasse automatisch auf Rechnung umgestellt.",
+      "due": "Der Rechnungsbetrag ist bei Zahlung auf Rechnung innerhalb von 14 Tagen auszugleichen. Auslands- und Erstbestellungen sind nur per Vorkasse möglich. Ausnahmen: Stammkunden und Händler die auch in der Vergangenheit auf Rechnung bezahlt haben.",
+      "contact": "Bei Fragen finden Sie unsere Kontaktdaten im Impressum oder nutzen Sie unser Kontaktformular."
+    },
+    "times": {
+      "title": "Liefer- & Produktionszeiten",
+      "custom": "Die überwiegende Mehrheit unserer Produkte wird individuell angefertigt oder nach Ihren Wünschen veredelt. Aus diesem Grund können wir hier keine generellen Produktions- & Lieferzeiten für alle Artikel bereitstellen. Die Lieferzeiten zu jedem Produkt finden Sie in der Produktbeschreibung auf der Produktseite unter dem Reiter \"zusätzliche Informationen\".",
+      "standard": "Die Regel-Laufzeiten für den Paketversand ab Aussendung liegen in Deutschland bei 2-3 Werktagen (Paketversand)/3-5 Werktage (Speditionsversand), im Ausland bei 3-8 Werktagen (Paketversand)/5-10 Werktage (Speditionsversand)."
+    }
+  },
+  "dealers": {
+    "title": "Lösungen für Wiederverkäufer & Unternehmen",
+    "intro": "Profitieren Sie von gestaffelten Preisen, Nettopreisen mit Umsatzsteuer-ID und einem dedizierten Support für Wiederverkäufer und Geschäftskunden.",
+    "cards": [
+      "Großhandelspreise",
+      "EU-Mehrwertsteuer (Reverse-Charge-Verfahren)",
+      "Individuelle Fertigung",
+      "Manuelle Freigabe zur Qualitätskontrolle"
+    ],
+    "cta": "Wiederverkäufer werden"
   }
 }
