@@ -29,19 +29,22 @@ const SORT_LABEL: Record<string, string> = {
 const PER_PAGE = 24
 
 /**
- * The shop archive.
+ * The shop archive, shared by /products and every category page.
  *
  * Filter state lives in the URL rather than in component state, so a filtered
  * view is shareable, survives a reload, and the back button steps through it.
  * `useSearchParams` is the single source of truth — nothing is mirrored into
  * local state, which is what usually makes the two disagree.
+ *
+ * The category is the exception: it arrives as a prop because it is part of the
+ * *path* on a category page, not a query parameter. A category is a place with
+ * its own URL, not a filter setting.
  */
-export const ProductListing = () => {
+export const ProductListing = ({ category = null }: { category?: string | null }) => {
 	const t = useTranslations("shop")
 	const router = useRouter()
 	const searchParams = useSearchParams()
 
-	const category = searchParams.get("category")
 	const search = searchParams.get("q") ?? ""
 	const sort = (searchParams.get("sort") as PublicProductListParams["sort"]) ?? "default"
 	const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1)
@@ -72,14 +75,14 @@ export const ProductListing = () => {
 	const products = data?.data ?? []
 	const total = data?.meta?.total ?? 0
 	const totalPages = data?.meta?.totalPages ?? 1
-	const hasFilters = Boolean(category || search)
+	// Only the search is clearable here; leaving a category means navigating.
+	const hasFilters = Boolean(search)
 
 	return (
 		<div className="mx-auto grid w-full max-w-[1400px] gap-10 px-6 py-12 lg:grid-cols-[240px_1fr]">
 			<ShopFilters
-				category={category}
+				activeSlug={category}
 				search={search}
-				onCategoryChange={(slug) => setParams({ category: slug })}
 				onSearchChange={(value) => setParams({ q: value })}
 			/>
 
@@ -92,7 +95,7 @@ export const ProductListing = () => {
 					{hasFilters && (
 						<button
 							type="button"
-							onClick={() => setParams({ category: null, q: null })}
+							onClick={() => setParams({ q: null })}
 							className="text-primary text-sm underline underline-offset-2"
 						>
 							{t("clearFilters")}

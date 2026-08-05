@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { Search } from "lucide-react"
+import { Link } from "@/i18n/navigation"
 import { useShopCategoriesQuery } from "@/redux/api/storefrontApi"
 import type { PublicCategory } from "@/types/storefront"
 import { cn } from "@/lib/utils"
@@ -9,30 +10,32 @@ import { cn } from "@/lib/utils"
 /**
  * Category rail plus the search box.
  *
- * Categories are rendered one level deep because that is how the tree comes
- * back; a child list is indented rather than collapsed, since with this
- * catalogue's depth a disclosure would hide two items behind a click.
+ * The categories are links, not buttons. A category is a place with its own
+ * URL — `/de/produkt-kategorie/ausstechformen` — not a filter state, so it
+ * should be shareable, indexable and reachable with the back button. Search,
+ * sort and page stay in the query string, where they belong.
+ *
+ * The tree is rendered one level deep because that is how it comes back; a
+ * child list is indented rather than collapsed, since with this catalogue's
+ * depth a disclosure would hide two items behind a click.
  */
 const CategoryLink = ({
 	category,
-	active,
-	onSelect,
+	activeSlug,
 	depth = 0,
 }: {
 	category: PublicCategory
-	active: string | null
-	onSelect: (slug: string | null) => void
+	activeSlug: string | null
 	depth?: number
 }) => (
 	<>
 		<li>
-			<button
-				type="button"
-				onClick={() => onSelect(category.slug)}
-				aria-current={active === category.slug ? "true" : undefined}
+			<Link
+				href={{ pathname: "/categories/[slug]", params: { slug: category.slug } }}
+				aria-current={activeSlug === category.slug ? "page" : undefined}
 				className={cn(
-					"hover:text-primary block w-full py-1.5 text-left text-sm transition-colors",
-					active === category.slug && "text-primary font-semibold",
+					"hover:text-primary block py-1.5 text-sm transition-colors",
+					activeSlug === category.slug && "text-primary font-semibold",
 					depth > 0 && "pl-4"
 				)}
 			>
@@ -40,29 +43,21 @@ const CategoryLink = ({
 				{typeof category.productCount === "number" && (
 					<span className="text-muted-foreground ml-1.5 text-xs">({category.productCount})</span>
 				)}
-			</button>
+			</Link>
 		</li>
 		{category.children?.map((child) => (
-			<CategoryLink
-				key={child.id}
-				category={child}
-				active={active}
-				onSelect={onSelect}
-				depth={depth + 1}
-			/>
+			<CategoryLink key={child.id} category={child} activeSlug={activeSlug} depth={depth + 1} />
 		))}
 	</>
 )
 
 export const ShopFilters = ({
-	category,
+	activeSlug,
 	search,
-	onCategoryChange,
 	onSearchChange,
 }: {
-	category: string | null
+	activeSlug: string | null
 	search: string
-	onCategoryChange: (slug: string | null) => void
 	onSearchChange: (value: string) => void
 }) => {
 	const t = useTranslations("shop")
@@ -104,25 +99,19 @@ export const ShopFilters = ({
 				<h2 className="font-heading mb-3 text-lg font-semibold">{t("categories")}</h2>
 				<ul className="divide-y">
 					<li>
-						<button
-							type="button"
-							onClick={() => onCategoryChange(null)}
-							aria-current={category === null ? "true" : undefined}
+						<Link
+							href="/products"
+							aria-current={activeSlug === null ? "page" : undefined}
 							className={cn(
-								"hover:text-primary block w-full py-1.5 text-left text-sm transition-colors",
-								category === null && "text-primary font-semibold"
+								"hover:text-primary block py-1.5 text-sm transition-colors",
+								activeSlug === null && "text-primary font-semibold"
 							)}
 						>
 							{t("allCategories")}
-						</button>
+						</Link>
 					</li>
 					{categories.map((item) => (
-						<CategoryLink
-							key={item.id}
-							category={item}
-							active={category}
-							onSelect={onCategoryChange}
-						/>
+						<CategoryLink key={item.id} category={item} activeSlug={activeSlug} />
 					))}
 				</ul>
 			</nav>

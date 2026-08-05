@@ -1,8 +1,12 @@
 import type { IMeta } from "@/types"
 import type {
+	AccountProfile,
+	AvailablePaymentMethod,
 	CartView,
 	CheckoutAddress,
 	CheckoutPreview,
+	CustomerOrder,
+	CustomerQuote,
 	PlacedOrder,
 	PlaceOrderPayload,
 	PublicCategory,
@@ -12,6 +16,7 @@ import type {
 	QuoteBasketView,
 	QuoteSubmission,
 	SavedAddress,
+	WishlistView,
 } from "@/types/storefront"
 import { tagTypes } from "../tag-types"
 import { baseApi } from "./baseApi"
@@ -44,6 +49,12 @@ export const storefrontApi = baseApi.injectEndpoints({
 				params: quantity ? { quantity } : undefined,
 			}),
 			providesTags: (_result, _error, arg) => [{ type: tagTypes.product, id: arg.slug }],
+		}),
+
+		/** One category by its (per-locale) slug. 404s when hidden — rule R13. */
+		shopCategory: build.query<PublicCategory, string>({
+			query: (slug) => ({ url: `/categories/${slug}`, method: "GET" }),
+			providesTags: (_result, _error, slug) => [{ type: tagTypes.category, id: slug }],
 		}),
 
 		shopCategories: build.query<PublicCategory[], { tree?: boolean } | void>({
@@ -136,6 +147,111 @@ export const storefrontApi = baseApi.injectEndpoints({
 			providesTags: [tagTypes.address],
 		}),
 
+		me: build.query<AccountProfile, void>({
+			query: () => ({ url: "/auth/me", method: "GET" }),
+			providesTags: [tagTypes.account],
+		}),
+
+		updateProfile: build.mutation<
+			AccountProfile,
+			{
+				firstName?: string
+				lastName?: string
+				company?: string | null
+				phone?: string | null
+				locale?: string
+			}
+		>({
+			query: (data) => ({ url: "/account/profile", method: "PATCH", data }),
+			invalidatesTags: [tagTypes.account, tagTypes.auth],
+		}),
+
+		createAddress: build.mutation<SavedAddress, Partial<SavedAddress>>({
+			query: (data) => ({ url: "/account/addresses", method: "POST", data }),
+			invalidatesTags: [tagTypes.address],
+		}),
+
+		updateAddress: build.mutation<SavedAddress, { id: string; data: Partial<SavedAddress> }>({
+			query: ({ id, data }) => ({ url: `/account/addresses/${id}`, method: "PATCH", data }),
+			invalidatesTags: [tagTypes.address],
+		}),
+
+		deleteAddress: build.mutation<unknown, string>({
+			query: (id) => ({ url: `/account/addresses/${id}`, method: "DELETE" }),
+			invalidatesTags: [tagTypes.address],
+		}),
+
+		myOrders: build.query<CustomerOrder[], void>({
+			query: () => ({ url: "/orders", method: "GET" }),
+			providesTags: [tagTypes.order],
+		}),
+
+		myOrder: build.query<CustomerOrder, string>({
+			query: (id) => ({ url: `/orders/${id}`, method: "GET" }),
+			providesTags: (_r, _e, id) => [{ type: tagTypes.order, id }],
+		}),
+
+		myQuotes: build.query<CustomerQuote[], void>({
+			query: () => ({ url: "/quotes", method: "GET" }),
+			providesTags: [tagTypes.quote],
+		}),
+
+		myQuote: build.query<CustomerQuote, string>({
+			query: (id) => ({ url: `/quotes/${id}`, method: "GET" }),
+			providesTags: (_r, _e, id) => [{ type: tagTypes.quote, id }],
+		}),
+
+		replyToQuote: build.mutation<unknown, { id: string; body: string }>({
+			query: ({ id, body }) => ({ url: `/quotes/${id}/messages`, method: "POST", data: { body } }),
+			invalidatesTags: (_r, _e, arg) => [{ type: tagTypes.quote, id: arg.id }],
+		}),
+
+		/**
+		 * Accepting a quote turns it into an order at the **quoted** prices, not
+		 * today's catalogue prices — a quote is an offer the shop made in writing.
+		 */
+		acceptQuote: build.mutation<
+			CustomerOrder,
+			{
+				id: string
+				billingAddress: CheckoutAddress
+				shippingAddress?: CheckoutAddress
+				paymentMethodId: string
+				customerNote?: string
+			}
+		>({
+			query: ({ id, ...data }) => ({ url: `/quotes/${id}/accept`, method: "POST", data }),
+			invalidatesTags: [tagTypes.quote, tagTypes.order],
+		}),
+
+		/** Eligibility without a cart — used when accepting a quote. */
+		availablePaymentMethods: build.query<
+			AvailablePaymentMethod[],
+			{ orderTotal: number; countryCode: string }
+		>({
+			query: (params) => ({ url: "/payment-methods/available", method: "GET", params }),
+			providesTags: [tagTypes.payment],
+		}),
+
+		/**
+		 * The wishlist is optionalAuth, like the baskets — a guest may build one
+		 * before deciding to register.
+		 */
+		wishlist: build.query<WishlistView, void>({
+			query: () => ({ url: "/wishlist", method: "GET" }),
+			providesTags: [tagTypes.wishlist],
+		}),
+
+		addToWishlist: build.mutation<WishlistView, string>({
+			query: (variantId) => ({ url: "/wishlist/items", method: "POST", data: { variantId } }),
+			invalidatesTags: [tagTypes.wishlist],
+		}),
+
+		removeFromWishlist: build.mutation<WishlistView, string>({
+			query: (variantId) => ({ url: `/wishlist/items/${variantId}`, method: "DELETE" }),
+			invalidatesTags: [tagTypes.wishlist],
+		}),
+
 		/**
 		 * Totals for a prospective order. A mutation rather than a query because
 		 * it POSTs an address and nothing about it is worth caching — the answer
@@ -213,6 +329,7 @@ export const {
 	// the cart means looking its default variant up on demand.
 	useLazyShopProductQuery,
 	useShopCategoriesQuery,
+	useShopCategoryQuery,
 
 	useCartQuery,
 	useAddToCartMutation,
@@ -223,6 +340,22 @@ export const {
 	useMyAddressesQuery,
 	useCheckoutPreviewMutation,
 	usePlaceOrderMutation,
+
+	useMeQuery,
+	useUpdateProfileMutation,
+	useCreateAddressMutation,
+	useUpdateAddressMutation,
+	useDeleteAddressMutation,
+	useMyOrdersQuery,
+	useMyOrderQuery,
+	useMyQuotesQuery,
+	useMyQuoteQuery,
+	useReplyToQuoteMutation,
+	useAcceptQuoteMutation,
+	useAvailablePaymentMethodsQuery,
+	useWishlistQuery,
+	useAddToWishlistMutation,
+	useRemoveFromWishlistMutation,
 
 	useQuoteBasketQuery,
 	useAddToQuoteBasketMutation,

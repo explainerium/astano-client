@@ -260,6 +260,112 @@ export interface PlacedOrder {
 	taxLines: TaxLine[]
 }
 
+export interface AccountProfile {
+	id: string
+	email: string
+	role: string
+	status: string
+	salutation: string | null
+	firstName: string | null
+	lastName: string | null
+	company: string | null
+	phone: string | null
+	vatNumber: string | null
+	foundingDate: string | null
+	psiMember: boolean
+	locale: string
+	createdAt: string
+}
+
+export interface OrderItem {
+	id: string
+	sku: string | null
+	name: string
+	attributes: { id: string; label: string }[]
+	quantity: number
+	unitPrice: string | null
+	lineTotal: string | null
+	options?: Omit<OrderItem, "options">[]
+}
+
+/** `GET /orders` returns whole orders, not summaries — the list has everything. */
+export interface CustomerOrder extends PlacedOrder {
+	items: OrderItem[]
+	paymentStatus: string
+	paidAt: string | null
+}
+
+export interface QuoteMessage {
+	id: string
+	author: "CUSTOMER" | "STAFF"
+	body: string
+	createdAt: string
+}
+
+export interface QuoteItem {
+	id: string
+	sku: string | null
+	name: string
+	attributes: { id: string; label: string }[]
+	quantity: number
+	moq: number
+	note: string | null
+	/** Null until staff have answered — that is the whole point of a quote. */
+	quotedUnitPrice: string | null
+	quotedLineTotal: string | null
+}
+
+export interface CustomerQuote {
+	id: string
+	quoteNumber: string
+	status: "OPEN" | "ANSWERED" | "ACCEPTED" | "DECLINED" | "EXPIRED" | "CLOSED"
+	locale: string
+	title: string
+	message: string | null
+	contact: { name: string | null; email: string | null; phone: string | null; company: string | null }
+	expiresAt: string | null
+	quotedSubtotal: string | null
+	currency: string | null
+	submittedAt: string
+	answeredAt: string | null
+	items: QuoteItem[]
+	messages: QuoteMessage[]
+}
+
+export interface WishlistItem {
+	id: string
+	variantId: string
+	productId: string
+	sku: string | null
+	name: string
+	slug: string
+	image: { id: string; url: string } | null
+	quoteOnly: boolean
+	moq: number
+	inStock: boolean
+	/** False once the product is unpublished or the variant disabled. */
+	available: boolean
+	unitPrice: string | null
+	addedAt: string
+}
+
+export interface WishlistView {
+	id: string
+	itemCount: number
+	items: WishlistItem[]
+}
+
+export interface AvailablePaymentMethod {
+	id: string
+	code: string
+	type?: string
+	title?: string
+	description?: string | null
+	instructions?: string | null
+	eligible: boolean
+	reason?: string
+}
+
 export interface PublicCategory {
 	id: string
 	slug: string

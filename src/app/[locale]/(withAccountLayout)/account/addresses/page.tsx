@@ -1,5 +1,12 @@
-import PagePlaceholder from "@/components/shared/PagePlaceholder"
+import { getTranslations } from "next-intl/server"
+import AddressBook from "./_components/AddressBook"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+	const { locale } = await params
+	const t = await getTranslations({ locale, namespace: "account" })
+	return { title: t("addressesTitle"), robots: { index: false, follow: false } }
+}
 
 export default function AddressesPage() {
-	return <PagePlaceholder title="Addresses" note="The address book is not built yet. Registration already saves a first address." />
+	return <AddressBook />
 }
