@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Copy, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -25,7 +25,10 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table"
-import { useDeleteAttributeMutation } from "@/redux/api/attributeApi"
+import {
+	useDeleteAttributeMutation,
+	useDuplicateAttributeMutation,
+} from "@/redux/api/attributeApi"
 import { cn } from "@/lib/utils"
 import type { AdminAttribute } from "@/types/attribute"
 
@@ -44,6 +47,37 @@ export const AttributeTable = ({
 	onCreate: () => void
 }) => {
 	const [deleteAttribute] = useDeleteAttributeMutation()
+	const [duplicateAttribute] = useDuplicateAttributeMutation()
+
+	/** Which row is being copied — one spinner, all copy buttons disabled. */
+	const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+
+	/**
+	 * Copies the attribute and its values, then opens the copy.
+	 *
+	 * The code is the field that must change, so the toast names the one the
+	 * server picked rather than leaving it to be discovered in the dialog.
+	 */
+	const runDuplicate = async (attribute: AdminAttribute) => {
+		setDuplicatingId(attribute.id)
+		try {
+			const copy = await duplicateAttribute(attribute.id).unwrap()
+			toast.success(`“${nameOf(attribute)}” duplicated`, {
+				description: `${copy.values.length} ${
+					copy.values.length === 1 ? "value" : "values"
+				} copied. The new code is “${copy.code}”.`,
+			})
+			onEdit(copy)
+		} catch (error) {
+			toast.error("Could not duplicate this attribute", {
+				description:
+					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+			})
+		} finally {
+			setDuplicatingId(null)
+		}
+	}
+
 	const [selected, setSelected] = useState<Set<string>>(new Set())
 	const [pending, setPending] = useState<AdminAttribute[] | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -150,7 +184,7 @@ export const AttributeTable = ({
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 									Values
 								</TableHead>
-								<TableHead className="w-16 pr-4" />
+								<TableHead className="w-24 pr-4" />
 							</TableRow>
 						</TableHeader>
 
@@ -233,6 +267,20 @@ export const AttributeTable = ({
 													onClick={() => onEdit(attribute)}
 												>
 													<Pencil />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													aria-label={`Duplicate ${nameOf(attribute)}`}
+													title="Duplicate"
+													disabled={duplicatingId !== null}
+													onClick={() => runDuplicate(attribute)}
+												>
+													{duplicatingId === attribute.id ? (
+														<Loader2 className="animate-spin" />
+													) : (
+														<Copy />
+													)}
 												</Button>
 											</div>
 										</TableCell>

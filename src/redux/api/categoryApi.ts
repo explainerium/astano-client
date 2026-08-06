@@ -20,6 +20,16 @@ export const categoryApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.category],
 		}),
 
+		/**
+		 * Copies a category's settings — parent, order, flags, image, and both
+		 * languages' text. Not its products and not its subcategories; the copy
+		 * starts empty. No body: the server already has the original.
+		 */
+		duplicateCategory: build.mutation<AdminCategory, string>({
+			query: (id) => ({ url: `/categories/${id}/duplicate`, method: "POST" }),
+			invalidatesTags: [tagTypes.category],
+		}),
+
 		deleteCategory: build.mutation<void, string>({
 			query: (id) => ({ url: `/categories/${id}`, method: "DELETE" }),
 			// Also invalidates products: deleting a category changes what a
@@ -33,5 +43,6 @@ export const {
 	useAdminCategoriesQuery,
 	useCreateCategoryMutation,
 	useUpdateCategoryMutation,
+	useDuplicateCategoryMutation,
 	useDeleteCategoryMutation,
 } = categoryApi

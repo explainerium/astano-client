@@ -34,6 +34,18 @@ export const productApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.product, tagTypes.category],
 		}),
 
+		/**
+		 * Copies a product, everything about it, and returns the copy.
+		 *
+		 * No body: the server already has the original, and sending it back would
+		 * let a stale form overwrite what is being copied. The copy is a **draft**
+		 * with no SKU and a fresh slug — see the service for why.
+		 */
+		duplicateProduct: build.mutation<AdminProduct, string>({
+			query: (id) => ({ url: `/admin/products/${id}/duplicate`, method: "POST" }),
+			invalidatesTags: [tagTypes.product, tagTypes.category],
+		}),
+
 		deleteProduct: build.mutation<void, string>({
 			query: (id) => ({ url: `/admin/products/${id}`, method: "DELETE" }),
 			invalidatesTags: [tagTypes.product, tagTypes.category],
@@ -46,5 +58,6 @@ export const {
 	useAdminProductQuery,
 	useCreateProductMutation,
 	useUpdateProductMutation,
+	useDuplicateProductMutation,
 	useDeleteProductMutation,
 } = productApi

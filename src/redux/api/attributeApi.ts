@@ -20,6 +20,17 @@ export const attributeApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.attribute],
 		}),
 
+		/**
+		 * Copies an attribute **with all of its values** — the values are the part
+		 * worth duplicating. The copy's code gains a "-copy" suffix because codes
+		 * are globally unique; value codes are reused, being unique only per
+		 * attribute. No body: the server already has the original.
+		 */
+		duplicateAttribute: build.mutation<AdminAttribute, string>({
+			query: (id) => ({ url: `/attributes/${id}/duplicate`, method: "POST" }),
+			invalidatesTags: [tagTypes.attribute],
+		}),
+
 		deleteAttribute: build.mutation<void, string>({
 			query: (id) => ({ url: `/attributes/${id}`, method: "DELETE" }),
 			// Products too: an attribute in use is what the API refuses to delete,
@@ -39,6 +50,7 @@ export const {
 	useAdminAttributesQuery,
 	useCreateAttributeMutation,
 	useUpdateAttributeMutation,
+	useDuplicateAttributeMutation,
 	useDeleteAttributeMutation,
 	useDeleteAttributeValueMutation,
 } = attributeApi

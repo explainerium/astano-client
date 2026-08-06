@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { CornerDownRight, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react"
+import { Copy, CornerDownRight, ExternalLink, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -25,7 +25,10 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table"
-import { useDeleteCategoryMutation } from "@/redux/api/categoryApi"
+import {
+	useDeleteCategoryMutation,
+	useDuplicateCategoryMutation,
+} from "@/redux/api/categoryApi"
 import { cn } from "@/lib/utils"
 import type { AdminCategory, CategoryNode } from "@/types/catalog"
 import {
@@ -46,6 +49,36 @@ export const CategoryTable = ({
 	onCreate: () => void
 }) => {
 	const [deleteCategory] = useDeleteCategoryMutation()
+	const [duplicateCategory] = useDuplicateCategoryMutation()
+
+	/** Which row is being copied — one spinner, all copy buttons disabled. */
+	const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+
+	/**
+	 * Copies the category's settings and opens the copy to be renamed.
+	 *
+	 * The toast says what did not come along, because "duplicated" on its own
+	 * would reasonably be read as "including its products", and finding out
+	 * otherwise later is worse than being told now.
+	 */
+	const runDuplicate = async (row: CategoryNode) => {
+		setDuplicatingId(row.id)
+		try {
+			const copy = await duplicateCategory(row.id).unwrap()
+			toast.success(`“${displayName(row)}” duplicated`, {
+				description: "Settings and text only — the copy has no products yet.",
+			})
+			onEdit(copy)
+		} catch (error) {
+			toast.error("Could not duplicate this category", {
+				description:
+					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+			})
+		} finally {
+			setDuplicatingId(null)
+		}
+	}
+
 	const [selected, setSelected] = useState<Set<string>>(new Set())
 	const [pending, setPending] = useState<CategoryNode[] | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -194,7 +227,7 @@ export const CategoryTable = ({
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									Products
 								</TableHead>
-								<TableHead className="w-24 pr-4" />
+								<TableHead className="w-32 pr-4" />
 							</TableRow>
 						</TableHeader>
 
@@ -289,6 +322,20 @@ export const CategoryTable = ({
 													onClick={() => onEdit(row)}
 												>
 													<Pencil />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													aria-label={`Duplicate ${displayName(row)}`}
+													title="Duplicate"
+													disabled={duplicatingId !== null}
+													onClick={() => runDuplicate(row)}
+												>
+													{duplicatingId === row.id ? (
+														<Loader2 className="animate-spin" />
+													) : (
+														<Copy />
+													)}
 												</Button>
 												<Button
 													variant="ghost"

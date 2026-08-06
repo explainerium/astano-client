@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ExternalLink, ImageOff, Pencil, Plus, Trash2 } from "lucide-react"
+import { Copy, ExternalLink, ImageOff, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -35,7 +35,7 @@ import {
 import Toolbar from "@/components/dashboard/shell/Toolbar"
 import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
-import { useDeleteProductMutation } from "@/redux/api/productApi"
+import { useDeleteProductMutation, useDuplicateProductMutation } from "@/redux/api/productApi"
 import { cn } from "@/lib/utils"
 import type {
 	AdminProduct,
@@ -179,9 +179,47 @@ export const ProductTable = ({
 	onCreate: () => void
 }) => {
 	const [deleteProduct] = useDeleteProductMutation()
+	const [duplicateProduct] = useDuplicateProductMutation()
 	const [selected, setSelected] = useState<Set<string>>(new Set())
 	const [pending, setPending] = useState<AdminProduct[] | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+
+	/**
+	 * Which row is being copied.
+	 *
+	 * An id rather than a boolean because it does two jobs: the spinner belongs
+	 * to one row, while the disabled state covers all of them — a copy ends by
+	 * opening the editor, so two started at once would race to open two and the
+	 * loser's work would be invisible.
+	 */
+	const [duplicatingId, setDuplicatingId] = useState<string | null>(null)
+
+	/**
+	 * Copies the product and opens the copy.
+	 *
+	 * Landing in the editor is the point: nobody duplicates a product to look at
+	 * a list, they duplicate it to change the two fields that differ. The copy
+	 * is a draft, so it is not in the shop while that happens — the toast says
+	 * so, because a new row appearing further down a list sorted by update time
+	 * is easy to miss.
+	 */
+	const runDuplicate = async (product: AdminProduct) => {
+		setDuplicatingId(product.id)
+		try {
+			const copy = await duplicateProduct(product.id).unwrap()
+			toast.success(`“${product.name}” duplicated`, {
+				description: "The copy is a draft. Give it a SKU and publish it when it is ready.",
+			})
+			onEdit(copy)
+		} catch (error) {
+			toast.error("Could not duplicate this product", {
+				description:
+					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+			})
+		} finally {
+			setDuplicatingId(null)
+		}
+	}
 
 	const toggle = (id: string) =>
 		setSelected((current) => {
@@ -384,7 +422,7 @@ export const ProductTable = ({
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									Stock
 								</TableHead>
-								<TableHead className="w-24 pr-4" />
+								<TableHead className="w-32 pr-4" />
 							</TableRow>
 						</TableHeader>
 
@@ -593,6 +631,23 @@ export const ProductTable = ({
 													onClick={() => onEdit(product)}
 												>
 													<Pencil />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													aria-label={`Duplicate ${product.name}`}
+													title="Duplicate"
+													// Every copy button, not just this row's: two copies
+													// started at once would open two editors, and the
+													// second would win.
+													disabled={duplicatingId !== null}
+													onClick={() => runDuplicate(product)}
+												>
+													{duplicatingId === product.id ? (
+														<Loader2 className="animate-spin" />
+													) : (
+														<Copy />
+													)}
 												</Button>
 												<Button
 													variant="ghost"
