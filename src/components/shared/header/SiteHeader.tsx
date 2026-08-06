@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { ChevronDown, FileText, Heart, Menu, ShoppingCart, User } from "lucide-react"
+import { ChevronDown, FileText, Heart, Menu, ShoppingCart, User, X } from "lucide-react"
 import { Link, usePathname } from "@/i18n/navigation"
 import {
 	useCartQuery,
@@ -99,6 +99,16 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 	const { data: cart } = useCartQuery()
 	const { data: quoteBasket } = useQuoteBasketQuery()
 
+	/**
+	 * The main nav is a desktop row that collapses below `lg`. Without this it
+	 * simply vanished on a phone — every page except the categories dropdown and
+	 * the footer became unreachable, which is most of the site.
+	 */
+	const [openMenu, setOpenMenu] = useState(false)
+
+	// Navigating with the panel open would leave it covering the new page.
+	const closeMenu = () => setOpenMenu(false)
+
 	return (
 		<header className="relative z-40">
 			{/* Black promo bar — the dealer registration CTA. */}
@@ -110,7 +120,18 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 			</Link>
 
 			<div className="border-b bg-white">
-				<div className="mx-auto flex w-full max-w-[1400px] items-center gap-8 px-6 py-4">
+				<div className="mx-auto flex w-full max-w-[1400px] items-center gap-4 px-6 py-4 lg:gap-8">
+					<button
+						type="button"
+						onClick={() => setOpenMenu((open) => !open)}
+						aria-expanded={openMenu}
+						aria-controls="mobile-nav"
+						aria-label={lang === "de" ? "Menü" : "Menu"}
+						className="hover:text-primary -ml-1 shrink-0 transition-colors lg:hidden"
+					>
+						{openMenu ? <X className="size-6" /> : <Menu className="size-6" />}
+					</button>
+
 					<Wordmark />
 
 					<nav className="hidden flex-1 items-center justify-center gap-7 lg:flex">
@@ -130,7 +151,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 						))}
 					</nav>
 
-					<div className="ml-auto flex items-center gap-5 lg:ml-0">
+					<div className="ml-auto flex items-center gap-4 sm:gap-5 lg:ml-0">
 						<IconLink href="/account" label="Account">
 							<User className="size-5" strokeWidth={1.5} />
 						</IconLink>
@@ -146,6 +167,30 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 						</IconLink>
 					</div>
 				</div>
+
+				{/* The same links as the desktop row, stacked. Rendered only when
+				    open so the collapsed header carries no hidden tab stops. */}
+				{openMenu && (
+					<nav id="mobile-nav" className="border-t lg:hidden">
+						<ul className="mx-auto w-full max-w-[1400px] divide-y px-6">
+							{NAV.map((item) => (
+								<li key={item.key}>
+									<Link
+										href={item.href}
+										onClick={closeMenu}
+										aria-current={pathname === item.href ? "page" : undefined}
+										className={cn(
+											"hover:text-primary block py-3.5 text-sm font-medium tracking-wide uppercase transition-colors",
+											pathname === item.href && "text-primary"
+										)}
+									>
+										{NAV_LABEL[item.key][lang]}
+									</Link>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)}
 			</div>
 
 			{/* Black categories bar, aligned under the wordmark as on the live site. */}

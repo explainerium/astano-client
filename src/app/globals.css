@@ -233,4 +233,26 @@
   html {
     @apply font-sans;
   }
+
+  /*
+   * German compound nouns break the layout on a phone.
+   *
+   * "Qualitätssicherungsprozess" set at text-4xl is 423px wide — wider than a
+   * 375px viewport — and a single word has nowhere to wrap, so it pushes the
+   * whole page sideways. Measured overflow before this rule: 72px on Qualität,
+   * 40px on Datenschutz, 37px on the home page, 33px on the AGB.
+   *
+   * `hyphens: auto` uses the browser's German dictionary, which works because
+   * the layout sets <html lang>. `overflow-wrap` is the fallback for words no
+   * dictionary knows — a SKU, a URL, a client's product name. Applied to
+   * headings only: body copy already wraps at spaces, and hyphenating every
+   * paragraph would be a typographic change nobody asked for.
+   */
+  h1,
+  h2,
+  h3,
+  h4 {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
 }
