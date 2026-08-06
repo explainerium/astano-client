@@ -1,766 +1,769 @@
 {
-  "site": {
-    "title": "astano®",
-    "description": "Maßgefertigte Backwerkzeuge aus Edelstahl, hergestellt in Deutschland."
-  },
-  "common": {
-    "loading": "Wird geladen…",
-    "save": "Speichern",
-    "cancel": "Abbrechen",
-    "delete": "Löschen",
-    "edit": "Bearbeiten",
-    "create": "Anlegen",
-    "search": "Suchen",
-    "select": "Auswählen…",
-    "noResults": "Keine Treffer.",
-    "resultCount": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
-    "close": "Schließen",
-    "back": "Zurück",
-    "next": "Weiter",
-    "previous": "Zurück",
-    "confirm": "Bestätigen",
-    "yes": "Ja",
-    "no": "Nein",
-    "selectDate": "Datum wählen",
-    "somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
-  },
-  "nav": {
-    "home": "Startseite",
-    "products": "Produkte",
-    "cart": "Warenkorb",
-    "checkout": "Kasse",
-    "quoteBasket": "Angebotsanfrage",
-    "wishlist": "Wunschliste",
-    "account": "Mein Konto",
-    "login": "Anmelden",
-    "logout": "Abmelden",
-    "register": "Konto erstellen",
-    "dealerRegistration": "Händler werden",
-    "language": "Sprache",
-    "contact": "Kontakt"
-  },
-  "auth": {
-    "signIn": "Anmelden",
-    "signInSubtitle": "Melden Sie sich an, um Ihre Preise und Bestellungen zu sehen.",
-    "createAccount": "Konto erstellen",
-    "createAccountSubtitle": "Schneller bestellen und Ihre Bestellungen verfolgen.",
-    "passwordHint": "Mindestens 8 Zeichen.",
-    "dealerPrompt": "Kaufen Sie für ein Unternehmen? Beantragen Sie stattdessen ein Händlerkonto.",
-    "email": "E-Mail-Adresse",
-    "password": "Passwort",
-    "currentPassword": "Aktuelles Passwort",
-    "newPassword": "Neues Passwort",
-    "confirmPassword": "Passwort bestätigen",
-    "forgotPassword": "Passwort vergessen?",
-    "resetPassword": "Passwort zurücksetzen",
-    "noAccount": "Noch kein Konto?",
-    "hasAccount": "Sie haben bereits ein Konto?",
-    "firstName": "Vorname",
-    "lastName": "Nachname",
-    "company": "Firma",
-    "phone": "Telefon",
-    "vatNumber": "Umsatzsteuer-Identifikationsnummer",
-    "salutation": "Anrede",
-    "salutationMr": "Herr",
-    "salutationMs": "Frau",
-    "pleaseSelect": "— Bitte wählen —",
-    "foundingDate": "Gründungsdatum",
-    "street": "Straße und Hausnummer",
-    "postcode": "PLZ",
-    "city": "Stadt",
-    "country": "Land",
-    "psiMember": "PSI Mitglied?",
-    "acceptTerms": "Ich stimme den Allgemeinen Geschäftsbedingungen und der Datenschutzrichtlinie zu.",
-    "sectionContact": "Ihre Angaben",
-    "sectionBusiness": "Ihr Unternehmen",
-    "sectionAddress": "Adresse",
-    "companyHint": "Mit Rechtsform, z. B. GmbH oder e. K.",
-    "phoneHint": "Mit Landesvorwahl, sofern nicht aus Deutschland.",
-    "dealerTitle": "Neu als Händler registrieren",
-    "dealerSubtitle": "Händlerpreise für Wiederverkäufer und Unternehmen. Jeder Antrag wird persönlich geprüft.",
-    "dealerSubmittedTitle": "Antrag eingegangen",
-    "dealerSubmittedBody": "Vielen Dank. Wir prüfen jeden Händlerantrag persönlich und melden uns per E-Mail, sobald er geprüft wurde. Sie können sich bereits anmelden, um den Status zu verfolgen — Händlerpreise erscheinen nach der Freigabe.",
-    "pendingTitle": "Ihr Antrag wird geprüft",
-    "pendingBody": "Jeder Händlerantrag wird von uns persönlich geprüft. Bis zur Freigabe können Sie sich anmelden, Händlerpreise und Ihr Kundenkonto bleiben jedoch gesperrt.",
-    "rejectedTitle": "Ihr Antrag wurde nicht freigegeben",
-    "rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt."
-  },
-  "shop": {
-    "addToCart": "In den Warenkorb",
-    "addToQuote": "In den Anfragekorb",
-    "priceOnRequest": "Preis auf Anfrage",
-    "quantity": "Menge",
-    "minimumOrder": "Mindestbestellmenge: {quantity}",
-    "inStock": "Auf Lager",
-    "outOfStock": "Nicht auf Lager",
-    "sku": "Artikelnummer",
-    "buyMoreSaveMore": "Mehr kaufen, mehr sparen",
-    "from": "ab {price}",
-    "noProducts": "Keine Produkte gefunden.",
-    "noImage": "Kein Bild",
-    "exclVat": "zzgl. MwSt",
-    "viewCategory": "Kategorie ansehen",
-    "allProducts": "Alle Produkte",
-    "searchPlaceholder": "Produkte suchen",
-    "search": "Suchen",
-    "sortBy": "Sortieren nach",
-    "sortDefault": "Standard",
-    "sortNewest": "Neueste",
-    "sortName": "Name",
-    "sortPriceAsc": "Preis: aufsteigend",
-    "sortPriceDesc": "Preis: absteigend",
-    "categories": "Kategorien",
-    "allCategories": "Alle Kategorien",
-    "resultsCount": "{count, plural, =0 {Keine Produkte} one {# Produkt} other {# Produkte}}",
-    "clearFilters": "Filter zurücksetzen",
-    "previous": "Zurück",
-    "next": "Weiter",
-    "pageOf": "Seite {page} von {total}",
-    "loading": "Wird geladen…",
-    "loadError": "Der Katalog konnte nicht geladen werden.",
-    "retry": "Erneut versuchen",
-    "notFound": "Dieses Produkt wurde nicht gefunden.",
-    "backToShop": "Zurück zu allen Produkten",
-    "description": "Beschreibung",
-    "details": "Details",
-    "options": "Optionen",
-    "addOption": "Hinzufügen",
-    "optionAdded": "Hinzugefügt",
-    "weight": "Gewicht",
-    "addedToCart": "Zum Warenkorb hinzugefügt.",
-    "addedToQuote": "Zur Angebotsanfrage hinzugefügt.",
-    "addFailed": "Das konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
-    "viewCart": "Zum Warenkorb",
-    "viewQuote": "Zur Angebotsanfrage",
-    "belowMoq": "Die Mindestbestellmenge für diesen Artikel beträgt {quantity}.",
-    "unavailable": "Derzeit nicht verfügbar",
-    "perUnit": "pro Stück",
-    "total": "Gesamt",
-    "tierQuantity": "Menge",
-    "tierPrice": "Stückpreis",
-    "variant": "Ausführung wählen"
-  },
-  "cart": {
-    "title": "Warenkorb",
-    "empty": "Ihr Warenkorb ist leer.",
-    "continueShopping": "Weiter einkaufen",
-    "product": "Produkt",
-    "price": "Stückpreis",
-    "quantity": "Menge",
-    "lineTotal": "Gesamt",
-    "remove": "Entfernen",
-    "clear": "Warenkorb leeren",
-    "clearConfirm": "Alle Artikel aus dem Warenkorb entfernen?",
-    "subtotal": "Zwischensumme",
-    "exclVat": "zzgl. MwSt",
-    "vatNote": "MwSt und Versandkosten werden an der Kasse berechnet.",
-    "checkout": "Zur Kasse",
-    "itemCount": "{count, plural, one {# Artikel} other {# Artikel}}",
-    "belowMoq": "Mindestbestellmenge ist {quantity}.",
-    "outOfStock": "Nicht auf Lager",
-    "onlyLeft": "Nur noch {count} verfügbar",
-    "issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge.",
-    "issueOutOfStock": "Mindestens ein Artikel ist nicht auf Lager.",
-    "cannotCheckout": "Bitte korrigieren Sie die oben genannten Artikel.",
-    "updateFailed": "Die Änderung konnte nicht gespeichert werden.",
-    "includedOption": "Enthaltene Option"
-  },
-  "quote": {
-    "title": "Angebotsanfrage",
-    "empty": "Ihre Angebotsanfrage ist leer.",
-    "submit": "Anfrage senden",
-    "contactName": "Ihr Name",
-    "contactEmail": "E-Mail-Adresse",
-    "message": "Nachricht",
-    "submitted": "Vielen Dank — wir melden uns in Kürze bei Ihnen."
-  },
-  "account": {
-    "title": "Mein Konto",
-    "greeting": "Hallo {name}",
-    "signedInAs": "Angemeldet als {email}",
-    "nav": {
-      "dashboard": "Übersicht",
-      "orders": "Bestellungen",
-      "quotes": "Angebotsanfragen",
-      "addresses": "Adressen",
-      "wishlist": "Wunschliste",
-      "profile": "Profil",
-      "logout": "Abmelden"
-    },
-    "pendingApproval": "Ihr Händlerkonto wird noch geprüft. Bis zur Freigabe gelten für Sie die Gastpreise.",
-    "recentOrders": "Letzte Bestellungen",
-    "recentQuotes": "Letzte Angebotsanfragen",
-    "viewAll": "Alle anzeigen",
-    "nothingYet": "Hier ist noch nichts.",
-    "startShopping": "Jetzt einkaufen",
-    "profileTitle": "Profil",
-    "profileNote": "Ihre E-Mail-Adresse ist Ihr Zugang und kann hier nicht geändert werden.",
-    "firstName": "Vorname",
-    "lastName": "Nachname",
-    "company": "Firma",
-    "phone": "Telefon",
-    "email": "E-Mail",
-    "language": "Bevorzugte Sprache",
-    "vatNumber": "Umsatzsteuer-ID",
-    "vatUnverified": "Noch nicht geprüft",
-    "vatVerified": "Geprüft",
-    "memberSince": "Kunde seit",
-    "save": "Änderungen speichern",
-    "saving": "Wird gespeichert…",
-    "saved": "Ihr Profil wurde aktualisiert.",
-    "saveFailed": "Ihr Profil konnte nicht gespeichert werden.",
-    "addressesTitle": "Adressen",
-    "addAddress": "Adresse hinzufügen",
-    "editAddress": "Adresse bearbeiten",
-    "deleteAddress": "Löschen",
-    "deleteAddressConfirm": "Diese Adresse löschen?",
-    "defaultBilling": "Standard-Rechnungsadresse",
-    "defaultShipping": "Standard-Lieferadresse",
-    "setDefaultBilling": "Für Rechnungen verwenden",
-    "setDefaultShipping": "Für Lieferungen verwenden",
-    "addressLabel": "Bezeichnung",
-    "addressLabelHint": "Für Ihre eigene Übersicht – „Werkstatt“, „Zentrale“",
-    "noAddresses": "Sie haben noch keine Adresse gespeichert.",
-    "addressSaved": "Adresse gespeichert.",
-    "addressDeleted": "Adresse gelöscht.",
-    "ordersTitle": "Bestellungen",
-    "orderNumber": "Bestellung",
-    "orderDate": "Datum",
-    "orderStatus": {
-      "PENDING": "Offen",
-      "PROCESSING": "In Bearbeitung",
-      "ON_HOLD": "Zurückgestellt",
-      "COMPLETED": "Abgeschlossen",
-      "CANCELLED": "Storniert",
-      "REFUNDED": "Erstattet",
-      "FAILED": "Fehlgeschlagen"
-    },
-    "orderTotal": "Gesamt",
-    "paymentStatus": {
-      "UNPAID": "Offen",
-      "PAID": "Bezahlt",
-      "PARTIALLY_REFUNDED": "Teilweise erstattet",
-      "REFUNDED": "Erstattet",
-      "FAILED": "Fehlgeschlagen"
-    },
-    "noOrders": "Sie haben noch keine Bestellung aufgegeben.",
-    "viewOrder": "Bestellung ansehen",
-    "downloadInvoice": "Rechnung herunterladen",
-    "orderItems": "Artikel",
-    "billingAddress": "Rechnungsadresse",
-    "shippingAddress": "Lieferadresse",
-    "deliveryMethod": "Versandart",
-    "paymentMethod": "Zahlungsart",
-    "paymentInstructions": "Zahlungshinweise",
-    "customerNote": "Ihre Anmerkung",
-    "subtotal": "Zwischensumme",
-    "shipping": "Versand",
-    "tax": "MwSt",
-    "grandTotal": "Gesamt",
-    "reverseCharged": "Reverse-Charge – die Steuerschuld geht auf den Leistungsempfänger über.",
-    "quotesTitle": "Angebotsanfragen",
-    "quoteNumber": "Anfrage",
-    "quoteSubject": "Betreff",
-    "quoteSubmitted": "Gesendet",
-    "quoteStatus": {
-      "OPEN": "Offen",
-      "ANSWERED": "Beantwortet",
-      "ACCEPTED": "Angenommen",
-      "DECLINED": "Abgelehnt",
-      "EXPIRED": "Abgelaufen",
-      "CLOSED": "Geschlossen"
-    },
-    "noQuotes": "Sie haben noch keine Angebotsanfrage gesendet.",
-    "viewQuote": "Anfrage ansehen",
-    "awaitingPrice": "Wir kalkulieren noch",
-    "quotedTotal": "Angebotssumme",
-    "validUntil": "Gültig bis",
-    "conversation": "Verlauf",
-    "you": "Sie",
-    "staff": "astano",
-    "writeReply": "Antwort schreiben…",
-    "sendReply": "Senden",
-    "replySent": "Ihre Nachricht wurde gesendet.",
-    "replyFailed": "Ihre Nachricht konnte nicht gesendet werden.",
-    "acceptQuote": "Annehmen und bestellen",
-    "accepting": "Bestellung wird aufgegeben…",
-    "acceptNote": "Bei Annahme gelten die angebotenen Preise, nicht die aktuellen Katalogpreise.",
-    "acceptAddress": "Lieferung an",
-    "acceptPayment": "Zahlung per",
-    "acceptFailed": "Dieses Angebot konnte nicht angenommen werden.",
-    "acceptNeedsAddress": "Bitte hinterlegen Sie eine Adresse, bevor Sie ein Angebot annehmen.",
-    "wishlistTitle": "Wunschliste",
-    "noWishlist": "Ihre Wunschliste ist leer.",
-    "removeFromWishlist": "Entfernen",
-    "addedOn": "Hinzugefügt am {date}",
-    "unavailable": "Nicht mehr verfügbar",
-    "outOfStock": "Nicht auf Lager",
-    "priceOnRequest": "Preis auf Anfrage",
-    "addToCart": "In den Warenkorb",
-    "addToQuote": "In den Anfragekorb",
-    "addedToCart": "Zum Warenkorb hinzugefügt.",
-    "addFailed": "Das konnte nicht hinzugefügt werden."
-  },
-  "validation": {
-    "required": "Dieses Feld ist erforderlich.",
-    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "minLength": "Muss mindestens {count} Zeichen lang sein.",
-    "passwordMismatch": "Die Passwörter stimmen nicht überein."
-  },
-  "error": {
-    "notFoundTitle": "Seite nicht gefunden",
-    "notFoundBody": "Die gesuchte Seite existiert nicht.",
-    "genericTitle": "Etwas ist schiefgelaufen",
-    "network": "Der Server ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-    "tryAgain": "Erneut versuchen"
-  },
-  "home": {
-    "topBar": "Klicken Sie hier, um sich als Händler oder Wiederverkäufer zu registrieren.",
-    "hero": {
-      "cta": "Jetzt entdecken",
-      "slides": [
-        {
-          "title": "Edelstahl-Strohhalme",
-          "body": "Edelstahl-Strohhalme sind eine langlebige, umweltfreundliche Alternative zu Plastikstrohhalmen. Sie sind für den jahrelangen Wiedergebrauch konzipiert, ohne an Qualität zu verlieren. Zudem sind sie leicht zu reinigen, stilvoll und ideal, um täglichen Abfall zu reduzieren und dabei Ihre Lieblingsgetränke zu genießen. Auch beim Thema Sicherheit und Branding punkten sie gegenüber anderen Materialien."
-        },
-        {
-          "title": "Die ganze Welt der Ausstechformen",
-          "body": "Sie benötigen keine individuelle Form? Wählen Sie aus unseren mehr als 400 verschiedenen Standardmotiven für nahezu jedes Thema und viele Branchen. Mit Ihrem Logo veredelt und individuell verpackt – einzeln oder als Set. Alles ist möglich."
-        },
-        {
-          "title": "Edelstahl-Eiswürfel",
-          "body": "Edelstahl-Eiswürfel halten Ihre Getränke perfekt gekühlt, ohne sie zu verwässern, und bewahren den vollen Geschmack vom ersten bis zum letzten Schluck. Wiederverwendbar und elegant sind sie ein hochwertiges Upgrade für Cocktails, Säfte und Getränke im Alltag. Mit Ihrem Logo als edler Werbeträger."
-        }
-      ]
-    },
-    "tiles": [
-      {
-        "title": "Individuelle Fertigung",
-        "body": "Jedes unserer Produkte ist so einzigartig wie die Ideen unserer Kunden."
-      },
-      {
-        "title": "Qualität als Grundsatz",
-        "body": "Materialien und Verarbeitung liegen bei uns auf höchstem Niveau – für uns Standard."
-      },
-      {
-        "title": "Verpackungslösungen",
-        "body": "Wir liefern nicht nur ein Produkt – wir liefern Komplettpakete mit ansprechenden Verpackungslösungen."
-      },
-      {
-        "title": "Umfangreiche Beratung",
-        "body": "Die ausführliche und detailreiche Beratung ist uns wichtig auf dem Weg zu Ihrem perfekten Produkt von astano."
-      }
-    ],
-    "categories": {
-      "heading": "Finden Sie das passende Produkt für Ihre Bedürfnisse"
-    },
-    "popular": {
-      "heading": "Unsere beliebtesten Produkte",
-      "cta": "Alle Produkte anzeigen",
-      "empty": "Noch keine Produkte veröffentlicht."
-    },
-    "custom": {
-      "heading": "Sonderanfertigungen",
-      "intro": "Ihre Ideen verdienen es, genau so umgesetzt zu werden, wie Sie sie sich vorstellen. Unser Service für Sonderanfertigungen ermöglicht es Ihnen, Stil, Funktionen und Ausführung zu wählen, sodass Ihr Produkt wirklich einzigartig wird. Ob einzigartiges Design oder maßgeschneiderte Lösung – wir verwandeln Ihre Vision mit Präzision und Sorgfalt in die Realität.",
-      "cards": [
-        {
-          "title": "Jedes Detail zählt",
-          "body": "Mit Blick auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und dabei ein hochwertiges Aussehen und Gefühl zu bewahren."
-        },
-        {
-          "title": "Hochwertiges Material",
-          "body": "Wir verwenden ausschließlich Materialien höchster Qualität, um erstklassige Leistung und eine Verarbeitung zu gewährleisten, die sich von anderen abhebt."
-        },
-        {
-          "title": "Wo Handwerkskunst auf Perfektion trifft",
-          "body": "Mit Fokus auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und gleichzeitig ein hochwertiges Aussehen und Gefühl zu bewahren."
-        },
-        {
-          "title": "Maßgeschneidert nach Ihren Anforderungen",
-          "body": "Jedes Detail wird sorgfältig von erfahrenen Händen gefertigt und vereint Kunstfertigkeit und Präzision in jedem Stück, um Ihre genauen Anforderungen zu erfüllen."
-        }
-      ]
-    },
-    "newsletter": {
-      "heading": "Abonnieren Sie und erfahren Sie mehr",
-      "note": "Die Verwendung erfolgt gemäß unserer Datenschutzrichtlinie.",
-      "email": "E-Mail",
-      "placeholder": "name@example.com",
-      "submit": "Anmelden"
-    },
-    "footer": {
-      "about": "Bei astano fertigen wir hochwertige Produkte, die auf Präzision und Langlebigkeit ausgelegt sind. Dabei liegt unser Fokus auf individualisierten Produkten für Küche, Kochen, Backen, Essen & Trinken. Individuell weil sie Werbe- und Botschaftsträger sind. Bei uns finden Sie ansprechende Werbegeschenke, On-Packs und Merchandising Artikel.",
-      "quicklinks": "Quicklinks",
-      "legal": "Rechtliche Seiten",
-      "contactHeading": "Informationen Speichern",
-      "designedBy": "Designed by Explainerium",
-      "copyright": "Copyright {year} - ASSCA GmbH"
-    }
-  },
-  "contact": {
-    "title": "Kontaktieren Sie uns",
-    "intro": "Wir helfen Ihnen gerne! Egal ob Fragen zu unseren Produkten, Unterstützung bei einer Bestellung, ein Angebot anfordern oder sonstige Anfragen – unser Team steht Ihnen jederzeit zur Verfügung.",
-    "emailLabel": "E-Mail:",
-    "phoneLabel": "Telefon:",
-    "addressLabel": "Anschrift:",
-    "formHeading": "Nehmen Sie Kontakt auf",
-    "formSubtitle": "Schreiben Sie uns",
-    "fields": {
-      "name": "Name",
-      "email": "E-Mail",
-      "phone": "Telefon",
-      "company": "Firma",
-      "subject": "Betreff",
-      "message": "Nachricht"
-    },
-    "submit": "Einreichen",
-    "sending": "Wird gesendet…",
-    "success": "Vielen Dank – Ihre Nachricht ist bei uns eingegangen. Wir melden uns in Kürze.",
-    "error": "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
-  },
-  "faq": {
-    "title": "Häufig gestellte Fragen",
-    "intro": "In unserem FAQ-Bereich finden Sie klare Antworten auf die häufigsten Fragen zu astano® – von Produktpflege und Individualisierungsmöglichkeiten bis hin zu Versand, Zahlung und Rückgabe.",
-    "groups": [
-      {
-        "title": "Allgemeine Fragen",
-        "items": [
-          {
-            "q": "Was ist astano®?",
-            "a": "astano® ist spezialisiert auf hochwertige Küchenhelfer, Backzubehör und individuell gestaltete Artikel. Wir bieten sowohl fertige Produkte als auch personalisierte Lösungen für Hobbybäcker und Unternehmen."
-          },
-          {
-            "q": "Wo werden astano®-Produkte hergestellt?",
-            "a": "Unsere Produkte werden sorgfältig aus hochwertigen Materialien entworfen und gefertigt und entsprechen strengen Qualitätsstandards. Viele Artikel werden in Europa hergestellt, um Langlebigkeit und Präzision zu gewährleisten."
-          },
-          {
-            "q": "Wie kann ich astano® kontaktieren, um Anfragen zu stellen oder Unterstützung zu erhalten?",
-            "a": "Sie erreichen uns über das Kontaktformular auf unserer Website, per E-Mail oder telefonisch. Unser Kundenservice-Team hilft Ihnen gerne bei Fragen zu Produkten, Bestellungen oder individuellen Anpassungen."
-          }
-        ]
-      },
-      {
-        "title": "Bestellungen & Versand",
-        "items": [
-          {
-            "q": "Wie lange dauert es, bis ich meine Bestellung erhalte?",
-            "a": "Der Standardversand innerhalb Deutschlands dauert in der Regel 3–7 Werktage. Internationale Bestellungen können je nach Bestimmungsort länger dauern. Sonderanfertigungen können zusätzliche Produktionszeit erfordern."
-          },
-          {
-            "q": "Kann ich meine Bestellung verfolgen?",
-            "a": "Ja! Sobald Ihre Bestellung versandt wurde, erhalten Sie per E-Mail eine Sendungsverfolgungsnummer, mit der Sie den Lieferstatus verfolgen können."
-          },
-          {
-            "q": "Bieten Sie internationalen Versand an?",
-            "a": "Ja, astano® liefert weltweit. Versandkosten und Lieferzeiten können je nach Bestimmungsort variieren."
-          }
-        ]
-      },
-      {
-        "title": "Produkte & Anpassung",
-        "items": [
-          {
-            "q": "Sind astano®-Produkte sicher in der Anwendung?",
-            "a": "Absolut. Wir verwenden ausschließlich lebensmittelechte, hochwertige Materialien wie Edelstahl und zugelassene Kunststoffe. Alle Produkte durchlaufen strenge Qualitätskontrollen, um Sicherheit und Langlebigkeit zu gewährleisten."
-          },
-          {
-            "q": "Kann ich einen Ausstecher oder ein Backwerkzeug individuell gestalten?",
-            "a": "Ja! Wir bieten individuelle Designs an, inklusive Logos, Formen und Größen. Teilen Sie uns einfach Ihre Wünsche mit, und wir erstellen ein einzigartiges Produkt, das genau auf Ihre Bedürfnisse zugeschnitten ist."
-          },
-          {
-            "q": "Wie pflege ich meine Produkte?",
-            "a": "Die meisten unserer Produkte lassen sich leicht von Hand oder in der Spülmaschine reinigen. Um ihre Langlebigkeit zu gewährleisten, empfehlen wir, Edelstahlartikel von Hand zu spülen und sofort abzutrocknen, um Wasserflecken zu vermeiden."
-          }
-        ]
-      }
-    ]
-  },
-  "about": {
-    "title": "Über uns – astano®",
-    "intro": "Seit über 20 Jahren steht astano® für hochwertige, individualisierbare Produkte rund um Küche, Kochen, Backen, Essen & Trinken. Was mit einer individuellen Ausstechform aus Kunststoff begann, hat sich zu einem vielseitigen Sortiment aus Edelstahl- und Silikonartikeln entwickelt – von Ausstechformen, Backformen und Keksstempeln bis hin zu Eiswürfelformen, Edelstahl-Eiswürfeln, Trinkhalmen und Lunchboxen. Unser Anspruch geht dabei weit über das Produkt hinaus: Wir individualisieren nahezu jeden Artikel – von der dezenten Logogravur bis zur kompletten kundenspezifischen Entwicklung inklusive passender, hochwertiger Verpackung. So entstehen Produkte, die nicht nur funktional überzeugen, sondern Marken sichtbar machen und Botschaften wirkungsvoll transportieren.",
-    "heroCta": "Jetzt entdecken",
-    "craft": {
-      "title": "Mit Sorgfalt gefertigt – individuell für Marke und Markt",
-      "body": "astano® entwickelt und fertigt Produkte nicht „von der Stange“, sondern mit Blick auf die Anforderungen unserer Kunden. Ob Werbeartikel, Merchandising, On-Pack-Aktion, OEM-Produktion oder Handelsware für den Einzelhandel – wir verbinden langjährige Erfahrung mit durchdachter Individualisierung und zuverlässiger Fertigungsqualität. Unsere Produkte entstehen überwiegend aus Edelstahl und Silikon – Materialien, die für Langlebigkeit, Funktionalität und eine hochwertige Anmutung stehen. So schaffen wir individuelle Lösungen, die im Alltag bestehen, die Marke unserer Kunden stärken und gleichzeitig preislich attraktiv bleiben."
-    },
-    "quality": {
-      "title": "Qualität, Erfahrung und Individualisierung aus einer Hand",
-      "body": "Bei astano® treffen Produktkompetenz, Fertigungserfahrung und Markenverständnis aufeinander. Wir wissen, worauf es bei individualisierten Produkten ankommt: eine saubere Umsetzung, überzeugende Materialqualität, ein stimmiges Design und ein Preis, der wirtschaftlich bleibt. Als Mitglied im Warenzeichenverband Edelstahl Rostfrei stehen wir zudem für einen besonders hohen Qualitätsanspruch bei der Verarbeitung unserer Edelstahlprodukte. Für unsere Kunden bedeutet das: verlässliche Materialien, hochwertige Ausführung und Produkte, die langfristig überzeugen – optisch wie funktional.",
-      "cta": "Qualität entdecken"
-    },
-    "practical": {
-      "title": "Wo Handwerkskunst auf Funktion und Markenwirkung trifft",
-      "body": "Unsere Produkte sollen mehr können als gut aussehen. Sie sollen im Alltag funktionieren, langlebig sein und gleichzeitig die Identität einer Marke transportieren. Genau deshalb entwickeln wir Lösungen, die praktischen Nutzen, hochwertige Verarbeitung und individuelle Gestaltung miteinander verbinden. Ob kleine Logogravur oder komplett neues Produkt nach Kundenvorgabe – astano® begleitet Projekte von der Idee bis zum fertigen Artikel. So entstehen Produkte, die nicht austauschbar wirken, sondern Wiedererkennung schaffen und einen bleibenden Eindruck hinterlassen.",
-      "cta": "Sonderanfertigungen entdecken"
-    },
-    "cards": [
-      {
-        "title": "Gebaut für langfristige Qualität. Entwickelt für starke Marken.",
-        "body": "Unsere Produkte sind für einen langlebigen Einsatz konzipiert. Hochwertige Materialien, sorgfältige Verarbeitung und ein durchdachtes Design sorgen dafür, dass sie auch bei häufiger Nutzung zuverlässig funktionieren und dabei einen hochwertigen Eindruck vermitteln."
-      },
-      {
-        "title": "Hochwertige Materialien",
-        "body": "Wir setzen überwiegend auf Edelstahl und Silikon, weil diese Materialien langlebig, funktional und für viele Anwendungen im Küchen- und Haushaltsbereich ideal geeignet sind. Das Ergebnis sind Produkte mit hoher Wertigkeit, angenehmer Haptik und überzeugender Alltagstauglichkeit."
-      },
-      {
-        "title": "Jedes Detail zählt",
-        "body": "Bei astano® fertigen wir hochwertige, individualisierbare Produkte für Küche, Kochen, Backen, Essen & Trinken. Unsere Artikel eignen sich als Werbegeschenke, Merchandising-Produkte, On-Pack-Lösungen, Handelsartikel oder OEM-Produkte für starke Marken. Über 20 Jahre Erfahrung, hochwertige Materialien, flexible Individualisierung und ein überzeugendes Preis-Leistungs-Verhältnis machen uns zu einem verlässlichen Partner."
-      },
-      {
-        "title": "Maßgeschneiderte Lösungen für Ihre Anforderungen",
-        "body": "Sie benötigen kein Standardprodukt, sondern eine individuelle Lösung? Wir realisieren Artikel nach Ihren Vorstellungen – von der einfachen Logoanbringung bis zur kompletten OEM- oder Sonderanfertigung inklusive individueller Verpackung für Handel, Promotion oder Markenkommunikation."
-      }
-    ]
-  },
-  "quality": {
-    "title": "Qualität bei astano®",
-    "intro": "Bei astano® ist Qualität für uns mehr als nur ein Merkmal – sie ist ein Versprechen. Jedes unserer Produkte – von Edelstahl-Ausstechformen über wiederverwendbare Strohhalme bis hin zu individuell gestaltbaren Eiswürfelformen und Backutensilien – erfüllt höchste Ansprüche an Langlebigkeit, Design und Benutzerfreundlichkeit. Wir setzen alles daran, in jedem einzelnen Produkt gleichbleibend exzellente Qualität zu liefern.",
-    "heroCta": "Jetzt entdecken",
-    "meaning": {
-      "title": "Was Qualität für uns bedeutet",
-      "cards": [
-        {
-          "title": "Premium-Materialien",
-          "body": "Wir verwenden hochwertigen Edelstahl, langlebige Kunststoffe und Premium Silikon – ausgewählt aufgrund ihrer Langlebigkeit, Sicherheit und Leistungsfähigkeit. Alle Produkte durchlaufen strenge Qualitätskontrollen, um sicherzustellen, dass sie unsere internen Standards erfüllen oder übertreffen."
-        },
-        {
-          "title": "Präzision und Konsistenz",
-          "body": "Egal, ob Sie sich für eine unserer über 400 Standard-Ausstechformen entscheiden oder eine individuell gestaltete Ausstechform mit Logogravur in Auftrag geben – unser Herstellungsprozess gewährleistet, dass jedes Produkt mit höchster Präzision und Liebe zum Detail gefertigt wird."
-        },
-        {
-          "title": "Funktionalität und Benutzerfreundlichkeit",
-          "body": "Qualität beschränkt sich nicht nur auf Aussehen und technische Daten – sie zeigt sich in der Alltagstauglichkeit. Bei der Entwicklung stehen die Bedürfnisse der Nutzer im Vordergrund: Unsere Produkte sollen häufigem Gebrauch standhalten, unsere Küchenaccessoires sollen einfach und sicher in der Anwendung sein."
-        }
-      ]
-    },
-    "process": {
-      "title": "Unser Qualitätssicherungsprozess",
-      "steps": [
-        {
-          "title": "Materialauswahl und -prüfung",
-          "body": "Jeder Rohstoff wird auf Sicherheit, Haltbarkeit und Eignung geprüft. Nur vertrauenswürdige Lieferanten bestehen unser Auswahlverfahren."
-        },
-        {
-          "title": "Mehrfache Korrekturdurchgänge",
-          "body": "Mehrfache Korrekturdurchgänge sorgen dafür, dass Sie schon vorab sehen was Sie später in den Händen halten. Zudem werden mögliche Fehlerquellen auf ein Minimum reduziert."
-        },
-        {
-          "title": "Kontrolle und Tests",
-          "body": "Jeder Artikel wird vor Auslieferung ausführlich geprüft. Hierbei werden Oberfläche, Detailverarbeitung und kundenspezifische Anforderungen in Augenschein genommen."
-        },
-        {
-          "title": "Kundenfeedback",
-          "body": "Wir schätzen Ihre Erfahrung. Ihr Feedback nach dem Kauf hilft uns, Verbesserungspotenzial zu erkennen, damit wir uns anpassen und weiterentwickeln können."
-        }
-      ],
-      "cta": "Jetzt entdecken"
-    },
-    "promise": {
-      "title": "Unser Versprechen an Sie",
-      "body": "Wenn Sie sich für astano® entscheiden, kaufen Sie nicht nur ein Produkt – Sie investieren in Zuverlässigkeit, handwerkliche Perfektion und langfristige Zufriedenheit. Wir verpflichten uns, diese Standards jeden Tag, bei jedem Werkzeug, jeder Form und jeder Verpackung, die wir herstellen, zu gewährleisten.",
-      "cta": "Jetzt einkaufen"
-    }
-  },
-  "custom": {
-    "title": "Sonderanfertigungen",
-    "intro": "Verwandeln Sie Ihre Ideen in einzigartige, hochwertige Kreationen. Von individuellen Ausstechformen bis hin zu personalisierten Backutensilien – astano® erweckt Ihre Designs mit Präzision, erstklassigen Materialien und schneller Fertigung zum Leben.",
-    "lead": {
-      "title": "Erwecken Sie Ihre Ideen zum Leben mit astano®",
-      "body": "Bei astano® beginnt jedes großartige Produkt mit einer großartigen Idee – Ihrer. Wir setzen Ihre individuellen Wünsche in Edelstahl, Silikon oder Kunststoff um. Eine durchgängige Begleitung von der ersten Beratung und Machbarkeitsprüfung über die Entwicklung des Produkts und der Verpackung bis hin zur Auslieferung. Bei uns erhalten Sie alles aus einer Hand. Sie müssen uns nur ansprechen."
-    },
-    "how": {
-      "title": "Wie es funktioniert",
-      "steps": [
-        {
-          "title": "Teilen Sie Ihre Idee",
-          "body": "Schicken Sie uns eine Email oder laden Sie Ihre Skizze, Ihr Logo oder ein Referenzbild hoch. Selbst eine einfache Zeichnung genügt – wir optimieren sie."
-        },
-        {
-          "title": "Prüfung und Angebot",
-          "body": "Wir prüfen Ihre Idee sorgfältig, beraten Sie und erstellen Ihnen ein maßgeschneidertes Angebot."
-        },
-        {
-          "title": "Entwurf und Produktion",
-          "body": "Nach Auftragsvergabe erstellen wir zunächst aussagekräftige Entwürfe und legen Ihnen diese zur Freigabe vor. In dieser Phase können nach Belieben Änderungen vorgenommen werden. Nach Freigabe starten wir die Produktion."
-        },
-        {
-          "title": "Lieferung und Logistik",
-          "body": "Ihr individuell angefertigtes Produkt wird sicher und nach Ihren Wünschen verpackt. Egal ob Lieferung an eine Adresse, Einzelaussendungen an verschiedene Adressen oder Lagerführung bei uns. Wir sorgen für eine reibungslose Logistik."
-        }
-      ]
-    },
-    "why": {
-      "title": "Warum es funktioniert",
-      "cards": [
-        {
-          "title": "Präzisionsgefertigte Designs",
-          "body": "Wir setzen Ihre Ideen und Vorstellung so präzise wie möglich um. Dabei nutzen wir alle zur Verfügung stehenden, technischen Möglichkeiten um das Produkt trotz hohem Qualitätsanspruch so effizient und kostengünstig wie möglich zur realisieren."
-        },
-        {
-          "title": "Hochwertige, lebensmittelechte Materialien",
-          "body": "Alle Sonderanfertigungen werden aus hochwertigem, rostfreiem Edelstahl oder zertifizierten lebensmittelechten Materialien hergestellt – langlebig, sicher und für den Langzeitgebrauch konzipiert. Nicht umnsonst sind wir Mitglied im Warenzeichenverband Edelstahl Rostfrei."
-        },
-        {
-          "title": "Erfahrung die Begeistert",
-          "body": "Mit mehr als 20 Jahren Erfahrung im Bereich individuell produzierter Produkte haben Sie mit uns einen starken Partner. Wir sind ehrlich und beraten Sie auch in Puncto Nutzen und Funktion Ihrer Idee. Wenn etwas nicht funktioniert oder es Verbesserungsmöglichkeiten gibt, sagen wir das ganz offen. Denn wir möchten, dass Sie ein rundum zufriedenstellendes Produkt erhalten."
-        },
-        {
-          "title": "Perfekt für Ihr Unternehmen und Ihre Marke",
-          "body": "Individuelle Produkte zeugen nicht nur von Kreativität, sie begeistern auch den Endverbraucher. Ein durchdachtes Produkt in hoher Qualität steigert das Ansehen Ihres Unternehmens und Ihrer Marke. Mit astano haben Sie den richtigen Partner für erfolgreiche Produkte an Ihrer Seite."
-        }
-      ]
-    },
-    "capabilities": {
-      "title": "Was können wir?",
-      "items": [
-        "Individuelle Haushalts- und Küchenartikel aus Edelstahl",
-        "Individuelle Haushalts- und Küchenartikel aus Silikon",
-        "Individuelle Haushalts- und Küchenartikel aus Kunststoffen",
-        "Individuelle Verpackungslösungen",
-        "Serien- und Zulieferatikel aus Edelstahl",
-        "Serien- und Zulieferartikel aus Kunststoffen und Silikon"
-      ]
-    },
-    "cta": {
-      "title": "Bereit für Ihre individuelle Produktreise?",
-      "body": "Senden Sie uns Ihr Konzept über das untenstehende Formular. Laden Sie Ihr Bild hoch, beschreiben Sie Ihre Idee, und unser Team meldet sich mit einem Angebot und einem Designvorschlag bei Ihnen.",
-      "button": "Kontaktieren Sie uns"
-    }
-  },
-  "payment": {
-    "title": "Zahlung & Versand",
-    "shipping": {
-      "title": "Versand",
-      "intro": "Es gelten folgende Bedingungen:",
-      "countries": "Die Lieferung erfolgt im Inland (Deutschland) und in die nachstehenden Länder: Österreich, Belgien, Luxemburg, Lettland, Litauen, Dänemark, Schweden, Spanien, Frankreich, Italien, Polen, Slowenien, Slowakei, Kroatien, Ungarn, Schweiz.",
-      "islands": "Der Versand auf deutsche und ausländische Inseln ist ausgeschlossen.",
-      "domesticLabel": "Lieferung innerhalb Deutschlands:",
-      "domestic": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
-      "abroadLabel": "Lieferungen ins Ausland:",
-      "abroad": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
-      "carriers": "Der Standardversand erfolgt per Paketdienst. Sperrige Güter und Bestellungen, deren Gewicht und Volumen sich nicht für den einzelnen Paketversand eignen versenden wir per Spedition auf Paletten. Die Versandkosten im Warenkorb sind immer fest. Der Versandweg wird von uns individuell gewählt."
-    },
-    "terms": {
-      "title": "Zahlungsbedingungen",
-      "methodsTitle": "Akzeptierte Zahlungsmöglichkeiten",
-      "methods": [
-        "Vorkasse per Überweisung",
-        "Zahlung per Rechnung"
-      ],
-      "detailsTitle": "Weitere Einzelheiten zur Zahlung",
-      "invoice": "Die Zahlung auf Rechnung ist ab der 2. Bestellung möglich. Kunden die bereits bei früheren Bestellungen per Rechnung bezahlt haben werden trotz Erstbestellung mit Vorkasse automatisch auf Rechnung umgestellt.",
-      "due": "Der Rechnungsbetrag ist bei Zahlung auf Rechnung innerhalb von 14 Tagen auszugleichen. Auslands- und Erstbestellungen sind nur per Vorkasse möglich. Ausnahmen: Stammkunden und Händler die auch in der Vergangenheit auf Rechnung bezahlt haben.",
-      "contact": "Bei Fragen finden Sie unsere Kontaktdaten im Impressum oder nutzen Sie unser Kontaktformular."
-    },
-    "times": {
-      "title": "Liefer- & Produktionszeiten",
-      "custom": "Die überwiegende Mehrheit unserer Produkte wird individuell angefertigt oder nach Ihren Wünschen veredelt. Aus diesem Grund können wir hier keine generellen Produktions- & Lieferzeiten für alle Artikel bereitstellen. Die Lieferzeiten zu jedem Produkt finden Sie in der Produktbeschreibung auf der Produktseite unter dem Reiter \"zusätzliche Informationen\".",
-      "standard": "Die Regel-Laufzeiten für den Paketversand ab Aussendung liegen in Deutschland bei 2-3 Werktagen (Paketversand)/3-5 Werktage (Speditionsversand), im Ausland bei 3-8 Werktagen (Paketversand)/5-10 Werktage (Speditionsversand)."
-    }
-  },
-  "dealers": {
-    "title": "Lösungen für Wiederverkäufer & Unternehmen",
-    "intro": "Profitieren Sie von gestaffelten Preisen, Nettopreisen mit Umsatzsteuer-ID und einem dedizierten Support für Wiederverkäufer und Geschäftskunden.",
-    "cards": [
-      "Großhandelspreise",
-      "EU-Mehrwertsteuer (Reverse-Charge-Verfahren)",
-      "Individuelle Fertigung",
-      "Manuelle Freigabe zur Qualitätskontrolle"
-    ],
-    "cta": "Wiederverkäufer werden"
-  },
-  "quoteBasket": {
-    "title": "Angebotsanfrage",
-    "intro": "Sagen Sie uns, was Sie brauchen – wir melden uns mit einem Preis.",
-    "empty": "Ihre Angebotsanfrage ist leer.",
-    "continueShopping": "Produkte ansehen",
-    "product": "Produkt",
-    "quantity": "Menge",
-    "note": "Anmerkung",
-    "notePlaceholder": "Gibt es etwas, das wir zu diesem Artikel wissen sollten?",
-    "remove": "Entfernen",
-    "clear": "Anfrage leeren",
-    "clearConfirm": "Alle Artikel aus der Anfrage entfernen?",
-    "noPrices": "Hier werden keine Preise angezeigt. Wir kalkulieren jede Anfrage individuell und antworten per E-Mail.",
-    "details": "Ihre Angaben",
-    "subject": "Betreff",
-    "subjectPlaceholder": "Worum geht es bei dieser Anfrage?",
-    "message": "Nachricht",
-    "messagePlaceholder": "Beschreiben Sie Ihr Projekt, Termine oder gewünschte Individualisierungen.",
-    "name": "Name",
-    "email": "E-Mail",
-    "phone": "Telefon",
-    "company": "Firma",
-    "submit": "Anfrage senden",
-    "submitting": "Wird gesendet…",
-    "submitted": "Vielen Dank – Ihre Anfrage wurde gesendet.",
-    "submittedNote": "Wir antworten per E-Mail. Bitte prüfen Sie Ihren Posteingang.",
-    "submitFailed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
-    "required": "Pflichtfeld",
-    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-    "belowMoq": "Mindestbestellmenge ist {quantity}.",
-    "issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge."
-  },
-  "checkout": {
-    "title": "Kasse",
-    "signInRequired": "Bitte melden Sie sich an, um Ihre Bestellung abzuschließen.",
-    "signInNote": "Ihr Warenkorb bleibt erhalten – Sie kommen direkt hierher zurück.",
-    "signIn": "Anmelden",
-    "register": "Konto erstellen",
-    "emptyCart": "Ihr Warenkorb ist leer.",
-    "backToCart": "Zurück zum Warenkorb",
-    "billingAddress": "Rechnungsadresse",
-    "shippingAddress": "Lieferadresse",
-    "shipToDifferent": "An eine andere Adresse liefern",
-    "useSaved": "Gespeicherte Adresse verwenden",
-    "firstName": "Vorname",
-    "lastName": "Nachname",
-    "company": "Firma",
-    "street1": "Straße und Hausnummer",
-    "street2": "Adresszusatz",
-    "postcode": "PLZ",
-    "city": "Ort",
-    "state": "Bundesland / Region",
-    "country": "Land",
-    "phone": "Telefon",
-    "email": "E-Mail",
-    "vatNumber": "Umsatzsteuer-ID",
-    "vatNote": "Wird auf Ihrer Rechnung ausgewiesen. Das Reverse-Charge-Verfahren wird automatisch angewendet, sobald Ihre USt-IdNr. in Ihrem Konto geprüft wurde.",
-    "delivery": "Versandart",
-    "noDelivery": "Wir liefern nicht in dieses Land. Bitte wählen Sie ein anderes Zielland.",
-    "chooseDelivery": "Bitte wählen Sie eine Versandart",
-    "unavailableNoBand": "Für dieses Versandgewicht nicht verfügbar",
-    "unavailableBelowFree": "Unterhalb der Grenze für kostenlosen Versand",
-    "unavailableNotConfigured": "Nicht verfügbar",
-    "payment": "Zahlungsart",
-    "choosePayment": "Bitte wählen Sie eine Zahlungsart",
-    "notEligible": "Für diese Bestellung nicht verfügbar",
-    "reasonNotEnoughOrderHistory": "Ab Ihrer zweiten Bestellung verfügbar",
-    "reasonRequiresValidatedVatId": "Erfordert eine geprüfte Umsatzsteuer-ID",
-    "reasonBelowMinimum": "Unterhalb des Mindestbestellwerts für diese Zahlungsart",
-    "reasonAboveMaximum": "Oberhalb des Höchstbestellwerts für diese Zahlungsart",
-    "note": "Anmerkung zur Bestellung",
-    "notePlaceholder": "Gibt es etwas, das wir zu dieser Bestellung wissen sollten?",
-    "summary": "Ihre Bestellung",
-    "subtotal": "Zwischensumme",
-    "shipping": "Versand",
-    "tax": "MwSt",
-    "grandTotal": "Gesamt",
-    "weight": "Versandgewicht",
-    "reverseCharged": "Reverse-Charge – die Steuerschuld geht auf den Leistungsempfänger über. Für diese Bestellung wird keine MwSt berechnet.",
-    "taxUnconfigured": "Für dieses Zielland ist kein Steuersatz hinterlegt, daher wurde keine MwSt berechnet. Bitte kontaktieren Sie uns vor der Bestellung.",
-    "placeOrder": "Zahlungspflichtig bestellen – {total}",
-    "placing": "Bestellung wird aufgegeben…",
-    "placeFailed": "Ihre Bestellung konnte nicht aufgegeben werden.",
-    "required": "Pflichtfeld",
-    "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-    "calculating": "Wird berechnet…",
-    "enterAddressFirst": "Geben Sie Ihre Lieferadresse ein, um die Kosten zu sehen.",
-    "orderPlaced": "Vielen Dank – Ihre Bestellung ist bestätigt.",
-    "orderNumber": "Bestellnummer",
-    "confirmationNote": "Eine Bestätigung wurde Ihnen per E-Mail zugesendet.",
-    "paymentInstructions": "Zahlungshinweise",
-    "viewOrders": "Meine Bestellungen",
-    "keepShopping": "Weiter einkaufen"
-  }
+	"site": {
+		"title": "astano®",
+		"description": "Maßgefertigte Backwerkzeuge aus Edelstahl, hergestellt in Deutschland."
+	},
+	"common": {
+		"loading": "Wird geladen…",
+		"save": "Speichern",
+		"cancel": "Abbrechen",
+		"delete": "Löschen",
+		"edit": "Bearbeiten",
+		"create": "Anlegen",
+		"search": "Suchen",
+		"select": "Auswählen…",
+		"noResults": "Keine Treffer.",
+		"resultCount": "{count, plural, =0 {Keine Ergebnisse} one {# Ergebnis} other {# Ergebnisse}}",
+		"close": "Schließen",
+		"back": "Zurück",
+		"next": "Weiter",
+		"previous": "Zurück",
+		"confirm": "Bestätigen",
+		"yes": "Ja",
+		"no": "Nein",
+		"selectDate": "Datum wählen",
+		"somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+	},
+	"nav": {
+		"home": "Startseite",
+		"products": "Produkte",
+		"cart": "Warenkorb",
+		"checkout": "Kasse",
+		"quoteBasket": "Angebotsanfrage",
+		"wishlist": "Wunschliste",
+		"account": "Mein Konto",
+		"login": "Anmelden",
+		"logout": "Abmelden",
+		"register": "Konto erstellen",
+		"dealerRegistration": "Händler werden",
+		"language": "Sprache",
+		"contact": "Kontakt"
+	},
+	"auth": {
+		"signIn": "Anmelden",
+		"signInSubtitle": "Melden Sie sich an, um Ihre Preise und Bestellungen zu sehen.",
+		"createAccount": "Konto erstellen",
+		"createAccountSubtitle": "Schneller bestellen und Ihre Bestellungen verfolgen.",
+		"passwordHint": "Mindestens 8 Zeichen.",
+		"dealerPrompt": "Kaufen Sie für ein Unternehmen? Beantragen Sie stattdessen ein Händlerkonto.",
+		"email": "E-Mail-Adresse",
+		"password": "Passwort",
+		"currentPassword": "Aktuelles Passwort",
+		"newPassword": "Neues Passwort",
+		"confirmPassword": "Passwort bestätigen",
+		"forgotPassword": "Passwort vergessen?",
+		"resetPassword": "Passwort zurücksetzen",
+		"noAccount": "Noch kein Konto?",
+		"hasAccount": "Sie haben bereits ein Konto?",
+		"firstName": "Vorname",
+		"lastName": "Nachname",
+		"company": "Firma",
+		"phone": "Telefon",
+		"vatNumber": "Umsatzsteuer-Identifikationsnummer",
+		"salutation": "Anrede",
+		"salutationMr": "Herr",
+		"salutationMs": "Frau",
+		"pleaseSelect": "— Bitte wählen —",
+		"foundingDate": "Gründungsdatum",
+		"street": "Straße und Hausnummer",
+		"postcode": "PLZ",
+		"city": "Stadt",
+		"country": "Land",
+		"psiMember": "PSI Mitglied?",
+		"acceptTerms": "Ich stimme den Allgemeinen Geschäftsbedingungen und der Datenschutzrichtlinie zu.",
+		"sectionContact": "Ihre Angaben",
+		"sectionBusiness": "Ihr Unternehmen",
+		"sectionAddress": "Adresse",
+		"companyHint": "Mit Rechtsform, z. B. GmbH oder e. K.",
+		"phoneHint": "Mit Landesvorwahl, sofern nicht aus Deutschland.",
+		"dealerTitle": "Neu als Händler registrieren",
+		"dealerSubtitle": "Händlerpreise für Wiederverkäufer und Unternehmen. Jeder Antrag wird persönlich geprüft.",
+		"dealerSubmittedTitle": "Antrag eingegangen",
+		"dealerSubmittedBody": "Vielen Dank. Wir prüfen jeden Händlerantrag persönlich und melden uns per E-Mail, sobald er geprüft wurde. Sie können sich bereits anmelden, um den Status zu verfolgen — Händlerpreise erscheinen nach der Freigabe.",
+		"pendingTitle": "Ihr Antrag wird geprüft",
+		"pendingBody": "Jeder Händlerantrag wird von uns persönlich geprüft. Bis zur Freigabe können Sie sich anmelden, Händlerpreise und Ihr Kundenkonto bleiben jedoch gesperrt.",
+		"rejectedTitle": "Ihr Antrag wurde nicht freigegeben",
+		"rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt."
+	},
+	"shop": {
+		"addToCart": "In den Warenkorb",
+		"addToQuote": "In den Anfragekorb",
+		"priceOnRequest": "Preis auf Anfrage",
+		"quantity": "Menge",
+		"minimumOrder": "Mindestbestellmenge: {quantity}",
+		"inStock": "Auf Lager",
+		"outOfStock": "Nicht auf Lager",
+		"sku": "Artikelnummer",
+		"buyMoreSaveMore": "Mehr kaufen, mehr sparen",
+		"from": "ab {price}",
+		"noProducts": "Keine Produkte gefunden.",
+		"noImage": "Kein Bild",
+		"exclVat": "zzgl. MwSt",
+		"viewCategory": "Kategorie ansehen",
+		"allProducts": "Alle Produkte",
+		"searchPlaceholder": "Produkte suchen",
+		"search": "Suchen",
+		"sortBy": "Sortieren nach",
+		"sortDefault": "Standard",
+		"sortNewest": "Neueste",
+		"sortName": "Name",
+		"sortPriceAsc": "Preis: aufsteigend",
+		"sortPriceDesc": "Preis: absteigend",
+		"categories": "Kategorien",
+		"allCategories": "Alle Kategorien",
+		"resultsCount": "{count, plural, =0 {Keine Produkte} one {# Produkt} other {# Produkte}}",
+		"clearFilters": "Filter zurücksetzen",
+		"previous": "Zurück",
+		"next": "Weiter",
+		"pageOf": "Seite {page} von {total}",
+		"loading": "Wird geladen…",
+		"loadError": "Der Katalog konnte nicht geladen werden.",
+		"retry": "Erneut versuchen",
+		"notFound": "Dieses Produkt wurde nicht gefunden.",
+		"backToShop": "Zurück zu allen Produkten",
+		"description": "Beschreibung",
+		"details": "Details",
+		"options": "Optionen",
+		"addOption": "Hinzufügen",
+		"optionAdded": "Hinzugefügt",
+		"weight": "Gewicht",
+		"addedToCart": "Zum Warenkorb hinzugefügt.",
+		"addedToQuote": "Zur Angebotsanfrage hinzugefügt.",
+		"addFailed": "Das konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
+		"viewCart": "Zum Warenkorb",
+		"viewQuote": "Zur Angebotsanfrage",
+		"belowMoq": "Die Mindestbestellmenge für diesen Artikel beträgt {quantity}.",
+		"unavailable": "Derzeit nicht verfügbar",
+		"perUnit": "pro Stück",
+		"total": "Gesamt",
+		"tierQuantity": "Menge",
+		"tierPrice": "Stückpreis",
+		"variant": "Ausführung wählen",
+		"tierDiscount": "Rabatt",
+		"optionQuantity": "Menge",
+		"optionTiers": "Mengenrabatte"
+	},
+	"cart": {
+		"title": "Warenkorb",
+		"empty": "Ihr Warenkorb ist leer.",
+		"continueShopping": "Weiter einkaufen",
+		"product": "Produkt",
+		"price": "Stückpreis",
+		"quantity": "Menge",
+		"lineTotal": "Gesamt",
+		"remove": "Entfernen",
+		"clear": "Warenkorb leeren",
+		"clearConfirm": "Alle Artikel aus dem Warenkorb entfernen?",
+		"subtotal": "Zwischensumme",
+		"exclVat": "zzgl. MwSt",
+		"vatNote": "MwSt und Versandkosten werden an der Kasse berechnet.",
+		"checkout": "Zur Kasse",
+		"itemCount": "{count, plural, one {# Artikel} other {# Artikel}}",
+		"belowMoq": "Mindestbestellmenge ist {quantity}.",
+		"outOfStock": "Nicht auf Lager",
+		"onlyLeft": "Nur noch {count} verfügbar",
+		"issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge.",
+		"issueOutOfStock": "Mindestens ein Artikel ist nicht auf Lager.",
+		"cannotCheckout": "Bitte korrigieren Sie die oben genannten Artikel.",
+		"updateFailed": "Die Änderung konnte nicht gespeichert werden.",
+		"includedOption": "Enthaltene Option"
+	},
+	"quote": {
+		"title": "Angebotsanfrage",
+		"empty": "Ihre Angebotsanfrage ist leer.",
+		"submit": "Anfrage senden",
+		"contactName": "Ihr Name",
+		"contactEmail": "E-Mail-Adresse",
+		"message": "Nachricht",
+		"submitted": "Vielen Dank — wir melden uns in Kürze bei Ihnen."
+	},
+	"account": {
+		"title": "Mein Konto",
+		"greeting": "Hallo {name}",
+		"signedInAs": "Angemeldet als {email}",
+		"nav": {
+			"dashboard": "Übersicht",
+			"orders": "Bestellungen",
+			"quotes": "Angebotsanfragen",
+			"addresses": "Adressen",
+			"wishlist": "Wunschliste",
+			"profile": "Profil",
+			"logout": "Abmelden"
+		},
+		"pendingApproval": "Ihr Händlerkonto wird noch geprüft. Bis zur Freigabe gelten für Sie die Gastpreise.",
+		"recentOrders": "Letzte Bestellungen",
+		"recentQuotes": "Letzte Angebotsanfragen",
+		"viewAll": "Alle anzeigen",
+		"nothingYet": "Hier ist noch nichts.",
+		"startShopping": "Jetzt einkaufen",
+		"profileTitle": "Profil",
+		"profileNote": "Ihre E-Mail-Adresse ist Ihr Zugang und kann hier nicht geändert werden.",
+		"firstName": "Vorname",
+		"lastName": "Nachname",
+		"company": "Firma",
+		"phone": "Telefon",
+		"email": "E-Mail",
+		"language": "Bevorzugte Sprache",
+		"vatNumber": "Umsatzsteuer-ID",
+		"vatUnverified": "Noch nicht geprüft",
+		"vatVerified": "Geprüft",
+		"memberSince": "Kunde seit",
+		"save": "Änderungen speichern",
+		"saving": "Wird gespeichert…",
+		"saved": "Ihr Profil wurde aktualisiert.",
+		"saveFailed": "Ihr Profil konnte nicht gespeichert werden.",
+		"addressesTitle": "Adressen",
+		"addAddress": "Adresse hinzufügen",
+		"editAddress": "Adresse bearbeiten",
+		"deleteAddress": "Löschen",
+		"deleteAddressConfirm": "Diese Adresse löschen?",
+		"defaultBilling": "Standard-Rechnungsadresse",
+		"defaultShipping": "Standard-Lieferadresse",
+		"setDefaultBilling": "Für Rechnungen verwenden",
+		"setDefaultShipping": "Für Lieferungen verwenden",
+		"addressLabel": "Bezeichnung",
+		"addressLabelHint": "Für Ihre eigene Übersicht – „Werkstatt“, „Zentrale“",
+		"noAddresses": "Sie haben noch keine Adresse gespeichert.",
+		"addressSaved": "Adresse gespeichert.",
+		"addressDeleted": "Adresse gelöscht.",
+		"ordersTitle": "Bestellungen",
+		"orderNumber": "Bestellung",
+		"orderDate": "Datum",
+		"orderStatus": {
+			"PENDING": "Offen",
+			"PROCESSING": "In Bearbeitung",
+			"ON_HOLD": "Zurückgestellt",
+			"COMPLETED": "Abgeschlossen",
+			"CANCELLED": "Storniert",
+			"REFUNDED": "Erstattet",
+			"FAILED": "Fehlgeschlagen"
+		},
+		"orderTotal": "Gesamt",
+		"paymentStatus": {
+			"UNPAID": "Offen",
+			"PAID": "Bezahlt",
+			"PARTIALLY_REFUNDED": "Teilweise erstattet",
+			"REFUNDED": "Erstattet",
+			"FAILED": "Fehlgeschlagen"
+		},
+		"noOrders": "Sie haben noch keine Bestellung aufgegeben.",
+		"viewOrder": "Bestellung ansehen",
+		"downloadInvoice": "Rechnung herunterladen",
+		"orderItems": "Artikel",
+		"billingAddress": "Rechnungsadresse",
+		"shippingAddress": "Lieferadresse",
+		"deliveryMethod": "Versandart",
+		"paymentMethod": "Zahlungsart",
+		"paymentInstructions": "Zahlungshinweise",
+		"customerNote": "Ihre Anmerkung",
+		"subtotal": "Zwischensumme",
+		"shipping": "Versand",
+		"tax": "MwSt",
+		"grandTotal": "Gesamt",
+		"reverseCharged": "Reverse-Charge – die Steuerschuld geht auf den Leistungsempfänger über.",
+		"quotesTitle": "Angebotsanfragen",
+		"quoteNumber": "Anfrage",
+		"quoteSubject": "Betreff",
+		"quoteSubmitted": "Gesendet",
+		"quoteStatus": {
+			"OPEN": "Offen",
+			"ANSWERED": "Beantwortet",
+			"ACCEPTED": "Angenommen",
+			"DECLINED": "Abgelehnt",
+			"EXPIRED": "Abgelaufen",
+			"CLOSED": "Geschlossen"
+		},
+		"noQuotes": "Sie haben noch keine Angebotsanfrage gesendet.",
+		"viewQuote": "Anfrage ansehen",
+		"awaitingPrice": "Wir kalkulieren noch",
+		"quotedTotal": "Angebotssumme",
+		"validUntil": "Gültig bis",
+		"conversation": "Verlauf",
+		"you": "Sie",
+		"staff": "astano",
+		"writeReply": "Antwort schreiben…",
+		"sendReply": "Senden",
+		"replySent": "Ihre Nachricht wurde gesendet.",
+		"replyFailed": "Ihre Nachricht konnte nicht gesendet werden.",
+		"acceptQuote": "Annehmen und bestellen",
+		"accepting": "Bestellung wird aufgegeben…",
+		"acceptNote": "Bei Annahme gelten die angebotenen Preise, nicht die aktuellen Katalogpreise.",
+		"acceptAddress": "Lieferung an",
+		"acceptPayment": "Zahlung per",
+		"acceptFailed": "Dieses Angebot konnte nicht angenommen werden.",
+		"acceptNeedsAddress": "Bitte hinterlegen Sie eine Adresse, bevor Sie ein Angebot annehmen.",
+		"wishlistTitle": "Wunschliste",
+		"noWishlist": "Ihre Wunschliste ist leer.",
+		"removeFromWishlist": "Entfernen",
+		"addedOn": "Hinzugefügt am {date}",
+		"unavailable": "Nicht mehr verfügbar",
+		"outOfStock": "Nicht auf Lager",
+		"priceOnRequest": "Preis auf Anfrage",
+		"addToCart": "In den Warenkorb",
+		"addToQuote": "In den Anfragekorb",
+		"addedToCart": "Zum Warenkorb hinzugefügt.",
+		"addFailed": "Das konnte nicht hinzugefügt werden."
+	},
+	"validation": {
+		"required": "Dieses Feld ist erforderlich.",
+		"email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+		"minLength": "Muss mindestens {count} Zeichen lang sein.",
+		"passwordMismatch": "Die Passwörter stimmen nicht überein."
+	},
+	"error": {
+		"notFoundTitle": "Seite nicht gefunden",
+		"notFoundBody": "Die gesuchte Seite existiert nicht.",
+		"genericTitle": "Etwas ist schiefgelaufen",
+		"network": "Der Server ist nicht erreichbar. Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+		"tryAgain": "Erneut versuchen"
+	},
+	"home": {
+		"topBar": "Klicken Sie hier, um sich als Händler oder Wiederverkäufer zu registrieren.",
+		"hero": {
+			"cta": "Jetzt entdecken",
+			"slides": [
+				{
+					"title": "Edelstahl-Strohhalme",
+					"body": "Edelstahl-Strohhalme sind eine langlebige, umweltfreundliche Alternative zu Plastikstrohhalmen. Sie sind für den jahrelangen Wiedergebrauch konzipiert, ohne an Qualität zu verlieren. Zudem sind sie leicht zu reinigen, stilvoll und ideal, um täglichen Abfall zu reduzieren und dabei Ihre Lieblingsgetränke zu genießen. Auch beim Thema Sicherheit und Branding punkten sie gegenüber anderen Materialien."
+				},
+				{
+					"title": "Die ganze Welt der Ausstechformen",
+					"body": "Sie benötigen keine individuelle Form? Wählen Sie aus unseren mehr als 400 verschiedenen Standardmotiven für nahezu jedes Thema und viele Branchen. Mit Ihrem Logo veredelt und individuell verpackt – einzeln oder als Set. Alles ist möglich."
+				},
+				{
+					"title": "Edelstahl-Eiswürfel",
+					"body": "Edelstahl-Eiswürfel halten Ihre Getränke perfekt gekühlt, ohne sie zu verwässern, und bewahren den vollen Geschmack vom ersten bis zum letzten Schluck. Wiederverwendbar und elegant sind sie ein hochwertiges Upgrade für Cocktails, Säfte und Getränke im Alltag. Mit Ihrem Logo als edler Werbeträger."
+				}
+			]
+		},
+		"tiles": [
+			{
+				"title": "Individuelle Fertigung",
+				"body": "Jedes unserer Produkte ist so einzigartig wie die Ideen unserer Kunden."
+			},
+			{
+				"title": "Qualität als Grundsatz",
+				"body": "Materialien und Verarbeitung liegen bei uns auf höchstem Niveau – für uns Standard."
+			},
+			{
+				"title": "Verpackungslösungen",
+				"body": "Wir liefern nicht nur ein Produkt – wir liefern Komplettpakete mit ansprechenden Verpackungslösungen."
+			},
+			{
+				"title": "Umfangreiche Beratung",
+				"body": "Die ausführliche und detailreiche Beratung ist uns wichtig auf dem Weg zu Ihrem perfekten Produkt von astano."
+			}
+		],
+		"categories": {
+			"heading": "Finden Sie das passende Produkt für Ihre Bedürfnisse"
+		},
+		"popular": {
+			"heading": "Unsere beliebtesten Produkte",
+			"cta": "Alle Produkte anzeigen",
+			"empty": "Noch keine Produkte veröffentlicht."
+		},
+		"custom": {
+			"heading": "Sonderanfertigungen",
+			"intro": "Ihre Ideen verdienen es, genau so umgesetzt zu werden, wie Sie sie sich vorstellen. Unser Service für Sonderanfertigungen ermöglicht es Ihnen, Stil, Funktionen und Ausführung zu wählen, sodass Ihr Produkt wirklich einzigartig wird. Ob einzigartiges Design oder maßgeschneiderte Lösung – wir verwandeln Ihre Vision mit Präzision und Sorgfalt in die Realität.",
+			"cards": [
+				{
+					"title": "Jedes Detail zählt",
+					"body": "Mit Blick auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und dabei ein hochwertiges Aussehen und Gefühl zu bewahren."
+				},
+				{
+					"title": "Hochwertiges Material",
+					"body": "Wir verwenden ausschließlich Materialien höchster Qualität, um erstklassige Leistung und eine Verarbeitung zu gewährleisten, die sich von anderen abhebt."
+				},
+				{
+					"title": "Wo Handwerkskunst auf Perfektion trifft",
+					"body": "Mit Fokus auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und gleichzeitig ein hochwertiges Aussehen und Gefühl zu bewahren."
+				},
+				{
+					"title": "Maßgeschneidert nach Ihren Anforderungen",
+					"body": "Jedes Detail wird sorgfältig von erfahrenen Händen gefertigt und vereint Kunstfertigkeit und Präzision in jedem Stück, um Ihre genauen Anforderungen zu erfüllen."
+				}
+			]
+		},
+		"newsletter": {
+			"heading": "Abonnieren Sie und erfahren Sie mehr",
+			"note": "Die Verwendung erfolgt gemäß unserer Datenschutzrichtlinie.",
+			"email": "E-Mail",
+			"placeholder": "name@example.com",
+			"submit": "Anmelden"
+		},
+		"footer": {
+			"about": "Bei astano fertigen wir hochwertige Produkte, die auf Präzision und Langlebigkeit ausgelegt sind. Dabei liegt unser Fokus auf individualisierten Produkten für Küche, Kochen, Backen, Essen & Trinken. Individuell weil sie Werbe- und Botschaftsträger sind. Bei uns finden Sie ansprechende Werbegeschenke, On-Packs und Merchandising Artikel.",
+			"quicklinks": "Quicklinks",
+			"legal": "Rechtliche Seiten",
+			"contactHeading": "Informationen Speichern",
+			"designedBy": "Designed by Explainerium",
+			"copyright": "Copyright {year} - ASSCA GmbH"
+		}
+	},
+	"contact": {
+		"title": "Kontaktieren Sie uns",
+		"intro": "Wir helfen Ihnen gerne! Egal ob Fragen zu unseren Produkten, Unterstützung bei einer Bestellung, ein Angebot anfordern oder sonstige Anfragen – unser Team steht Ihnen jederzeit zur Verfügung.",
+		"emailLabel": "E-Mail:",
+		"phoneLabel": "Telefon:",
+		"addressLabel": "Anschrift:",
+		"formHeading": "Nehmen Sie Kontakt auf",
+		"formSubtitle": "Schreiben Sie uns",
+		"fields": {
+			"name": "Name",
+			"email": "E-Mail",
+			"phone": "Telefon",
+			"company": "Firma",
+			"subject": "Betreff",
+			"message": "Nachricht"
+		},
+		"submit": "Einreichen",
+		"sending": "Wird gesendet…",
+		"success": "Vielen Dank – Ihre Nachricht ist bei uns eingegangen. Wir melden uns in Kürze.",
+		"error": "Ihre Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+	},
+	"faq": {
+		"title": "Häufig gestellte Fragen",
+		"intro": "In unserem FAQ-Bereich finden Sie klare Antworten auf die häufigsten Fragen zu astano® – von Produktpflege und Individualisierungsmöglichkeiten bis hin zu Versand, Zahlung und Rückgabe.",
+		"groups": [
+			{
+				"title": "Allgemeine Fragen",
+				"items": [
+					{
+						"q": "Was ist astano®?",
+						"a": "astano® ist spezialisiert auf hochwertige Küchenhelfer, Backzubehör und individuell gestaltete Artikel. Wir bieten sowohl fertige Produkte als auch personalisierte Lösungen für Hobbybäcker und Unternehmen."
+					},
+					{
+						"q": "Wo werden astano®-Produkte hergestellt?",
+						"a": "Unsere Produkte werden sorgfältig aus hochwertigen Materialien entworfen und gefertigt und entsprechen strengen Qualitätsstandards. Viele Artikel werden in Europa hergestellt, um Langlebigkeit und Präzision zu gewährleisten."
+					},
+					{
+						"q": "Wie kann ich astano® kontaktieren, um Anfragen zu stellen oder Unterstützung zu erhalten?",
+						"a": "Sie erreichen uns über das Kontaktformular auf unserer Website, per E-Mail oder telefonisch. Unser Kundenservice-Team hilft Ihnen gerne bei Fragen zu Produkten, Bestellungen oder individuellen Anpassungen."
+					}
+				]
+			},
+			{
+				"title": "Bestellungen & Versand",
+				"items": [
+					{
+						"q": "Wie lange dauert es, bis ich meine Bestellung erhalte?",
+						"a": "Der Standardversand innerhalb Deutschlands dauert in der Regel 3–7 Werktage. Internationale Bestellungen können je nach Bestimmungsort länger dauern. Sonderanfertigungen können zusätzliche Produktionszeit erfordern."
+					},
+					{
+						"q": "Kann ich meine Bestellung verfolgen?",
+						"a": "Ja! Sobald Ihre Bestellung versandt wurde, erhalten Sie per E-Mail eine Sendungsverfolgungsnummer, mit der Sie den Lieferstatus verfolgen können."
+					},
+					{
+						"q": "Bieten Sie internationalen Versand an?",
+						"a": "Ja, astano® liefert weltweit. Versandkosten und Lieferzeiten können je nach Bestimmungsort variieren."
+					}
+				]
+			},
+			{
+				"title": "Produkte & Anpassung",
+				"items": [
+					{
+						"q": "Sind astano®-Produkte sicher in der Anwendung?",
+						"a": "Absolut. Wir verwenden ausschließlich lebensmittelechte, hochwertige Materialien wie Edelstahl und zugelassene Kunststoffe. Alle Produkte durchlaufen strenge Qualitätskontrollen, um Sicherheit und Langlebigkeit zu gewährleisten."
+					},
+					{
+						"q": "Kann ich einen Ausstecher oder ein Backwerkzeug individuell gestalten?",
+						"a": "Ja! Wir bieten individuelle Designs an, inklusive Logos, Formen und Größen. Teilen Sie uns einfach Ihre Wünsche mit, und wir erstellen ein einzigartiges Produkt, das genau auf Ihre Bedürfnisse zugeschnitten ist."
+					},
+					{
+						"q": "Wie pflege ich meine Produkte?",
+						"a": "Die meisten unserer Produkte lassen sich leicht von Hand oder in der Spülmaschine reinigen. Um ihre Langlebigkeit zu gewährleisten, empfehlen wir, Edelstahlartikel von Hand zu spülen und sofort abzutrocknen, um Wasserflecken zu vermeiden."
+					}
+				]
+			}
+		]
+	},
+	"about": {
+		"title": "Über uns – astano®",
+		"intro": "Seit über 20 Jahren steht astano® für hochwertige, individualisierbare Produkte rund um Küche, Kochen, Backen, Essen & Trinken. Was mit einer individuellen Ausstechform aus Kunststoff begann, hat sich zu einem vielseitigen Sortiment aus Edelstahl- und Silikonartikeln entwickelt – von Ausstechformen, Backformen und Keksstempeln bis hin zu Eiswürfelformen, Edelstahl-Eiswürfeln, Trinkhalmen und Lunchboxen. Unser Anspruch geht dabei weit über das Produkt hinaus: Wir individualisieren nahezu jeden Artikel – von der dezenten Logogravur bis zur kompletten kundenspezifischen Entwicklung inklusive passender, hochwertiger Verpackung. So entstehen Produkte, die nicht nur funktional überzeugen, sondern Marken sichtbar machen und Botschaften wirkungsvoll transportieren.",
+		"heroCta": "Jetzt entdecken",
+		"craft": {
+			"title": "Mit Sorgfalt gefertigt – individuell für Marke und Markt",
+			"body": "astano® entwickelt und fertigt Produkte nicht „von der Stange“, sondern mit Blick auf die Anforderungen unserer Kunden. Ob Werbeartikel, Merchandising, On-Pack-Aktion, OEM-Produktion oder Handelsware für den Einzelhandel – wir verbinden langjährige Erfahrung mit durchdachter Individualisierung und zuverlässiger Fertigungsqualität. Unsere Produkte entstehen überwiegend aus Edelstahl und Silikon – Materialien, die für Langlebigkeit, Funktionalität und eine hochwertige Anmutung stehen. So schaffen wir individuelle Lösungen, die im Alltag bestehen, die Marke unserer Kunden stärken und gleichzeitig preislich attraktiv bleiben."
+		},
+		"quality": {
+			"title": "Qualität, Erfahrung und Individualisierung aus einer Hand",
+			"body": "Bei astano® treffen Produktkompetenz, Fertigungserfahrung und Markenverständnis aufeinander. Wir wissen, worauf es bei individualisierten Produkten ankommt: eine saubere Umsetzung, überzeugende Materialqualität, ein stimmiges Design und ein Preis, der wirtschaftlich bleibt. Als Mitglied im Warenzeichenverband Edelstahl Rostfrei stehen wir zudem für einen besonders hohen Qualitätsanspruch bei der Verarbeitung unserer Edelstahlprodukte. Für unsere Kunden bedeutet das: verlässliche Materialien, hochwertige Ausführung und Produkte, die langfristig überzeugen – optisch wie funktional.",
+			"cta": "Qualität entdecken"
+		},
+		"practical": {
+			"title": "Wo Handwerkskunst auf Funktion und Markenwirkung trifft",
+			"body": "Unsere Produkte sollen mehr können als gut aussehen. Sie sollen im Alltag funktionieren, langlebig sein und gleichzeitig die Identität einer Marke transportieren. Genau deshalb entwickeln wir Lösungen, die praktischen Nutzen, hochwertige Verarbeitung und individuelle Gestaltung miteinander verbinden. Ob kleine Logogravur oder komplett neues Produkt nach Kundenvorgabe – astano® begleitet Projekte von der Idee bis zum fertigen Artikel. So entstehen Produkte, die nicht austauschbar wirken, sondern Wiedererkennung schaffen und einen bleibenden Eindruck hinterlassen.",
+			"cta": "Sonderanfertigungen entdecken"
+		},
+		"cards": [
+			{
+				"title": "Gebaut für langfristige Qualität. Entwickelt für starke Marken.",
+				"body": "Unsere Produkte sind für einen langlebigen Einsatz konzipiert. Hochwertige Materialien, sorgfältige Verarbeitung und ein durchdachtes Design sorgen dafür, dass sie auch bei häufiger Nutzung zuverlässig funktionieren und dabei einen hochwertigen Eindruck vermitteln."
+			},
+			{
+				"title": "Hochwertige Materialien",
+				"body": "Wir setzen überwiegend auf Edelstahl und Silikon, weil diese Materialien langlebig, funktional und für viele Anwendungen im Küchen- und Haushaltsbereich ideal geeignet sind. Das Ergebnis sind Produkte mit hoher Wertigkeit, angenehmer Haptik und überzeugender Alltagstauglichkeit."
+			},
+			{
+				"title": "Jedes Detail zählt",
+				"body": "Bei astano® fertigen wir hochwertige, individualisierbare Produkte für Küche, Kochen, Backen, Essen & Trinken. Unsere Artikel eignen sich als Werbegeschenke, Merchandising-Produkte, On-Pack-Lösungen, Handelsartikel oder OEM-Produkte für starke Marken. Über 20 Jahre Erfahrung, hochwertige Materialien, flexible Individualisierung und ein überzeugendes Preis-Leistungs-Verhältnis machen uns zu einem verlässlichen Partner."
+			},
+			{
+				"title": "Maßgeschneiderte Lösungen für Ihre Anforderungen",
+				"body": "Sie benötigen kein Standardprodukt, sondern eine individuelle Lösung? Wir realisieren Artikel nach Ihren Vorstellungen – von der einfachen Logoanbringung bis zur kompletten OEM- oder Sonderanfertigung inklusive individueller Verpackung für Handel, Promotion oder Markenkommunikation."
+			}
+		]
+	},
+	"quality": {
+		"title": "Qualität bei astano®",
+		"intro": "Bei astano® ist Qualität für uns mehr als nur ein Merkmal – sie ist ein Versprechen. Jedes unserer Produkte – von Edelstahl-Ausstechformen über wiederverwendbare Strohhalme bis hin zu individuell gestaltbaren Eiswürfelformen und Backutensilien – erfüllt höchste Ansprüche an Langlebigkeit, Design und Benutzerfreundlichkeit. Wir setzen alles daran, in jedem einzelnen Produkt gleichbleibend exzellente Qualität zu liefern.",
+		"heroCta": "Jetzt entdecken",
+		"meaning": {
+			"title": "Was Qualität für uns bedeutet",
+			"cards": [
+				{
+					"title": "Premium-Materialien",
+					"body": "Wir verwenden hochwertigen Edelstahl, langlebige Kunststoffe und Premium Silikon – ausgewählt aufgrund ihrer Langlebigkeit, Sicherheit und Leistungsfähigkeit. Alle Produkte durchlaufen strenge Qualitätskontrollen, um sicherzustellen, dass sie unsere internen Standards erfüllen oder übertreffen."
+				},
+				{
+					"title": "Präzision und Konsistenz",
+					"body": "Egal, ob Sie sich für eine unserer über 400 Standard-Ausstechformen entscheiden oder eine individuell gestaltete Ausstechform mit Logogravur in Auftrag geben – unser Herstellungsprozess gewährleistet, dass jedes Produkt mit höchster Präzision und Liebe zum Detail gefertigt wird."
+				},
+				{
+					"title": "Funktionalität und Benutzerfreundlichkeit",
+					"body": "Qualität beschränkt sich nicht nur auf Aussehen und technische Daten – sie zeigt sich in der Alltagstauglichkeit. Bei der Entwicklung stehen die Bedürfnisse der Nutzer im Vordergrund: Unsere Produkte sollen häufigem Gebrauch standhalten, unsere Küchenaccessoires sollen einfach und sicher in der Anwendung sein."
+				}
+			]
+		},
+		"process": {
+			"title": "Unser Qualitätssicherungsprozess",
+			"steps": [
+				{
+					"title": "Materialauswahl und -prüfung",
+					"body": "Jeder Rohstoff wird auf Sicherheit, Haltbarkeit und Eignung geprüft. Nur vertrauenswürdige Lieferanten bestehen unser Auswahlverfahren."
+				},
+				{
+					"title": "Mehrfache Korrekturdurchgänge",
+					"body": "Mehrfache Korrekturdurchgänge sorgen dafür, dass Sie schon vorab sehen was Sie später in den Händen halten. Zudem werden mögliche Fehlerquellen auf ein Minimum reduziert."
+				},
+				{
+					"title": "Kontrolle und Tests",
+					"body": "Jeder Artikel wird vor Auslieferung ausführlich geprüft. Hierbei werden Oberfläche, Detailverarbeitung und kundenspezifische Anforderungen in Augenschein genommen."
+				},
+				{
+					"title": "Kundenfeedback",
+					"body": "Wir schätzen Ihre Erfahrung. Ihr Feedback nach dem Kauf hilft uns, Verbesserungspotenzial zu erkennen, damit wir uns anpassen und weiterentwickeln können."
+				}
+			],
+			"cta": "Jetzt entdecken"
+		},
+		"promise": {
+			"title": "Unser Versprechen an Sie",
+			"body": "Wenn Sie sich für astano® entscheiden, kaufen Sie nicht nur ein Produkt – Sie investieren in Zuverlässigkeit, handwerkliche Perfektion und langfristige Zufriedenheit. Wir verpflichten uns, diese Standards jeden Tag, bei jedem Werkzeug, jeder Form und jeder Verpackung, die wir herstellen, zu gewährleisten.",
+			"cta": "Jetzt einkaufen"
+		}
+	},
+	"custom": {
+		"title": "Sonderanfertigungen",
+		"intro": "Verwandeln Sie Ihre Ideen in einzigartige, hochwertige Kreationen. Von individuellen Ausstechformen bis hin zu personalisierten Backutensilien – astano® erweckt Ihre Designs mit Präzision, erstklassigen Materialien und schneller Fertigung zum Leben.",
+		"lead": {
+			"title": "Erwecken Sie Ihre Ideen zum Leben mit astano®",
+			"body": "Bei astano® beginnt jedes großartige Produkt mit einer großartigen Idee – Ihrer. Wir setzen Ihre individuellen Wünsche in Edelstahl, Silikon oder Kunststoff um. Eine durchgängige Begleitung von der ersten Beratung und Machbarkeitsprüfung über die Entwicklung des Produkts und der Verpackung bis hin zur Auslieferung. Bei uns erhalten Sie alles aus einer Hand. Sie müssen uns nur ansprechen."
+		},
+		"how": {
+			"title": "Wie es funktioniert",
+			"steps": [
+				{
+					"title": "Teilen Sie Ihre Idee",
+					"body": "Schicken Sie uns eine Email oder laden Sie Ihre Skizze, Ihr Logo oder ein Referenzbild hoch. Selbst eine einfache Zeichnung genügt – wir optimieren sie."
+				},
+				{
+					"title": "Prüfung und Angebot",
+					"body": "Wir prüfen Ihre Idee sorgfältig, beraten Sie und erstellen Ihnen ein maßgeschneidertes Angebot."
+				},
+				{
+					"title": "Entwurf und Produktion",
+					"body": "Nach Auftragsvergabe erstellen wir zunächst aussagekräftige Entwürfe und legen Ihnen diese zur Freigabe vor. In dieser Phase können nach Belieben Änderungen vorgenommen werden. Nach Freigabe starten wir die Produktion."
+				},
+				{
+					"title": "Lieferung und Logistik",
+					"body": "Ihr individuell angefertigtes Produkt wird sicher und nach Ihren Wünschen verpackt. Egal ob Lieferung an eine Adresse, Einzelaussendungen an verschiedene Adressen oder Lagerführung bei uns. Wir sorgen für eine reibungslose Logistik."
+				}
+			]
+		},
+		"why": {
+			"title": "Warum es funktioniert",
+			"cards": [
+				{
+					"title": "Präzisionsgefertigte Designs",
+					"body": "Wir setzen Ihre Ideen und Vorstellung so präzise wie möglich um. Dabei nutzen wir alle zur Verfügung stehenden, technischen Möglichkeiten um das Produkt trotz hohem Qualitätsanspruch so effizient und kostengünstig wie möglich zur realisieren."
+				},
+				{
+					"title": "Hochwertige, lebensmittelechte Materialien",
+					"body": "Alle Sonderanfertigungen werden aus hochwertigem, rostfreiem Edelstahl oder zertifizierten lebensmittelechten Materialien hergestellt – langlebig, sicher und für den Langzeitgebrauch konzipiert. Nicht umnsonst sind wir Mitglied im Warenzeichenverband Edelstahl Rostfrei."
+				},
+				{
+					"title": "Erfahrung die Begeistert",
+					"body": "Mit mehr als 20 Jahren Erfahrung im Bereich individuell produzierter Produkte haben Sie mit uns einen starken Partner. Wir sind ehrlich und beraten Sie auch in Puncto Nutzen und Funktion Ihrer Idee. Wenn etwas nicht funktioniert oder es Verbesserungsmöglichkeiten gibt, sagen wir das ganz offen. Denn wir möchten, dass Sie ein rundum zufriedenstellendes Produkt erhalten."
+				},
+				{
+					"title": "Perfekt für Ihr Unternehmen und Ihre Marke",
+					"body": "Individuelle Produkte zeugen nicht nur von Kreativität, sie begeistern auch den Endverbraucher. Ein durchdachtes Produkt in hoher Qualität steigert das Ansehen Ihres Unternehmens und Ihrer Marke. Mit astano haben Sie den richtigen Partner für erfolgreiche Produkte an Ihrer Seite."
+				}
+			]
+		},
+		"capabilities": {
+			"title": "Was können wir?",
+			"items": [
+				"Individuelle Haushalts- und Küchenartikel aus Edelstahl",
+				"Individuelle Haushalts- und Küchenartikel aus Silikon",
+				"Individuelle Haushalts- und Küchenartikel aus Kunststoffen",
+				"Individuelle Verpackungslösungen",
+				"Serien- und Zulieferatikel aus Edelstahl",
+				"Serien- und Zulieferartikel aus Kunststoffen und Silikon"
+			]
+		},
+		"cta": {
+			"title": "Bereit für Ihre individuelle Produktreise?",
+			"body": "Senden Sie uns Ihr Konzept über das untenstehende Formular. Laden Sie Ihr Bild hoch, beschreiben Sie Ihre Idee, und unser Team meldet sich mit einem Angebot und einem Designvorschlag bei Ihnen.",
+			"button": "Kontaktieren Sie uns"
+		}
+	},
+	"payment": {
+		"title": "Zahlung & Versand",
+		"shipping": {
+			"title": "Versand",
+			"intro": "Es gelten folgende Bedingungen:",
+			"countries": "Die Lieferung erfolgt im Inland (Deutschland) und in die nachstehenden Länder: Österreich, Belgien, Luxemburg, Lettland, Litauen, Dänemark, Schweden, Spanien, Frankreich, Italien, Polen, Slowenien, Slowakei, Kroatien, Ungarn, Schweiz.",
+			"islands": "Der Versand auf deutsche und ausländische Inseln ist ausgeschlossen.",
+			"domesticLabel": "Lieferung innerhalb Deutschlands:",
+			"domestic": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
+			"abroadLabel": "Lieferungen ins Ausland:",
+			"abroad": "Wir berechnen die Versandkosten nach Versandgewicht: Die individuell berechneten Versandkosten werden Ihnen vor Ihrer Bestellung im Warenkorb angezeigt.",
+			"carriers": "Der Standardversand erfolgt per Paketdienst. Sperrige Güter und Bestellungen, deren Gewicht und Volumen sich nicht für den einzelnen Paketversand eignen versenden wir per Spedition auf Paletten. Die Versandkosten im Warenkorb sind immer fest. Der Versandweg wird von uns individuell gewählt."
+		},
+		"terms": {
+			"title": "Zahlungsbedingungen",
+			"methodsTitle": "Akzeptierte Zahlungsmöglichkeiten",
+			"methods": [
+				"Vorkasse per Überweisung",
+				"Zahlung per Rechnung"
+			],
+			"detailsTitle": "Weitere Einzelheiten zur Zahlung",
+			"invoice": "Die Zahlung auf Rechnung ist ab der 2. Bestellung möglich. Kunden die bereits bei früheren Bestellungen per Rechnung bezahlt haben werden trotz Erstbestellung mit Vorkasse automatisch auf Rechnung umgestellt.",
+			"due": "Der Rechnungsbetrag ist bei Zahlung auf Rechnung innerhalb von 14 Tagen auszugleichen. Auslands- und Erstbestellungen sind nur per Vorkasse möglich. Ausnahmen: Stammkunden und Händler die auch in der Vergangenheit auf Rechnung bezahlt haben.",
+			"contact": "Bei Fragen finden Sie unsere Kontaktdaten im Impressum oder nutzen Sie unser Kontaktformular."
+		},
+		"times": {
+			"title": "Liefer- & Produktionszeiten",
+			"custom": "Die überwiegende Mehrheit unserer Produkte wird individuell angefertigt oder nach Ihren Wünschen veredelt. Aus diesem Grund können wir hier keine generellen Produktions- & Lieferzeiten für alle Artikel bereitstellen. Die Lieferzeiten zu jedem Produkt finden Sie in der Produktbeschreibung auf der Produktseite unter dem Reiter \"zusätzliche Informationen\".",
+			"standard": "Die Regel-Laufzeiten für den Paketversand ab Aussendung liegen in Deutschland bei 2-3 Werktagen (Paketversand)/3-5 Werktage (Speditionsversand), im Ausland bei 3-8 Werktagen (Paketversand)/5-10 Werktage (Speditionsversand)."
+		}
+	},
+	"dealers": {
+		"title": "Lösungen für Wiederverkäufer & Unternehmen",
+		"intro": "Profitieren Sie von gestaffelten Preisen, Nettopreisen mit Umsatzsteuer-ID und einem dedizierten Support für Wiederverkäufer und Geschäftskunden.",
+		"cards": [
+			"Großhandelspreise",
+			"EU-Mehrwertsteuer (Reverse-Charge-Verfahren)",
+			"Individuelle Fertigung",
+			"Manuelle Freigabe zur Qualitätskontrolle"
+		],
+		"cta": "Wiederverkäufer werden"
+	},
+	"quoteBasket": {
+		"title": "Angebotsanfrage",
+		"intro": "Sagen Sie uns, was Sie brauchen – wir melden uns mit einem Preis.",
+		"empty": "Ihre Angebotsanfrage ist leer.",
+		"continueShopping": "Produkte ansehen",
+		"product": "Produkt",
+		"quantity": "Menge",
+		"note": "Anmerkung",
+		"notePlaceholder": "Gibt es etwas, das wir zu diesem Artikel wissen sollten?",
+		"remove": "Entfernen",
+		"clear": "Anfrage leeren",
+		"clearConfirm": "Alle Artikel aus der Anfrage entfernen?",
+		"noPrices": "Hier werden keine Preise angezeigt. Wir kalkulieren jede Anfrage individuell und antworten per E-Mail.",
+		"details": "Ihre Angaben",
+		"subject": "Betreff",
+		"subjectPlaceholder": "Worum geht es bei dieser Anfrage?",
+		"message": "Nachricht",
+		"messagePlaceholder": "Beschreiben Sie Ihr Projekt, Termine oder gewünschte Individualisierungen.",
+		"name": "Name",
+		"email": "E-Mail",
+		"phone": "Telefon",
+		"company": "Firma",
+		"submit": "Anfrage senden",
+		"submitting": "Wird gesendet…",
+		"submitted": "Vielen Dank – Ihre Anfrage wurde gesendet.",
+		"submittedNote": "Wir antworten per E-Mail. Bitte prüfen Sie Ihren Posteingang.",
+		"submitFailed": "Ihre Anfrage konnte nicht gesendet werden. Bitte versuchen Sie es erneut.",
+		"required": "Pflichtfeld",
+		"invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+		"belowMoq": "Mindestbestellmenge ist {quantity}.",
+		"issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge."
+	},
+	"checkout": {
+		"title": "Kasse",
+		"signInRequired": "Bitte melden Sie sich an, um Ihre Bestellung abzuschließen.",
+		"signInNote": "Ihr Warenkorb bleibt erhalten – Sie kommen direkt hierher zurück.",
+		"signIn": "Anmelden",
+		"register": "Konto erstellen",
+		"emptyCart": "Ihr Warenkorb ist leer.",
+		"backToCart": "Zurück zum Warenkorb",
+		"billingAddress": "Rechnungsadresse",
+		"shippingAddress": "Lieferadresse",
+		"shipToDifferent": "An eine andere Adresse liefern",
+		"useSaved": "Gespeicherte Adresse verwenden",
+		"firstName": "Vorname",
+		"lastName": "Nachname",
+		"company": "Firma",
+		"street1": "Straße und Hausnummer",
+		"street2": "Adresszusatz",
+		"postcode": "PLZ",
+		"city": "Ort",
+		"state": "Bundesland / Region",
+		"country": "Land",
+		"phone": "Telefon",
+		"email": "E-Mail",
+		"vatNumber": "Umsatzsteuer-ID",
+		"vatNote": "Wird auf Ihrer Rechnung ausgewiesen. Das Reverse-Charge-Verfahren wird automatisch angewendet, sobald Ihre USt-IdNr. in Ihrem Konto geprüft wurde.",
+		"delivery": "Versandart",
+		"noDelivery": "Wir liefern nicht in dieses Land. Bitte wählen Sie ein anderes Zielland.",
+		"chooseDelivery": "Bitte wählen Sie eine Versandart",
+		"unavailableNoBand": "Für dieses Versandgewicht nicht verfügbar",
+		"unavailableBelowFree": "Unterhalb der Grenze für kostenlosen Versand",
+		"unavailableNotConfigured": "Nicht verfügbar",
+		"payment": "Zahlungsart",
+		"choosePayment": "Bitte wählen Sie eine Zahlungsart",
+		"notEligible": "Für diese Bestellung nicht verfügbar",
+		"reasonNotEnoughOrderHistory": "Ab Ihrer zweiten Bestellung verfügbar",
+		"reasonRequiresValidatedVatId": "Erfordert eine geprüfte Umsatzsteuer-ID",
+		"reasonBelowMinimum": "Unterhalb des Mindestbestellwerts für diese Zahlungsart",
+		"reasonAboveMaximum": "Oberhalb des Höchstbestellwerts für diese Zahlungsart",
+		"note": "Anmerkung zur Bestellung",
+		"notePlaceholder": "Gibt es etwas, das wir zu dieser Bestellung wissen sollten?",
+		"summary": "Ihre Bestellung",
+		"subtotal": "Zwischensumme",
+		"shipping": "Versand",
+		"tax": "MwSt",
+		"grandTotal": "Gesamt",
+		"weight": "Versandgewicht",
+		"reverseCharged": "Reverse-Charge – die Steuerschuld geht auf den Leistungsempfänger über. Für diese Bestellung wird keine MwSt berechnet.",
+		"taxUnconfigured": "Für dieses Zielland ist kein Steuersatz hinterlegt, daher wurde keine MwSt berechnet. Bitte kontaktieren Sie uns vor der Bestellung.",
+		"placeOrder": "Zahlungspflichtig bestellen – {total}",
+		"placing": "Bestellung wird aufgegeben…",
+		"placeFailed": "Ihre Bestellung konnte nicht aufgegeben werden.",
+		"required": "Pflichtfeld",
+		"invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+		"calculating": "Wird berechnet…",
+		"enterAddressFirst": "Geben Sie Ihre Lieferadresse ein, um die Kosten zu sehen.",
+		"orderPlaced": "Vielen Dank – Ihre Bestellung ist bestätigt.",
+		"orderNumber": "Bestellnummer",
+		"confirmationNote": "Eine Bestätigung wurde Ihnen per E-Mail zugesendet.",
+		"paymentInstructions": "Zahlungshinweise",
+		"viewOrders": "Meine Bestellungen",
+		"keepShopping": "Weiter einkaufen"
+	}
 }

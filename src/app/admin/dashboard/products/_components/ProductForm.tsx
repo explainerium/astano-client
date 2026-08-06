@@ -32,6 +32,7 @@ import MoqField from "./MoqField"
 import OptionsTab from "./OptionsTab"
 import ProductImages from "./ProductImages"
 import QuantityPricing from "./QuantityPricing"
+import { TIER_ROLES, tierUnitPrice, type TierRole } from "@/lib/tiers"
 import {
 	buildTree,
 	displayName,
@@ -81,15 +82,16 @@ const sizeField = z
 	})
 
 /**
- * One rung of the ladder, both prices side by side.
+ * One rung: from what quantity, how to read the amount, and the amount.
  *
- * The amount *is* the unit price at that quantity — every tier in the live shop
- * is a fixed price (§4.2), so there is no discount-type column to get wrong.
+ * Mirrors WholesaleX's tier entry exactly — `_min_quantity`, `_discount_type`,
+ * `_discount_amount` (§4.2) — so a migrated ladder round-trips through this
+ * form unchanged.
  */
 const tierRow = z.object({
 	minQuantity: z.number({ message: "Enter a quantity" }).int().min(1, "At least 1"),
-	retail: moneyField,
-	reseller: moneyField,
+	type: z.enum(["FIXED_PRICE", "PERCENTAGE", "FIXED_AMOUNT"]),
+	amount: moneyField,
 })
 
 const localeBlock = (nameRequired: boolean) =>
@@ -157,7 +159,19 @@ const schema = z.object({
 	}),
 	taxStatus: z.enum(["TAXABLE", "SHIPPING_ONLY", "NONE"]),
 
-	tiers: z.array(tierRow),
+	/**
+	 * One ladder per audience, keyed by role.
+	 *
+	 * Not a single array with a role column: the three ladders are edited
+	 * independently — the retail one has eight rungs while the dealer one may
+	 * have four — and interleaving them in one table made the shared quantity
+	 * column a lie.
+	 */
+	tiers: z.object({
+		GUEST: z.array(tierRow),
+		B2C: z.array(tierRow),
+		RESELLER: z.array(tierRow),
+	}),
 
 	/**
 	 * Rows are not validated for completeness — `onSubmit` already drops the
@@ -234,65 +248,99 @@ const schema = z.object({
 			}
 		}
 
-		// A ladder with nothing to step down from is dead data: the rungs attach
-		// to the price row of their own role, and a role with no row is never
-		// resolved at all. A dealer ladder can stand on the dealer price alone,
-		// which is why this is not simply "any ladder needs a regular price".
-		const needsRegular =
-			rows.some((row) => row.retail.trim()) ||
-			(!dealer && rows.some((row) => row.reseller.trim()))
-
-		if (!regular && needsRegular) {
-			ctx.addIssue({
-				code: "custom",
-				path: ["prices", "GUEST", "basePrice"],
-				message: "Set a regular price before adding quantity discounts.",
-			})
+		/**
+		 * What each role's ladder is measured against.
+		 *
+		 * A rung attaches to the price row of its own role, and a role with no
+		 * row is never resolved at all — so a ladder without a base is dead data
+		 * the shop will silently ignore. `onSubmit` seeds a missing role's row
+		 * from the regular price, so that is what the base falls back to here.
+		 * The sale price wins when there is one, because that is what
+		 * `resolvePrice` discounts from.
+		 */
+		const baseFor = (role: TierRole): string => {
+			const own = values.prices[role === "B2C" ? "GUEST" : role]
+			const sale = own.salePrice.trim()
+			const list = own.basePrice.trim()
+			return sale || list || regular
 		}
 
-		// Two rungs at the same quantity: which one wins is undefined, since the
-		// resolver picks by highest threshold and both are equally high.
-		const seen = new Map<number, number>()
-		rows.forEach((row, index) => {
-			const first = seen.get(row.minQuantity)
-			if (first === undefined) {
-				seen.set(row.minQuantity, index)
-				return
+		for (const { key: role, label } of TIER_ROLES) {
+			const ladder = rows[role]
+			if (!ladder.length) continue
+
+			const base = baseFor(role)
+
+			if (!base) {
+				ctx.addIssue({
+					code: "custom",
+					path: ["prices", "GUEST", "basePrice"],
+					message: `Set a regular price before adding ${label.toLowerCase()} quantity discounts.`,
+				})
 			}
-			ctx.addIssue({
-				code: "custom",
-				path: ["tiers", index, "minQuantity"],
-				message: `Row ${first + 1} already covers ${row.minQuantity}.`,
+
+			// Two rungs at the same quantity: which one wins is undefined, since
+			// the resolver picks by highest threshold and both are equally high.
+			const seen = new Map<number, number>()
+			ladder.forEach((row, index) => {
+				const first = seen.get(row.minQuantity)
+				if (first === undefined) {
+					seen.set(row.minQuantity, index)
+					return
+				}
+				ctx.addIssue({
+					code: "custom",
+					path: ["tiers", role, index, "minQuantity"],
+					message: `Row ${first + 1} already covers ${row.minQuantity}.`,
+				})
 			})
-		})
 
-		// §4.2 found a live product whose Reseller ladder went *up* at 1000 —
-		// order more, pay more per unit. This is the validation that note asks
-		// for. The base price seeds the comparison, so a first rung above the
-		// regular price is caught as the same mistake.
-		const ordered = [...rows]
-			.map((row, index) => ({ row, index }))
-			.sort((a, b) => a.row.minQuantity - b.row.minQuantity)
-
-		const ladders = [
-			{ column: "retail" as const, floor: regular },
-			{ column: "reseller" as const, floor: dealer || regular },
-		]
-
-		for (const { column, floor } of ladders) {
-			let previous = floor ? Number(floor) : null
-			for (const { row, index } of ordered) {
-				const amount = row[column].trim()
-				if (!amount) continue
-				const value = Number(amount)
-				if (previous !== null && value > previous) {
+			// A percentage cannot take more than the whole price away.
+			ladder.forEach((row, index) => {
+				if (row.type !== "PERCENTAGE") return
+				const amount = row.amount.trim()
+				if (amount && Number(amount) > 100) {
 					ctx.addIssue({
 						code: "custom",
-						path: ["tiers", index, column],
-						message: `Above the ${previous} charged for a smaller order.`,
+						path: ["tiers", role, index, "amount"],
+						message: "A discount cannot be more than 100 %.",
 					})
 				}
-				previous = value
+			})
+
+			/**
+			 * §4.2 found a live product whose Reseller ladder went *up* at 1000 —
+			 * order more, pay more per unit. This is the validation that note asks
+			 * for, and it now has to compare **resolved unit prices** rather than
+			 * raw amounts: with three discount types in play, "20" can be a
+			 * cheaper rung than "15" or a dearer one depending on how each is
+			 * read. The base price seeds the comparison, so a first rung that
+			 * costs more than the regular price is caught as the same mistake.
+			 */
+			const baseValue = base ? Number(base) : null
+
+			const ordered = [...ladder]
+				.map((row, index) => ({ row, index }))
+				.sort((a, b) => a.row.minQuantity - b.row.minQuantity)
+
+			let previous = baseValue
+			for (const { row, index } of ordered) {
+				const amount = row.amount.trim()
+				if (!amount) continue
+
+				const unit = tierUnitPrice(baseValue, row.type, Number(amount))
+				if (unit === null) continue
+
+				if (previous !== null && unit > previous + 1e-9) {
+					ctx.addIssue({
+						code: "custom",
+						path: ["tiers", role, index, "amount"],
+						message: `Works out at ${unit.toFixed(2)} per unit — above the ${previous.toFixed(
+							2
+						)} charged for a smaller order.`,
+					})
+				}
+				previous = unit
 			}
 		}
 	})
@@ -312,25 +360,28 @@ const retailPrice = (product?: AdminProduct) =>
 	product?.prices.find((p) => p.role === "GUEST") ?? product?.prices.find((p) => p.role === "B2C")
 
 /**
- * The flat (role, quantity) rows folded back into one row per quantity.
+ * The flat (role, quantity) rows split into one ladder per role.
  *
- * Only fixed-price rungs are read. The value of a percentage rung is a
- * percentage, and showing it in a column headed "price" would invite an admin
- * to save it as one. Nothing in the catalogue uses the other two types (§4.2).
+ * Every type is read now, not just fixed-price: a percentage rung entered here
+ * has to come back as a percentage rung, and an earlier version that filtered
+ * to `FIXED_PRICE` would have silently dropped the others on the next save.
  */
 const toTierRows = (product?: AdminProduct) => {
-	const fixed = (product?.tiers ?? []).filter((tier) => tier.type === "FIXED_PRICE")
+	const ladderFor = (role: PriceRole) =>
+		(product?.tiers ?? [])
+			.filter((tier) => tier.role === role)
+			.sort((a, b) => a.minQuantity - b.minQuantity)
+			.map((tier) => ({
+				minQuantity: tier.minQuantity,
+				type: tier.type,
+				amount: tier.value,
+			}))
 
-	const valueAt = (role: PriceRole, minQuantity: number) =>
-		fixed.find((tier) => tier.role === role && tier.minQuantity === minQuantity)?.value ?? ""
-
-	return [...new Set(fixed.map((tier) => tier.minQuantity))]
-		.sort((a, b) => a - b)
-		.map((minQuantity) => ({
-			minQuantity,
-			retail: valueAt("GUEST", minQuantity) || valueAt("B2C", minQuantity),
-			reseller: valueAt("RESELLER", minQuantity),
-		}))
+	return {
+		GUEST: ladderFor("GUEST"),
+		B2C: ladderFor("B2C"),
+		RESELLER: ladderFor("RESELLER"),
+	}
 }
 
 const toDefaults = (product?: AdminProduct): FormValues => {
@@ -451,7 +502,31 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 		const regularSale = form.prices.GUEST.salePrice.trim()
 		const dealer = form.prices.RESELLER.basePrice.trim()
 		const dealerSale = form.prices.RESELLER.salePrice.trim()
-		const hasDealerLadder = form.tiers.some((row) => row.reseller.trim())
+
+		/**
+		 * The three ladders flattened back to one row per (role, quantity).
+		 *
+		 * A rung with no amount is dropped rather than sent as zero — an
+		 * abandoned row must not silently price the product at nothing. Sorted by
+		 * quantity so the stored ladder reads in order even if the table did not.
+		 */
+		const tiers: ProductTier[] = []
+
+		for (const { key: role } of TIER_ROLES) {
+			for (const row of [...form.tiers[role]].sort((a, b) => a.minQuantity - b.minQuantity)) {
+				const amount = row.amount.trim()
+				if (!amount) continue
+
+				tiers.push({
+					role,
+					minQuantity: row.minQuantity,
+					type: row.type,
+					value: amount,
+				})
+			}
+		}
+
+		const hasLadder = (role: TierRole) => tiers.some((tier) => tier.role === role)
 
 		const prices: ProductPrice[] = []
 
@@ -463,48 +538,29 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			})
 		}
 
-		// A dealer ladder needs a RESELLER row to hang from — the rungs attach to
-		// the price row of their own role, and a role with no row is never
-		// resolved at all. When no dealer price was typed, the regular price is
-		// that row's base, which is exactly what "leave empty to use the regular
-		// price" says on the field.
-		if (dealer || (hasDealerLadder && regular)) {
+		/**
+		 * A ladder needs a price row of its own role to hang from.
+		 *
+		 * The rungs attach to the price row of their own role, and a role with no
+		 * row is never resolved at all — so a B2C ladder without a B2C price is
+		 * data the shop would silently ignore. Where the admin gave no price for
+		 * that role, the regular price becomes the row's base, which is what
+		 * "leave empty and they pay the regular price" says on the field.
+		 */
+		if (hasLadder("B2C") && regular) {
+			prices.push({
+				role: "B2C",
+				basePrice: regular,
+				...(regularSale ? { salePrice: regularSale } : {}),
+			})
+		}
+
+		if (dealer || (hasLadder("RESELLER") && regular)) {
 			prices.push({
 				role: "RESELLER",
 				basePrice: dealer || regular,
 				...(dealerSale ? { salePrice: dealerSale } : {}),
 			})
-		}
-
-		/**
-		 * The table unfolded back into one row per (role, quantity).
-		 *
-		 * An empty cell is dropped rather than sent as zero — an abandoned row
-		 * must not silently price the product at nothing. A row with both cells
-		 * empty therefore disappears entirely, which is what deleting it means.
-		 */
-		const tiers: ProductTier[] = []
-
-		for (const row of [...form.tiers].sort((a, b) => a.minQuantity - b.minQuantity)) {
-			const retail = row.retail.trim()
-			const reseller = row.reseller.trim()
-
-			if (retail) {
-				tiers.push({
-					role: "GUEST",
-					minQuantity: row.minQuantity,
-					type: "FIXED_PRICE",
-					value: retail,
-				})
-			}
-			if (reseller) {
-				tiers.push({
-					role: "RESELLER",
-					minQuantity: row.minQuantity,
-					type: "FIXED_PRICE",
-					value: reseller,
-				})
-			}
 		}
 
 		const payload: ProductPayload = {

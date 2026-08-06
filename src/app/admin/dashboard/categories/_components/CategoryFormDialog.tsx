@@ -7,6 +7,7 @@ import { z } from "zod"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProCombobox from "@/components/form/ProCombobox"
 import ProForm from "@/components/form/ProForm"
+import CategoryTiersPanel from "./CategoryTiersPanel"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import ProTextarea from "@/components/form/ProTextarea"
@@ -250,6 +251,20 @@ export const CategoryFormDialog = ({
 						<ProSubmit>{isEdit ? "Save changes" : "Create category"}</ProSubmit>
 					</div>
 				</ProForm>
+
+				{/*
+				 * Outside the form, and only once the category exists.
+				 *
+				 * Ladders are a separate resource with their own endpoint and their
+				 * own save — folding them into this form would mean one button that
+				 * writes to two places and half-succeeds. A new category has no id to
+				 * hang them on yet, so they appear on the next open.
+				 */}
+				{isEdit && category && (
+					<div className="border-t pt-6">
+						<CategoryTiersPanel categoryId={category.id} />
+					</div>
+				)}
 			</DialogContent>
 		</Dialog>
 	)

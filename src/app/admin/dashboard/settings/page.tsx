@@ -8,6 +8,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import ProTextarea from "@/components/form/ProTextarea"
+import TierPriorityCard from "./_components/TierPriorityCard"
 import { useSaveSettingsMutation, useSettingsQuery } from "@/redux/api/settingApi"
 import type { SettingsResponse } from "@/types/setting"
 
@@ -54,8 +55,15 @@ const MULTILINE = new Set(["invoice.footer"])
 const asString = (value: unknown) =>
 	value === null || value === undefined ? "" : String(value)
 
+/**
+ * Settings that have a screen of their own and must not also appear as a raw
+ * text field here. A comma-separated priority string is not something anyone
+ * should have to type correctly.
+ */
+const HAS_OWN_CONTROL = new Set(["pricing.tierPriority"])
+
 const groupKeys = (known: Record<string, string>) => {
-	const keys = Object.keys(known)
+	const keys = Object.keys(known).filter((key) => !HAS_OWN_CONTROL.has(key))
 	const grouped = SECTIONS.map((section) => ({
 		...section,
 		keys: keys.filter((key) => key.startsWith(section.prefix)),
@@ -218,6 +226,10 @@ export default function SettingsPage() {
 			{/* Keyed on the loaded values so useForm rebuilds once they arrive — it
 			    reads defaultValues only on mount. */}
 			{data && <SettingsForm key={data.settings.length} data={data} />}
+
+			{/* Its own card, below the generic form: the value is an order, not a
+			    string, and it saves through its own endpoint. */}
+			{data && <TierPriorityCard />}
 		</div>
 	)
 }

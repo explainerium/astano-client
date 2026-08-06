@@ -45,7 +45,14 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const [variantId, setVariantId] = useState<string | null>(null)
 	const [quantity, setQuantity] = useState(1)
 	const [pricedQuantity, setPricedQuantity] = useState(1)
-	const [chosenOptions, setChosenOptions] = useState<Set<string>>(new Set())
+	/**
+	 * The chosen options and how many of each.
+	 *
+	 * A map rather than a set, because an option is a product bought in its own
+	 * quantity: 500 cutters might carry 500 engravings or one hang-tag design.
+	 * Ticking one seeds it at that option's own minimum (§4.6, R3).
+	 */
+	const [chosenOptions, setChosenOptions] = useState<Map<string, number>>(new Map())
 	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 	const [attaching, setAttaching] = useState(false)
 
@@ -117,6 +124,18 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const belowMoq = quantity < minQuantity
 
 	/**
+	 * An option under its own minimum blocks the whole add, not just itself.
+	 *
+	 * The alternative is adding the main product and failing on the option,
+	 * which leaves a half-built configuration in the cart — worse than refusing
+	 * and saying which line is short.
+	 */
+	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
+		const option = product?.options.find((o) => o.id === id)
+		return !!option && chosenQuantity < option.startQuantity
+	})
+
+	/**
 	 * Any change to the quantity retires the last confirmation. "Added to your
 	 * cart" left standing next to a quantity that is no longer the one that was
 	 * added reads as if the new number went in too.
@@ -127,7 +146,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	}
 
 	const handleAdd = async () => {
-		if (!product || !variant || belowMoq) return
+		if (!product || !variant || belowMoq || optionBelowMoq) return
 		setFeedback(null)
 
 		try {
@@ -145,7 +164,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				// Options hang off the line that was just created. If that line
 				// cannot be found the main product is still in the cart — the
 				// message below reports the failure rather than pretending.
-				for (const optionId of chosenOptions) {
+				for (const [optionId, optionQuantity] of chosenOptions) {
 					const option = product.options.find((o) => o.id === optionId)
 					if (!option || !line) continue
 					const optionProduct = await fetchOptionProduct({ slug: option.slug }).unwrap()
@@ -154,7 +173,11 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 					if (!optionVariant) continue
 					await addToCart({
 						variantId: optionVariant.id,
-						quantity: option.startQuantity,
+						// The quantity the customer set, floored at the option's own
+						// minimum — the API rejects a short line rather than quietly
+						// raising it, and losing the whole basket to a typo here would
+						// be a poor trade.
+						quantity: Math.max(optionQuantity, option.startQuantity),
 						parentItemId: line.id,
 					}).unwrap()
 				}
@@ -272,6 +295,20 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</fieldset>
 					)}
 
+					{!product.quoteOnly && variant && (
+						<div className="mt-8">
+							<TierTable
+								tiers={variant.tiers}
+								quantity={quantity}
+								baseRow={
+									minQuantity < firstTierAt && openingPrice?.variantId === variant.id
+										? { minQuantity, unitPrice: openingPrice.unitPrice }
+										: null
+								}
+							/>
+						</div>
+					)}
+
 					<div className="mt-8">
 						<label htmlFor="quantity" className="font-heading mb-3 block text-base font-semibold">
 							{t("quantity")}
@@ -329,54 +366,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						)}
 					</div>
 
-					{!!product.options.length && (
-						<fieldset className="mt-8">
-							<legend className="font-heading mb-3 text-base font-semibold">{t("options")}</legend>
-							<ul className="space-y-2">
-								{product.options.map((option) => {
-									const price = formatMoney(option.unitPrice, locale)
-									return (
-										<li key={option.id}>
-											<label className="hover:border-neutral-400 flex cursor-pointer items-start gap-3 border p-3.5 transition-colors">
-												<input
-													type="checkbox"
-													checked={chosenOptions.has(option.id)}
-													onChange={(event) =>
-														setChosenOptions((current) => {
-															const next = new Set(current)
-															if (event.target.checked) next.add(option.id)
-															else next.delete(option.id)
-															return next
-														})
-													}
-													className="mt-0.5 size-4 shrink-0"
-												/>
-												<span className="flex-1 text-sm">
-													{option.groupLabel && (
-														<span className="text-muted-foreground block text-xs uppercase">
-															{option.groupLabel}
-														</span>
-													)}
-													<span className="font-medium">{option.name}</span>
-													{option.startQuantity > 1 && (
-														<span className="text-muted-foreground block text-xs">
-															{t("minimumOrder", { quantity: option.startQuantity })}
-														</span>
-													)}
-												</span>
-												{price && <span className="text-sm font-semibold">{price}</span>}
-											</label>
-										</li>
-									)
-								})}
-							</ul>
-						</fieldset>
-					)}
-
 					<button
 						type="button"
 						onClick={handleAdd}
-						disabled={busy || belowMoq || (!product.quoteOnly && !variant?.inStock)}
+						disabled={busy || belowMoq || optionBelowMoq || (!product.quoteOnly && !variant?.inStock)}
 						className="bg-primary text-primary-foreground mt-8 inline-flex w-full items-center justify-center gap-2 px-8 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
 					>
 						{busy && <Loader2 className="size-4 animate-spin" />}
@@ -429,18 +422,138 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</div>
 					</dl>
 
-					{!product.quoteOnly && variant && (
-						<div className="mt-8">
-							<TierTable
-								tiers={variant.tiers}
-								quantity={quantity}
-								baseRow={
-									minQuantity < firstTierAt && openingPrice?.variantId === variant.id
-										? { minQuantity, unitPrice: openingPrice.unitPrice }
-										: null
-								}
-							/>
-						</div>
+					{!!product.options.length && (
+						<fieldset className="mt-8">
+							<legend className="font-heading mb-3 text-base font-semibold">{t("options")}</legend>
+							<ul className="space-y-2">
+								{product.options.map((option) => {
+									const chosen = chosenOptions.has(option.id)
+									const optionQuantity = chosenOptions.get(option.id) ?? option.startQuantity
+									const optionBelowMoq = chosen && optionQuantity < option.startQuantity
+
+									/**
+									 * What this option costs at the quantity chosen.
+									 *
+									 * Read off its own ladder rather than refetched: the rungs
+									 * were priced by the server for this visitor, so picking the
+									 * highest one the quantity reaches gives the same answer the
+									 * cart will, with no request per keystroke.
+									 */
+									const rung = option.tiers.reduce<{ unitPrice: string | null } | null>(
+										(best, tier) => (optionQuantity >= tier.minQuantity ? tier : best),
+										null
+									)
+									const price = formatMoney(rung?.unitPrice ?? option.unitPrice, locale)
+
+									const setQuantityFor = (next: number) =>
+										setChosenOptions((current) => {
+											const map = new Map(current)
+											map.set(option.id, Math.max(1, next))
+											return map
+										})
+
+									return (
+										<li
+											key={option.id}
+											className={cn(
+												"border transition-colors",
+												chosen ? "border-neutral-400" : "hover:border-neutral-400"
+											)}
+										>
+											<label className="flex cursor-pointer items-start gap-3 p-3.5">
+												<input
+													type="checkbox"
+													checked={chosen}
+													onChange={(event) =>
+														setChosenOptions((current) => {
+															const next = new Map(current)
+															// Seeded at the option's own minimum, not at 1.
+															if (event.target.checked) next.set(option.id, option.startQuantity)
+															else next.delete(option.id)
+															return next
+														})
+													}
+													className="mt-0.5 size-4 shrink-0"
+												/>
+												<span className="flex-1 text-sm">
+													{option.groupLabel && (
+														<span className="text-muted-foreground block text-xs uppercase">
+															{option.groupLabel}
+														</span>
+													)}
+													<span className="font-medium">{option.name}</span>
+													{option.startQuantity > 1 && (
+														<span className="text-muted-foreground block text-xs">
+															{t("minimumOrder", { quantity: option.startQuantity })}
+														</span>
+													)}
+												</span>
+												{price && <span className="text-sm font-semibold">{price}</span>}
+											</label>
+
+											{/* Quantity and ladder appear only once the option is
+											    taken — an untaken option showing a quantity field
+											    invites the customer to set one and wonder why
+											    nothing happened. */}
+											{chosen && (
+												<div className="space-y-3 border-t px-3.5 py-3">
+													<div className="flex flex-wrap items-center gap-3">
+														<span className="text-muted-foreground text-xs">
+															{t("optionQuantity")}
+														</span>
+														<div className="flex items-center border">
+															<button
+																type="button"
+																onClick={() => setQuantityFor(optionQuantity - 1)}
+																disabled={optionQuantity <= option.startQuantity}
+																className="px-3 py-1.5 text-sm disabled:opacity-40"
+																aria-label="−"
+															>
+																−
+															</button>
+															<input
+																type="number"
+																min={option.startQuantity}
+																value={optionQuantity}
+																onChange={(event) =>
+																	setQuantityFor(Number(event.target.value) || 1)
+																}
+																className="w-16 border-x py-1.5 text-center text-sm"
+																aria-label={`${option.name} ${t("optionQuantity")}`}
+															/>
+															<button
+																type="button"
+																onClick={() => setQuantityFor(optionQuantity + 1)}
+																className="px-3 py-1.5 text-sm"
+																aria-label="+"
+															>
+																+
+															</button>
+														</div>
+													</div>
+
+													{optionBelowMoq && (
+														<p role="alert" className="text-destructive text-xs">
+															{t("belowMoq", { quantity: option.startQuantity })}
+														</p>
+													)}
+
+													{!!option.tiers.length && (
+														<TierTable
+															tiers={option.tiers}
+															quantity={optionQuantity}
+															baseRow={null}
+															title={t("optionTiers")}
+															compact
+														/>
+													)}
+												</div>
+											)}
+										</li>
+									)
+								})}
+							</ul>
+						</fieldset>
 					)}
 				</div>
 			</div>

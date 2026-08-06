@@ -6,16 +6,24 @@ import { cn } from "@/lib/utils"
 import type { PublicVariant } from "@/types/storefront"
 
 /**
- * "Mehr kaufen, mehr sparen" — the quantity ladder for this variant.
+ * "Mehr kaufen, mehr sparen" — the quantity ladder.
  *
- * Every unit price in here was resolved by the server for the visitor's own
- * role. The only thing decided locally is which row to highlight, and that is
- * a comparison of quantities, not of money.
+ * Three columns, matching the live shop's own configuration: quantity range,
+ * the saving as a percentage, and the unit price. The saving is derived here
+ * rather than stored, because it is a *presentation* of two prices the server
+ * already resolved — computing it server-side would mean shipping a number that
+ * can be got from two others.
+ *
+ * Every unit price was resolved by the server for the visitor's own role. The
+ * only things decided locally are which row to highlight and what the discount
+ * reads as, and neither is money.
  */
 export const TierTable = ({
 	tiers,
 	quantity,
 	baseRow,
+	title,
+	compact,
 }: {
 	tiers: PublicVariant["tiers"]
 	quantity: number
@@ -25,6 +33,10 @@ export const TierTable = ({
 	 * ladder starts at that threshold and there is nothing below it.
 	 */
 	baseRow: { minQuantity: number; unitPrice: string | null } | null
+	/** Overrides the heading. Options name themselves rather than repeat it. */
+	title?: string
+	/** Denser type and padding, for a table nested inside an option row. */
+	compact?: boolean
 }) => {
 	const t = useTranslations("shop")
 	const locale = useLocale()
@@ -41,38 +53,107 @@ export const TierTable = ({
 		-1
 	)
 
+	/**
+	 * The saving against the opening price, as a whole percent.
+	 *
+	 * Measured from the first row rather than from the row above, so every line
+	 * answers the same question — "how much cheaper than buying one?" — instead
+	 * of a chain the reader has to add up. Blank on the opening row itself,
+	 * because nothing is saved there.
+	 */
+	const opening = Number(rows[0]?.unitPrice ?? Number.NaN)
+	const savingOf = (unitPrice: string | null): string | null => {
+		const value = Number(unitPrice ?? Number.NaN)
+		if (Number.isNaN(opening) || Number.isNaN(value) || opening <= 0) return null
+		const percent = Math.round(((opening - value) / opening) * 100)
+		return percent > 0 ? `−${percent}%` : null
+	}
+
 	return (
 		<div>
-			<h2 className="font-heading mb-3 text-base font-semibold">{t("buyMoreSaveMore")}</h2>
-			<table className="w-full border-collapse text-sm">
-				<thead>
-					<tr className="border-b text-left">
-						<th scope="col" className="text-muted-foreground py-2 font-medium">
-							{t("tierQuantity")}
-						</th>
-						<th scope="col" className="text-muted-foreground py-2 text-right font-medium">
-							{t("tierPrice")}
-						</th>
-					</tr>
-				</thead>
-				<tbody>
-					{rows.map((row, index) => (
-						<tr
-							key={row.minQuantity}
-							className={cn(
-								"border-b",
-								index === activeIndex && "bg-tier-active/10 text-tier-active font-semibold"
-							)}
-						>
-							<td className="py-2">
-								{row.minQuantity}
-								{index < rows.length - 1 ? `–${rows[index + 1].minQuantity - 1}` : "+"}
-							</td>
-							<td className="py-2 text-right">{formatMoney(row.unitPrice, locale) ?? "—"}</td>
+			<h2
+				className={cn(
+					"font-heading font-semibold",
+					compact ? "mb-2 text-sm" : "mb-3 text-base"
+				)}
+			>
+				{title ?? t("buyMoreSaveMore")}
+			</h2>
+
+			<div className="overflow-x-auto border">
+				<table className="w-full border-collapse text-sm">
+					<thead>
+						{/* A filled header bar rather than a rule: this table sits among
+						    other blocks on a long page, and a header that reads as a
+						    header is what makes it scannable at a glance. */}
+						<tr className="bg-muted text-left">
+							<th
+								scope="col"
+								className={cn(
+									"text-muted-foreground text-xs font-semibold tracking-wide uppercase",
+									compact ? "px-3 py-2" : "px-4 py-2.5"
+								)}
+							>
+								{t("tierQuantity")}
+							</th>
+							<th
+								scope="col"
+								className={cn(
+									"text-muted-foreground text-right text-xs font-semibold tracking-wide uppercase",
+									compact ? "px-3 py-2" : "px-4 py-2.5"
+								)}
+							>
+								{t("tierDiscount")}
+							</th>
+							<th
+								scope="col"
+								className={cn(
+									"text-muted-foreground text-right text-xs font-semibold tracking-wide uppercase",
+									compact ? "px-3 py-2" : "px-4 py-2.5"
+								)}
+							>
+								{t("tierPrice")}
+							</th>
 						</tr>
-					))}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{rows.map((row, index) => {
+							const saving = savingOf(row.unitPrice)
+							const isActive = index === activeIndex
+							const cell = compact ? "px-3 py-1.5" : "px-4 py-2.5"
+
+							return (
+								<tr
+									key={row.minQuantity}
+									// The live shop paints the matching row solid #ff4d00 on
+									// black text; --tier-active carries both.
+									className={cn(
+										"border-t",
+										isActive && "bg-tier-active text-tier-active-foreground font-semibold"
+									)}
+								>
+									<td className={cn(cell, "tabular-nums")}>
+										{row.minQuantity}
+										{index < rows.length - 1 ? `–${rows[index + 1].minQuantity - 1}` : "+"}
+									</td>
+									<td
+										className={cn(
+											cell,
+											"text-right tabular-nums",
+											!isActive && "text-muted-foreground"
+										)}
+									>
+										{saving ?? "—"}
+									</td>
+									<td className={cn(cell, "text-right font-medium tabular-nums")}>
+										{formatMoney(row.unitPrice, locale) ?? "—"}
+									</td>
+								</tr>
+							)
+						})}
+					</tbody>
+				</table>
+			</div>
 		</div>
 	)
 }

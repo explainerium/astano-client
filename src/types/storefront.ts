@@ -70,6 +70,14 @@ export interface PublicOption {
 	discountPercent: string | null
 	image: PublicImage | null
 	unitPrice: string | null
+	/**
+	 * The option's own quantity ladder, already priced for this visitor.
+	 *
+	 * An option is a product bought in its own quantity — engraving 500 cutters
+	 * is not the same unit price as engraving 50 — so it carries its own rungs
+	 * rather than inheriting the parent's.
+	 */
+	tiers: { minQuantity: number; unitPrice: string | null }[]
 }
 
 /**
