@@ -55,7 +55,12 @@ export interface ProductTier {
 
 export interface ProductVariantInput {
 	id?: string
-	sku: string
+	/**
+	 * Null when the product has no SKU. Nothing generates one — a SKU is the
+	 * client's own identifier, and the column is nullable precisely so it can be
+	 * left alone.
+	 */
+	sku: string | null
 	isDefault: boolean
 	isActive: boolean
 	sortOrder: number
@@ -76,16 +81,13 @@ export interface ProductVariantInput {
 }
 
 /**
- * Mirrors the backend's `variantPatch`: SKU required, everything else optional
- * and with no defaults.
+ * Mirrors the backend's `variantPatch`: everything optional, with no defaults.
  *
  * A form that only owns some of a variant's fields must send only those. Send
  * `prices: []` and the API deletes the ladder; omit the key and it is left
  * alone. Works for create too, where the server supplies the defaults.
  */
-export type ProductVariantPatch = Partial<Omit<ProductVariantInput, "sku">> & {
-	sku: string
-}
+export type ProductVariantPatch = Partial<ProductVariantInput>
 
 /**
  * A product's attributes, grouped per attribute — the shape the API takes and
@@ -135,6 +137,14 @@ export interface AdminProduct {
 	tiers: ProductTier[]
 	variants: (ProductVariantInput & { id: string })[]
 	options: (ProductOptionInput & { name: string })[]
+	/**
+	 * The staff account that created the product. `name` falls back to the email
+	 * when the profile has no name.
+	 *
+	 * Null for anything created before the column existed, and for a product
+	 * whose author has since been deleted — the catalogue outlives the account.
+	 */
+	createdBy: { id: string; name: string; email: string } | null
 	createdAt: string
 	updatedAt: string
 }

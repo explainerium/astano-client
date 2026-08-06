@@ -12,6 +12,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
 import ProSubmit from "@/components/form/ProSubmit"
+import ValidationSummary from "./ValidationSummary"
 import ProPermalink from "@/components/form/ProPermalink"
 import ProRichText from "@/components/form/ProRichText"
 import { Badge } from "@/components/ui/badge"
@@ -119,9 +120,17 @@ const schema = z.object({
 	featuredAssetId: z.string().nullable(),
 	assetIds: z.array(z.string()),
 
-	// Inventory — the API requires at least one variant, and SKU is mandatory on
-	// it, so a product cannot be created without these two.
-	sku: z.string().trim().min(1, "A SKU is required").max(100),
+	/**
+	 * Optional, and left empty when left empty.
+	 *
+	 * The name is the only thing an admin must type. A blank SKU used to be
+	 * filled in from the product name, which stopped the form failing silently
+	 * but meant the catalogue quietly filled with invented identifiers nobody
+	 * had chosen and every stock report then had to carry. A SKU is a real
+	 * business identifier: either it is the one the client uses, or there isn't
+	 * one yet.
+	 */
+	sku: z.string().trim().max(100),
 	manageStock: z.boolean(),
 	stock: z.number({ message: "Enter a number" }).int().min(0),
 	allowBackorder: z.boolean(),
@@ -150,10 +159,16 @@ const schema = z.object({
 
 	tiers: z.array(tierRow),
 
+	/**
+	 * Rows are not validated for completeness — `onSubmit` already drops the
+	 * half-filled ones. Rejecting what the submit handler would silently
+	 * discard only produced an error the admin could not act on, on a tab they
+	 * may not have open.
+	 */
 	attributes: z.array(
 		z.object({
-			attributeId: z.string().min(1, "Choose an attribute"),
-			attributeValueIds: z.array(z.string()).min(1, "Choose at least one value"),
+			attributeId: z.string(),
+			attributeValueIds: z.array(z.string()),
 			isVisible: z.boolean(),
 			isVariation: z.boolean(),
 		})
@@ -161,7 +176,7 @@ const schema = z.object({
 
 	options: z.array(
 		z.object({
-			optionProductId: z.string().min(1, "Choose a product"),
+			optionProductId: z.string(),
 			groupLabel: z.string().trim().max(120),
 			sortOrder: z.number({ message: "Enter a number" }).int().min(0),
 			preselected: z.boolean(),
@@ -172,6 +187,52 @@ const schema = z.object({
 		const regular = values.prices.GUEST.basePrice.trim()
 		const dealer = values.prices.RESELLER.basePrice.trim()
 		const rows = values.tiers
+
+		/**
+		 * A sale price above the price it discounts is not a sale.
+		 *
+		 * `resolvePrice` charges the sale price whenever one is set and in
+		 * window; it never compares it to the base. So 200 on sale against 100
+		 * regular bills the customer *more* than the product costs, and the
+		 * product page strikes through the 100 to advertise it as the saving.
+		 * The API rejects this too — caught here so the admin sees which field
+		 * is wrong instead of a request failing after Save.
+		 *
+		 * Equal passes. It is pointless, not wrong, and it is a normal state to
+		 * pass through while typing.
+		 */
+		const saleRows = [
+			{ role: "GUEST" as const, base: regular, label: "regular" },
+			// An empty reseller price means dealers pay the regular one — that is
+			// what the field says and what `onSubmit` sends as the row's base, so
+			// the reseller sale has to be measured against the same number.
+			{ role: "RESELLER" as const, base: dealer || regular, label: dealer ? "reseller" : "regular" },
+		]
+
+		for (const { role, base, label } of saleRows) {
+			const sale = values.prices[role].salePrice.trim()
+			if (!sale) continue
+
+			// With no price to hang from, `onSubmit` drops the whole row and the
+			// sale price disappears without a word. Said plainly rather than
+			// compared against an implied zero, which would read as "too high".
+			if (!base) {
+				ctx.addIssue({
+					code: "custom",
+					path: ["prices", role, "salePrice"],
+					message: "Set a regular price for this sale price to discount.",
+				})
+				continue
+			}
+
+			if (Number(sale) > Number(base)) {
+				ctx.addIssue({
+					code: "custom",
+					path: ["prices", role, "salePrice"],
+					message: `Must not be above the ${label} price of ${base}.`,
+				})
+			}
+		}
 
 		// A ladder with nothing to step down from is dead data: the rungs attach
 		// to the price row of their own role, and a role with no row is never
@@ -285,7 +346,16 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 	return {
 		en: block("en"),
 		de: block("de"),
-		status: product?.status ?? "DRAFT",
+		/**
+		 * New products are published.
+		 *
+		 * Drafting was the default and nothing said so, so a product filled in
+		 * and saved simply did not appear in the shop — indistinguishable from a
+		 * save that failed. Publishing is what an admin adding a product means to
+		 * do; the ones that genuinely need holding back are the exception, and
+		 * the selector is right there on the same panel as Save.
+		 */
+		status: product?.status ?? "PUBLISHED",
 		visibility: product?.visibility ?? "SHOP_AND_SEARCH",
 		kind: product?.kind ?? "MAIN",
 		quoteEnabled: product?.quoteEnabled ?? false,
@@ -332,6 +402,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 	const [createProduct] = useCreateProductMutation()
 	const [updateProduct] = useUpdateProductMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
+	const [tab, setTab] = useState("general")
 
 	const isEdit = !!product
 
@@ -472,7 +543,9 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			variants: [
 				{
 					...(defaultVariant?.id ? { id: defaultVariant.id } : {}),
-					sku: form.sku.trim(),
+					// Null, not "". The column is unique, so two products without a
+					// SKU would collide on the empty string; NULLs do not.
+					sku: form.sku.trim() || null,
 					isDefault: true,
 					isActive: true,
 					sortOrder: 0,
@@ -536,6 +609,8 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					<ProSubmit>{isEdit ? "Save changes" : "Create product"}</ProSubmit>
 				</div>
 			</div>
+
+			<ValidationSummary onJump={setTab} />
 
 			{/*
 			 * Two columns, as WooCommerce arranges it: what the product *is* on
@@ -602,7 +677,10 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					<h2 className="font-heading text-sm font-semibold">Product data</h2>
 				</div>
 
-				<Tabs defaultValue="general" className="gap-0">
+				{/* Controlled, so a failed save can open the tab holding the error.
+				    Uncontrolled, a required field on a hidden tab made Save look
+				    broken — see ValidationSummary. */}
+				<Tabs value={tab} onValueChange={setTab} className="gap-0">
 					<TabsList className="mx-5 mt-4">
 						<TabsTrigger value="general">General</TabsTrigger>
 						<TabsTrigger value="inventory">Inventory</TabsTrigger>
@@ -671,11 +749,13 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					</TabsContent>
 
 					<TabsContent value="inventory" className="space-y-4 p-5">
+						{/* Not `required`: the asterisk was the only thing on the form
+						    claiming a SKU is mandatory, and it never was — the API
+						    accepts a product without one. */}
 						<ProInput
 							name="sku"
 							label="SKU"
-							description="Must be unique across the whole catalogue."
-							required
+							description="Optional. Leave it empty and the product simply has none. If you do set one, it must be unique across the whole catalogue."
 						/>
 
 						<ProCheckbox name="manageStock" label="Track stock for this product" />

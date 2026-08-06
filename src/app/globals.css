@@ -2,6 +2,15 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/*
+ * Deliberately kept even though astano has no dark mode.
+ *
+ * Tailwind's built-in "dark" variant follows prefers-color-scheme. Deleting
+ * this line would not remove dark styling — it would hand it to the visitor's
+ * operating system, so anyone with dark mode on would get half-repainted
+ * components in a shop that has no dark palette. Anchoring the variant to a
+ * .dark class that is never applied makes any stray dark: utility inert.
+ */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -63,6 +72,17 @@
  * component. The admin keeps its own 5px radius in `.admin-theme` below.
  */
 :root {
+  /*
+   * The last thing the OS could still repaint.
+   *
+   * Stylesheets only reach what the page draws. Date pickers, number spinners,
+   * the native <select> popup, scrollbars and Chrome's autofill fill are drawn
+   * by the browser, and with no color-scheme declared it is free to darken them
+   * on a machine set to dark — light inputs with a black calendar dropping out
+   * of them. Stating `light` settles it in every browser.
+   */
+  color-scheme: light;
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -105,39 +125,6 @@
   --sidebar-ring: oklch(0.708 0 0);
 }
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
-}
 
 /*
  * Admin dashboard theme.

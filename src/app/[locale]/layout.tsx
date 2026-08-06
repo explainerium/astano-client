@@ -81,9 +81,6 @@ export default async function LocaleLayout({
 		<html
 			lang={locale}
 			className={`${mulish.variable} ${poppins.variable} ${lato.variable} h-full antialiased`}
-			// next-themes writes the theme class onto <html> before React
-			// hydrates, which would otherwise be reported as a mismatch.
-			suppressHydrationWarning
 		>
 			<body className="flex min-h-full flex-col">
 				<NextIntlClientProvider messages={messages}>

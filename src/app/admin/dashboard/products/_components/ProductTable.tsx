@@ -37,7 +37,13 @@ import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
 import { useDeleteProductMutation } from "@/redux/api/productApi"
 import { cn } from "@/lib/utils"
-import type { AdminProduct, ProductKind, ProductStatus, StockStatus } from "@/types/product"
+import type {
+	AdminProduct,
+	ProductKind,
+	ProductPrice,
+	ProductStatus,
+	StockStatus,
+} from "@/types/product"
 
 const ANY = "__any__"
 
@@ -46,18 +52,62 @@ const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR
 /**
  * The price a normal retail customer sees.
  *
- * Variant prices win as a complete set over product prices — never mixed row by
- * row — so the variant is checked first (§1C). This column is indicative only;
- * the real figure depends on role and quantity and is resolved server-side by
- * resolvePrice().
+ * Variant prices are checked before product prices (§1C). This column is
+ * indicative only; the real figure depends on role and quantity and is resolved
+ * server-side by resolvePrice().
+ *
+ * The role order mirrors that resolver's own GUEST chain — `GUEST` then `B2C`.
+ * It used to look for `B2C` alone, and the product editor writes retail to
+ * `GUEST` (that is where the fallback chain terminates, so it covers both a
+ * guest and a signed-in customer with no row of their own). The result was a
+ * PRICE column that was empty for every product the editor had ever created,
+ * priced or not.
  */
-const displayPrice = (product: AdminProduct): string | null => {
-	const variant = product.variants.find((v) => v.isDefault) ?? product.variants[0]
-	const row =
-		variant?.prices.find((p) => p.role === "B2C") ??
-		product.prices.find((p) => p.role === "B2C")
+const RETAIL_ROLES = ["GUEST", "B2C"] as const
 
-	return row ? money.format(Number(row.basePrice)) : null
+const retailRow = (rows: ProductPrice[] | undefined) => {
+	if (!rows?.length) return undefined
+	for (const role of RETAIL_ROLES) {
+		const row = rows.find((p) => p.role === role)
+		if (row) return row
+	}
+	return undefined
+}
+
+/**
+ * Whether a sale price is in effect right now.
+ *
+ * Same three conditions as the API's `saleActive()`: a price is set, the start
+ * has passed, the end has not. A scheduled sale is deliberately not shown as
+ * live — the column has to agree with what a shopper is being charged today,
+ * and a strikethrough for a sale that starts next month would be a lie.
+ */
+const saleActive = (row: ProductPrice): boolean => {
+	if (row.salePrice === null || row.salePrice === undefined || row.salePrice === "") return false
+
+	const now = Date.now()
+	if (row.saleStartsAt && now < new Date(row.saleStartsAt).getTime()) return false
+	if (row.saleEndsAt && now > new Date(row.saleEndsAt).getTime()) return false
+	return true
+}
+
+/**
+ * Regular and sale price together, the way WooCommerce prints them: the regular
+ * struck through, the sale beside it.
+ *
+ * `sale` is null unless one is set and currently running, in which case the two
+ * are shown together — a lone number in this column is the price being charged,
+ * never an obsolete one.
+ */
+const displayPrice = (product: AdminProduct): { regular: string; sale: string | null } | null => {
+	const variant = product.variants.find((v) => v.isDefault) ?? product.variants[0]
+	const row = retailRow(variant?.prices) ?? retailRow(product.prices)
+	if (!row) return null
+
+	return {
+		regular: money.format(Number(row.basePrice)),
+		sale: saleActive(row) ? money.format(Number(row.salePrice)) : null,
+	}
 }
 
 /**
@@ -323,6 +373,9 @@ export const ProductTable = ({
 									Categories
 								</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+									Author
+								</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 									Status
 								</TableHead>
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
@@ -331,14 +384,14 @@ export const ProductTable = ({
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									Stock
 								</TableHead>
-								<TableHead className="w-16 pr-4" />
+								<TableHead className="w-24 pr-4" />
 							</TableRow>
 						</TableHeader>
 
 						<TableBody>
 							{!products.length && (
 								<TableRow className="hover:bg-transparent">
-									<TableCell colSpan={10} className="h-40 text-center">
+									<TableCell colSpan={11} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{filters.search || filters.status || filters.kind
 												? "Nothing matches these filters."
@@ -355,6 +408,7 @@ export const ProductTable = ({
 								const thumbnail = thumbnailOf(product)
 								const productCategories = categoryNamesFor(product)
 								const status = STATUS_CHIP[product.status]
+								const price = displayPrice(product)
 
 								return (
 									<TableRow
@@ -425,15 +479,28 @@ export const ProductTable = ({
 											)}
 										</TableCell>
 
+										{/* Both prices, WooCommerce's way round: the regular struck
+										    through, the sale after it. Stacked rather than inline so
+										    the column keeps one number per line and the figures stay
+										    aligned down the page. */}
 										<TableCell className="text-right tabular-nums">
 											{product.quoteEnabled ? (
 												<span className="text-muted-foreground text-xs">
 													On request
 												</span>
+											) : price ? (
+												price.sale ? (
+													<div className="flex flex-col items-end leading-tight">
+														<span className="text-muted-foreground text-xs line-through">
+															{price.regular}
+														</span>
+														<span className="text-positive font-medium">{price.sale}</span>
+													</div>
+												) : (
+													price.regular
+												)
 											) : (
-												(displayPrice(product) ?? (
-													<span className="text-muted-foreground">—</span>
-												))
+												<span className="text-muted-foreground">—</span>
 											)}
 										</TableCell>
 
@@ -442,6 +509,24 @@ export const ProductTable = ({
 												productCategories.join(", ")
 											) : (
 												<span>Uncategorised</span>
+											)}
+										</TableCell>
+
+										{/*
+										 * Who added the product.
+										 *
+										 * Em dash for the products that predate the column and for
+										 * those whose author's account has since been deleted — the
+										 * catalogue outlives the staff who built it, and "—" says
+										 * "not recorded" without inventing a name for it. The email
+										 * goes in the title so two colleagues sharing a first name
+										 * are still tellable apart.
+										 */}
+										<TableCell className="text-muted-foreground max-w-40 truncate text-xs">
+											{product.createdBy ? (
+												<span title={product.createdBy.email}>{product.createdBy.name}</span>
+											) : (
+												"—"
 											)}
 										</TableCell>
 
@@ -495,6 +580,10 @@ export const ProductTable = ({
 											)}
 										</TableCell>
 
+										{/* Delete alongside edit, so a single product can go without
+										    first being ticked and sent through the bulk bar. It opens
+										    the same confirmation — one product is just a list of one,
+										    and the dialog already words that case. */}
 										<TableCell className="pr-4">
 											<div className="flex justify-end">
 												<Button
@@ -504,6 +593,15 @@ export const ProductTable = ({
 													onClick={() => onEdit(product)}
 												>
 													<Pencil />
+												</Button>
+												<Button
+													variant="ghost"
+													size="icon"
+													aria-label={`Delete ${product.name}`}
+													onClick={() => setPending([product])}
+													className="text-muted-foreground hover:text-destructive"
+												>
+													<Trash2 />
 												</Button>
 											</div>
 										</TableCell>
