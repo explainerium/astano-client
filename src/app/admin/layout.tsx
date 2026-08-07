@@ -37,9 +37,21 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 			// admin-theme carries the dashboard's own tokens — orange accent,
 			// rounded cards, grey canvas. Scoped here so the storefront's §6.1
 			// identity is unaffected.
-			className={`admin-theme ${mulish.variable} ${poppins.variable} h-full antialiased`}
+			/**
+			 * `overflow-hidden` on both, and it is load-bearing.
+			 *
+			 * The dashboard is an app shell, not a document: the sidebar and topbar
+			 * are fixed and only the content column scrolls. Left scrollable, the
+			 * page produced a *second* scrollbar beside the content's own — and
+			 * dragging the outer one slid the whole shell, showing empty canvas
+			 * below the sidebar.
+			 *
+			 * This is why the admin has its own root layout rather than sharing the
+			 * storefront's, where the document is exactly what should scroll.
+			 */
+			className={`admin-theme ${mulish.variable} ${poppins.variable} h-full overflow-hidden antialiased`}
 		>
-			<body className="flex min-h-full flex-col">
+			<body className="flex h-full flex-col overflow-hidden">
 				<NextIntlClientProvider locale="en" messages={messages}>
 					<Providers>{children}</Providers>
 				</NextIntlClientProvider>

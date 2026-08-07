@@ -141,7 +141,12 @@
 		"variant": "Choose an option",
 		"tierDiscount": "Discount",
 		"optionQuantity": "Quantity",
-		"optionTiers": "Quantity discounts"
+		"optionTiers": "Quantity discounts",
+		"additionalInformation": "Additional information",
+		"productInformation": "Product information",
+		"dimensions": "Dimensions",
+		"minimumOrderLabel": "Minimum order",
+		"fromQuantity": "from {quantity}: {price}"
 	},
 	"cart": {
 		"title": "Shopping cart",

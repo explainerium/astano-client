@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft } from "lucide-react"
@@ -455,6 +455,41 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
 	const [tab, setTab] = useState("general")
 
+	/**
+	 * Switching tabs used to throw the page around.
+	 *
+	 * The panels are wildly different heights — General carries prices, MOQ and
+	 * the whole quantity ladder; Shipping is four boxes. Clicking from a long one
+	 * to a short one shrinks the scroll container under the reader, the browser
+	 * clamps the scroll position, and the view lurches downwards for no reason
+	 * the reader can see.
+	 *
+	 * Two things fix it together. The panels share a floor height, so the
+	 * difference is small enough not to move anything in most cases; and when
+	 * the strip has scrolled out of sight above, it is brought back — landing on
+	 * a new tab should show you its heading, not its middle.
+	 */
+	const tabStripRef = useRef<HTMLDivElement>(null)
+
+	const changeTab = (next: string) => {
+		setTab(next)
+
+		const strip = tabStripRef.current
+		if (!strip) return
+
+		// Only when it is actually above the fold. Scrolling a strip that is
+		// already in view is motion for its own sake.
+		const { top } = strip.getBoundingClientRect()
+		if (top >= 0) return
+
+		strip.scrollIntoView({
+			behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+				? "auto"
+				: "smooth",
+			block: "start",
+		})
+	}
+
 	const isEdit = !!product
 
 	const { data: rawCategories = [] } = useAdminCategoriesQuery()
@@ -666,7 +701,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				</div>
 			</div>
 
-			<ValidationSummary onJump={setTab} />
+			<ValidationSummary onJump={changeTab} />
 
 			{/*
 			 * Two columns, as WooCommerce arranges it: what the product *is* on
@@ -736,16 +771,18 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				{/* Controlled, so a failed save can open the tab holding the error.
 				    Uncontrolled, a required field on a hidden tab made Save look
 				    broken — see ValidationSummary. */}
-				<Tabs value={tab} onValueChange={setTab} className="gap-0">
-					<TabsList className="mx-5 mt-4">
-						<TabsTrigger value="general">General</TabsTrigger>
-						<TabsTrigger value="inventory">Inventory</TabsTrigger>
-						<TabsTrigger value="shipping">Shipping</TabsTrigger>
-						<TabsTrigger value="attributes">Attributes</TabsTrigger>
-						<TabsTrigger value="options">Options</TabsTrigger>
-					</TabsList>
+				<Tabs value={tab} onValueChange={changeTab} className="gap-0">
+					<div ref={tabStripRef} className="scroll-mt-4 px-5 pt-4">
+						<TabsList>
+							<TabsTrigger value="general">General</TabsTrigger>
+							<TabsTrigger value="inventory">Inventory</TabsTrigger>
+							<TabsTrigger value="shipping">Shipping</TabsTrigger>
+							<TabsTrigger value="attributes">Attributes</TabsTrigger>
+							<TabsTrigger value="options">Options</TabsTrigger>
+						</TabsList>
+					</div>
 
-					<TabsContent value="general" className="space-y-6 p-5">
+					<TabsContent value="general" className="min-h-[26rem] space-y-6 p-5">
 						{/* The price everyone pays. Written to the GUEST row, which is
 						    where resolvePrice()'s fallback chain terminates — so it is
 						    what every role falls back to when no override exists. */}
@@ -804,7 +841,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						</div>
 					</TabsContent>
 
-					<TabsContent value="inventory" className="space-y-4 p-5">
+					<TabsContent value="inventory" className="min-h-[26rem] space-y-4 p-5">
 						{/* Not `required`: the asterisk was the only thing on the form
 						    claiming a SKU is mandatory, and it never was — the API
 						    accepts a product without one. */}
@@ -827,7 +864,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						/>
 					</TabsContent>
 
-					<TabsContent value="shipping" className="space-y-6 p-5">
+					<TabsContent value="shipping" className="min-h-[26rem] space-y-6 p-5">
 						<ProInput
 							name="weightKg"
 							label="Weight (kg)"
@@ -854,10 +891,10 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						</div>
 					</TabsContent>
 
-					<TabsContent value="attributes" className="p-5">
+					<TabsContent value="attributes" className="min-h-[26rem] p-5">
 						<AttributesTab />
 					</TabsContent>
-					<TabsContent value="options" className="p-5">
+					<TabsContent value="options" className="min-h-[26rem] p-5">
 						<OptionsTab currentProductId={product?.id} />
 					</TabsContent>
 				</Tabs>

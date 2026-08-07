@@ -272,16 +272,19 @@ export const QuantityPricing = () => {
 						return (
 							<TabsTrigger key={item.key} value={item.key}>
 								{item.label}
-								{/* A count rather than a dot: which group has rungs, and how
-								    many, is the thing you come to this tab strip to find out. */}
-								<span
-									className={cn(
-										"ml-1.5 text-[10px] tabular-nums",
-										count ? "text-primary" : "text-muted-foreground"
-									)}
-								>
-									{count || ""}
-								</span>
+								{/*
+								 * A count rather than a dot: which group has rungs, and how
+								 * many, is the thing you come to this tab strip to find out.
+								 *
+								 * A filled pill rather than bare text, because the active
+								 * tab's own label is now the accent colour and a loose
+								 * number beside it would read as part of the name.
+								 */}
+								{!!count && (
+									<span className="bg-primary/12 text-primary inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums">
+										{count}
+									</span>
+								)}
 							</TabsTrigger>
 						)
 					})}

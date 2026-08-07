@@ -141,7 +141,12 @@
 		"variant": "Ausführung wählen",
 		"tierDiscount": "Rabatt",
 		"optionQuantity": "Menge",
-		"optionTiers": "Mengenrabatte"
+		"optionTiers": "Mengenrabatte",
+		"additionalInformation": "Zusätzliche Informationen",
+		"productInformation": "Produktinformationen",
+		"dimensions": "Maße",
+		"minimumOrderLabel": "Mindestbestellmenge",
+		"fromQuantity": "ab {quantity}: {price}"
 	},
 	"cart": {
 		"title": "Warenkorb",

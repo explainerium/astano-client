@@ -45,8 +45,13 @@ export interface PublicVariant {
 	/** Null when the variant does not manage stock. */
 	stock: number | null
 	weightKg: string | null
+	/** Printed in the "Additional information" tab. Null means unset, not zero. */
+	lengthCm: string | null
+	widthCm: string | null
+	heightCm: string | null
 	image: PublicImage | null
-	attributes: { id: string; label: string }[]
+	/** `label` is the value ("Ø 60 mm"), `name` the attribute ("Diameter"). */
+	attributes: { id: string; label: string; name: string }[]
 	/** Null when quote-only, or when this role has no price at all. */
 	unitPrice: string | null
 	/** The struck-through price when onSale. */

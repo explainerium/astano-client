@@ -95,14 +95,19 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 
 			<Tabs value={role} onValueChange={(value) => setRole(value as TierRole)}>
 				<TabsList>
-					{TIER_ROLES.map((item) => (
-						<TabsTrigger key={item.key} value={item.key}>
-							{item.label}
-							<span className="text-primary ml-1.5 text-[10px] tabular-nums">
-								{draft?.[item.key]?.length || ""}
-							</span>
-						</TabsTrigger>
-					))}
+					{TIER_ROLES.map((item) => {
+						const count = draft?.[item.key]?.length ?? 0
+						return (
+							<TabsTrigger key={item.key} value={item.key}>
+								{item.label}
+								{!!count && (
+									<span className="bg-primary/12 text-primary inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums">
+										{count}
+									</span>
+								)}
+							</TabsTrigger>
+						)
+					})}
 				</TabsList>
 			</Tabs>
 
