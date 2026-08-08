@@ -28,6 +28,8 @@ export interface PublicProduct {
 	featuredImage: PublicImage | null
 	images: PublicImage[]
 	categories: { id: string; name: string; slug: string }[]
+	/** The variant a listing card acts on — wishlist, quick view. */
+	defaultVariantId: string | null
 	/** The "from X" range shown on listings. Null when quote-only. */
 	priceFrom: string | null
 	priceTo: string | null
@@ -389,11 +391,23 @@ export interface PublicCategory {
 	children?: PublicCategory[]
 }
 
+/** What the archive's price filter needs beyond the rows themselves. */
+export interface ProductListMeta {
+	page: number
+	limit: number
+	total: number
+	totalPages: number
+	/** The cheapest and dearest resolved price in the matching set. */
+	priceBounds: { min: number; max: number } | null
+}
+
 export interface PublicProductListParams {
 	category?: string
 	search?: string
 	quantity?: number
 	page?: number
 	limit?: number
+	minPrice?: number
+	maxPrice?: number
 	sort?: "default" | "newest" | "name" | "price_asc" | "price_desc"
 }

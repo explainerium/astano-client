@@ -1,12 +1,14 @@
 "use client"
 
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import ProductCard from "@/app/[locale]/_components/ProductCard"
+import QuickViewDialog from "@/app/[locale]/_components/QuickViewDialog"
+import CompareBar from "@/app/[locale]/_components/CompareBar"
+import Pagination from "@/app/[locale]/_components/Pagination"
 import { useShopProductsQuery } from "@/redux/api/storefrontApi"
-import type { PublicProductListParams } from "@/types/storefront"
+import type { PublicProduct, PublicProductListParams } from "@/types/storefront"
 import { cn } from "@/lib/utils"
 import ShopFilters from "./ShopFilters"
 
@@ -26,7 +28,12 @@ const SORT_LABEL: Record<string, string> = {
 	price_desc: "sortPriceDesc",
 }
 
-const PER_PAGE = 24
+/**
+ * The live shop's own defaults: twelve per page, and the same four choices it
+ * offers (`shop_per_page: 12`, `per_page_options: 9,12,18,24`).
+ */
+const PER_PAGE_OPTIONS = [9, 12, 18, 24]
+const DEFAULT_PER_PAGE = 12
 
 /**
  * The shop archive, shared by /products and every category page.
@@ -49,6 +56,17 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 	const sort = (searchParams.get("sort") as PublicProductListParams["sort"]) ?? "default"
 	const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1)
 
+	const perPage = PER_PAGE_OPTIONS.includes(Number(searchParams.get("per")))
+		? Number(searchParams.get("per"))
+		: DEFAULT_PER_PAGE
+
+	// Blank rather than 0 when absent — 0 is a real bound the customer might set.
+	const minPrice = searchParams.get("min")
+	const maxPrice = searchParams.get("max")
+
+	/** The product the quick view is open on, or null. */
+	const [quickView, setQuickView] = useState<PublicProduct | null>(null)
+
 	/** Rewrites the query string, always resetting to page 1 unless paging. */
 	const setParams = useCallback(
 		(changes: Record<string, string | null>) => {
@@ -67,23 +85,36 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 	const { data, isFetching, isError, refetch } = useShopProductsQuery({
 		...(category ? { category } : {}),
 		...(search ? { search } : {}),
+		...(minPrice ? { minPrice: Number(minPrice) } : {}),
+		...(maxPrice ? { maxPrice: Number(maxPrice) } : {}),
 		sort,
 		page,
-		limit: PER_PAGE,
+		limit: perPage,
 	})
 
 	const products = data?.data ?? []
 	const total = data?.meta?.total ?? 0
 	const totalPages = data?.meta?.totalPages ?? 1
 	// Only the search is clearable here; leaving a category means navigating.
-	const hasFilters = Boolean(search)
+	const hasFilters = Boolean(search || minPrice || maxPrice)
 
 	return (
-		<div className="mx-auto grid w-full max-w-[1400px] gap-10 px-6 py-12 lg:grid-cols-[240px_1fr]">
+		/*
+		 * Narrower than the header's 1400 and with a wider rail: at full width the
+		 * three columns were stretched wide enough that a card was mostly empty
+		 * space, and the filters were cramped against them.
+		 */
+		<div className="mx-auto grid w-full max-w-[1280px] gap-10 px-6 py-12 lg:grid-cols-[280px_1fr]">
 			<ShopFilters
 				activeSlug={category}
 				search={search}
 				onSearchChange={(value) => setParams({ q: value })}
+				minPrice={minPrice ?? ""}
+				maxPrice={maxPrice ?? ""}
+				// The bounds describe everything matching the *other* filters, so the
+				// placeholders do not shrink as the customer narrows the price.
+				bounds={data?.meta?.priceBounds ?? null}
+				onPriceChange={({ min, max }) => setParams({ min, max })}
 			/>
 
 			<div>
@@ -95,14 +126,42 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 					{hasFilters && (
 						<button
 							type="button"
-							onClick={() => setParams({ q: null })}
+							onClick={() => setParams({ q: null, min: null, max: null })}
 							className="text-primary text-sm underline underline-offset-2"
 						>
 							{t("clearFilters")}
 						</button>
 					)}
 
-					<div className="ml-auto flex items-center gap-2">
+					<div className="ml-auto flex flex-wrap items-center gap-4">
+						{/* How many per page, the same four the live shop offers. Changing
+						    it returns to page 1, because page 5 of 24 is not page 5 of 9. */}
+						<div className="flex items-center gap-2">
+							<label htmlFor="shop-per-page" className="text-muted-foreground text-sm">
+								{t("perPage")}
+							</label>
+							<select
+								id="shop-per-page"
+								value={perPage}
+								onChange={(event) =>
+									setParams({
+										per:
+											Number(event.target.value) === DEFAULT_PER_PAGE
+												? null
+												: event.target.value,
+									})
+								}
+								className="focus:border-primary border px-3 py-2 text-sm outline-none"
+							>
+								{PER_PAGE_OPTIONS.map((value) => (
+									<option key={value} value={value}>
+										{value}
+									</option>
+								))}
+							</select>
+						</div>
+
+						<div className="flex items-center gap-2">
 						<label htmlFor="shop-sort" className="text-muted-foreground text-sm">
 							{t("sortBy")}
 						</label>
@@ -118,6 +177,7 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 								</option>
 							))}
 						</select>
+						</div>
 					</div>
 				</div>
 
@@ -135,44 +195,34 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 				) : !products.length && !isFetching ? (
 					<p className="text-muted-foreground py-20 text-center text-sm">{t("noProducts")}</p>
 				) : (
+					/*
+					 * Three across, as the live shop has it. `items-stretch` with a
+					 * full-height card is what makes every tile in a row end level
+					 * however long its name runs.
+					 */
 					<div
 						className={cn(
-							"mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+							"mt-6 grid grid-cols-2 items-stretch gap-6 lg:grid-cols-3",
 							isFetching && "opacity-60 transition-opacity"
 						)}
 					>
 						{products.map((product) => (
-							<ProductCard key={product.id} product={product} />
+							<ProductCard key={product.id} product={product} onQuickView={setQuickView} />
 						))}
 					</div>
 				)}
 
-				{totalPages > 1 && (
-					<nav className="mt-12 flex items-center justify-center gap-4">
-						<button
-							type="button"
-							disabled={page <= 1}
-							onClick={() => setParams({ page: String(page - 1) })}
-							className="inline-flex items-center gap-1 border px-4 py-2 text-sm disabled:opacity-40"
-						>
-							<ChevronLeft className="size-4" />
-							{t("previous")}
-						</button>
-						<span className="text-muted-foreground text-sm">
-							{t("pageOf", { page, total: totalPages })}
-						</span>
-						<button
-							type="button"
-							disabled={page >= totalPages}
-							onClick={() => setParams({ page: String(page + 1) })}
-							className="inline-flex items-center gap-1 border px-4 py-2 text-sm disabled:opacity-40"
-						>
-							{t("next")}
-							<ChevronRight className="size-4" />
-						</button>
-					</nav>
-				)}
+				<Pagination
+					page={page}
+					totalPages={totalPages}
+					onPage={(next) => setParams({ page: String(next) })}
+				/>
 			</div>
+
+			{/* Both are portalled or fixed, so where they sit in the tree only
+			    decides who owns their state — not where they appear. */}
+			<QuickViewDialog product={quickView} onOpenChange={(open) => !open && setQuickView(null)} />
+			<CompareBar />
 		</div>
 	)
 }

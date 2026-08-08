@@ -55,6 +55,7 @@ export const pathnames = {
 	"/privacy": { en: "/privacy-policy", de: "/datenschutz" },
 	"/terms": { en: "/terms-and-conditions", de: "/agb" },
 	"/cart": { en: "/cart", de: "/warenkorb" },
+	"/compare": { en: "/compare", de: "/vergleichen" },
 	"/checkout": { en: "/checkout", de: "/kasse" },
 	"/quote-basket": { en: "/quote-request", de: "/angebotsanfrage" },
 

@@ -9,6 +9,7 @@ import {
 	useQuoteBasketQuery,
 	useShopCategoriesQuery,
 } from "@/redux/api/storefrontApi"
+import CartDrawer from "./CartDrawer"
 import { cn } from "@/lib/utils"
 
 /**
@@ -106,6 +107,9 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 	 */
 	const [openMenu, setOpenMenu] = useState(false)
 
+	/** The basket panel. Opened from the icon, closed by any link inside it. */
+	const [openCart, setOpenCart] = useState(false)
+
 	// Navigating with the panel open would leave it covering the new page.
 	const closeMenu = () => setOpenMenu(false)
 
@@ -162,9 +166,24 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 						<IconLink href="/account/wishlist" label="Wishlist">
 							<Heart className="size-5" strokeWidth={1.5} />
 						</IconLink>
-						<IconLink href="/cart" label="Cart" count={cart?.lineCount ?? 0}>
+						{/*
+						 * A button, not a link — the basket opens beside the page rather
+						 * than replacing it. /cart is still a real page and the drawer's
+						 * own "View cart" goes there; this is the shortcut, not the
+						 * replacement.
+						 */}
+						<button
+							type="button"
+							onClick={() => setOpenCart(true)}
+							aria-label={lang === "de" ? "Warenkorb" : "Cart"}
+							aria-haspopup="dialog"
+							className="hover:text-primary relative inline-flex items-center transition-colors"
+						>
 							<ShoppingCart className="size-5" strokeWidth={1.5} />
-						</IconLink>
+							<span className="bg-ink text-ink-foreground absolute -top-1.5 -right-2 flex size-4 items-center justify-center rounded-full text-[10px] leading-none">
+								{cart?.lineCount ?? 0}
+							</span>
+						</button>
 					</div>
 				</div>
 
@@ -233,6 +252,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 					</div>
 				</div>
 			</div>
+			<CartDrawer open={openCart} onOpenChange={setOpenCart} />
 		</header>
 	)
 }

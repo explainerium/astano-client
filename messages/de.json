@@ -146,7 +146,22 @@
 		"productInformation": "Produktinformationen",
 		"dimensions": "Maße",
 		"minimumOrderLabel": "Mindestbestellmenge",
-		"fromQuantity": "ab {quantity}: {price}"
+		"fromQuantity": "ab {quantity}: {price}",
+		"compare": "Vergleichen",
+		"quickView": "Schnellansicht",
+		"addToWishlist": "Zur Wunschliste",
+		"viewFullDetails": "Alle Details ansehen",
+		"close": "Schließen",
+		"priceFilter": "Preis",
+		"priceFrom": "Von",
+		"priceTo": "Bis",
+		"apply": "Anwenden",
+		"perPage": "Anzeigen",
+		"comparing": "{count} zum Vergleich",
+		"viewCompare": "Jetzt vergleichen",
+		"pagination": "Seitennummerierung",
+		"goToPage": "Seite {page}",
+		"compareEmpty": "Wählen Sie einige Produkte über die Vergleichen-Schaltfläche aus."
 	},
 	"cart": {
 		"title": "Warenkorb",
@@ -171,7 +186,11 @@
 		"issueOutOfStock": "Mindestens ein Artikel ist nicht auf Lager.",
 		"cannotCheckout": "Bitte korrigieren Sie die oben genannten Artikel.",
 		"updateFailed": "Die Änderung konnte nicht gespeichert werden.",
-		"includedOption": "Enthaltene Option"
+		"includedOption": "Enthaltene Option",
+		"loading": "Warenkorb wird geladen…",
+		"emptyHint": "Stöbern Sie im Katalog und legen Sie etwas hinein.",
+		"viewCart": "Warenkorb ansehen",
+		"close": "Schließen"
 	},
 	"quote": {
 		"title": "Angebotsanfrage",

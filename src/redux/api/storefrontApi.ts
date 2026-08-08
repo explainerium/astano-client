@@ -1,4 +1,3 @@
-import type { IMeta } from "@/types"
 import type {
 	AccountProfile,
 	AvailablePaymentMethod,
@@ -12,12 +11,19 @@ import type {
 	PublicCategory,
 	PublicProduct,
 	PublicProductDetail,
+	ProductListMeta,
 	PublicProductListParams,
 	QuoteBasketView,
 	QuoteSubmission,
 	SavedAddress,
 	WishlistView,
 } from "@/types/storefront"
+import {
+	applyClear,
+	applyQuantity,
+	applyRemoval,
+	type OptimisticCartView,
+} from "./cartOptimistic"
 import { tagTypes } from "../tag-types"
 import { baseApi } from "./baseApi"
 
@@ -29,9 +35,12 @@ import { baseApi } from "./baseApi"
  */
 export const storefrontApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
-		shopProducts: build.query<{ data: PublicProduct[]; meta?: IMeta }, PublicProductListParams>({
+		shopProducts: build.query<
+			{ data: PublicProduct[]; meta?: ProductListMeta },
+			PublicProductListParams
+		>({
 			query: (params) => ({ url: "/products", method: "GET", params }),
-			transformResponse: (rows: PublicProduct[], meta?: IMeta) => ({ data: rows, meta }),
+			transformResponse: (rows: PublicProduct[], meta?: ProductListMeta) => ({ data: rows, meta }),
 			providesTags: [tagTypes.product],
 		}),
 
@@ -73,7 +82,7 @@ export const storefrontApi = baseApi.injectEndpoints({
 		 * Which basket a product goes into is decided by `quoteOnly` (R2), not by
 		 * the visitor — a quote-only product has no price to put in a cart.
 		 */
-		cart: build.query<CartView, void>({
+		cart: build.query<OptimisticCartView, void>({
 			query: () => ({ url: "/cart", method: "GET" }),
 			providesTags: [tagTypes.cart],
 		}),
@@ -94,16 +103,59 @@ export const storefrontApi = baseApi.injectEndpoints({
 				data: { quantity },
 			}),
 			invalidatesTags: [tagTypes.cart],
+			/**
+			 * Paints the new quantity before the round trip, and only the quantity.
+			 * See `cartOptimistic.ts` for why the money is deliberately left alone.
+			 */
+			async onQueryStarted({ id, quantity }, { dispatch, queryFulfilled }) {
+				const patch = dispatch(
+					storefrontApi.util.updateQueryData("cart", undefined, (draft) => {
+						applyQuantity(draft, id, quantity)
+					})
+				)
+				try {
+					await queryFulfilled
+				} catch {
+					// Put it back. The API refuses a quantity below MOQ or above
+					// stock, and a stepper left showing the refused number would be
+					// telling the customer their change stuck.
+					patch.undo()
+				}
+			},
 		}),
 
 		removeCartItem: build.mutation<CartView, string>({
 			query: (id) => ({ url: `/cart/items/${id}`, method: "DELETE" }),
 			invalidatesTags: [tagTypes.cart],
+			async onQueryStarted(id, { dispatch, queryFulfilled }) {
+				const patch = dispatch(
+					storefrontApi.util.updateQueryData("cart", undefined, (draft) => {
+						applyRemoval(draft, id)
+					})
+				)
+				try {
+					await queryFulfilled
+				} catch {
+					patch.undo()
+				}
+			},
 		}),
 
 		clearCart: build.mutation<CartView, void>({
 			query: () => ({ url: "/cart", method: "DELETE" }),
 			invalidatesTags: [tagTypes.cart],
+			async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+				const patch = dispatch(
+					storefrontApi.util.updateQueryData("cart", undefined, (draft) => {
+						applyClear(draft)
+					})
+				)
+				try {
+					await queryFulfilled
+				} catch {
+					patch.undo()
+				}
+			},
 		}),
 
 		quoteBasket: build.query<QuoteBasketView, void>({

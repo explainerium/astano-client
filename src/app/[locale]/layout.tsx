@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { locales, routing, type Locale } from "@/i18n/routing"
 import Providers from "@/lib/providers/Providers"
+import { SITE_URL } from "@/lib/siteUrl"
 import "../globals.css"
 
 /**
@@ -51,7 +52,7 @@ export async function generateMetadata({
 	const t = await getTranslations({ locale, namespace: "site" })
 
 	return {
-		metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+		metadataBase: new URL(SITE_URL),
 		title: {
 			default: t("title"),
 			template: `%s · ${t("title")}`,

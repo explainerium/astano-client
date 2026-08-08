@@ -146,7 +146,22 @@
 		"productInformation": "Product information",
 		"dimensions": "Dimensions",
 		"minimumOrderLabel": "Minimum order",
-		"fromQuantity": "from {quantity}: {price}"
+		"fromQuantity": "from {quantity}: {price}",
+		"compare": "Compare",
+		"quickView": "Quick view",
+		"addToWishlist": "Add to wishlist",
+		"viewFullDetails": "View full details",
+		"close": "Close",
+		"priceFilter": "Price",
+		"priceFrom": "From",
+		"priceTo": "To",
+		"apply": "Apply",
+		"perPage": "Show",
+		"comparing": "{count} to compare",
+		"viewCompare": "Compare now",
+		"pagination": "Pagination",
+		"goToPage": "Page {page}",
+		"compareEmpty": "Pick a few products with the compare button and they will line up here."
 	},
 	"cart": {
 		"title": "Shopping cart",
@@ -171,7 +186,11 @@
 		"issueOutOfStock": "One or more items are out of stock.",
 		"cannotCheckout": "Fix the items above before checking out.",
 		"updateFailed": "That change could not be saved.",
-		"includedOption": "Included option"
+		"includedOption": "Included option",
+		"loading": "Loading your cart…",
+		"emptyHint": "Browse the catalogue and add something to get started.",
+		"viewCart": "View cart",
+		"close": "Close"
 	},
 	"quote": {
 		"title": "Quote request",

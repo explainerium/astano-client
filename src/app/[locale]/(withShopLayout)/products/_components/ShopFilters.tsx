@@ -55,12 +55,23 @@ export const ShopFilters = ({
 	activeSlug,
 	search,
 	onSearchChange,
+	minPrice,
+	maxPrice,
+	bounds,
+	onPriceChange,
 }: {
 	activeSlug: string | null
 	search: string
 	onSearchChange: (value: string) => void
+	/** Current bounds as typed, or empty. Strings, because a cleared box is not 0. */
+	minPrice: string
+	maxPrice: string
+	/** What the catalogue actually spans, for the placeholders. Null when nothing is priced. */
+	bounds: { min: number; max: number } | null
+	onPriceChange: (next: { min: string | null; max: string | null }) => void
 }) => {
 	const t = useTranslations("shop")
+
 	const { data: categories = [] } = useShopCategoriesQuery({ tree: true })
 
 	return (
@@ -94,6 +105,57 @@ export const ShopFilters = ({
 					</button>
 				</div>
 			</form>
+
+			{/*
+			 * Two boxes, not a slider.
+			 *
+			 * A dealer filtering a wholesale catalogue types a figure; dragging to
+			 * €1.24 with a mouse is guesswork. The placeholders carry the range the
+			 * catalogue actually spans, so the boxes still say what is possible.
+			 * Hidden when nothing in view has a price at all.
+			 */}
+			{bounds && (
+				<form
+					onSubmit={(event) => {
+						event.preventDefault()
+						const data = new FormData(event.currentTarget)
+						const min = String(data.get("min") ?? "").trim()
+						const max = String(data.get("max") ?? "").trim()
+						onPriceChange({ min: min || null, max: max || null })
+					}}
+				>
+					<h2 className="font-heading mb-3 text-lg font-semibold">{t("priceFilter")}</h2>
+					<div className="flex items-center gap-2">
+						<input
+							name="min"
+							type="number"
+							min={0}
+							step="0.01"
+							defaultValue={minPrice}
+							placeholder={String(bounds.min)}
+							aria-label={t("priceFrom")}
+							className="focus:border-primary w-full min-w-0 border px-2.5 py-2 text-sm outline-none"
+						/>
+						<span className="text-muted-foreground text-sm">–</span>
+						<input
+							name="max"
+							type="number"
+							min={0}
+							step="0.01"
+							defaultValue={maxPrice}
+							placeholder={String(bounds.max)}
+							aria-label={t("priceTo")}
+							className="focus:border-primary w-full min-w-0 border px-2.5 py-2 text-sm outline-none"
+						/>
+					</div>
+					<button
+						type="submit"
+						className="bg-ink text-ink-foreground mt-3 w-full py-2.5 text-xs font-semibold tracking-wide uppercase transition-opacity hover:opacity-90"
+					>
+						{t("apply")}
+					</button>
+				</form>
+			)}
 
 			<nav>
 				<h2 className="font-heading mb-3 text-lg font-semibold">{t("categories")}</h2>

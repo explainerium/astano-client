@@ -163,6 +163,25 @@
   --negative-soft: #fee2e2;
 
   /*
+   * Chart ramp — categorical, not sequential.
+   *
+   * These sit beside each other in a donut, so the job is telling them apart
+   * at a glance, not reading them as an order. The accent leads because the
+   * largest slice should look like it belongs to the product; the rest are
+   * walked around the wheel at a similar weight so no one slice shouts. Slate
+   * last, for the "everything else" tail.
+   *
+   * Charts that mean something specific — an order's status, a rise or a fall —
+   * use the semantic colours above instead. A cancelled order is red because it
+   * is bad news, not because it happened to be fourth in a list.
+   */
+  --chart-1: #f97316;
+  --chart-2: #0ea5e9;
+  --chart-3: #a855f7;
+  --chart-4: #10b981;
+  --chart-5: #64748b;
+
+  /*
    * A 5px corner — nearly square, but not hard.
    *
    * Fully square read too severe next to the orange accent. The storefront

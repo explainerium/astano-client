@@ -1,7 +1,5 @@
-import { Suspense } from "react"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { getTranslations } from "next-intl/server"
 import type { PublicCategory } from "@/types/storefront"
 import ProductListing from "../../products/_components/ProductListing"
 
@@ -61,10 +59,7 @@ export default async function CategoryPage({
 }) {
 	const { locale, slug } = await params
 
-	const [category, t] = await Promise.all([
-		getCategory(slug, locale),
-		getTranslations({ locale, namespace: "shop" }),
-	])
+	const category = await getCategory(slug, locale)
 
 	if (!category) notFound()
 
@@ -83,11 +78,9 @@ export default async function CategoryPage({
 				</div>
 			</section>
 
-			<Suspense
-				fallback={<p className="text-muted-foreground py-24 text-center text-sm">{t("loading")}</p>}
-			>
-				<ProductListing category={slug} />
-			</Suspense>
+			{/* No <Suspense> here — it stops this subtree hydrating and leaves the
+			    page inert. The reasoning is on the products archive page. */}
+			<ProductListing category={slug} />
 		</>
 	)
 }

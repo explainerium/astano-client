@@ -133,7 +133,7 @@ export const CartView = () => {
 			)}
 
 			<div className="grid gap-10 lg:grid-cols-[1fr_340px] lg:items-start">
-				<ul className={cn("divide-y border-y", busy && "opacity-60 transition-opacity")}>
+				<ul className="divide-y border-y">
 					{cart.items.map((line) => (
 						<li key={line.id} className="py-6">
 							<div className="flex gap-5">
@@ -172,13 +172,17 @@ export const CartView = () => {
 											value={line.quantity}
 											min={line.moq > 0 ? line.moq : 1}
 											max={line.availableStock}
-											disabled={busy}
 											onCommit={(quantity) =>
 												void run(() => updateItem({ id: line.id, quantity }).unwrap())
 											}
 										/>
 
-										<span className="text-muted-foreground text-sm">
+										<span
+											className={cn(
+												"text-muted-foreground text-sm transition-opacity",
+												(cart.repricing ?? []).includes(line.id) && "opacity-40"
+											)}
+										>
 											{formatMoney(line.unitPrice, locale)} {t("exclVat")}
 										</span>
 

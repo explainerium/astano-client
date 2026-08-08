@@ -1,0 +1,250 @@
+"use client"
+
+import { useState } from "react"
+import { useLocale, useTranslations } from "next-intl"
+import { AlertCircle, Check, Loader2, Minus, Plus, X } from "lucide-react"
+import { Link } from "@/i18n/navigation"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { useAddToCartMutation, useShopProductQuery } from "@/redux/api/storefrontApi"
+import { formatMoney } from "@/lib/money"
+import { cn } from "@/lib/utils"
+import TierTable from "@/app/[locale]/(withShopLayout)/products/[slug]/_components/TierTable"
+import type { PublicProduct } from "@/types/storefront"
+
+/**
+ * The grid's quick view.
+ *
+ * Horizontal — gallery left, summary right — at the width the live shop uses
+ * (920px, `quick_view_layout: horizontal`). It exists so a shopper scanning a
+ * category can check a price, a minimum and a photograph without losing their
+ * place in the grid; anything that needs more than that is the product page,
+ * and the dialog says so with a link rather than trying to be one.
+ *
+ * It fetches the full product on open rather than rendering the card's data,
+ * because a listing carries a *range* ("from €1.24") and this needs the price
+ * at a chosen quantity. Fetching only when open keeps a grid of twenty-four
+ * cards from making twenty-four requests nobody asked for.
+ */
+export const QuickViewDialog = ({
+	product,
+	onOpenChange,
+}: {
+	/** Null when closed. The card passes the product it was clicked on. */
+	product: PublicProduct | null
+	onOpenChange: (open: boolean) => void
+}) => {
+	const t = useTranslations("shop")
+	const locale = useLocale()
+
+	const [quantity, setQuantity] = useState(1)
+	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
+
+	const { data, isFetching } = useShopProductQuery(
+		product ? { slug: product.slug, quantity } : { slug: "" },
+		{ skip: !product }
+	)
+
+	const [addToCart, cartState] = useAddToCartMutation()
+
+	const detail = data
+	const variant = detail?.variants.find((v) => v.isDefault) ?? detail?.variants[0] ?? null
+	const min = variant && variant.moq > 0 ? variant.moq : 1
+	const belowMoq = quantity < min
+
+	/**
+	 * The quantity resets to the product's own minimum each time the dialog
+	 * opens on a different product — carrying 500 over from the last card would
+	 * quote a price for something nobody asked about.
+	 */
+	const [seededFor, setSeededFor] = useState<string | null>(null)
+	if (product && seededFor !== product.id) {
+		setSeededFor(product.id)
+		setQuantity(1)
+		setFeedback(null)
+	}
+	if (variant && quantity < min) setQuantity(min)
+
+	const image = detail?.featuredImage ?? product?.featuredImage ?? null
+	const hero = image ? (image.srcset.detail ?? image.srcset.grid ?? image.url) : null
+
+	const add = async () => {
+		if (!variant || belowMoq) return
+		setFeedback(null)
+		try {
+			await addToCart({ variantId: variant.id, quantity }).unwrap()
+			setFeedback({ ok: true, message: t("addedToCart") })
+		} catch (error) {
+			setFeedback({
+				ok: false,
+				message:
+					(error as { data?: { message?: string } })?.data?.message ?? t("addFailed"),
+			})
+		}
+	}
+
+	return (
+		<Dialog open={!!product} onOpenChange={onOpenChange}>
+			<DialogContent
+				showCloseButton={false}
+				className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-[920px]"
+			>
+				<button
+					type="button"
+					onClick={() => onOpenChange(false)}
+					aria-label={t("close")}
+					className="hover:bg-muted absolute top-3 right-3 z-10 rounded-full bg-white/80 p-2 transition-colors"
+				>
+					<X className="size-5" />
+				</button>
+
+				<div className="grid gap-0 md:grid-cols-2">
+					<div className="bg-muted flex aspect-square items-center justify-center overflow-hidden">
+						{hero ? (
+							// eslint-disable-next-line @next/next/no-img-element
+							<img src={hero} alt="" className="size-full object-contain" />
+						) : (
+							<span className="text-muted-foreground text-xs">{t("noImage")}</span>
+						)}
+					</div>
+
+					<div className="flex flex-col gap-4 p-6 md:p-8">
+						<div>
+							<DialogTitle className="font-heading text-xl leading-tight font-bold tracking-tight">
+								{product?.name ?? ""}
+							</DialogTitle>
+							{!!detail?.categories.length && (
+								<p className="text-muted-foreground mt-1 text-xs">
+									{detail.categories.map((c) => c.name).join(", ")}
+								</p>
+							)}
+						</div>
+
+						{isFetching && !detail ? (
+							<div className="text-muted-foreground flex items-center gap-2 py-8 text-sm">
+								<Loader2 className="size-4 animate-spin" />
+								{t("loading")}
+							</div>
+						) : detail?.quoteOnly ? (
+							<p className="text-muted-foreground italic">{t("priceOnRequest")}</p>
+						) : (
+							<>
+								<div className="flex items-baseline gap-2">
+									<span className="font-heading text-2xl font-bold">
+										{formatMoney(variant?.unitPrice ?? null, locale) ?? "—"}
+									</span>
+									{variant?.onSale && variant.listPrice && (
+										<span className="text-muted-foreground text-sm line-through">
+											{formatMoney(variant.listPrice, locale)}
+										</span>
+									)}
+									<span className="text-muted-foreground text-xs">{t("exclVat")}</span>
+								</div>
+
+								{detail?.shortDescription && (
+									<p className="text-muted-foreground line-clamp-4 text-sm leading-relaxed">
+										{detail.shortDescription}
+									</p>
+								)}
+
+								{!!variant?.tiers.length && (
+									<TierTable
+										tiers={variant.tiers}
+										quantity={quantity}
+										baseRow={null}
+										title={t("buyMoreSaveMore")}
+										compact
+									/>
+								)}
+
+								<div className="flex flex-wrap items-center gap-3">
+									<div className="flex items-center border">
+										<button
+											type="button"
+											onClick={() => setQuantity(Math.max(min, quantity - 1))}
+											disabled={quantity <= min}
+											aria-label="-"
+											className="px-3 py-2 disabled:opacity-40"
+										>
+											<Minus className="size-4" />
+										</button>
+										<input
+											type="number"
+											min={min}
+											value={quantity}
+											onChange={(e) => setQuantity(Math.max(1, Number(e.target.value) || 1))}
+											className="w-16 border-x py-2 text-center text-sm outline-none"
+											aria-label={t("quantity")}
+										/>
+										<button
+											type="button"
+											onClick={() => setQuantity(quantity + 1)}
+											aria-label="+"
+											className="px-3 py-2"
+										>
+											<Plus className="size-4" />
+										</button>
+									</div>
+
+									{min > 1 && (
+										<span className="text-muted-foreground text-xs">
+											{t("minimumOrder", { quantity: min })}
+										</span>
+									)}
+								</div>
+
+								{belowMoq && (
+									<p className="text-destructive flex items-center gap-1.5 text-sm">
+										<AlertCircle className="size-4 shrink-0" />
+										{t("belowMoq", { quantity: min })}
+									</p>
+								)}
+
+								<button
+									type="button"
+									onClick={add}
+									disabled={cartState.isLoading || belowMoq || !variant?.inStock}
+									className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
+								>
+									{cartState.isLoading && <Loader2 className="size-4 animate-spin" />}
+									{t("addToCart")}
+								</button>
+
+								{feedback && (
+									<p
+										role="status"
+										className={cn(
+											"flex items-center gap-2 text-sm",
+											feedback.ok ? "text-primary" : "text-destructive"
+										)}
+									>
+										{feedback.ok ? (
+											<Check className="size-4 shrink-0" />
+										) : (
+											<AlertCircle className="size-4 shrink-0" />
+										)}
+										{feedback.message}
+									</p>
+								)}
+							</>
+						)}
+
+						{/* Quick view is a glance, not a substitute. Everything it leaves
+						    out — the full description, the specification table, the
+						    options — is one click away and named as such. */}
+						{product && (
+							<Link
+								href={{ pathname: "/products/[slug]", params: { slug: product.slug } }}
+								onClick={() => onOpenChange(false)}
+								className="text-primary mt-auto text-sm underline underline-offset-4"
+							>
+								{t("viewFullDetails")}
+							</Link>
+						)}
+					</div>
+				</div>
+			</DialogContent>
+		</Dialog>
+	)
+}
+
+export default QuickViewDialog

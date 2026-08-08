@@ -32,14 +32,13 @@ import MoqField from "./MoqField"
 import OptionsTab from "./OptionsTab"
 import ProductImages from "./ProductImages"
 import QuantityPricing from "./QuantityPricing"
+import { SITE_URL } from "@/lib/siteUrl"
 import { TIER_ROLES, tierUnitPrice, type TierRole } from "@/lib/tiers"
 import {
 	buildTree,
 	displayName,
 	flattenTree,
 } from "../../categories/_components/categoryTree"
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"
 
 const EDITOR_LOCALES = [
 	{ code: "en", label: "English" },
