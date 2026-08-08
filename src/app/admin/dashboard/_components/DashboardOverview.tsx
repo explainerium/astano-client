@@ -527,7 +527,10 @@ export const DashboardOverview = () => {
 						</span>
 					}
 					action={
-						<Link href="/admin/dashboard/b2b" className="text-primary text-sm hover:underline">
+						<Link
+							href="/admin/dashboard/users?status=PENDING"
+							className="text-primary text-sm hover:underline"
+						>
 							Review
 						</Link>
 					}
@@ -540,8 +543,10 @@ export const DashboardOverview = () => {
 						<ul className="divide-y">
 							{data.pendingDealers.map((dealer) => (
 								<li key={dealer.id} className="py-2.5 first:pt-0 last:pb-0">
+									{/* The account, not the application — the decision is made on
+									    the person's own page now. */}
 									<Link
-										href={`/admin/dashboard/b2b/${dealer.id}`}
+										href={`/admin/dashboard/users/${dealer.userId}`}
 										className="hover:text-primary block truncate text-sm font-medium"
 									>
 										{dealer.companyName}

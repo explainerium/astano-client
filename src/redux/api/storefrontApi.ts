@@ -204,17 +204,67 @@ export const storefrontApi = baseApi.injectEndpoints({
 			providesTags: [tagTypes.account],
 		}),
 
+		/**
+		 * Everything a customer may change about themselves.
+		 *
+		 * Not email — that has its own flow below, because the address has to prove
+		 * it can receive mail before it becomes the one invoices go to. Not role or
+		 * status either: what someone is, and whether they may trade, is never
+		 * their own decision.
+		 *
+		 * Editing the VAT number clears its VIES validation server-side, so
+		 * reverse charge (R10) cannot be inherited by a number nobody has checked.
+		 */
 		updateProfile: build.mutation<
 			AccountProfile,
 			{
+				salutation?: string | null
 				firstName?: string
 				lastName?: string
 				company?: string | null
 				phone?: string | null
+				vatNumber?: string | null
 				locale?: string
 			}
 		>({
 			query: (data) => ({ url: "/account/profile", method: "PATCH", data }),
+			invalidatesTags: [tagTypes.account, tagTypes.auth],
+		}),
+
+		/**
+		 * Ask to change the sign-in address.
+		 *
+		 * Nothing changes when this succeeds. It sends a link to the *new* address
+		 * and the account keeps its current one until that link is used — so a typo
+		 * costs a resend rather than the account. The current password is required:
+		 * the link proves the destination is real, the password proves the request
+		 * came from the owner.
+		 */
+		requestEmailChange: build.mutation<
+			{ pendingEmail: string; expiresAt: string },
+			{ email: string; currentPassword: string }
+		>({
+			query: (data) => ({ url: "/account/email", method: "POST", data }),
+			invalidatesTags: [tagTypes.account],
+		}),
+
+		/** Null when nothing is waiting. Drives the "check your inbox" notice. */
+		pendingEmailChange: build.query<{ pendingEmail: string; expiresAt: string } | null, void>({
+			query: () => ({ url: "/account/email/pending", method: "GET" }),
+			providesTags: [tagTypes.account],
+		}),
+
+		cancelEmailChange: build.mutation<null, void>({
+			query: () => ({ url: "/account/email/pending", method: "DELETE" }),
+			invalidatesTags: [tagTypes.account],
+		}),
+
+		/**
+		 * Consume the link. Unauthenticated — the token is the authorisation,
+		 * because the mailbox is rarely open in the browser that made the request.
+		 */
+		verifyEmailChange: build.mutation<AccountProfile, string>({
+			query: (token) => ({ url: "/account/email/verify", method: "POST", data: { token } }),
 			invalidatesTags: [tagTypes.account, tagTypes.auth],
 		}),
 
@@ -395,6 +445,10 @@ export const {
 
 	useMeQuery,
 	useUpdateProfileMutation,
+	useRequestEmailChangeMutation,
+	usePendingEmailChangeQuery,
+	useCancelEmailChangeMutation,
+	useVerifyEmailChangeMutation,
 	useCreateAddressMutation,
 	useUpdateAddressMutation,
 	useDeleteAddressMutation,

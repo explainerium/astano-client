@@ -24,8 +24,21 @@ const pathFor = (key: PathKey, locale: Locale): string => {
 
 const allPathsFor = (key: PathKey): string[] => locales.map((l) => pathFor(key, l))
 
-/** Signed-in-only areas. Matched as prefixes, so /account/orders/123 is covered. */
-const PROTECTED = [...allPathsFor("/account"), ...allPathsFor("/checkout")]
+/**
+ * Signed-in-only areas. Matched as prefixes, so /account/orders/123 is covered.
+ *
+ * Split by what the area *does*, because suspension is a commercial measure and
+ * not a lockout. A suspended customer keeps their own account — their details,
+ * their invoices, their address book — and loses the ability to buy. Bouncing
+ * them off /account as well would leave them unable to correct the very thing
+ * the suspension is often about, and mirrors nothing the API does: authAccount
+ * serves them there, auth refuses them at checkout.
+ */
+const ACCOUNT_PATHS = allPathsFor("/account")
+const TRADING_PATHS = allPathsFor("/checkout")
+
+/** May reach their own account. */
+const CAN_VIEW_ACCOUNT = ["ACTIVE", "SUSPENDED"]
 
 /** Pages an approved, signed-in user has no reason to see. */
 const AUTH_PAGES = [...allPathsFor("/login"), ...allPathsFor("/register")]
@@ -63,25 +76,37 @@ export async function proxy(request: NextRequest) {
 
 	const locale = localeOf(pathname)
 
-	// Only ACTIVE accounts are bounced off the sign-in pages. A PENDING Reseller
-	// must be able to reach /login — that is where their application status is
-	// shown. Bouncing them would trap them in a redirect loop with the rule
-	// below, which sends non-ACTIVE users here in the first place.
-	if (matches(pathname, AUTH_PAGES) && user?.status === "ACTIVE") {
+	// Anyone who has an account to go to is bounced off the sign-in pages. A
+	// PENDING Reseller is not: /login is where their application status is shown,
+	// and bouncing them would trap them in a redirect loop with the rule below,
+	// which sends them here in the first place.
+	if (matches(pathname, AUTH_PAGES) && user && CAN_VIEW_ACCOUNT.includes(user.status)) {
 		return NextResponse.redirect(new URL(pathFor("/account", locale), request.url))
 	}
 
-	if (matches(pathname, PROTECTED)) {
+	const wantsAccount = matches(pathname, ACCOUNT_PATHS)
+	const wantsTrading = matches(pathname, TRADING_PATHS)
+
+	if (wantsAccount || wantsTrading) {
 		if (!user) {
 			const login = new URL(pathFor("/login", locale), request.url)
 			login.searchParams.set("redirect", pathname)
 			return NextResponse.redirect(login)
 		}
 
-		// Signed in but not approved. The API 403s every protected route for a
-		// PENDING or REJECTED account (R5b), so letting them through would only
-		// render a wall of permission errors.
-		if (user.status !== "ACTIVE") {
+		/*
+		 * Signed in but not permitted here. The API refuses these routes for the
+		 * same statuses, so letting the page render would only produce a wall of
+		 * permission errors — PENDING and REJECTED accounts go back to sign-in,
+		 * where their application status is what they are shown.
+		 *
+		 * Checkout is stricter than the account area: only ACTIVE may commit to
+		 * anything, which is what keeps a suspended customer from ordering while
+		 * still letting them read what they already ordered.
+		 */
+		const allowed = wantsTrading ? ["ACTIVE"] : CAN_VIEW_ACCOUNT
+
+		if (!allowed.includes(user.status)) {
 			return NextResponse.redirect(new URL(pathFor("/login", locale), request.url))
 		}
 	}

@@ -88,6 +88,18 @@ export const pathnames = {
 		en: "/account/wishlist",
 		de: "/mein-konto/wunschliste",
 	},
+
+	/**
+	 * Where an email-change confirmation link lands.
+	 *
+	 * Outside /account because the link is opened wherever the mailbox is, which
+	 * is frequently a browser with no session — the token in the URL is the
+	 * authorisation, so a signed-out visitor has to be able to reach it.
+	 *
+	 * The backend composes this URL and therefore repeats these slugs; keep the
+	 * two in step. See VERIFY_PATH in backend account.service.ts.
+	 */
+	"/verify-email": { en: "/verify-email", de: "/e-mail-bestaetigen" },
 } as const
 
 export const routing = defineRouting({

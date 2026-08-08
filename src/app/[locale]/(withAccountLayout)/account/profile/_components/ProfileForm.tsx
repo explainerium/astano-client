@@ -12,6 +12,7 @@ import ProSelect from "@/components/form/ProSelect"
 import ProSubmit from "@/components/form/ProSubmit"
 import { useMeQuery, useUpdateProfileMutation } from "@/redux/api/storefrontApi"
 import { formatDate } from "@/lib/dates"
+import EmailChangeCard from "./EmailChangeCard"
 
 const buildSchema = () =>
 	z.object({
@@ -19,6 +20,7 @@ const buildSchema = () =>
 		lastName: z.string().trim().max(100),
 		company: z.string().trim().max(200),
 		phone: z.string().trim().max(50),
+		vatNumber: z.string().trim().max(30),
 		locale: z.string().trim().min(2).max(5),
 	})
 
@@ -27,10 +29,14 @@ type FormValues = z.infer<ReturnType<typeof buildSchema>>
 /**
  * The editable half of the account.
  *
- * Email, VAT number and role are shown but not editable here: the email is the
- * sign-in identity, and a VAT number that has been checked against VIES cannot
- * be changed from a text box without silently invalidating the reverse-charge
- * status that depends on it (R10).
+ * Role and status are absent and always will be: what someone is, and whether
+ * they may trade, is a staff decision and never their own. Email has its own
+ * card below — it is the sign-in identity, so it changes only once the new
+ * address has proved it can receive mail.
+ *
+ * The VAT number *is* editable, and editing it drops its VIES validation
+ * server-side. Reverse charge (R10) depends on that flag, so a freshly typed
+ * number has to be checked again before it can zero anyone's tax.
  */
 export const ProfileForm = () => {
 	const t = useTranslations("account")
@@ -55,6 +61,7 @@ export const ProfileForm = () => {
 				lastName: form.lastName.trim(),
 				company: form.company.trim() || null,
 				phone: form.phone.trim() || null,
+				vatNumber: form.vatNumber.trim() || null,
 				locale: form.locale,
 			}).unwrap()
 			toast.success(t("saved"))
@@ -75,12 +82,6 @@ export const ProfileForm = () => {
 					<dt className="text-muted-foreground">{t("memberSince")}</dt>
 					<dd className="font-medium">{formatDate(profile.createdAt, locale)}</dd>
 				</div>
-				{profile.vatNumber && (
-					<div>
-						<dt className="text-muted-foreground">{t("vatNumber")}</dt>
-						<dd className="font-medium">{profile.vatNumber}</dd>
-					</div>
-				)}
 			</dl>
 
 			<p className="text-muted-foreground text-sm leading-relaxed">{t("profileNote")}</p>
@@ -93,6 +94,7 @@ export const ProfileForm = () => {
 					lastName: profile.lastName ?? "",
 					company: profile.company ?? "",
 					phone: profile.phone ?? "",
+					vatNumber: profile.vatNumber ?? "",
 					locale: profile.locale ?? "de",
 				}}
 				className="space-y-5"
@@ -102,6 +104,11 @@ export const ProfileForm = () => {
 					<ProInput name="lastName" label={t("lastName")} autoComplete="family-name" />
 					<ProInput name="company" label={t("company")} autoComplete="organization" />
 					<ProInput name="phone" type="tel" label={t("phone")} autoComplete="tel" />
+					<ProInput
+						name="vatNumber"
+						label={t("vatNumber")}
+						description={t("vatNumberNote")}
+					/>
 					<ProSelect
 						name="locale"
 						label={t("language")}
@@ -116,6 +123,8 @@ export const ProfileForm = () => {
 					{t("save")}
 				</ProSubmit>
 			</ProForm>
+
+			<EmailChangeCard currentEmail={profile.email} />
 		</div>
 	)
 }

@@ -1,5 +1,4 @@
 import {
-	Building2,
 	CreditCard,
 	FolderTree,
 	Image as ImageIcon,
@@ -51,8 +50,14 @@ export const navGroups: NavItem[][] = [
 		{ label: "Media", href: "/admin/dashboard/media", icon: ImageIcon, nested: true },
 	],
 	[
-		{ label: "Customers", href: "/admin/dashboard/users", icon: Users, nested: true },
-		{ label: "Dealers", href: "/admin/dashboard/b2b", icon: Building2, nested: true },
+		/*
+		 * One entry, not two.
+		 *
+		 * "Customers" and "Dealers" were the same table filtered differently, and
+		 * a dealer who also buys at retail existed on both. Role is a column on
+		 * the Users screen now.
+		 */
+		{ label: "Users", href: "/admin/dashboard/users", icon: Users, nested: true },
 		{ label: "Contact", href: "/admin/dashboard/contact", icon: Mail, nested: true },
 		{ label: "Newsletter", href: "/admin/dashboard/newsletter", icon: Send, nested: true },
 	],

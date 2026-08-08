@@ -45,7 +45,11 @@ export type UserRole = "GUEST" | "B2C" | "RESELLER" | "SHOP_MANAGER" | "ADMIN"
  * Separate from role on purpose. A RESELLER can be PENDING while an admin
  * reviews the application, and such an account is priced as a GUEST (R5b).
  */
-export type UserStatus = "ACTIVE" | "PENDING" | "REJECTED"
+/**
+ * SUSPENDED and DRAFT are staff decisions, not registration states. Only ACTIVE
+ * may trade; everything else is priced as a guest by the API (R5b).
+ */
+export type UserStatus = "ACTIVE" | "PENDING" | "REJECTED" | "SUSPENDED" | "DRAFT"
 
 /** Claims carried by the access token. Signed by the API, read-only here. */
 export interface AccessTokenPayload {
