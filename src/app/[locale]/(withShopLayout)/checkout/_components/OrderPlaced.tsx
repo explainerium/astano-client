@@ -5,6 +5,7 @@ import { CheckCircle2 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { formatMoney } from "@/lib/money"
 import { countryName } from "@/lib/countries"
+import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { PlacedOrder } from "@/types/storefront"
 
 /** Order confirmation — the last thing the customer sees before their inbox. */
@@ -83,6 +84,12 @@ export const OrderPlaced = ({ order }: { order: PlacedOrder }) => {
 								{order.paymentMethod.instructions}
 							</p>
 						</>
+					)}
+
+					{/* The details themselves, as rows with a copy button. This is the
+					    part of a bank-transfer order that has a job to do. */}
+					{!!order.paymentMethod?.bankAccounts?.length && (
+						<BankAccountDetails accounts={order.paymentMethod.bankAccounts} />
 					)}
 					{order.shippingMethod && (
 						<>

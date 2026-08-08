@@ -8,6 +8,8 @@
  * nothing on this side ever computes one — that is spec risk #1.
  */
 
+import type { BankAccount } from "./payment"
+
 export interface PublicImage {
 	id: string
 	url: string
@@ -242,6 +244,14 @@ export interface CheckoutPreview {
 	/** No rate configured for this destination at all — 0% by omission, not by rule. */
 	taxUnconfigured: boolean
 	taxLines: TaxLine[]
+	/**
+	 * False until a delivery country is known.
+	 *
+	 * Distinguishes "you have not told us where yet" from "we do not deliver
+	 * there" — both leave shippingOptions empty, and only one of them warrants a
+	 * warning.
+	 */
+	hasDestination: boolean
 	shippingOptions: ShippingOption[]
 	paymentMethods: CheckoutPaymentMethod[]
 }
@@ -267,7 +277,13 @@ export interface PlacedOrder {
 	discountTotal: string
 	grandTotal: string
 	shippingMethod: { code: string; title: string } | null
-	paymentMethod: { code: string; title: string; instructions?: string | null } | null
+	paymentMethod: {
+		code: string
+		title: string
+		instructions?: string | null
+		/** Frozen on the order at checkout — see Order.paymentAccounts. */
+		bankAccounts?: BankAccount[]
+	} | null
 	reverseCharged: boolean
 	customerNote: string | null
 	placedAt: string
@@ -370,14 +386,25 @@ export interface WishlistView {
 	items: WishlistItem[]
 }
 
+/**
+ * A payment method as the shop offers it, eligible or not.
+ *
+ * Everything but `reason` is always present. An earlier API returned only an id
+ * and a code for the ineligible ones — hence the optional fields this used to
+ * carry — which left the checkout unable to name a method it was meant to show
+ * greyed out.
+ */
 export interface AvailablePaymentMethod {
 	id: string
 	code: string
-	type?: string
-	title?: string
-	description?: string | null
-	instructions?: string | null
+	type: string
+	title: string
+	description: string | null
+	instructions: string | null
+	/** Bank details for a transfer. Empty for every other kind. */
+	bankAccounts: BankAccount[]
 	eligible: boolean
+	/** Why not, when not — e.g. AWAITING_COUNTRY, NOT_ENOUGH_ORDER_HISTORY. */
 	reason?: string
 }
 

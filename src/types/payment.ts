@@ -42,6 +42,11 @@ export interface PaymentMethod {
 	 * actually reads, not in a raw blob that never reaches them.
 	 */
 	config: unknown
+	/**
+	 * One of the three fixed kinds. A built-in is switched off, never deleted;
+	 * only a leftover from the old builder can be removed.
+	 */
+	isBuiltIn: boolean
 }
 
 export interface PaymentMethodPayload {
@@ -56,5 +61,21 @@ export interface PaymentMethodPayload {
 	minOrderTotal?: string | null
 	maxOrderTotal?: string | null
 	requiresValidatedVatId?: boolean
+	/**
+	 * Method-specific settings. `bankAccounts` is the only part with a shape the
+	 * admin edits; the rest stays open so a future provider needs no migration.
+	 */
+	config?: Record<string, unknown> | null
 	translations?: PaymentTranslation[]
+}
+
+/** What a customer needs in order to send the money. Mirrors the backend's BankAccount. */
+export interface BankAccount {
+	label?: string
+	accountName: string
+	bankName?: string
+	accountNumber?: string
+	iban?: string
+	bic?: string
+	countryCode?: string
 }

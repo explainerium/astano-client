@@ -809,6 +809,18 @@
 		"confirmationNote": "A confirmation has been sent to you by email.",
 		"paymentInstructions": "Payment instructions",
 		"viewOrders": "View my orders",
-		"keepShopping": "Continue shopping"
+		"keepShopping": "Continue shopping",
+		"bankAccountName": "Account holder",
+		"bankName": "Bank",
+		"bankAccountNumber": "Account number",
+		"bankIban": "IBAN",
+		"bankBic": "BIC / SWIFT",
+		"bankCountry": "Country",
+		"bankReferenceHint": "Please quote your order number as the payment reference so we can match it to your order.",
+		"awaitingAddressDelivery": "Fill in the address above and the delivery options will appear here, with their costs.",
+		"reasonAwaitingCountry": "Available once we know your delivery country",
+		"reasonCountryNotAllowed": "Not available for deliveries to this country",
+		"reasonRequiresLogin": "Sign in to use this",
+		"noticeTitle": "Before we can place your order:"
 	}
 }

@@ -326,12 +326,27 @@ export const storefrontApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.quote, tagTypes.order],
 		}),
 
-		/** Eligibility without a cart — used when accepting a quote. */
+		/**
+		 * Every active payment method, whether or not anything else is known.
+		 *
+		 * Both arguments are optional and usually omitted. What a shop accepts is
+		 * a property of the shop, not of one basket going to one address, so the
+		 * checkout lists these the moment the page opens rather than waiting on a
+		 * cart total or a delivery country. The few methods that do carry a
+		 * restriction come back flagged, and the checkout refines them once the
+		 * address is in.
+		 *
+		 * Also used when accepting a quote, where there is no cart at all.
+		 */
 		availablePaymentMethods: build.query<
 			AvailablePaymentMethod[],
-			{ orderTotal: number; countryCode: string }
+			{ orderTotal?: number; countryCode?: string } | void
 		>({
-			query: (params) => ({ url: "/payment-methods/available", method: "GET", params }),
+			query: (params) => ({
+				url: "/payment-methods/available",
+				method: "GET",
+				...(params ? { params } : {}),
+			}),
 			providesTags: [tagTypes.payment],
 		}),
 

@@ -810,6 +810,18 @@
 		"confirmationNote": "Eine Bestätigung wurde Ihnen per E-Mail zugesendet.",
 		"paymentInstructions": "Zahlungshinweise",
 		"viewOrders": "Meine Bestellungen",
-		"keepShopping": "Weiter einkaufen"
+		"keepShopping": "Weiter einkaufen",
+		"bankAccountName": "Kontoinhaber",
+		"bankName": "Bank",
+		"bankAccountNumber": "Kontonummer",
+		"bankIban": "IBAN",
+		"bankBic": "BIC / SWIFT",
+		"bankCountry": "Land",
+		"bankReferenceHint": "Bitte geben Sie Ihre Bestellnummer als Verwendungszweck an, damit wir die Zahlung zuordnen können.",
+		"awaitingAddressDelivery": "Füllen Sie oben die Adresse aus — die Versandarten erscheinen dann hier, mit ihren Kosten.",
+		"reasonAwaitingCountry": "Verfügbar, sobald Ihr Lieferland bekannt ist",
+		"reasonCountryNotAllowed": "Für Lieferungen in dieses Land nicht verfügbar",
+		"reasonRequiresLogin": "Zum Nutzen bitte anmelden",
+		"noticeTitle": "Bevor wir Ihre Bestellung aufgeben können:"
 	}
 }

@@ -7,6 +7,7 @@ import { useMyOrderQuery } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
 import { formatDate } from "@/lib/dates"
 import { formatMoney } from "@/lib/money"
+import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { CheckoutAddress } from "@/types/storefront"
 import StatusChip from "../../../_components/StatusChip"
 
@@ -170,6 +171,13 @@ export const OrderDetail = ({ id }: { id: string }) => {
 										{order.paymentMethod.instructions}
 									</p>
 								</>
+							)}
+
+							{/* Repeated here, not only on the thank-you page: an unpaid
+							    transfer is exactly what somebody comes back to their order
+							    history to look up. */}
+							{!!order.paymentMethod.bankAccounts?.length && (
+								<BankAccountDetails accounts={order.paymentMethod.bankAccounts} />
 							)}
 						</>
 					)}

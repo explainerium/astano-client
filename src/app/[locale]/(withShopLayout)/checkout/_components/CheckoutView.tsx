@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, Loader2 } from "lucide-react"
@@ -13,6 +13,7 @@ import ProTextarea from "@/components/form/ProTextarea"
 import { Link } from "@/i18n/navigation"
 import useUserInfo from "@/hooks/useUserInfo"
 import {
+	useAvailablePaymentMethodsQuery,
 	useCartQuery,
 	useCheckoutPreviewMutation,
 	useMyAddressesQuery,
@@ -165,6 +166,10 @@ export const CheckoutView = () => {
 		skip: !isLoggedIn,
 	})
 
+	// No arguments: the shop's payment options do not depend on this basket or
+	// this address, so they load with the page.
+	const { data: allPaymentMethods } = useAvailablePaymentMethodsQuery()
+
 	const [runPreview, previewState] = useCheckoutPreviewMutation()
 	const [placeOrder, placeState] = usePlaceOrderMutation()
 
@@ -173,6 +178,10 @@ export const CheckoutView = () => {
 	const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null)
 	const [order, setOrder] = useState<PlacedOrder | null>(null)
 	const [error, setError] = useState<string | null>(null)
+
+	/** What the customer still has to choose. Filled on a submit that cannot proceed. */
+	const [notice, setNotice] = useState<string[]>([])
+	const noticeRef = useRef<HTMLDivElement>(null)
 
 	const schema = useMemo(() => buildSchema(t), [t])
 
@@ -192,8 +201,15 @@ export const CheckoutView = () => {
 				// falls back to the billing address only when there is no separate
 				// one. Empty optional fields are stripped: the API validates
 				// `email` as an email, and "" is not one.
+				// An empty destination is a real call, not a mistake: it asks the API
+				// what the shop offers before anyone has said where it is going. The
+				// address is omitted entirely rather than sent as a bag of empty
+				// strings, which validation would reject.
+				const address = toApiAddress(destination)
+				const hasAddress = Object.keys(address).length > 0
+
 				const result = await runPreview({
-					shippingAddress: toApiAddress(destination),
+					...(hasAddress ? { shippingAddress: address } : {}),
 					...(methodId ? { shippingMethodId: methodId } : {}),
 				}).unwrap()
 
@@ -217,7 +233,30 @@ export const CheckoutView = () => {
 	)
 
 	const onSubmit = async (values: FormValues) => {
-		if (!shippingMethodId || !paymentMethodId) return
+		/*
+		 * What is still missing, said once, at the top, on submit.
+		 *
+		 * The button stays enabled and pressing it is what surfaces the problem —
+		 * a disabled button with no explanation is the worst of both, and standing
+		 * hints under it nag about steps the customer has not reached. WooCommerce
+		 * puts a notice at the top of the page; so does this.
+		 */
+		const missing = [
+			!shippingMethodId && t("chooseDelivery"),
+			!paymentMethodId && t("choosePayment"),
+		].filter((line): line is string => Boolean(line))
+
+		// The `!shippingMethodId` narrowing above lives inside an array, which TS
+		// cannot follow, so the guard is repeated here where it can.
+		if (missing.length || !shippingMethodId || !paymentMethodId) {
+			setNotice(missing)
+			// The notice sits above a long address form, so on a tall checkout it
+			// would otherwise appear somewhere the customer is not looking.
+			noticeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+			return
+		}
+
+		setNotice([])
 		setError(null)
 		try {
 			const placed = await placeOrder({
@@ -310,20 +349,41 @@ export const CheckoutView = () => {
 						? "reasonBelowMinimum"
 						: reason === "ABOVE_MAXIMUM"
 							? "reasonAboveMaximum"
-							: null
+							: // Not "unavailable in your country" — nobody has said which
+								// country it is yet. See AWAITING_COUNTRY on the API side.
+								reason === "AWAITING_COUNTRY"
+								? "reasonAwaitingCountry"
+								: reason === "COUNTRY_NOT_ALLOWED"
+									? "reasonCountryNotAllowed"
+									: reason === "REQUIRES_LOGIN"
+										? "reasonRequiresLogin"
+										: null
 		return key ? t(key) : t("notEligible")
 	}
 
-	const paymentOptions: MethodOption[] = (preview?.paymentMethods ?? []).map((method) => ({
+	/**
+	 * Payment options, listed from the moment the page opens.
+	 *
+	 * Deliberately **not** tied to the checkout preview. What a shop accepts is a
+	 * property of the shop, not of one basket going to one address — so
+	 * `paymentMethods` is fetched on its own with no arguments and renders
+	 * immediately. Earlier versions gated this behind the preview, which meant a
+	 * customer stared at "Loading…" or "enter your address" where a plain list
+	 * belonged.
+	 *
+	 * Once the preview does arrive it takes over, because by then the country and
+	 * the order total are known and the handful of restricted methods can be
+	 * judged properly. Same shape either way, so the list does not jump.
+	 */
+	const paymentSource = preview?.paymentMethods ?? allPaymentMethods ?? []
+
+	const paymentOptions: MethodOption[] = paymentSource.map((method) => ({
 		id: method.id,
 		title: method.title,
 		description: method.description,
 		disabled: !method.eligible,
 		disabledReason: method.eligible ? undefined : reasonLabel(method.reason),
 	}))
-
-	const canPlace =
-		Boolean(shippingMethodId) && Boolean(paymentMethodId) && !placeState.isLoading && !!preview
 
 	return (
 		<ProForm
@@ -357,6 +417,32 @@ export const CheckoutView = () => {
 					{t("title")}
 				</h1>
 
+				{/*
+				 * The notice, in the place people look for one.
+				 *
+				 * `role="alert"` and `tabIndex={-1}` so a screen reader announces it
+				 * and the scroll target can take focus — a visual jump alone tells a
+				 * keyboard or screen-reader user nothing.
+				 */}
+				<div ref={noticeRef} tabIndex={-1}>
+					{!!notice.length && (
+						<div
+							role="alert"
+							className="border-destructive/40 bg-negative-soft mb-8 border px-5 py-4"
+						>
+							<p className="text-destructive flex items-start gap-2 text-sm font-medium">
+								<AlertCircle className="mt-0.5 size-4 shrink-0" />
+								{t("noticeTitle")}
+							</p>
+							<ul className="text-destructive mt-2 ml-6 list-disc space-y-1 text-sm">
+								{notice.map((line) => (
+									<li key={line}>{line}</li>
+								))}
+							</ul>
+						</div>
+					)}
+				</div>
+
 				<div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start">
 					<div className="space-y-10">
 						<section>
@@ -377,8 +463,14 @@ export const CheckoutView = () => {
 
 						<section>
 							<h2 className="font-heading mb-5 text-xl font-semibold">{t("delivery")}</h2>
-							{!preview ? (
-								<p className="text-muted-foreground text-sm">{t("enterAddressFirst")}</p>
+							{/*
+							 * Three states, not two. "No address yet" and "we do not deliver
+							 * there" both leave the list empty, and only the second is bad
+							 * news — showing a red warning on a page nobody has typed into
+							 * is alarming and wrong.
+							 */}
+							{!preview || !preview.hasDestination ? (
+								<p className="text-muted-foreground text-sm">{t("awaitingAddressDelivery")}</p>
 							) : !shippingOptions.length ? (
 								<p className="text-destructive flex items-center gap-2 text-sm">
 									<AlertCircle className="size-4 shrink-0" />
@@ -396,16 +488,14 @@ export const CheckoutView = () => {
 
 						<section>
 							<h2 className="font-heading mb-5 text-xl font-semibold">{t("payment")}</h2>
-							{!preview ? (
-								<p className="text-muted-foreground text-sm">{t("enterAddressFirst")}</p>
-							) : (
-								<MethodChoice
-									name="paymentMethod"
-									options={paymentOptions}
-									value={paymentMethodId}
-									onChange={setPaymentMethodId}
-								/>
-							)}
+							{/* No gate. See paymentOptions — the list comes from its own
+							    query and is here from the first paint. */}
+							<MethodChoice
+								name="paymentMethod"
+								options={paymentOptions}
+								value={paymentMethodId}
+								onChange={setPaymentMethodId}
+							/>
 						</section>
 
 						<section>
@@ -428,16 +518,17 @@ export const CheckoutView = () => {
 							</p>
 						)}
 
-						{preview && !shippingMethodId && !!shippingOptions.length && (
-							<p className="text-muted-foreground text-sm">{t("chooseDelivery")}</p>
-						)}
-						{preview && !paymentMethodId && (
-							<p className="text-muted-foreground text-sm">{t("choosePayment")}</p>
-						)}
-
+						{/*
+						 * No "choose a delivery method" / "choose a payment method" hints.
+						 *
+						 * They sat under the button permanently, nagging about steps the
+						 * customer had not reached yet. What is missing is told at the
+						 * moment it matters — on submit, in the notice at the top — which
+						 * is how WooCommerce handles it and what people expect.
+						 */}
 						<button
 							type="submit"
-							disabled={!canPlace}
+							disabled={placeState.isLoading}
 							className="bg-primary text-primary-foreground inline-flex w-full items-center justify-center gap-2 px-6 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 						>
 							{placeState.isLoading && <Loader2 className="size-4 animate-spin" />}

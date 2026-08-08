@@ -64,9 +64,15 @@ export const navGroups: NavItem[][] = [
 	[
 		{ label: "Tax", href: "/admin/dashboard/tax", icon: Percent, nested: true },
 		{ label: "Shipping", href: "/admin/dashboard/shipping", icon: Truck, nested: true },
+		/*
+		 * One entry. Stripe and "Bank transfer" are both simply ways to be paid;
+		 * splitting them by how they are implemented is a distinction only a
+		 * developer cares about, and it left whoever runs the shop looking in two
+		 * places for one setting.
+		 */
 		{
-			label: "Payment methods",
-			href: "/admin/dashboard/payment-methods",
+			label: "Payments",
+			href: "/admin/dashboard/payments",
 			icon: CreditCard,
 			nested: true,
 		},

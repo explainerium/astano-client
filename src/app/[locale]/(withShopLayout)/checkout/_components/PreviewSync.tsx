@@ -58,6 +58,15 @@ export const PreviewSync = ({
 	const key = destination ? JSON.stringify(destination) : ""
 	const ready = isComplete(destination)
 
+	/*
+	 * Nothing is asked for until the address is complete.
+	 *
+	 * A call on mount was tried, to fill the page sooner. It did not belong here:
+	 * the only thing that genuinely needed to appear early was the payment list,
+	 * and that now loads from its own query. All the mount call achieved was a
+	 * failed request whose error banner read "Your order could not be placed" on
+	 * a page nobody had typed into.
+	 */
 	useEffect(() => {
 		if (!ready || !key) return
 		const timer = setTimeout(() => {
