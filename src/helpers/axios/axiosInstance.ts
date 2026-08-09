@@ -71,6 +71,19 @@ const refreshAccessToken = async (): Promise<string | null> => {
 
 instance.interceptors.response.use(
 	(response) => {
+		/*
+		 * Binary passes through untouched.
+		 *
+		 * The reshaping below reaches into `response.data.data`, which is right
+		 * for the JSON envelope and nonsense for a PDF: a Blob has no `.data`, so
+		 * an invoice download would arrive as `{ data: null }` and the caller
+		 * would save an empty file. Anything not JSON is returned as the axios
+		 * response it is.
+		 */
+		if (response.config.responseType === "blob" || response.config.responseType === "arraybuffer") {
+			return response
+		}
+
 		// Deliberately reshaped: callers get { data, meta } and never have to
 		// reach through the API envelope themselves.
 		//

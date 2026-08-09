@@ -348,7 +348,8 @@
 		"verifyEmailFailed": "This confirmation link is invalid or has expired.",
 		"verifyEmailNoToken": "This link is missing its confirmation code.",
 		"verifyEmailRetry": "Request a new one from your profile and try again.",
-		"verifyEmailToProfile": "Go to my profile"
+		"verifyEmailToProfile": "Go to my profile",
+		"invoiceFailed": "Could not open the invoice. Please try again."
 	},
 	"validation": {
 		"required": "This field is required.",

@@ -348,7 +348,8 @@
 		"verifyEmailFailed": "Dieser Bestätigungslink ist ungültig oder abgelaufen.",
 		"verifyEmailNoToken": "Diesem Link fehlt der Bestätigungscode.",
 		"verifyEmailRetry": "Fordern Sie in Ihrem Profil einen neuen an und versuchen Sie es erneut.",
-		"verifyEmailToProfile": "Zu meinem Profil"
+		"verifyEmailToProfile": "Zu meinem Profil",
+		"invoiceFailed": "Die Rechnung konnte nicht geöffnet werden. Bitte versuchen Sie es erneut."
 	},
 	"validation": {
 		"required": "Dieses Feld ist erforderlich.",

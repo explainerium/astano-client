@@ -1,12 +1,15 @@
 "use client"
 
+import { useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { Download, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import { Link } from "@/i18n/navigation"
 import { useMyOrderQuery } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
 import { formatDate } from "@/lib/dates"
 import { formatMoney } from "@/lib/money"
+import { openInvoice } from "@/lib/downloadInvoice"
 import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { CheckoutAddress } from "@/types/storefront"
 import StatusChip from "../../../_components/StatusChip"
@@ -40,7 +43,7 @@ export const OrderDetail = ({ id }: { id: string }) => {
 	const locale = useLocale()
 	const { data: order, isLoading, isError } = useMyOrderQuery(id)
 
-	const apiBase = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1"
+	const [downloading, setDownloading] = useState(false)
 
 	if (isLoading) {
 		return (
@@ -76,15 +79,33 @@ export const OrderDetail = ({ id }: { id: string }) => {
 					{formatDate(order.placedAt, locale)}
 				</span>
 
-				{/* Plain anchor, not next/link: this streams a PDF rather than
-				    navigating to a page. */}
-				<a
-					href={`${apiBase}/orders/${order.id}/invoice.pdf`}
-					className="text-primary ml-auto inline-flex items-center gap-2 text-sm underline underline-offset-2"
+				{/* A button, not a link. A browser following an href sends cookies and
+				    no Authorization header, so linking straight at the API answered
+				    401 to a signed-in customer — see lib/downloadInvoice. */}
+				<button
+					type="button"
+					disabled={downloading}
+					onClick={async () => {
+						setDownloading(true)
+						try {
+							await openInvoice(
+								`/orders/${order.id}/invoice.pdf`,
+								`invoice-${order.orderNumber}.pdf`
+							)
+						} catch {
+							toast.error(t("invoiceFailed"))
+						}
+						setDownloading(false)
+					}}
+					className="text-primary ml-auto inline-flex items-center gap-2 text-sm underline underline-offset-2 disabled:opacity-60"
 				>
-					<Download className="size-4" />
+					{downloading ? (
+						<Loader2 className="size-4 animate-spin" />
+					) : (
+						<Download className="size-4" />
+					)}
 					{t("downloadInvoice")}
-				</a>
+				</button>
 			</div>
 
 			<section>

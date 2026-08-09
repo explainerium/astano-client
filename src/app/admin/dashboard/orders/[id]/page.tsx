@@ -3,8 +3,10 @@
 import { Fragment, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft, FileText, Loader2, Pencil } from "lucide-react"
+import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { openInvoice } from "@/lib/downloadInvoice"
 import {
 	Table,
 	TableBody,
@@ -22,8 +24,6 @@ import {
 	ORDER_STATUS,
 	PAYMENT_STATUS,
 } from "../_components/orderStatus"
-
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1"
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
 
@@ -121,6 +121,7 @@ export default function OrderDetailPage() {
 	const params = useParams<{ id: string }>()
 	const { data: order, isLoading, isError, error } = useAdminOrderQuery(params.id)
 	const [statusOpen, setStatusOpen] = useState(false)
+	const [downloading, setDownloading] = useState(false)
 
 	if (isLoading) {
 		return (
@@ -165,18 +166,32 @@ export default function OrderDetailPage() {
 
 				<div className="ml-auto flex gap-2">
 					{/*
-					 * A plain anchor, not the router: this streams a PDF from the API,
-					 * and Next would try to treat it as a route transition.
+					 * Fetched, not linked. A browser following an href sends cookies and
+					 * no Authorization header, so a direct link to the API answered 401
+					 * to a signed-in admin — see lib/downloadInvoice.
 					 */}
-					<Button asChild variant="outline" size="lg">
-						<a
-							href={`${API}/admin/orders/${order.id}/invoice.pdf`}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<FileText />
-							Invoice
-						</a>
+					<Button
+						variant="outline"
+						size="lg"
+						disabled={downloading}
+						onClick={async () => {
+							setDownloading(true)
+							try {
+								await openInvoice(
+									`/admin/orders/${order.id}/invoice.pdf`,
+									`invoice-${order.orderNumber}.pdf`
+								)
+							} catch (error) {
+								toast.error(
+									(error as { data?: { message?: string } })?.data?.message ??
+										"Could not open the invoice."
+								)
+							}
+							setDownloading(false)
+						}}
+					>
+						{downloading ? <Loader2 className="animate-spin" /> : <FileText />}
+						Invoice
 					</Button>
 					<Button size="lg" onClick={() => setStatusOpen(true)}>
 						<Pencil />
