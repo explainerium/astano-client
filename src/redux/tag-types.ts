@@ -30,6 +30,7 @@ export enum tagTypes {
 	shipping = "shipping",
 	payment = "payment",
 	setting = "setting",
+	email = "email",
 
 	contact = "contact",
 	newsletter = "newsletter",

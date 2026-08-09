@@ -1,4 +1,4 @@
-import type { SettingsPayload, SettingsResponse } from "@/types/setting"
+import type { PublicSettings, SettingsPayload, SettingsResponse } from "@/types/setting"
 import { tagTypes } from "../tag-types"
 import { baseApi } from "./baseApi"
 
@@ -6,6 +6,17 @@ export const settingApi = baseApi.injectEndpoints({
 	endpoints: (build) => ({
 		settings: build.query<SettingsResponse, void>({
 			query: () => ({ url: "/settings", method: "GET" }),
+			providesTags: [tagTypes.setting],
+		}),
+
+		/**
+		 * Currency, units and shop layout, readable without signing in.
+		 *
+		 * Every price on every page is formatted with these, so the storefront
+		 * fetches them once at the root rather than per component.
+		 */
+		publicSettings: build.query<PublicSettings, void>({
+			query: () => ({ url: "/settings/public", method: "GET" }),
 			providesTags: [tagTypes.setting],
 		}),
 
@@ -22,4 +33,9 @@ export const settingApi = baseApi.injectEndpoints({
 	}),
 })
 
-export const { useSettingsQuery, useSaveSettingsMutation, useDeleteSettingMutation } = settingApi
+export const {
+	useSettingsQuery,
+	usePublicSettingsQuery,
+	useSaveSettingsMutation,
+	useDeleteSettingMutation,
+} = settingApi

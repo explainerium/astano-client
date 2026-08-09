@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { AlertCircle, Check, Loader2, Minus, Plus, X } from "lucide-react"
-import { Link } from "@/i18n/navigation"
+import { Link, useRouter } from "@/i18n/navigation"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useAddToCartMutation, useShopProductQuery } from "@/redux/api/storefrontApi"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { formatMoney } from "@/lib/money"
 import { cn } from "@/lib/utils"
 import TierTable from "@/app/[locale]/(withShopLayout)/products/[slug]/_components/TierTable"
@@ -45,6 +46,8 @@ export const QuickViewDialog = ({
 	)
 
 	const [addToCart, cartState] = useAddToCartMutation()
+	const router = useRouter()
+	const { data: shopSettings } = usePublicSettingsQuery()
 
 	const detail = data
 	const variant = detail?.variants.find((v) => v.isDefault) ?? detail?.variants[0] ?? null
@@ -73,6 +76,11 @@ export const QuickViewDialog = ({
 		try {
 			await addToCart({ variantId: variant.id, quantity }).unwrap()
 			setFeedback({ ok: true, message: t("addedToCart") })
+
+			// Same rule as the product page. A quick view that adds silently while
+			// the product page jumps to the cart is the sort of inconsistency the
+			// setting exists to prevent.
+			if (shopSettings?.["cart.redirectAfterAdd"] === true) router.push("/cart")
 		} catch (error) {
 			setFeedback({
 				ok: false,

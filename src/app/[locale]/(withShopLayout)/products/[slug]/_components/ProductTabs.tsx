@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
+import { convertDimension, dimensionUnitOf, formatWeight, weightUnitOf } from "@/lib/units"
 import type { PublicProductDetail, PublicVariant } from "@/types/storefront"
 
 /**
@@ -25,6 +27,12 @@ export const ProductTabs = ({
 	variant: PublicVariant | null
 }) => {
 	const t = useTranslations("shop")
+	const locale = useLocale()
+	const { data: shopSettings } = usePublicSettingsQuery()
+
+	// Stored in kg and cm; shown in whatever the shop configured.
+	const weightUnit = weightUnitOf(shopSettings)
+	const dimensionUnit = dimensionUnitOf(shopSettings)
 
 	/**
 	 * Weight, the three dimensions, and every attribute the variant carries.
@@ -35,7 +43,9 @@ export const ProductTabs = ({
 	const spec: { label: string; value: string }[] = []
 
 	if (variant?.sku) spec.push({ label: t("sku"), value: variant.sku })
-	if (variant?.weightKg) spec.push({ label: t("weight"), value: `${variant.weightKg} kg` })
+
+	const weight = formatWeight(variant?.weightKg, weightUnit, locale)
+	if (weight) spec.push({ label: t("weight"), value: weight })
 
 	const dimensions = [variant?.lengthCm, variant?.widthCm, variant?.heightCm]
 	if (dimensions.some(Boolean)) {
@@ -43,7 +53,7 @@ export const ProductTabs = ({
 		// than a zero, which would read as a measurement.
 		spec.push({
 			label: t("dimensions"),
-			value: `${dimensions.map((d) => d ?? "—").join(" × ")} cm`,
+			value: `${dimensions.map((d) => convertDimension(d, dimensionUnit) ?? "—").join(" × ")} ${dimensionUnit}`,
 		})
 	}
 

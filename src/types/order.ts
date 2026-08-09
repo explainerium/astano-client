@@ -104,3 +104,23 @@ export interface OrderStatusPayload {
 	paymentStatus?: PaymentStatus
 	note?: string
 }
+
+/**
+ * A note staff added after the order was placed.
+ *
+ * Distinct from `customerNote`, which is what the customer typed at checkout,
+ * and from `internalNote`, which is a single field overwritten in place.
+ */
+export interface OrderNote {
+	id: string
+	authorName: string
+	body: string
+	/** True means it was emailed to the customer when it was added. */
+	isCustomerVisible: boolean
+	createdAt: string
+}
+
+export interface OrderNotePayload {
+	body: string
+	isCustomerVisible: boolean
+}

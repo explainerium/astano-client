@@ -4,6 +4,7 @@ import type { ReactNode } from "react"
 import { Provider as ReduxProvider } from "react-redux"
 import { Toaster } from "sonner"
 import { store } from "@/redux/store"
+import MoneyFormatProvider from "./MoneyFormatProvider"
 
 /**
  * Client-side providers, mounted once per root layout.
@@ -19,6 +20,10 @@ import { store } from "@/redux/store"
  */
 export const Providers = ({ children }: { children: ReactNode }) => (
 	<ReduxProvider store={store}>
+		{/* Renders nothing — it teaches formatMoney the shop's currency and
+		    separators. Inside the Redux provider because it reads them from the
+		    API; before the children so prices format correctly on first paint. */}
+		<MoneyFormatProvider />
 		{children}
 		{/* Pinned rather than left to the default: sonner is the one component
 		    that would still follow the OS, and its `system` setting would paint

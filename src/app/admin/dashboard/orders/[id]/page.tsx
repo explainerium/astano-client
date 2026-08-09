@@ -18,6 +18,7 @@ import {
 import { useAdminOrderQuery } from "@/redux/api/orderApi"
 import type { Order, OrderAddress } from "@/types/order"
 import OrderStatusDialog from "../_components/OrderStatusDialog"
+import OrderNotes from "./_components/OrderNotes"
 import {
 	formatDate,
 	formatMoney,
@@ -298,6 +299,8 @@ export default function OrderDetailPage() {
 							</ol>
 						</section>
 					)}
+
+					<OrderNotes orderId={order.id} />
 				</div>
 
 				<aside className="space-y-5">

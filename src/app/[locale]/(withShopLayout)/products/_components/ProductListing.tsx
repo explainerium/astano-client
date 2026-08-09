@@ -8,6 +8,7 @@ import QuickViewDialog from "@/app/[locale]/_components/QuickViewDialog"
 import CompareBar from "@/app/[locale]/_components/CompareBar"
 import Pagination from "@/app/[locale]/_components/Pagination"
 import { useShopProductsQuery } from "@/redux/api/storefrontApi"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import type { PublicProduct, PublicProductListParams } from "@/types/storefront"
 import { cn } from "@/lib/utils"
 import ShopFilters from "./ShopFilters"
@@ -33,7 +34,12 @@ const SORT_LABEL: Record<string, string> = {
  * offers (`shop_per_page: 12`, `per_page_options: 9,12,18,24`).
  */
 const PER_PAGE_OPTIONS = [9, 12, 18, 24]
-const DEFAULT_PER_PAGE = 12
+
+/**
+ * Used until the shop's own setting arrives, and if it is ever set to something
+ * outside the four choices above.
+ */
+const FALLBACK_PER_PAGE = 12
 
 /**
  * The shop archive, shared by /products and every category page.
@@ -56,9 +62,19 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 	const sort = (searchParams.get("sort") as PublicProductListParams["sort"]) ?? "default"
 	const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1)
 
+	// The shop's own defaults, editable in Settings. The URL still wins — a
+	// customer who picked 24 keeps 24 when the admin changes the default.
+	const { data: shopSettings } = usePublicSettingsQuery()
+
+	const defaultPerPage = PER_PAGE_OPTIONS.includes(Number(shopSettings?.["shop.productsPerPage"]))
+		? Number(shopSettings!["shop.productsPerPage"])
+		: FALLBACK_PER_PAGE
+
+	const columns = Number(shopSettings?.["shop.productColumns"] ?? 3)
+
 	const perPage = PER_PAGE_OPTIONS.includes(Number(searchParams.get("per")))
 		? Number(searchParams.get("per"))
-		: DEFAULT_PER_PAGE
+		: defaultPerPage
 
 	// Blank rather than 0 when absent — 0 is a real bound the customer might set.
 	const minPrice = searchParams.get("min")
@@ -146,7 +162,7 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 								onChange={(event) =>
 									setParams({
 										per:
-											Number(event.target.value) === DEFAULT_PER_PAGE
+											Number(event.target.value) === defaultPerPage
 												? null
 												: event.target.value,
 									})
@@ -202,7 +218,10 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 					 */
 					<div
 						className={cn(
-							"mt-6 grid grid-cols-2 items-stretch gap-6 lg:grid-cols-3",
+							"mt-6 grid grid-cols-2 items-stretch gap-6",
+							// Tailwind needs whole class names, so this is a lookup rather
+							// than an interpolated `lg:grid-cols-${n}` the compiler cannot see.
+							columns === 2 ? "lg:grid-cols-2" : columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3",
 							isFetching && "opacity-60 transition-opacity"
 						)}
 					>

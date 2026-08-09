@@ -19,6 +19,7 @@ import {
 	useMyAddressesQuery,
 	usePlaceOrderMutation,
 } from "@/redux/api/storefrontApi"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { formatMoney } from "@/lib/money"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
 import AddressFields from "./AddressFields"
@@ -120,6 +121,7 @@ const EMPTY_ADDRESS = {
 	postcode: "",
 	city: "",
 	state: "",
+	// Overridden by the shop's preselected country — see defaultCountry below.
 	countryCode: "DE",
 	phone: "",
 	email: "",
@@ -169,6 +171,11 @@ export const CheckoutView = () => {
 	// No arguments: the shop's payment options do not depend on this basket or
 	// this address, so they load with the page.
 	const { data: allPaymentMethods } = useAvailablePaymentMethodsQuery()
+
+	// Which country the address form opens on. A German shop should not make
+	// every customer scroll to Deutschland.
+	const { data: shopSettings } = usePublicSettingsQuery()
+	const defaultCountry = String(shopSettings?.["selling.defaultCountry"] ?? "DE")
 
 	const [runPreview, previewState] = useCheckoutPreviewMutation()
 	const [placeOrder, placeState] = usePlaceOrderMutation()
@@ -401,13 +408,13 @@ export const CheckoutView = () => {
 							postcode: defaultBilling.postcode ?? "",
 							city: defaultBilling.city ?? "",
 							state: defaultBilling.state ?? "",
-							countryCode: defaultBilling.countryCode ?? "DE",
+							countryCode: defaultBilling.countryCode ?? defaultCountry,
 							phone: defaultBilling.phone ?? "",
 							email: defaultBilling.email ?? "",
 						}
-					: EMPTY_ADDRESS,
+					: { ...EMPTY_ADDRESS, countryCode: defaultCountry },
 				shipToDifferent: false,
-				shipping: EMPTY_ADDRESS,
+				shipping: { ...EMPTY_ADDRESS, countryCode: defaultCountry },
 				customerNote: "",
 				vatNumber: "",
 			}}

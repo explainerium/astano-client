@@ -4,6 +4,7 @@ import {
 	Image as ImageIcon,
 	LayoutGrid,
 	Mail,
+	MailOpen,
 	Package,
 	Percent,
 	Send,
@@ -76,6 +77,12 @@ export const navGroups: NavItem[][] = [
 			icon: CreditCard,
 			nested: true,
 		},
+		/*
+		 * Beside Settings rather than inside it. What an email says is edited far
+		 * more often than what colour it is, and burying nineteen templates behind
+		 * a settings tab makes the common job the harder one to find.
+		 */
+		{ label: "Emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
 		{ label: "Settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
 	],
 ]

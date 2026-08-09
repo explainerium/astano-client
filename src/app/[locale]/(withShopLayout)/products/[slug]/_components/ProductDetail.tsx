@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { AlertCircle, Check, Loader2, Minus, Package, Plus } from "lucide-react"
-import { Link } from "@/i18n/navigation"
+import { Link, useRouter } from "@/i18n/navigation"
 import {
 	useAddToCartMutation,
 	useAddToQuoteBasketMutation,
@@ -11,6 +11,8 @@ import {
 	useShopProductQuery,
 } from "@/redux/api/storefrontApi"
 import { formatMoney } from "@/lib/money"
+import { formatWeight, weightUnitOf } from "@/lib/units"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
 import type { PublicProductDetail } from "@/types/storefront"
 import ProductGallery from "./ProductGallery"
@@ -42,6 +44,7 @@ const apiMessage = (error: unknown) =>
 export const ProductDetail = ({ slug }: { slug: string }) => {
 	const t = useTranslations("shop")
 	const locale = useLocale()
+	const router = useRouter()
 
 	const [variantId, setVariantId] = useState<string | null>(null)
 	const [quantity, setQuantity] = useState(1)
@@ -88,6 +91,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 	const minQuantity = variant && variant.moq > 0 ? variant.moq : 1
 	const variantKey = variant?.id ?? null
+
+	// Stored in kilograms; shown in the unit the shop configured.
+	const { data: shopSettings } = usePublicSettingsQuery()
+	const displayWeight = formatWeight(variant?.weightKg, weightUnitOf(shopSettings), locale)
 
 	/**
 	 * Switching variant can raise the floor — a variant carries its own MOQ,
@@ -203,6 +210,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			}
 
 			setFeedback({ ok: true, message: t("addedToCart") })
+
+			// After the options are attached, not before: leaving mid-way would
+			// take the customer to a cart still missing half of what they picked.
+			if (shopSettings?.["cart.redirectAfterAdd"] === true) router.push("/cart")
 		} catch (error) {
 			setFeedback({ ok: false, message: apiMessage(error) ?? t("addFailed") })
 		} finally {
@@ -427,10 +438,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 								<dd className="text-foreground">{variant.sku}</dd>
 							</div>
 						)}
-						{variant?.weightKg && (
+						{!!displayWeight && (
 							<div className="flex gap-2">
 								<dt>{t("weight")}:</dt>
-								<dd className="text-foreground">{variant.weightKg} kg</dd>
+								<dd className="text-foreground">{displayWeight}</dd>
 							</div>
 						)}
 						<div className="flex gap-2">

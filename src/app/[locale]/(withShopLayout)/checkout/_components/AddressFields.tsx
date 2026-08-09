@@ -4,6 +4,8 @@ import { useLocale, useTranslations } from "next-intl"
 import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
 import { SHIPPING_COUNTRIES } from "@/lib/countries"
+import { canSellTo, readSellingRule } from "@/lib/sellingLocations"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 
 /**
  * One address block, used for both billing and delivery.
@@ -20,10 +22,22 @@ export const AddressFields = ({ prefix }: { prefix: "billing" | "shipping" }) =>
 	const t = useTranslations("checkout")
 	const locale = useLocale()
 
-	const countries = SHIPPING_COUNTRIES.map((country) => ({
-		value: country.code,
-		label: locale === "de" ? country.de : country.en,
-	}))
+	/**
+	 * Narrowed to where the shop actually sells.
+	 *
+	 * The same rule the API enforces at placement, applied here so a customer is
+	 * never offered a country their order would then be refused for. Filtered
+	 * rather than disabled: an option that cannot be chosen is just noise.
+	 */
+	const { data: shopSettings } = usePublicSettingsQuery()
+	const selling = readSellingRule(shopSettings ?? {})
+
+	const countries = SHIPPING_COUNTRIES.filter((country) => canSellTo(selling, country.code)).map(
+		(country) => ({
+			value: country.code,
+			label: locale === "de" ? country.de : country.en,
+		})
+	)
 
 	return (
 		<div className="grid gap-5 sm:grid-cols-2">
