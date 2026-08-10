@@ -592,9 +592,22 @@ export const ProductTable = ({
 											)}
 										</TableCell>
 
-										<TableCell className="text-muted-foreground max-w-56 text-xs">
+										{/*
+										 * `truncate`, not a width cap on its own.
+										 *
+										 * TableCell sets `whitespace-nowrap`, so a `max-w-*` with
+										 * no overflow rule gives a box narrower than its text and
+										 * says nothing about the rest — a product in four
+										 * categories painted its list straight across the Author
+										 * column beside it. `truncate` supplies the missing
+										 * `overflow-hidden`, and the full list moves to the title
+										 * so nothing is lost.
+										 */}
+										<TableCell className="text-muted-foreground max-w-56 truncate text-xs">
 											{productCategories.length ? (
-												productCategories.join(", ")
+												<span title={productCategories.join(", ")}>
+													{productCategories.join(", ")}
+												</span>
 											) : (
 												<span>Uncategorised</span>
 											)}
