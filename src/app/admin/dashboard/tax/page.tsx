@@ -1,29 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import Link from "next/link"
 import { Loader2, Plus, TriangleAlert } from "lucide-react"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
 import { Button } from "@/components/ui/button"
 import { useTaxClassesQuery } from "@/redux/api/taxApi"
-import type { TaxClass } from "@/types/tax"
 import TaxClassCard from "./_components/TaxClassCard"
-import TaxClassDialog from "./_components/TaxClassDialog"
 
 export default function TaxPage() {
 	const { data: classes, isLoading, isError, error } = useTaxClassesQuery()
 
-	const [dialogOpen, setDialogOpen] = useState(false)
-	const [editing, setEditing] = useState<TaxClass | undefined>()
-
-	const openCreate = () => {
-		setEditing(undefined)
-		setDialogOpen(true)
-	}
-
-	const openEdit = (taxClass: TaxClass) => {
-		setEditing(taxClass)
-		setDialogOpen(true)
-	}
 
 	// A product with no class of its own falls back to the default. Without one,
 	// those products are simply untaxed — silently, and only visible on an
@@ -34,9 +20,11 @@ export default function TaxPage() {
 		<div className="space-y-4">
 			<Toolbar
 				primaryAction={
-					<Button size="lg" onClick={openCreate}>
-						<Plus />
-						New tax class
+					<Button asChild size="lg">
+						<Link href="/admin/dashboard/tax/classes/new">
+							<Plus />
+							New tax class
+						</Link>
 					</Button>
 				}
 			/>
@@ -72,26 +60,18 @@ export default function TaxPage() {
 						No tax classes yet. Checkout cannot work out what to charge until one
 						class and one matching rate exist.
 					</p>
-					<Button onClick={openCreate}>
-						<Plus />
-						New tax class
+					<Button asChild>
+						<Link href="/admin/dashboard/tax/classes/new">
+							<Plus />
+							New tax class
+						</Link>
 					</Button>
 				</div>
 			)}
 
 			{classes?.map((taxClass) => (
-				<TaxClassCard
-					key={taxClass.id}
-					taxClass={taxClass}
-					onEdit={() => openEdit(taxClass)}
-				/>
+				<TaxClassCard key={taxClass.id} taxClass={taxClass} />
 			))}
-
-			{/* Mounted only while open so the form rebuilds per class — useForm reads
-			    defaultValues once. */}
-			{dialogOpen && (
-				<TaxClassDialog open onOpenChange={setDialogOpen} taxClass={editing} />
-			)}
 		</div>
 	)
 }

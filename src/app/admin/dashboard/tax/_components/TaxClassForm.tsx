@@ -1,21 +1,18 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { z } from "zod"
+import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import { Badge } from "@/components/ui/badge"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCreateTaxClassMutation, useUpdateTaxClassMutation } from "@/redux/api/taxApi"
 import type { TaxClass, TaxClassPayload } from "@/types/tax"
@@ -51,15 +48,8 @@ const toDefaults = (taxClass?: TaxClass): FormValues => ({
 	de: { name: nameFor(taxClass, "de") },
 })
 
-export const TaxClassDialog = ({
-	open,
-	onOpenChange,
-	taxClass,
-}: {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	taxClass?: TaxClass
-}) => {
+export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
+	const router = useRouter()
 	const [createTaxClass] = useCreateTaxClassMutation()
 	const [updateTaxClass] = useUpdateTaxClassMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -84,10 +74,12 @@ export const TaxClassDialog = ({
 				await updateTaxClass({ id: taxClass.id, data: payload }).unwrap()
 				toast.success("Tax class updated.")
 			} else {
-				await createTaxClass(payload).unwrap()
+				const created = await createTaxClass(payload).unwrap()
 				toast.success("Tax class created.")
+				// Into the class's own page, where its rates are added. A class with
+				// no rates charges nothing, which is the mistake this avoids.
+				router.replace(`/admin/dashboard/tax/classes/${created.id}/edit`)
 			}
-			onOpenChange(false)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not save the tax class.")
@@ -95,23 +87,22 @@ export const TaxClassDialog = ({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit tax class" : "New tax class"}</DialogTitle>
-					<DialogDescription>
-						A class groups rates. Products pick a class; the one marked default
-						applies to any product that has not.
-					</DialogDescription>
-				</DialogHeader>
+		<div className="space-y-6">
+			<EditorHeader
+				backHref="/admin/dashboard/tax"
+				backLabel="All tax classes"
+				title={isEdit ? taxClass.name : "New tax class"}
+				description="A class groups rates. Products pick a class; the one marked default applies to any product that has not."
+			/>
 
-				<ProForm
-					key={taxClass?.id ?? "new"}
-					onSubmit={onSubmit}
-					resolver={zodResolver(schema)}
-					defaultValues={toDefaults(taxClass)}
-					className="space-y-6"
-				>
+			<ProForm
+				key={taxClass?.id ?? "new"}
+				onSubmit={onSubmit}
+				resolver={zodResolver(schema)}
+				defaultValues={toDefaults(taxClass)}
+				className="space-y-6"
+			>
+				<div className="bg-card space-y-6 rounded-lg border p-5">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
@@ -149,14 +140,17 @@ export const TaxClassDialog = ({
 						description="Applies to every product that has not picked a class of its own. Only one class can be the default — setting this clears the previous one."
 						className="border-t pt-4"
 					/>
+				</div>
 
-					<div className="flex justify-end border-t pt-4">
-						<ProSubmit>{isEdit ? "Save changes" : "Create class"}</ProSubmit>
-					</div>
-				</ProForm>
-			</DialogContent>
-		</Dialog>
+				<div className="flex justify-end gap-2">
+					<Button asChild type="button" variant="ghost">
+						<Link href="/admin/dashboard/tax">Cancel</Link>
+					</Button>
+					<ProSubmit>{isEdit ? "Save changes" : "Create class"}</ProSubmit>
+				</div>
+			</ProForm>
+		</div>
 	)
 }
 
-export default TaxClassDialog
+export default TaxClassForm

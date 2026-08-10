@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Copy, CornerDownRight, ExternalLink, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -39,15 +41,10 @@ import {
 	translationFor,
 } from "./categoryTree"
 
-export const CategoryTable = ({
-	categories,
-	onEdit,
-	onCreate,
-}: {
-	categories: AdminCategory[]
-	onEdit: (category: AdminCategory) => void
-	onCreate: () => void
-}) => {
+const editHref = (id: string) => `/admin/dashboard/categories/${id}/edit`
+
+export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) => {
+	const router = useRouter()
 	const [deleteCategory] = useDeleteCategoryMutation()
 	const [duplicateCategory] = useDuplicateCategoryMutation()
 
@@ -68,7 +65,9 @@ export const CategoryTable = ({
 			toast.success(`“${displayName(row)}” duplicated`, {
 				description: "Settings and text only — the copy has no products yet.",
 			})
-			onEdit(copy)
+			// Straight into the copy, which is the point of duplicating one — it
+			// needs a new name before it is any use.
+			router.push(editHref(copy.id))
 		} catch (error) {
 			toast.error("Could not duplicate this category", {
 				description:
@@ -192,9 +191,11 @@ export const CategoryTable = ({
 					</Button>
 				}
 				primaryAction={
-					<Button size="lg" onClick={onCreate}>
-						<Plus />
-						New category
+					<Button asChild size="lg">
+						<Link href="/admin/dashboard/categories/new">
+							<Plus />
+							New category
+						</Link>
 					</Button>
 				}
 			/>
@@ -315,13 +316,13 @@ export const CategoryTable = ({
 
 										<TableCell className="pr-4">
 											<div className="flex justify-end gap-1">
-												<Button
-													variant="ghost"
-													size="icon"
-													aria-label={`Edit ${displayName(row)}`}
-													onClick={() => onEdit(row)}
-												>
-													<Pencil />
+												<Button asChild variant="ghost" size="icon">
+													<Link
+														href={editHref(row.id)}
+														aria-label={`Edit ${displayName(row)}`}
+													>
+														<Pencil />
+													</Link>
 												</Button>
 												<Button
 													variant="ghost"

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Check, Minus, Pencil, Plus, Trash2, Wand2 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -29,7 +30,6 @@ import {
 	useDeleteTaxRateMutation,
 } from "@/redux/api/taxApi"
 import type { TaxClass, TaxRate } from "@/types/tax"
-import TaxRateDialog from "./TaxRateDialog"
 
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
 
@@ -61,20 +61,16 @@ const Yes = ({ on }: { on: boolean }) =>
 		<Minus className="text-muted-foreground size-4" aria-label="No" />
 	)
 
-export const TaxClassCard = ({
-	taxClass,
-	onEdit,
-}: {
-	taxClass: TaxClass
-	onEdit: () => void
-}) => {
+const classHref = (id: string) => `/admin/dashboard/tax/classes/${id}/edit`
+const rateHref = (classId: string, rateId: string) =>
+	`/admin/dashboard/tax/classes/${classId}/rates/${rateId}/edit`
+const newRateHref = (classId: string) => `/admin/dashboard/tax/classes/${classId}/rates/new`
+
+export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 	const [createRate] = useCreateTaxRateMutation()
 	const [deleteClass] = useDeleteTaxClassMutation()
 	const [deleteRate] = useDeleteTaxRateMutation()
 
-	const [rateDialog, setRateDialog] = useState<{ open: boolean; rate?: TaxRate }>({
-		open: false,
-	})
 	const [pending, setPending] = useState<{ kind: "class" } | { kind: "rate"; rate: TaxRate } | null>(
 		null
 	)
@@ -155,8 +151,10 @@ export const TaxClassCard = ({
 				)}
 
 				<div className="ml-auto flex gap-1">
-					<Button variant="ghost" size="icon" aria-label={`Edit ${taxClass.name}`} onClick={onEdit}>
-						<Pencil />
+					<Button asChild variant="ghost" size="icon">
+						<Link href={classHref(taxClass.id)} aria-label={`Edit ${taxClass.name}`}>
+							<Pencil />
+						</Link>
 					</Button>
 					<Button
 						variant="ghost"
@@ -177,9 +175,11 @@ export const TaxClassCard = ({
 						charges nothing.
 					</p>
 					<div className="flex flex-wrap justify-center gap-2">
-						<Button variant="outline" size="sm" onClick={() => setRateDialog({ open: true })}>
-							<Plus />
-							Add rate
+						<Button asChild variant="outline" size="sm">
+							<Link href={newRateHref(taxClass.id)}>
+								<Plus />
+								Add rate
+							</Link>
 						</Button>
 						<Button size="sm" disabled={busy} onClick={seedLiveRates}>
 							<Wand2 />
@@ -233,13 +233,13 @@ export const TaxClassCard = ({
 										</TableCell>
 										<TableCell className="pr-4">
 											<div className="flex justify-end">
-												<Button
-													variant="ghost"
-													size="icon"
-													aria-label={`Edit the ${countryName(rate.countryCode)} rate`}
-													onClick={() => setRateDialog({ open: true, rate })}
-												>
-													<Pencil />
+												<Button asChild variant="ghost" size="icon">
+													<Link
+														href={rateHref(taxClass.id, rate.id)}
+														aria-label={`Edit the ${countryName(rate.countryCode)} rate`}
+													>
+														<Pencil />
+													</Link>
 												</Button>
 												<Button
 													variant="ghost"
@@ -267,24 +267,15 @@ export const TaxClassCard = ({
 								<Wand2 />
 								Fill gaps from the live matrix
 							</Button>
-							<Button variant="outline" size="sm" onClick={() => setRateDialog({ open: true })}>
-								<Plus />
-								Add rate
+							<Button asChild variant="outline" size="sm">
+								<Link href={newRateHref(taxClass.id)}>
+									<Plus />
+									Add rate
+								</Link>
 							</Button>
 						</div>
 					</div>
 				</>
-			)}
-
-			{/* Mounted only while open so the form rebuilds per rate — useForm reads
-			    defaultValues once. */}
-			{rateDialog.open && (
-				<TaxRateDialog
-					open
-					onOpenChange={(open) => !open && setRateDialog({ open: false })}
-					taxClassId={taxClass.id}
-					rate={rateDialog.rate}
-				/>
 			)}
 
 			<AlertDialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>

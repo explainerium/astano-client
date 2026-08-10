@@ -1,22 +1,19 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { z } from "zod"
+import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProCombobox from "@/components/form/ProCombobox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import { Badge } from "@/components/ui/badge"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { countryOptions } from "@/constants/countries"
 import {
@@ -58,15 +55,8 @@ const toDefaults = (zone?: ShippingZone): FormValues => ({
 	de: { name: nameFor(zone, "de") },
 })
 
-export const ZoneDialog = ({
-	open,
-	onOpenChange,
-	zone,
-}: {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	zone?: ShippingZone
-}) => {
+export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
+	const router = useRouter()
 	const [createZone] = useCreateShippingZoneMutation()
 	const [updateZone] = useUpdateShippingZoneMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -90,10 +80,13 @@ export const ZoneDialog = ({
 				await updateZone({ id: zone.id, data: payload }).unwrap()
 				toast.success("Zone updated.")
 			} else {
-				await createZone(payload).unwrap()
+				const created = await createZone(payload).unwrap()
 				toast.success("Zone created.")
+				// Into the new zone's own page, where its first method is added. A
+				// zone with no methods offers no shipping, so leaving the admin on
+				// the list would hide the half-finished state behind a scroll.
+				router.replace(`/admin/dashboard/shipping/zones/${created.id}/edit`)
 			}
-			onOpenChange(false)
 		} catch (error) {
 			// A country already claimed by another zone is refused by the API.
 			const message = (error as { data?: { message?: string } })?.data?.message
@@ -102,23 +95,22 @@ export const ZoneDialog = ({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit zone" : "New zone"}</DialogTitle>
-					<DialogDescription>
-						A zone is a group of countries that share the same rates. Each country
-						belongs to exactly one zone.
-					</DialogDescription>
-				</DialogHeader>
+		<div className="space-y-6">
+			<EditorHeader
+				backHref="/admin/dashboard/shipping"
+				backLabel="All shipping zones"
+				title={isEdit ? zone.name : "New zone"}
+				description="A zone is a group of countries that share the same rates. Each country belongs to exactly one zone."
+			/>
 
-				<ProForm
-					key={zone?.id ?? "new"}
-					onSubmit={onSubmit}
-					resolver={zodResolver(schema)}
-					defaultValues={toDefaults(zone)}
-					className="space-y-6"
-				>
+			<ProForm
+				key={zone?.id ?? "new"}
+				onSubmit={onSubmit}
+				resolver={zodResolver(schema)}
+				defaultValues={toDefaults(zone)}
+				className="space-y-6"
+			>
+				<div className="bg-card space-y-6 rounded-lg border p-5">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
@@ -165,14 +157,17 @@ export const ZoneDialog = ({
 						description="An inactive zone offers no shipping at all to its countries."
 						className="border-t pt-4"
 					/>
+				</div>
 
-					<div className="flex justify-end border-t pt-4">
-						<ProSubmit>{isEdit ? "Save changes" : "Create zone"}</ProSubmit>
-					</div>
-				</ProForm>
-			</DialogContent>
-		</Dialog>
+				<div className="flex justify-end gap-2">
+					<Button asChild type="button" variant="ghost">
+						<Link href="/admin/dashboard/shipping">Cancel</Link>
+					</Button>
+					<ProSubmit>{isEdit ? "Save changes" : "Create zone"}</ProSubmit>
+				</div>
+			</ProForm>
+		</div>
 	)
 }
 
-export default ZoneDialog
+export default ZoneForm

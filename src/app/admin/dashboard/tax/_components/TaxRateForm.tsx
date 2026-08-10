@@ -1,20 +1,17 @@
 "use client"
 
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { z } from "zod"
+import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProCombobox from "@/components/form/ProCombobox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { countryOptions } from "@/constants/countries"
 import { useCreateTaxRateMutation, useUpdateTaxRateMutation } from "@/redux/api/taxApi"
 import type { TaxRate, TaxRatePayload } from "@/types/tax"
@@ -51,21 +48,28 @@ const toDefaults = (rate?: TaxRate): FormValues => ({
 	isActive: rate?.isActive ?? true,
 })
 
-export const TaxRateDialog = ({
-	open,
-	onOpenChange,
+export const TaxRateForm = ({
 	taxClassId,
 	rate,
 }: {
-	open: boolean
-	onOpenChange: (open: boolean) => void
 	taxClassId: string
 	rate?: TaxRate
 }) => {
+	const router = useRouter()
 	const [createTaxRate] = useCreateTaxRateMutation()
 	const [updateTaxRate] = useUpdateTaxRateMutation()
 
 	const isEdit = !!rate
+
+	/*
+	 * Back to the list, not to the class's own page.
+	 *
+	 * The list is where every class shows its full rate table, and a rate is
+	 * read against its neighbours — a duplicate country or a priority clash is
+	 * only visible beside them. The class page holds the class's own settings
+	 * and would show this rate on its own, which is the least useful view of it.
+	 */
+	const backHref = "/admin/dashboard/tax"
 
 	const onSubmit = async (form: FormValues) => {
 		const payload: TaxRatePayload = {
@@ -88,7 +92,7 @@ export const TaxRateDialog = ({
 				await createTaxRate({ ...payload, taxClassId }).unwrap()
 				toast.success("Rate added.")
 			}
-			onOpenChange(false)
+			router.push(backHref)
 		} catch (error) {
 			// The API refuses a duplicate (class, country, state, priority).
 			const message = (error as { data?: { message?: string } })?.data?.message
@@ -97,22 +101,26 @@ export const TaxRateDialog = ({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit rate" : "New rate"}</DialogTitle>
-					<DialogDescription>
+		<div className="space-y-6">
+			<EditorHeader
+				backHref={backHref}
+				backLabel="All tax classes"
+				title={isEdit ? `${rate.countryCode} · ${rate.name}` : "New rate"}
+				description={
+					<>
 						Tax is worked out from the <strong>shipping</strong> address (R10).
-					</DialogDescription>
-				</DialogHeader>
+					</>
+				}
+			/>
 
-				<ProForm
-					key={rate?.id ?? "new"}
-					onSubmit={onSubmit}
-					resolver={zodResolver(schema)}
-					defaultValues={toDefaults(rate)}
-					className="space-y-5"
-				>
+			<ProForm
+				key={rate?.id ?? "new"}
+				onSubmit={onSubmit}
+				resolver={zodResolver(schema)}
+				defaultValues={toDefaults(rate)}
+				className="space-y-6"
+			>
+				<div className="bg-card space-y-5 rounded-lg border p-5">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProCombobox
 							name="countryCode"
@@ -169,14 +177,17 @@ export const TaxRateDialog = ({
 							description="Turn off to retire a rate without deleting its history."
 						/>
 					</div>
+				</div>
 
-					<div className="flex justify-end border-t pt-4">
-						<ProSubmit>{isEdit ? "Save changes" : "Add rate"}</ProSubmit>
-					</div>
-				</ProForm>
-			</DialogContent>
-		</Dialog>
+				<div className="flex justify-end gap-2">
+					<Button asChild type="button" variant="ghost">
+						<Link href={backHref}>Cancel</Link>
+					</Button>
+					<ProSubmit>{isEdit ? "Save changes" : "Add rate"}</ProSubmit>
+				</div>
+			</ProForm>
+		</div>
 	)
 }
 
-export default TaxRateDialog
+export default TaxRateForm

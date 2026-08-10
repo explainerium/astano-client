@@ -1,11 +1,14 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { z } from "zod"
+import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
@@ -14,13 +17,6 @@ import ProSubmit from "@/components/form/ProSubmit"
 import ProTextarea from "@/components/form/ProTextarea"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
 	useCreateShippingMethodMutation,
@@ -296,22 +292,23 @@ const TypeFields = () => {
 	)
 }
 
-export const MethodDialog = ({
-	open,
-	onOpenChange,
+export const MethodForm = ({
 	zoneId,
+	zoneName,
 	method,
 }: {
-	open: boolean
-	onOpenChange: (open: boolean) => void
 	zoneId: string
+	/** For the heading — a method only means anything as part of its zone. */
+	zoneName: string
 	method?: ShippingMethod
 }) => {
+	const router = useRouter()
 	const [createMethod] = useCreateShippingMethodMutation()
 	const [updateMethod] = useUpdateShippingMethodMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
 
 	const isEdit = !!method
+	const zoneHref = `/admin/dashboard/shipping/zones/${zoneId}/edit`
 
 	const onSubmit = async (form: FormValues) => {
 		const banded = BANDED.includes(form.type)
@@ -363,7 +360,9 @@ export const MethodDialog = ({
 				await createMethod({ ...payload, zoneId }).unwrap()
 				toast.success("Method added.")
 			}
-			onOpenChange(false)
+			// Back to the zone either way: a method is only meaningful beside the
+			// others in its zone, and the gap-free ladder is checked across them.
+			router.push(zoneHref)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not save the method.")
@@ -371,27 +370,27 @@ export const MethodDialog = ({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit method" : "New method"}</DialogTitle>
-					<DialogDescription>
-						What the customer is offered at checkout, and what it costs.
-					</DialogDescription>
-				</DialogHeader>
+		<div className="space-y-6">
+			<EditorHeader
+				backHref={zoneHref}
+				backLabel={zoneName}
+				title={isEdit ? (translationFor(method, "en")?.name ?? method.code) : "New method"}
+				description="What the customer is offered at checkout, and what it costs."
+			/>
 
-				<ProForm
+			<ProForm
 					key={method?.id ?? "new"}
 					onSubmit={onSubmit}
 					resolver={zodResolver(schema)}
 					defaultValues={toDefaults(method)}
 					className="space-y-6"
 				>
-					<div className="grid gap-4 sm:grid-cols-3">
-						<ProInput name="code" label="Code" required />
-						<ProSelect name="type" label="Cost is based on" options={TYPES} />
-						<ProInput name="sortOrder" type="number" label="Sort order" />
-					</div>
+					<div className="bg-card space-y-6 rounded-lg border p-5">
+						<div className="grid gap-4 sm:grid-cols-3">
+							<ProInput name="code" label="Code" required />
+							<ProSelect name="type" label="Cost is based on" options={TYPES} />
+							<ProInput name="sortOrder" type="number" label="Sort order" />
+						</div>
 
 					<Tabs value={activeLocale} onValueChange={setActiveLocale}>
 						<TabsList>
@@ -424,30 +423,33 @@ export const MethodDialog = ({
 						))}
 					</Tabs>
 
-					<div className="border-t pt-5">
-						<TypeFields />
+						<div className="border-t pt-5">
+							<TypeFields />
+						</div>
+
+						<div className="space-y-4 border-t pt-5">
+							<ProCheckbox
+								name="taxable"
+								label="Tax the shipping charge"
+								description="On for the EU zones on the live site, off for Switzerland."
+							/>
+							<ProCheckbox
+								name="isActive"
+								label="Active"
+								description="An inactive method is never offered at checkout."
+							/>
+						</div>
 					</div>
 
-					<div className="space-y-4 border-t pt-5">
-						<ProCheckbox
-							name="taxable"
-							label="Tax the shipping charge"
-							description="On for the EU zones on the live site, off for Switzerland."
-						/>
-						<ProCheckbox
-							name="isActive"
-							label="Active"
-							description="An inactive method is never offered at checkout."
-						/>
-					</div>
-
-					<div className="flex justify-end border-t pt-4">
+					<div className="flex justify-end gap-2">
+						<Button asChild type="button" variant="ghost">
+							<Link href={zoneHref}>Cancel</Link>
+						</Button>
 						<ProSubmit>{isEdit ? "Save changes" : "Add method"}</ProSubmit>
 					</div>
 				</ProForm>
-			</DialogContent>
-		</Dialog>
+		</div>
 	)
 }
 
-export default MethodDialog
+export default MethodForm

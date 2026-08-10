@@ -1,29 +1,21 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { z } from "zod"
+import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
-import ProRadioGroup from "@/components/form/ProRadioGroup"
 import ProSubmit from "@/components/form/ProSubmit"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-	useCreateAttributeMutation,
-	useUpdateAttributeMutation,
-} from "@/redux/api/attributeApi"
+import { useCreateAttributeMutation, useUpdateAttributeMutation } from "@/redux/api/attributeApi"
 import type { AdminAttribute, AttributePayload } from "@/types/attribute"
 
 const EDITOR_LOCALES = [
@@ -117,8 +109,16 @@ const ValuesEditor = () => {
 				<div key={field.id} className="flex items-start gap-2">
 					<GripVertical className="text-muted-foreground/50 mt-3 size-4 shrink-0" />
 					<ProInput name={`values.${index}.code`} placeholder="code" className="w-32" />
-					<ProInput name={`values.${index}.labelEn`} placeholder="Label (English)" className="flex-1" />
-					<ProInput name={`values.${index}.labelDe`} placeholder="Label (Deutsch)" className="flex-1" />
+					<ProInput
+						name={`values.${index}.labelEn`}
+						placeholder="Label (English)"
+						className="flex-1"
+					/>
+					<ProInput
+						name={`values.${index}.labelDe`}
+						placeholder="Label (Deutsch)"
+						className="flex-1"
+					/>
 					<Button
 						type="button"
 						variant="ghost"
@@ -135,15 +135,8 @@ const ValuesEditor = () => {
 	)
 }
 
-export const AttributeFormDialog = ({
-	open,
-	onOpenChange,
-	attribute,
-}: {
-	open: boolean
-	onOpenChange: (open: boolean) => void
-	attribute?: AdminAttribute
-}) => {
+export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => {
+	const router = useRouter()
 	const [createAttribute] = useCreateAttributeMutation()
 	const [updateAttribute] = useUpdateAttributeMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -179,8 +172,8 @@ export const AttributeFormDialog = ({
 			} else {
 				await createAttribute(payload).unwrap()
 				toast.success("Attribute created.")
+				router.push("/admin/dashboard/attributes")
 			}
-			onOpenChange(false)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not save the attribute.")
@@ -188,23 +181,27 @@ export const AttributeFormDialog = ({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
-				<DialogHeader>
-					<DialogTitle>{isEdit ? "Edit attribute" : "New attribute"}</DialogTitle>
-					<DialogDescription>
-						Variant axes build product variants. Descriptive attributes only
-						appear as information on the product page.
-					</DialogDescription>
-				</DialogHeader>
+		<div className="space-y-6">
+			<EditorHeader
+				backHref="/admin/dashboard/attributes"
+				backLabel="All attributes"
+				title={
+					isEdit
+						? ((translationFor(attribute.translations, "en") as { name?: string })?.name ??
+							attribute.code)
+						: "New attribute"
+				}
+				description="Variant axes build product variants. Descriptive attributes only appear as information on the product page."
+			/>
 
-				<ProForm
-					key={attribute?.id ?? "new"}
-					onSubmit={onSubmit}
-					resolver={zodResolver(schema)}
-					defaultValues={toDefaults(attribute)}
-					className="space-y-6"
-				>
+			<ProForm
+				key={attribute?.id ?? "new"}
+				onSubmit={onSubmit}
+				resolver={zodResolver(schema)}
+				defaultValues={toDefaults(attribute)}
+				className="space-y-6"
+			>
+				<div className="bg-card space-y-6 rounded-lg border p-5">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
@@ -246,18 +243,21 @@ export const AttributeFormDialog = ({
 							</TabsContent>
 						))}
 					</Tabs>
+				</div>
 
-					<div className="border-t pt-6">
-						<ValuesEditor />
-					</div>
+				<div className="bg-card rounded-lg border p-5">
+					<ValuesEditor />
+				</div>
 
-					<div className="flex justify-end border-t pt-4">
-						<ProSubmit>{isEdit ? "Save changes" : "Create attribute"}</ProSubmit>
-					</div>
-				</ProForm>
-			</DialogContent>
-		</Dialog>
+				<div className="flex justify-end gap-2">
+					<Button asChild type="button" variant="ghost">
+						<Link href="/admin/dashboard/attributes">Cancel</Link>
+					</Button>
+					<ProSubmit>{isEdit ? "Save changes" : "Create attribute"}</ProSubmit>
+				</div>
+			</ProForm>
+		</div>
 	)
 }
 
-export default AttributeFormDialog
+export default AttributeForm

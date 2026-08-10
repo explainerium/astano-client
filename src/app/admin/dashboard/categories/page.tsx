@@ -1,27 +1,19 @@
 "use client"
 
-import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { useAdminCategoriesQuery } from "@/redux/api/categoryApi"
-import type { AdminCategory } from "@/types/catalog"
-import CategoryFormDialog from "./_components/CategoryFormDialog"
 import CategoryTable from "./_components/CategoryTable"
 
+/**
+ * The category list.
+ *
+ * Creating and editing are pages of their own, not a dialog over this one. A
+ * category is a screen's worth of settings in two languages, and a modal holding
+ * that much cannot be linked to, reloaded, or left open while something else is
+ * checked — and a stray click on the overlay discards the lot.
+ */
 export default function CategoriesPage() {
 	const { data: categories, isLoading, isError, error } = useAdminCategoriesQuery()
-
-	const [dialogOpen, setDialogOpen] = useState(false)
-	const [editing, setEditing] = useState<AdminCategory | undefined>()
-
-	const openCreate = () => {
-		setEditing(undefined)
-		setDialogOpen(true)
-	}
-
-	const openEdit = (category: AdminCategory) => {
-		setEditing(category)
-		setDialogOpen(true)
-	}
 
 	return (
 		<div className="space-y-4">
@@ -39,24 +31,7 @@ export default function CategoriesPage() {
 				</div>
 			)}
 
-			{categories && (
-				<CategoryTable
-					categories={categories}
-					onEdit={openEdit}
-					onCreate={openCreate}
-				/>
-			)}
-
-			{/* Mounted only while open so the form rebuilds per category — useForm
-			    reads defaultValues once. */}
-			{dialogOpen && (
-				<CategoryFormDialog
-					open={dialogOpen}
-					onOpenChange={setDialogOpen}
-					category={editing}
-					allCategories={categories ?? []}
-				/>
-			)}
+			{categories && <CategoryTable categories={categories} />}
 		</div>
 	)
 }

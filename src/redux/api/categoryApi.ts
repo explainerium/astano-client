@@ -10,6 +10,17 @@ export const categoryApi = baseApi.injectEndpoints({
 			providesTags: [tagTypes.category],
 		}),
 
+		/**
+		 * One category, for the edit page.
+		 *
+		 * Separate from the list rather than filtered out of it: the edit page is
+		 * reachable by URL, so it has to work on a cold load with no list cached.
+		 */
+		adminCategory: build.query<AdminCategory, string>({
+			query: (id) => ({ url: `/admin/categories/${id}`, method: "GET" }),
+			providesTags: [tagTypes.category],
+		}),
+
 		createCategory: build.mutation<AdminCategory, CategoryPayload>({
 			query: (data) => ({ url: "/categories", method: "POST", data }),
 			invalidatesTags: [tagTypes.category],
@@ -41,6 +52,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
 export const {
 	useAdminCategoriesQuery,
+	useAdminCategoryQuery,
 	useCreateCategoryMutation,
 	useUpdateCategoryMutation,
 	useDuplicateCategoryMutation,

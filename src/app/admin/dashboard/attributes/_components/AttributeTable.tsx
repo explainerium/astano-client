@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Copy, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -37,15 +39,10 @@ const nameOf = (attribute: AdminAttribute): string =>
 	attribute.translations[0]?.name ??
 	attribute.code
 
-export const AttributeTable = ({
-	attributes,
-	onEdit,
-	onCreate,
-}: {
-	attributes: AdminAttribute[]
-	onEdit: (attribute: AdminAttribute) => void
-	onCreate: () => void
-}) => {
+const editHref = (id: string) => `/admin/dashboard/attributes/${id}/edit`
+
+export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] }) => {
+	const router = useRouter()
 	const [deleteAttribute] = useDeleteAttributeMutation()
 	const [duplicateAttribute] = useDuplicateAttributeMutation()
 
@@ -67,7 +64,8 @@ export const AttributeTable = ({
 					copy.values.length === 1 ? "value" : "values"
 				} copied. The new code is “${copy.code}”.`,
 			})
-			onEdit(copy)
+			// Straight into the copy — it needs a new code before it is any use.
+			router.push(editHref(copy.id))
 		} catch (error) {
 			toast.error("Could not duplicate this attribute", {
 				description:
@@ -153,9 +151,11 @@ export const AttributeTable = ({
 					</Button>
 				}
 				primaryAction={
-					<Button size="lg" onClick={onCreate}>
-						<Plus />
-						New attribute
+					<Button asChild size="lg">
+						<Link href="/admin/dashboard/attributes/new">
+							<Plus />
+							New attribute
+						</Link>
 					</Button>
 				}
 			/>
@@ -260,13 +260,13 @@ export const AttributeTable = ({
 
 										<TableCell className="pr-4">
 											<div className="flex justify-end">
-												<Button
-													variant="ghost"
-													size="icon"
-													aria-label={`Edit ${nameOf(attribute)}`}
-													onClick={() => onEdit(attribute)}
-												>
-													<Pencil />
+												<Button asChild variant="ghost" size="icon">
+													<Link
+														href={editHref(attribute.id)}
+														aria-label={`Edit ${nameOf(attribute)}`}
+													>
+														<Pencil />
+													</Link>
 												</Button>
 												<Button
 													variant="ghost"

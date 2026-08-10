@@ -413,7 +413,10 @@ export interface PublicCategory {
 	slug: string
 	name: string
 	description?: string | null
+	/** The banner. Optional — most categories have none. */
 	image?: PublicImage | null
+	/** A small mark for menus and filters, cropped for that job rather than resized. */
+	icon?: PublicImage | null
 	productCount?: number
 	children?: PublicCategory[]
 }

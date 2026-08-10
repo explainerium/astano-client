@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Loader2, Plus, Wand2 } from "lucide-react"
 import { toast } from "sonner"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
@@ -10,9 +11,7 @@ import {
 	useCreateShippingZoneMutation,
 	useShippingZonesQuery,
 } from "@/redux/api/shippingApi"
-import type { ShippingZone } from "@/types/shipping"
 import ZoneCard from "./_components/ZoneCard"
-import ZoneDialog from "./_components/ZoneDialog"
 import { LIVE_MATRIX, MATRIX_BAND_COUNT } from "./_components/liveMatrix"
 
 export default function ShippingPage() {
@@ -20,19 +19,7 @@ export default function ShippingPage() {
 	const [createZone] = useCreateShippingZoneMutation()
 	const [createMethod] = useCreateShippingMethodMutation()
 
-	const [dialogOpen, setDialogOpen] = useState(false)
-	const [editing, setEditing] = useState<ShippingZone | undefined>()
 	const [seeding, setSeeding] = useState(false)
-
-	const openCreate = () => {
-		setEditing(undefined)
-		setDialogOpen(true)
-	}
-
-	const openEdit = (zone: ShippingZone) => {
-		setEditing(zone)
-		setDialogOpen(true)
-	}
 
 	/**
 	 * Builds the five zones from §3.6 in one action.
@@ -119,9 +106,11 @@ export default function ShippingPage() {
 								Fill gaps from the live matrix
 							</Button>
 						)}
-						<Button size="lg" onClick={openCreate}>
-							<Plus />
-							New zone
+						<Button asChild size="lg">
+							<Link href="/admin/dashboard/shipping/zones/new">
+								<Plus />
+								New zone
+							</Link>
 						</Button>
 					</div>
 				}
@@ -153,9 +142,11 @@ export default function ShippingPage() {
 						</p>
 					</div>
 					<div className="flex flex-wrap justify-center gap-2">
-						<Button variant="outline" onClick={openCreate}>
-							<Plus />
-							New zone
+						<Button asChild variant="outline">
+							<Link href="/admin/dashboard/shipping/zones/new">
+								<Plus />
+								New zone
+							</Link>
 						</Button>
 						<Button disabled={seeding} onClick={seedLiveMatrix}>
 							<Wand2 />
@@ -166,12 +157,8 @@ export default function ShippingPage() {
 			)}
 
 			{zones?.map((zone) => (
-				<ZoneCard key={zone.id} zone={zone} onEdit={() => openEdit(zone)} />
+				<ZoneCard key={zone.id} zone={zone} />
 			))}
-
-			{/* Mounted only while open so the form rebuilds per zone — useForm reads
-			    defaultValues once. */}
-			{dialogOpen && <ZoneDialog open onOpenChange={setDialogOpen} zone={editing} />}
 		</div>
 	)
 }
