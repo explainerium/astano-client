@@ -176,7 +176,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 				className="bg-primary text-primary-foreground inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 			>
 				{isLoading && <Loader2 className="size-4 animate-spin" />}
-				{isLoading ? t("accepting") : `${t("acceptQuote")} — ${formatMoney(total, locale) ?? ""}`}
+				{isLoading ? t("accepting") : `${t("acceptQuote")} — ${formatMoney(total) ?? ""}`}
 			</button>
 		</div>
 	)

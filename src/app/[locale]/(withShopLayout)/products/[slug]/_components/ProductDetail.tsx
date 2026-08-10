@@ -153,7 +153,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		)
 		const unit = Number(rung?.unitPrice ?? option.unitPrice ?? Number.NaN)
 		if (Number.isNaN(unit)) return null
-		return formatMoney((unit * units).toFixed(2), locale)
+		return formatMoney((unit * units).toFixed(2))
 	}
 
 	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
@@ -245,9 +245,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	}
 
 	const hasChoices = product.variants.length > 1
-	const unitPrice = formatMoney(variant?.unitPrice, locale)
-	const listPrice = formatMoney(variant?.listPrice, locale)
-	const lineTotal = formatMoney(variant?.lineTotal, locale)
+	const unitPrice = formatMoney(variant?.unitPrice)
+	const listPrice = formatMoney(variant?.listPrice)
+	const lineTotal = formatMoney(variant?.lineTotal)
 
 	return (
 		<div className="mx-auto w-full max-w-[1400px] px-6 py-12">
@@ -473,7 +473,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 										(best, tier) => (optionQuantity >= tier.minQuantity ? tier : best),
 										null
 									)
-									const price = formatMoney(rung?.unitPrice ?? option.unitPrice, locale)
+									const price = formatMoney(rung?.unitPrice ?? option.unitPrice)
 
 									const setQuantityFor = (next: number) =>
 										setChosenOptions((current) => {
@@ -547,7 +547,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 														<span className="text-muted-foreground block text-[11px]">
 															{t("fromQuantity", {
 																quantity: option.tiers[0].minQuantity,
-																price: formatMoney(option.tiers[0].unitPrice, locale) ?? "",
+																price: formatMoney(option.tiers[0].unitPrice) ?? "",
 															})}
 														</span>
 													)}

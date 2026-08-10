@@ -96,10 +96,10 @@ export const QuoteDetail = ({ id }: { id: string }) => {
 								{item.quotedLineTotal ? (
 									<>
 										<span className="font-semibold">
-											{formatMoney(item.quotedLineTotal, locale)}
+											{formatMoney(item.quotedLineTotal)}
 										</span>
 										<span className="text-muted-foreground block text-xs">
-											{formatMoney(item.quotedUnitPrice, locale)}
+											{formatMoney(item.quotedUnitPrice)}
 										</span>
 									</>
 								) : (
@@ -114,7 +114,7 @@ export const QuoteDetail = ({ id }: { id: string }) => {
 					<div className="mt-4 flex justify-end gap-4 text-sm">
 						<span className="font-heading font-semibold">{t("quotedTotal")}</span>
 						<span className="text-lg font-bold">
-							{formatMoney(quote.quotedSubtotal, locale)}
+							{formatMoney(quote.quotedSubtotal)}
 						</span>
 					</div>
 				)}

@@ -70,7 +70,7 @@ export const AccountDashboard = () => {
 								</span>
 								<StatusChip status={order.status} kind="orderStatus" />
 								<span className="ml-auto font-semibold">
-									{formatMoney(order.grandTotal, locale)}
+									{formatMoney(order.grandTotal)}
 								</span>
 							</li>
 						))}
@@ -107,7 +107,7 @@ export const AccountDashboard = () => {
 								<StatusChip status={quote.status} kind="quoteStatus" />
 								<span className="text-muted-foreground ml-auto">
 									{quote.quotedSubtotal
-										? formatMoney(quote.quotedSubtotal, locale)
+										? formatMoney(quote.quotedSubtotal)
 										: t("awaitingPrice")}
 								</span>
 							</li>

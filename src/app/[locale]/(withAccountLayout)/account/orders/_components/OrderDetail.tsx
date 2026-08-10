@@ -117,15 +117,15 @@ export const OrderDetail = ({ id }: { id: string }) => {
 								<p className="font-medium">{item.name}</p>
 								{item.sku && <p className="text-muted-foreground text-xs">{item.sku}</p>}
 								<p className="text-muted-foreground mt-1 text-sm">
-									{item.quantity} × {formatMoney(item.unitPrice, locale)}
+									{item.quantity} × {formatMoney(item.unitPrice)}
 								</p>
 								{item.options?.map((option) => (
 									<p key={option.id} className="text-muted-foreground mt-1 text-xs">
-										+ {option.name} ({option.quantity} × {formatMoney(option.unitPrice, locale)})
+										+ {option.name} ({option.quantity} × {formatMoney(option.unitPrice)})
 									</p>
 								))}
 							</div>
-							<span className="shrink-0 font-semibold">{formatMoney(item.lineTotal, locale)}</span>
+							<span className="shrink-0 font-semibold">{formatMoney(item.lineTotal)}</span>
 						</li>
 					))}
 				</ul>
@@ -133,23 +133,23 @@ export const OrderDetail = ({ id }: { id: string }) => {
 				<dl className="mt-6 ml-auto max-w-xs space-y-2 text-sm">
 					<div className="flex justify-between gap-4">
 						<dt className="text-muted-foreground">{t("subtotal")}</dt>
-						<dd>{formatMoney(order.subtotal, locale)}</dd>
+						<dd>{formatMoney(order.subtotal)}</dd>
 					</div>
 					<div className="flex justify-between gap-4">
 						<dt className="text-muted-foreground">{t("shipping")}</dt>
-						<dd>{formatMoney(order.shippingTotal, locale)}</dd>
+						<dd>{formatMoney(order.shippingTotal)}</dd>
 					</div>
 					{order.taxLines.map((line, index) => (
 						<div key={index} className="flex justify-between gap-4">
 							<dt className="text-muted-foreground">
 								{t("tax")} ({line.ratePercent}%)
 							</dt>
-							<dd>{formatMoney(line.amount, locale)}</dd>
+							<dd>{formatMoney(line.amount)}</dd>
 						</div>
 					))}
 					<div className="flex justify-between gap-4 border-t pt-2">
 						<dt className="font-heading font-semibold">{t("grandTotal")}</dt>
-						<dd className="text-lg font-bold">{formatMoney(order.grandTotal, locale)}</dd>
+						<dd className="text-lg font-bold">{formatMoney(order.grandTotal)}</dd>
 					</div>
 				</dl>
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useMemo, useRef, useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { useWatch } from "react-hook-form"
@@ -20,6 +20,7 @@ import {
 	usePlaceOrderMutation,
 } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
+import { preselectedCountry } from "@/lib/sellingLocations"
 import { formatMoney } from "@/lib/money"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
 import AddressFields from "./AddressFields"
@@ -160,7 +161,6 @@ const toApiAddress = (values: Record<string, string | undefined>): CheckoutAddre
  */
 export const CheckoutView = () => {
 	const t = useTranslations("checkout")
-	const locale = useLocale()
 	const { isLoggedIn, isResolved } = useUserInfo()
 
 	const { data: cart, isLoading: cartLoading } = useCartQuery()
@@ -173,9 +173,10 @@ export const CheckoutView = () => {
 	const { data: allPaymentMethods } = useAvailablePaymentMethodsQuery()
 
 	// Which country the address form opens on. A German shop should not make
-	// every customer scroll to Deutschland.
+	// every customer scroll to Deutschland — but a shop that would rather not
+	// guess can say so, and then this is blank on purpose.
 	const { data: shopSettings } = usePublicSettingsQuery()
-	const defaultCountry = String(shopSettings?.["selling.defaultCountry"] ?? "DE")
+	const defaultCountry = preselectedCountry(shopSettings ?? {})
 
 	const [runPreview, previewState] = useCheckoutPreviewMutation()
 	const [placeOrder, placeState] = usePlaceOrderMutation()
@@ -334,7 +335,7 @@ export const CheckoutView = () => {
 	const shippingOptions: MethodOption[] = (preview?.shippingOptions ?? []).map((option) => ({
 		id: option.methodId,
 		title: option.name,
-		trailing: formatMoney(option.cost, locale) ?? undefined,
+		trailing: formatMoney(option.cost) ?? undefined,
 		disabled: Boolean(option.unavailableReason),
 		disabledReason:
 			option.unavailableReason === "NO_MATCHING_BAND"
@@ -542,7 +543,7 @@ export const CheckoutView = () => {
 							{placeState.isLoading
 								? t("placing")
 								: t("placeOrder", {
-										total: formatMoney(preview?.grandTotal, locale) ?? "",
+										total: formatMoney(preview?.grandTotal) ?? "",
 									})}
 						</button>
 

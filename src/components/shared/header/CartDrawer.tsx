@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { AlertCircle, ArrowRight, Loader2, Minus, Plus, ShoppingCart, Trash2, X } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import {
@@ -29,13 +29,11 @@ import type { CartLine } from "@/types/storefront"
 
 const LineRow = ({
 	line,
-	locale,
 	repricing,
 	onQuantity,
 	onRemove,
 }: {
 	line: CartLine
-	locale: string
 	/**
 	 * This line's figures are waiting on the server.
 	 *
@@ -127,11 +125,11 @@ const LineRow = ({
 
 					<div className={cn("text-right transition-opacity", repricing && "opacity-40")}>
 						<div className="text-sm font-semibold tabular-nums">
-							{formatMoney(line.lineTotal, locale)}
+							{formatMoney(line.lineTotal)}
 						</div>
 						{line.quantity > 1 && (
 							<div className="text-muted-foreground text-[11px] tabular-nums">
-								{formatMoney(line.unitPrice, locale)} × {line.quantity}
+								{formatMoney(line.unitPrice)} × {line.quantity}
 							</div>
 						)}
 					</div>
@@ -156,7 +154,6 @@ export const CartDrawer = ({
 	onOpenChange: (open: boolean) => void
 }) => {
 	const t = useTranslations("cart")
-	const locale = useLocale()
 
 	const { data: cart, isLoading } = useCartQuery()
 	const [updateItem, updateState] = useUpdateCartItemMutation()
@@ -248,7 +245,6 @@ export const CartDrawer = ({
 									<LineRow
 										key={line.id}
 										line={line}
-										locale={locale}
 										repricing={(cart?.repricing ?? []).includes(line.id)}
 										onQuantity={(quantity) =>
 											void run(() => updateItem({ id: line.id, quantity }).unwrap())
@@ -282,7 +278,7 @@ export const CartDrawer = ({
 										busy && "opacity-40"
 									)}
 								>
-									{formatMoney(cart?.subtotal ?? null, locale)}
+									{formatMoney(cart?.subtotal ?? null)}
 								</span>
 							</div>
 							<p className="text-muted-foreground -mt-3 text-xs">{t("vatNote")}</p>

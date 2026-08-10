@@ -1,6 +1,6 @@
 "use client"
 
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { AlertCircle, Info, Loader2 } from "lucide-react"
 import { formatMoney } from "@/lib/money"
 import type { CartView, CheckoutPreview } from "@/types/storefront"
@@ -26,7 +26,6 @@ export const OrderSummary = ({
 	calculating: boolean
 }) => {
 	const t = useTranslations("checkout")
-	const locale = useLocale()
 
 	const row = (label: string, value: string | null, muted = true) => (
 		<div className="flex justify-between gap-4 text-sm">
@@ -48,7 +47,7 @@ export const OrderSummary = ({
 						<span className="min-w-0">
 							<span className="block truncate font-medium">{line.name}</span>
 							<span className="text-muted-foreground text-xs">
-								{line.quantity} × {formatMoney(line.unitPrice, locale)}
+								{line.quantity} × {formatMoney(line.unitPrice)}
 							</span>
 							{!!line.options?.length &&
 								line.options.map((option) => (
@@ -57,7 +56,7 @@ export const OrderSummary = ({
 									</span>
 								))}
 						</span>
-						<span className="shrink-0">{formatMoney(line.lineTotal, locale)}</span>
+						<span className="shrink-0">{formatMoney(line.lineTotal)}</span>
 					</li>
 				))}
 			</ul>
@@ -75,8 +74,8 @@ export const OrderSummary = ({
 				</p>
 			) : (
 				<div className="space-y-2.5">
-					{row(t("subtotal"), formatMoney(preview.subtotal, locale))}
-					{row(t("shipping"), formatMoney(preview.shippingTotal, locale))}
+					{row(t("subtotal"), formatMoney(preview.subtotal))}
+					{row(t("shipping"), formatMoney(preview.shippingTotal))}
 
 					{preview.taxLines.length
 						? preview.taxLines.map((line, index) => (
@@ -84,16 +83,16 @@ export const OrderSummary = ({
 									<span className="text-muted-foreground">
 										{t("tax")} ({line.ratePercent}%)
 									</span>
-									<span>{formatMoney(line.amount, locale)}</span>
+									<span>{formatMoney(line.amount)}</span>
 								</div>
 							))
-						: row(t("tax"), formatMoney(preview.taxTotal, locale))}
+						: row(t("tax"), formatMoney(preview.taxTotal))}
 
 					{row(t("weight"), `${Number(preview.totalWeightKg).toFixed(2)} kg`)}
 
 					<div className="mt-4 flex justify-between gap-4 border-t pt-4">
 						<span className="font-heading text-lg font-semibold">{t("grandTotal")}</span>
-						<span className="text-xl font-bold">{formatMoney(preview.grandTotal, locale)}</span>
+						<span className="text-xl font-bold">{formatMoney(preview.grandTotal)}</span>
 					</div>
 
 					{preview.reverseCharged && (

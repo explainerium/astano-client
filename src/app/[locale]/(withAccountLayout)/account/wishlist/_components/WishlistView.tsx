@@ -104,7 +104,7 @@ export const WishlistView = () => {
 							{item.quoteOnly ? (
 								<span className="text-muted-foreground italic">{t("priceOnRequest")}</span>
 							) : item.unitPrice ? (
-								<span className="font-semibold">{formatMoney(item.unitPrice, locale)}</span>
+								<span className="font-semibold">{formatMoney(item.unitPrice)}</span>
 							) : null}
 						</p>
 

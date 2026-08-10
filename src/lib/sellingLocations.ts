@@ -45,3 +45,22 @@ export const readSellingRule = (settings: Record<string, unknown>): SellingRule 
 			: [],
 	}
 }
+
+/**
+ * Which country the checkout should start on.
+ *
+ * Three answers, matching the setting: the shop's own country, one the admin
+ * named, or none at all — an empty string, which leaves the field for the
+ * customer to fill rather than guessing on their behalf.
+ */
+export const preselectedCountry = (settings: Record<string, unknown>): string => {
+	const mode = settings["selling.customerDefault"]
+
+	if (mode === "none") return ""
+
+	if (mode === "specific") return String(settings["selling.defaultCountry"] ?? "")
+
+	// The shop's own country, which is also the fallback: it is the right guess
+	// far more often than not for a German shop selling mostly into Germany.
+	return String(settings["company.countryCode"] ?? settings["selling.defaultCountry"] ?? "DE")
+}

@@ -33,61 +33,69 @@ export interface NavItem {
  * Grouped the way staff actually work: what sells, who buys, how the shop is
  * configured. Groups are separated by a rule, matching the reference design.
  */
-export const navGroups: NavItem[][] = [
-	[
-		{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutGrid },
-		{ label: "Orders", href: "/admin/dashboard/orders", icon: ShoppingCart, nested: true },
-		{ label: "Quotes", href: "/admin/dashboard/quotes", icon: FileText, nested: true },
-	],
-	[
-		{ label: "Products", href: "/admin/dashboard/products", icon: Package, nested: true },
-		{ label: "Categories", href: "/admin/dashboard/categories", icon: FolderTree, nested: true },
-		{
-			label: "Attributes",
-			href: "/admin/dashboard/attributes",
-			icon: SlidersHorizontal,
-			nested: true,
-		},
-		{ label: "Media", href: "/admin/dashboard/media", icon: ImageIcon, nested: true },
-	],
-	[
+export interface NavGroup {
+	/** Absent on the first group — the overview needs no heading above it. */
+	title?: string
+	items: NavItem[]
+}
+
+export const navGroups: NavGroup[] = [
+	{
+		items: [{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutGrid }],
+	},
+	{
 		/*
-		 * One entry, not two.
+		 * Everything about selling: what is sold, who bought it, and the three
+		 * things that decide what an order costs.
 		 *
-		 * "Customers" and "Dealers" were the same table filtered differently, and
-		 * a dealer who also buys at retail existed on both. Role is a column on
-		 * the Users screen now.
+		 * Tax, Shipping and Payments used to sit down with Settings, filed by
+		 * "things you configure once". That is a developer's grouping — the person
+		 * running the shop reaches for a shipping rate while looking at an order,
+		 * not while tidying the company address.
 		 */
-		{ label: "Users", href: "/admin/dashboard/users", icon: Users, nested: true },
-		{ label: "Contact", href: "/admin/dashboard/contact", icon: Mail, nested: true },
-		{ label: "Newsletter", href: "/admin/dashboard/newsletter", icon: Send, nested: true },
-	],
-	[
-		{ label: "Tax", href: "/admin/dashboard/tax", icon: Percent, nested: true },
-		{ label: "Shipping", href: "/admin/dashboard/shipping", icon: Truck, nested: true },
-		/*
-		 * One entry. Stripe and "Bank transfer" are both simply ways to be paid;
-		 * splitting them by how they are implemented is a distinction only a
-		 * developer cares about, and it left whoever runs the shop looking in two
-		 * places for one setting.
-		 */
-		{
-			label: "Payments",
-			href: "/admin/dashboard/payments",
-			icon: CreditCard,
-			nested: true,
-		},
-		/*
-		 * Beside Settings rather than inside it. What an email says is edited far
-		 * more often than what colour it is, and burying nineteen templates behind
-		 * a settings tab makes the common job the harder one to find.
-		 */
-		{ label: "Emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
-		{ label: "Settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
-	],
+		title: "Shop",
+		items: [
+			{ label: "Orders", href: "/admin/dashboard/orders", icon: ShoppingCart, nested: true },
+			{ label: "Quotes", href: "/admin/dashboard/quotes", icon: FileText, nested: true },
+			{ label: "Products", href: "/admin/dashboard/products", icon: Package, nested: true },
+			{ label: "Categories", href: "/admin/dashboard/categories", icon: FolderTree, nested: true },
+			{
+				label: "Attributes",
+				href: "/admin/dashboard/attributes",
+				icon: SlidersHorizontal,
+				nested: true,
+			},
+			{ label: "Payments", href: "/admin/dashboard/payments", icon: CreditCard, nested: true },
+			{ label: "Shipping", href: "/admin/dashboard/shipping", icon: Truck, nested: true },
+			{ label: "Tax", href: "/admin/dashboard/tax", icon: Percent, nested: true },
+		],
+	},
+	{
+		title: "Site",
+		items: [
+			/*
+			 * One entry, not two.
+			 *
+			 * "Customers" and "Dealers" were the same table filtered differently,
+			 * and a dealer who also buys at retail existed on both. Role is a column
+			 * on the Users screen now.
+			 */
+			{ label: "Users", href: "/admin/dashboard/users", icon: Users, nested: true },
+			{ label: "Media", href: "/admin/dashboard/media", icon: ImageIcon, nested: true },
+			{ label: "Contact", href: "/admin/dashboard/contact", icon: Mail, nested: true },
+			{ label: "Newsletter", href: "/admin/dashboard/newsletter", icon: Send, nested: true },
+			/*
+			 * Beside Settings rather than inside it. What an email says is edited far
+			 * more often than what colour it is, and burying twenty templates behind
+			 * a settings tab makes the common job the harder one to find.
+			 */
+			{ label: "Emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
+			{ label: "Settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
+		],
+	},
 ]
 
-export const allNavItems: NavItem[] = navGroups.flat()
+export const allNavItems: NavItem[] = navGroups.flatMap((group) => group.items)
 
 /**
  * The item a path belongs to. Longest href wins, so /products/123/edit resolves

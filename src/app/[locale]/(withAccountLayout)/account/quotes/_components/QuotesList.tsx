@@ -74,7 +74,7 @@ export const QuotesList = () => {
 							<td className="py-4 text-right">
 								{quote.quotedSubtotal ? (
 									<span className="font-semibold">
-										{formatMoney(quote.quotedSubtotal, locale)}
+										{formatMoney(quote.quotedSubtotal)}
 									</span>
 								) : (
 									<span className="text-muted-foreground italic">{t("awaitingPrice")}</span>

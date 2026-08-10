@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { Loader2, Repeat, X } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { useShopProductsQuery } from "@/redux/api/storefrontApi"
@@ -29,7 +29,6 @@ import { formatMoney } from "@/lib/money"
  */
 export const CompareTable = () => {
 	const t = useTranslations("shop")
-	const locale = useLocale()
 
 	const dispatch = useAppDispatch()
 	const { ids, hydrated } = useAppSelector((state) => state.compare)
@@ -79,7 +78,7 @@ export const CompareTable = () => {
 				p.quoteOnly ? (
 					<span className="text-muted-foreground italic">{t("priceOnRequest")}</span>
 				) : p.priceFrom ? (
-					<span className="font-semibold">{formatMoney(p.priceFrom, locale)}</span>
+					<span className="font-semibold">{formatMoney(p.priceFrom)}</span>
 				) : (
 					"—"
 				),

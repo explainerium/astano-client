@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { AlertCircle, Loader2, Trash2 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import ClearBasketButton from "@/components/shared/basket/ClearBasketButton"
@@ -31,7 +31,6 @@ const apiMessage = (error: unknown) => (error as { data?: { message?: string } }
  */
 export const CartView = () => {
 	const t = useTranslations("cart")
-	const locale = useLocale()
 
 	const { data: cart, isLoading, isError } = useCartQuery()
 	const [updateItem, updateState] = useUpdateCartItemMutation()
@@ -80,10 +79,10 @@ export const CartView = () => {
 				<span className="text-xs uppercase">{t("includedOption")}</span>
 				<span className="text-foreground block">{option.name}</span>
 				<span className="text-xs">
-					{option.quantity} × {formatMoney(option.unitPrice, locale) ?? "—"}
+					{option.quantity} × {formatMoney(option.unitPrice) ?? "—"}
 				</span>
 			</span>
-			<span className="font-medium">{formatMoney(option.lineTotal, locale)}</span>
+			<span className="font-medium">{formatMoney(option.lineTotal)}</span>
 		</div>
 	)
 
@@ -183,7 +182,7 @@ export const CartView = () => {
 												(cart.repricing ?? []).includes(line.id) && "opacity-40"
 											)}
 										>
-											{formatMoney(line.unitPrice, locale)} {t("exclVat")}
+											{formatMoney(line.unitPrice)} {t("exclVat")}
 										</span>
 
 										<button
@@ -217,7 +216,7 @@ export const CartView = () => {
 								</div>
 
 								<div className="shrink-0 text-right font-semibold">
-									{formatMoney(line.lineTotal, locale)}
+									{formatMoney(line.lineTotal)}
 								</div>
 							</div>
 						</li>
@@ -227,7 +226,7 @@ export const CartView = () => {
 				<aside className="bg-muted/50 p-6 lg:sticky lg:top-6">
 					<div className="flex items-baseline justify-between">
 						<span className="font-heading text-lg font-semibold">{t("subtotal")}</span>
-						<span className="text-xl font-bold">{formatMoney(cart.subtotal, locale)}</span>
+						<span className="text-xl font-bold">{formatMoney(cart.subtotal)}</span>
 					</div>
 					<p className="text-muted-foreground mt-1 text-right text-xs">{t("exclVat")}</p>
 

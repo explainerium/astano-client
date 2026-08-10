@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { AlertCircle, Check, Loader2, Minus, Plus, X } from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
@@ -35,7 +35,6 @@ export const QuickViewDialog = ({
 	onOpenChange: (open: boolean) => void
 }) => {
 	const t = useTranslations("shop")
-	const locale = useLocale()
 
 	const [quantity, setQuantity] = useState(1)
 	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
@@ -138,11 +137,11 @@ export const QuickViewDialog = ({
 							<>
 								<div className="flex items-baseline gap-2">
 									<span className="font-heading text-2xl font-bold">
-										{formatMoney(variant?.unitPrice ?? null, locale) ?? "—"}
+										{formatMoney(variant?.unitPrice ?? null) ?? "—"}
 									</span>
 									{variant?.onSale && variant.listPrice && (
 										<span className="text-muted-foreground text-sm line-through">
-											{formatMoney(variant.listPrice, locale)}
+											{formatMoney(variant.listPrice)}
 										</span>
 									)}
 									<span className="text-muted-foreground text-xs">{t("exclVat")}</span>

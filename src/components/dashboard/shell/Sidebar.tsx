@@ -27,14 +27,22 @@ export const Sidebar = () => {
 			<nav className="flex-1 overflow-y-auto px-3 pb-6">
 				{navGroups.map((group, index) => (
 					<div
-						key={index}
+						key={group.title ?? index}
 						className={cn(
 							"space-y-0.5",
 							// A rule between groups, matching the reference design.
 							index > 0 && "border-border mt-4 border-t pt-4"
 						)}
 					>
-						{group.map((item) => {
+						{/* A heading, now that the groups are long enough that a rule
+						    alone no longer says what they have in common. */}
+						{group.title && (
+							<p className="text-muted-foreground px-3 pt-1 pb-2 text-[11px] font-medium tracking-wider uppercase">
+								{group.title}
+							</p>
+						)}
+
+						{group.items.map((item) => {
 							const isActive = active?.href === item.href
 							const Icon = item.icon
 

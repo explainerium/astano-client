@@ -1,7 +1,9 @@
 "use client"
 
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
-import { configureMoney } from "@/lib/money"
+import { configureMoney, type SymbolPosition } from "@/lib/money"
+
+const POSITIONS: SymbolPosition[] = ["left", "right", "left_space", "right_space"]
 
 /**
  * Applies the shop's currency settings to the money formatter.
@@ -19,9 +21,17 @@ export const MoneyFormatProvider = () => {
 	const { data } = usePublicSettingsQuery()
 
 	if (data) {
+		const position = String(data["currency.position"] ?? "")
+
 		configureMoney({
 			currency: String(data["currency.code"] ?? "EUR"),
-			locale: String(data["currency.locale"] ?? "de-DE"),
+			position: POSITIONS.includes(position as SymbolPosition)
+				? (position as SymbolPosition)
+				: "right_space",
+			// A separator may legitimately be an empty string — "1234,56" is a
+			// real choice — so these fall back only when the setting is absent.
+			thousandSeparator: String(data["currency.thousandSeparator"] ?? "."),
+			decimalSeparator: String(data["currency.decimalSeparator"] ?? ","),
 			decimals: Number(data["currency.decimals"] ?? 2),
 		})
 	}

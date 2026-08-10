@@ -32,23 +32,23 @@ export const OrderPlaced = ({ order }: { order: PlacedOrder }) => {
 				</div>
 				<div className="flex justify-between gap-4">
 					<dt className="text-muted-foreground">{t("subtotal")}</dt>
-					<dd>{formatMoney(order.subtotal, locale)}</dd>
+					<dd>{formatMoney(order.subtotal)}</dd>
 				</div>
 				<div className="flex justify-between gap-4">
 					<dt className="text-muted-foreground">{t("shipping")}</dt>
-					<dd>{formatMoney(order.shippingTotal, locale)}</dd>
+					<dd>{formatMoney(order.shippingTotal)}</dd>
 				</div>
 				{order.taxLines.map((line, index) => (
 					<div key={index} className="flex justify-between gap-4">
 						<dt className="text-muted-foreground">
 							{t("tax")} ({line.ratePercent}%)
 						</dt>
-						<dd>{formatMoney(line.amount, locale)}</dd>
+						<dd>{formatMoney(line.amount)}</dd>
 					</div>
 				))}
 				<div className="flex justify-between gap-4 border-t pt-3">
 					<dt className="font-heading font-semibold">{t("grandTotal")}</dt>
-					<dd className="text-lg font-bold">{formatMoney(order.grandTotal, locale)}</dd>
+					<dd className="text-lg font-bold">{formatMoney(order.grandTotal)}</dd>
 				</div>
 			</dl>
 

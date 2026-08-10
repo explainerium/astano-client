@@ -8,12 +8,23 @@
  *
  * The prices come off the wire as decimal strings, not numbers, because that
  * is how they survive the trip from Postgres without a float rounding it.
+ *
+ * The layout is composed here rather than handed to `Intl` with a locale. It
+ * used to be the other way round, and a locale is genuinely the tidier idea —
+ * one choice that cannot produce a contradiction. But the shop's settings now
+ * name the separators and the symbol position directly, the way WooCommerce
+ * does, and a price written by `Intl` would ignore them. Intl is still asked
+ * for the currency *symbol*, which is the part it knows and we should not
+ * keep a table of.
  */
+
+export type SymbolPosition = "left" | "right" | "left_space" | "right_space"
 
 export interface MoneyFormat {
 	currency: string
-	/** Intl locale — decides separators and where the symbol sits. */
-	locale: string
+	position: SymbolPosition
+	thousandSeparator: string
+	decimalSeparator: string
 	decimals: number
 }
 
@@ -24,10 +35,13 @@ export interface MoneyFormat {
  * completes, and a price rendered as `NaN` for a moment is worse than one
  * rendered in the wrong separator for a moment.
  */
-let format: MoneyFormat = { currency: "EUR", locale: "de-DE", decimals: 2 }
-
-/** False until the shop's settings arrive, which is when the hint below stops mattering. */
-let configured = false
+let format: MoneyFormat = {
+	currency: "EUR",
+	position: "right_space",
+	thousandSeparator: ".",
+	decimalSeparator: ",",
+	decimals: 2,
+}
 
 /**
  * Applies the shop's currency settings. Called once, from MoneyFormatProvider.
@@ -38,34 +52,70 @@ let configured = false
  */
 export const configureMoney = (next: Partial<MoneyFormat>): void => {
 	format = { ...format, ...next }
-	configured = true
+	symbolCache.clear()
 }
 
 export const moneyFormat = (): MoneyFormat => format
 
-/**
- * The shop's format wins over the visitor's language.
- *
- * A shop writes its prices one way — that is what the setting means, and what
- * WooCommerce does. The `locale` argument is a hint used only in the moment
- * before the settings land, so the very first paint on the English storefront
- * does not flicker from one convention to another.
- */
-export const formatMoney = (value: string | number | null | undefined, locale?: string) => {
+/** Symbol lookup is the one thing Intl is still asked for, so it is cached. */
+const symbolCache = new Map<string, string>()
+
+const symbolOf = (currency: string): string => {
+	const cached = symbolCache.get(currency)
+	if (cached !== undefined) return cached
+
+	let symbol = currency
+
+	try {
+		const parts = new Intl.NumberFormat("en", {
+			style: "currency",
+			currency,
+			currencyDisplay: "narrowSymbol",
+		}).formatToParts(0)
+
+		symbol = parts.find((p) => p.type === "currency")?.value ?? currency
+	} catch {
+		// An unknown or malformed code. The code itself is a fair label — better
+		// than throwing on every price in the shop.
+	}
+
+	symbolCache.set(currency, symbol)
+	return symbol
+}
+
+/** Groups the integer part in threes with whatever the shop uses. */
+const group = (digits: string, separator: string): string =>
+	separator ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, separator) : digits
+
+export const formatMoney = (value: string | number | null | undefined) => {
 	if (value === null || value === undefined || value === "") return null
+
 	const amount = typeof value === "number" ? value : Number(value)
 	if (!Number.isFinite(amount)) return null
 
-	const active = configured
-		? format.locale
-		: locale?.startsWith("en")
-			? "en-GB"
-			: format.locale
+	const { currency, position, thousandSeparator, decimalSeparator, decimals } = format
 
-	return new Intl.NumberFormat(active, {
-		style: "currency",
-		currency: format.currency,
-		minimumFractionDigits: format.decimals,
-		maximumFractionDigits: format.decimals,
-	}).format(amount)
+	// toFixed rounds half away from zero, which is what a price list does.
+	const fixed = Math.abs(amount).toFixed(Math.max(0, Math.min(10, decimals)))
+	const [whole = "0", fraction = ""] = fixed.split(".")
+
+	const number =
+		group(whole, thousandSeparator) + (fraction ? decimalSeparator + fraction : "")
+
+	// The sign goes outside the symbol — "-€5", not "€-5".
+	const sign = amount < 0 ? "-" : ""
+	const symbol = symbolOf(currency)
+
+	switch (position) {
+		case "left":
+			return `${sign}${symbol}${number}`
+		case "left_space":
+			return `${sign}${symbol} ${number}`
+		case "right":
+			return `${sign}${number}${symbol}`
+		default:
+			// A non-breaking space, so a price never wraps between the number and
+			// its symbol at the end of a line.
+			return `${sign}${number} ${symbol}`
+	}
 }

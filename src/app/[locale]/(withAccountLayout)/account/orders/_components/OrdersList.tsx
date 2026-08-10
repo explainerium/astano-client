@@ -74,7 +74,7 @@ export const OrdersList = () => {
 								<StatusChip status={order.paymentStatus} kind="paymentStatus" />
 							</td>
 							<td className="py-4 text-right font-semibold">
-								{formatMoney(order.grandTotal, locale)}
+								{formatMoney(order.grandTotal)}
 							</td>
 							<td className="py-4 text-right">
 								<Link

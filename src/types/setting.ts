@@ -38,6 +38,13 @@ export interface SettingGroup {
 	key: string
 	title: string
 	blurb: string
+	/** Which heading the group sits under in the menu. */
+	section: string
+}
+
+export interface SettingSection {
+	key: string
+	title: string
 }
 
 export interface SettingsResponse {
@@ -45,6 +52,8 @@ export interface SettingsResponse {
 	/** Keyed by setting key. The screen renders itself from this. */
 	definitions: Record<string, SettingDefinition>
 	groups: SettingGroup[]
+	/** In display order. Groups are filed under these by their `section`. */
+	sections: SettingSection[]
 }
 
 /** Resolved values the storefront may read without signing in. */

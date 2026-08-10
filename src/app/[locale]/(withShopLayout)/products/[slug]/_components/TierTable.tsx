@@ -1,6 +1,6 @@
 "use client"
 
-import { useLocale, useTranslations } from "next-intl"
+import { useTranslations } from "next-intl"
 import { formatMoney } from "@/lib/money"
 import { cn } from "@/lib/utils"
 import type { PublicVariant } from "@/types/storefront"
@@ -39,7 +39,6 @@ export const TierTable = ({
 	compact?: boolean
 }) => {
 	const t = useTranslations("shop")
-	const locale = useLocale()
 
 	if (!tiers.length) return null
 
@@ -146,7 +145,7 @@ export const TierTable = ({
 										{saving ?? "—"}
 									</td>
 									<td className={cn(cell, "text-right font-medium tabular-nums")}>
-										{formatMoney(row.unitPrice, locale) ?? "—"}
+										{formatMoney(row.unitPrice) ?? "—"}
 									</td>
 								</tr>
 							)
