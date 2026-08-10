@@ -16,7 +16,20 @@ export const settingApi = baseApi.injectEndpoints({
 		 * fetches them once at the root rather than per component.
 		 */
 		publicSettings: build.query<PublicSettings, void>({
-			query: () => ({ url: "/settings/public", method: "GET" }),
+			query: () => ({
+				url: "/settings/public",
+				method: "GET",
+				/*
+				 * Short, and retried — the opposite of the 60s default.
+				 *
+				 * The API sleeps on the free tier and takes the better part of a
+				 * minute to wake. One long attempt either hangs the whole page's
+				 * prices on it or times out with nothing to show for it; a short
+				 * attempt wakes the server and the retry lands on a warm one.
+				 */
+				timeout: 15_000,
+			}),
+			extraOptions: { maxRetries: 3 },
 			providesTags: [tagTypes.setting],
 		}),
 

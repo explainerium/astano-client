@@ -2,6 +2,7 @@
 
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { configureMoney, formatWith, readMoneyFormat } from "./money"
+import { readLastKnownSettings, rememberSettings } from "./lastKnownSettings"
 
 /**
  * The shop's price formatter, as a value.
@@ -23,7 +24,18 @@ import { configureMoney, formatWith, readMoneyFormat } from "./money"
  */
 export const useMoney = () => {
 	const { data } = usePublicSettingsQuery()
-	const format = readMoneyFormat(data)
+
+	/*
+	 * The last known settings cover the wait.
+	 *
+	 * Without them the first paint after a cold API — up to a minute on the free
+	 * tier — writes every price in the built-in defaults, which on a shop whose
+	 * separators differ looks exactly like the settings having stopped working.
+	 * It is a deployed-only failure: a local API answers before anything renders.
+	 */
+	if (data) rememberSettings(data)
+
+	const format = readMoneyFormat(data ?? readLastKnownSettings() ?? undefined)
 
 	// Keeps the module version in step for callers that are not components.
 	configureMoney(format)
