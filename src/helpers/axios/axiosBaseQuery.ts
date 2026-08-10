@@ -11,6 +11,12 @@ export interface IAxiosBaseQueryArgs {
 	headers?: AxiosRequestConfig["headers"]
 	meta?: IMeta
 	contentType?: string
+	/**
+	 * Overrides the instance's 60s default for the few calls that legitimately
+	 * take longer — a catalogue import walks every row and fetches every image,
+	 * and a minute is not enough for either.
+	 */
+	timeout?: number
 }
 
 export const axiosBaseQuery =
@@ -19,13 +25,14 @@ export const axiosBaseQuery =
 		unknown,
 		unknown
 	> =>
-	async ({ url, method, data, params, headers, contentType }) => {
+	async ({ url, method, data, params, headers, contentType, timeout }) => {
 		try {
 			return await axiosInstance({
 				url: baseUrl + url,
 				method,
 				data,
 				params,
+				...(timeout ? { timeout } : {}),
 				headers: {
 					...headers,
 					// Leave it to the browser for FormData — it has to append the

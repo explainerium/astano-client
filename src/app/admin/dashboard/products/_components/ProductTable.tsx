@@ -2,7 +2,17 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Copy, ExternalLink, ImageOff, Loader2, Pencil, Plus, Trash2 } from "lucide-react"
+import {
+	Copy,
+	Download,
+	ExternalLink,
+	ImageOff,
+	Loader2,
+	Pencil,
+	Plus,
+	Trash2,
+	Upload,
+} from "lucide-react"
 import { toast } from "sonner"
 import {
 	AlertDialog,
@@ -36,6 +46,7 @@ import Toolbar from "@/components/dashboard/shell/Toolbar"
 import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
 import { useDeleteProductMutation, useDuplicateProductMutation } from "@/redux/api/productApi"
+import { downloadFile } from "@/lib/downloadFile"
 import { cn } from "@/lib/utils"
 import type {
 	AdminProduct,
@@ -183,6 +194,20 @@ export const ProductTable = ({
 	const [selected, setSelected] = useState<Set<string>>(new Set())
 	const [pending, setPending] = useState<AdminProduct[] | null>(null)
 	const [isDeleting, setIsDeleting] = useState(false)
+	const [exporting, setExporting] = useState(false)
+
+	const runExport = async () => {
+		setExporting(true)
+
+		try {
+			const stamp = new Date().toISOString().slice(0, 10)
+			await downloadFile("/admin/products-io/export", `astano-products-${stamp}.csv`)
+		} catch {
+			toast.error("Could not build the export.")
+		}
+
+		setExporting(false)
+	}
 
 	/**
 	 * Which row is being copied.
@@ -373,10 +398,23 @@ export const ProductTable = ({
 					</Button>
 				}
 				primaryAction={
-					<Button size="lg" onClick={onCreate}>
-						<Plus />
-						New product
-					</Button>
+					<div className="flex flex-wrap gap-2">
+						{/* Beside New product, as WooCommerce puts them. */}
+						<Button variant="outline" size="lg" disabled={exporting} onClick={runExport}>
+							{exporting ? <Loader2 className="animate-spin" /> : <Download />}
+							Export
+						</Button>
+						<Button asChild variant="outline" size="lg">
+							<Link href="/admin/dashboard/products/import">
+								<Upload />
+								Import
+							</Link>
+						</Button>
+						<Button size="lg" onClick={onCreate}>
+							<Plus />
+							New product
+						</Button>
+					</div>
 				}
 			/>
 
