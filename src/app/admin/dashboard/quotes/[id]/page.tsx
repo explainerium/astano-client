@@ -26,12 +26,11 @@ import { useAdminQuoteQuery, useReplyToQuoteMutation, useUpdateQuoteMutation } f
 import type { Quote, QuoteStatus } from "@/types/quote"
 import {
 	formatDate,
-	formatMoney,
 	isFullyPriced,
 	QUOTE_STATUS,
 	QUOTE_STATUS_OPTIONS,
 } from "../_components/quoteStatus"
-
+import useMoney from "@/lib/useMoney"
 const money = z
 	.string()
 	.trim()
@@ -39,6 +38,10 @@ const money = z
 
 /** Pricing the lines. Empty clears a price rather than sending zero. */
 const PricingForm = ({ quote }: { quote: Quote }) => {
+	// Its own, rather than threaded from the parent — it is a component, and
+	// the query behind this is shared.
+	const formatMoney = useMoney()
+
 	const [updateQuote] = useUpdateQuoteMutation()
 
 	const schema = z.object({

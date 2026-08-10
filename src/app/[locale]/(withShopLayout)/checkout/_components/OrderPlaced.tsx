@@ -3,13 +3,17 @@
 import { useLocale, useTranslations } from "next-intl"
 import { CheckCircle2 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { countryName } from "@/lib/countries"
 import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { PlacedOrder } from "@/types/storefront"
 
 /** Order confirmation — the last thing the customer sees before their inbox. */
 export const OrderPlaced = ({ order }: { order: PlacedOrder }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("checkout")
 	const locale = useLocale()
 

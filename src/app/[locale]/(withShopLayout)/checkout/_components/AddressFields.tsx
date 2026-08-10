@@ -5,6 +5,7 @@ import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
 import { SHIPPING_COUNTRIES } from "@/lib/countries"
 import { canSellTo, readSellingRule } from "@/lib/sellingLocations"
+import { canShipTo, readShippingRule } from "@/lib/shippingLocations"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 
 /**
@@ -23,16 +24,26 @@ export const AddressFields = ({ prefix }: { prefix: "billing" | "shipping" }) =>
 	const locale = useLocale()
 
 	/**
-	 * Narrowed to where the shop actually sells.
+	 * Narrowed to where the shop actually sells — and, for the delivery address,
+	 * to where it actually ships.
 	 *
-	 * The same rule the API enforces at placement, applied here so a customer is
+	 * The same rules the API enforces at placement, applied here so a customer is
 	 * never offered a country their order would then be refused for. Filtered
 	 * rather than disabled: an option that cannot be chosen is just noise.
+	 *
+	 * The two lists differ on purpose. A shop can invoice a customer in a country
+	 * it will not deliver to — the billing address is where the money comes from,
+	 * not where the pallet goes.
 	 */
 	const { data: shopSettings } = usePublicSettingsQuery()
-	const selling = readSellingRule(shopSettings ?? {})
+	const settings = shopSettings ?? {}
+	const selling = readSellingRule(settings)
+	const shipping = readShippingRule(settings)
 
-	const countries = SHIPPING_COUNTRIES.filter((country) => canSellTo(selling, country.code)).map(
+	const allowed = (code: string) =>
+		prefix === "shipping" ? canShipTo(shipping, selling, code) : canSellTo(selling, code)
+
+	const countries = SHIPPING_COUNTRIES.filter((country) => allowed(country.code)).map(
 		(country) => ({
 			value: country.code,
 			label: locale === "de" ? country.de : country.en,

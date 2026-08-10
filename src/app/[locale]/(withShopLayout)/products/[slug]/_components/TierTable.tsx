@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { PublicVariant } from "@/types/storefront"
 
@@ -38,6 +38,10 @@ export const TierTable = ({
 	/** Denser type and padding, for a table nested inside an option row. */
 	compact?: boolean
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("shop")
 
 	if (!tiers.length) return null

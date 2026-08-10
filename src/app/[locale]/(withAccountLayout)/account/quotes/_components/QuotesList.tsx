@@ -5,10 +5,14 @@ import { Loader2 } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { useMyQuotesQuery } from "@/redux/api/storefrontApi"
 import { formatDate } from "@/lib/dates"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import StatusChip from "../../../_components/StatusChip"
 
 export const QuotesList = () => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("account")
 	const locale = useLocale()
 	const { data: quotes = [], isLoading } = useMyQuotesQuery()

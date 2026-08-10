@@ -6,7 +6,7 @@ import { AlertCircle, Loader2, Send } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { useMyQuoteQuery, useReplyToQuoteMutation } from "@/redux/api/storefrontApi"
 import { formatDate, formatDateTime } from "@/lib/dates"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import StatusChip from "../../../_components/StatusChip"
 import AcceptQuote from "./AcceptQuote"
@@ -14,6 +14,10 @@ import AcceptQuote from "./AcceptQuote"
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
 
 export const QuoteDetail = ({ id }: { id: string }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("account")
 	const locale = useLocale()
 

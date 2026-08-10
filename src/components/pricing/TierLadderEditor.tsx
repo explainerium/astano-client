@@ -18,7 +18,7 @@ import {
 	tierUnitPrice,
 	type TierType,
 } from "@/lib/tiers"
-
+import useMoney from "@/lib/useMoney"
 export interface LadderRung {
 	minQuantity: number
 	type: TierType
@@ -53,7 +53,10 @@ export const TierLadderEditor = ({
 	baseHint?: string
 	disabled?: boolean
 }) => {
-	const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" })
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 
 	const sorted = (rows: LadderRung[]) =>
 		[...rows].sort((a, b) => (a.minQuantity ?? 0) - (b.minQuantity ?? 0))
@@ -225,7 +228,7 @@ export const TierLadderEditor = ({
 																risingRows.has(index) ? "text-destructive" : "text-foreground"
 															)}
 														>
-															{money.format(unit)}
+															{formatMoney(unit)}
 														</span>
 														<span className="text-[10px]">{suffix}</span>
 													</span>

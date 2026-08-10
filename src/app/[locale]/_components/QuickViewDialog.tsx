@@ -7,7 +7,7 @@ import { Link, useRouter } from "@/i18n/navigation"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useAddToCartMutation, useShopProductQuery } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import TierTable from "@/app/[locale]/(withShopLayout)/products/[slug]/_components/TierTable"
 import type { PublicProduct } from "@/types/storefront"
@@ -34,6 +34,10 @@ export const QuickViewDialog = ({
 	product: PublicProduct | null
 	onOpenChange: (open: boolean) => void
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("shop")
 
 	const [quantity, setQuantity] = useState(1)

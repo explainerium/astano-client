@@ -12,8 +12,7 @@ import {
 	readStoredCompare,
 	removeFromCompare,
 } from "@/redux/slices/compareSlice"
-import { formatMoney } from "@/lib/money"
-
+import useMoney from "@/lib/useMoney"
 /**
  * Side-by-side, one column per product.
  *
@@ -28,6 +27,10 @@ import { formatMoney } from "@/lib/money"
  * three too many.
  */
 export const CompareTable = () => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("shop")
 
 	const dispatch = useAppDispatch()

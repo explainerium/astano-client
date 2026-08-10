@@ -12,7 +12,7 @@ import {
 	useRemoveCartItemMutation,
 	useUpdateCartItemMutation,
 } from "@/redux/api/storefrontApi"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/types/storefront"
 
@@ -30,6 +30,10 @@ const apiMessage = (error: unknown) => (error as { data?: { message?: string } }
  * checkout knows the country would mean quoting it wrong.
  */
 export const CartView = () => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("cart")
 
 	const { data: cart, isLoading, isError } = useCartQuery()

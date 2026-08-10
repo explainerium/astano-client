@@ -17,14 +17,13 @@ import {
 	type TierRole,
 	type TierType,
 } from "@/lib/tiers"
-
+import useMoney from "@/lib/useMoney"
 type TierRow = {
 	minQuantity?: number
 	type: TierType
 	amount: string
 }
 
-const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" })
 
 const TYPE_OPTIONS = TIER_TYPES.map((t) => ({ value: t.value, label: t.label }))
 
@@ -49,6 +48,10 @@ const optionsFor = (type: TierType | undefined) =>
  * again when the form is flattened for the API.
  */
 const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => {
+	// Its own, rather than threaded from the parent — it is a component, and
+	// the query behind this is shared.
+	const formatMoney = useMoney()
+
 	const { control, getValues } = useFormContext()
 	const name = `tiers.${role}`
 	const { fields, append, remove, replace } = useFieldArray({ control, name })
@@ -174,7 +177,7 @@ const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => 
 												{unit !== null ? (
 													<>
 														<span className="text-foreground font-medium tabular-nums">
-															{money.format(unit)}
+															{formatMoney(unit)}
 														</span>
 														<span className="text-[10px]">{suffix}</span>
 													</>

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { useParams } from "next/navigation"
 import { Mail, MapPin, Phone } from "lucide-react"
 import { Link, usePathname } from "@/i18n/navigation"
+import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 
 type LinkHref = ComponentProps<typeof Link>["href"]
 
@@ -32,6 +33,36 @@ export const SiteFooter = ({ locale }: { locale: string }) => {
 	const pathname = usePathname()
 	const params = useParams()
 	const lang = locale === "de" ? "de" : "en"
+
+	/*
+	 * The contact block comes from the settings, not the markup.
+	 *
+	 * It was typed in here, which meant changing the phone number in Settings
+	 * changed it on invoices and in emails and left the footer — the one place
+	 * most customers actually look — showing the old one.
+	 *
+	 * The current values are the fallbacks, so an unconfigured shop still reads
+	 * correctly rather than showing an empty address block.
+	 */
+	const { data: shopSettings } = usePublicSettingsQuery()
+	const setting = (key: string, fallback: string) => {
+		const value = shopSettings?.[key]
+		return typeof value === "string" && value.trim() ? value.trim() : fallback
+	}
+
+	const country = setting("company.countryCode", "DE")
+
+	const addressLines = [
+		[setting("company.name", "ASSCA GmbH"), setting("company.street", "Fronstrasse 6")]
+			.filter(Boolean)
+			.join(", "),
+		setting("company.street2", ""),
+		`${setting("company.postcode", "78661")} ${setting("company.city", "Dietingen")}`.trim(),
+		country === "DE" ? (lang === "de" ? "Deutschland" : "Germany") : country,
+	].filter((line) => line.trim())
+
+	const phone = setting("company.phone", "+49 (0) 7721 6809150")
+	const email = setting("company.email", "info@astano.de")
 
 	/**
 	 * Stay on the current page when switching language, translated slug and all
@@ -111,25 +142,33 @@ export const SiteFooter = ({ locale }: { locale: string }) => {
 								<MapPin className="text-muted-foreground mt-0.5 size-4 shrink-0" />
 								<div>
 									<p className="font-medium">astano®</p>
-									<p className="text-muted-foreground">ASSCA GmbH, Fronstrasse 6</p>
-									<p className="text-muted-foreground">78661 Dietingen</p>
-									<p className="text-muted-foreground">
-										{lang === "de" ? "Deutschland" : "Germany"}
-									</p>
+									{addressLines.map((line) => (
+										<p key={line} className="text-muted-foreground">
+											{line}
+										</p>
+									))}
 								</div>
 							</div>
-							<div className="flex items-center gap-3">
-								<Phone className="text-muted-foreground size-4 shrink-0" />
-								<a href="tel:+4977216809150" className="hover:text-primary transition-colors">
-									+49 (0) 7721 6809150
-								</a>
-							</div>
-							<div className="flex items-center gap-3">
-								<Mail className="text-muted-foreground size-4 shrink-0" />
-								<a href="mailto:info@astano.de" className="hover:text-primary transition-colors">
-									info@astano.de
-								</a>
-							</div>
+							{!!phone && (
+								<div className="flex items-center gap-3">
+									<Phone className="text-muted-foreground size-4 shrink-0" />
+									{/* Spaces and brackets are for reading; the dial string is not. */}
+									<a
+										href={`tel:${phone.replace(/[^\d+]/g, "")}`}
+										className="hover:text-primary transition-colors"
+									>
+										{phone}
+									</a>
+								</div>
+							)}
+							{!!email && (
+								<div className="flex items-center gap-3">
+									<Mail className="text-muted-foreground size-4 shrink-0" />
+									<a href={`mailto:${email}`} className="hover:text-primary transition-colors">
+										{email}
+									</a>
+								</div>
+							)}
 						</address>
 					</div>
 				</div>

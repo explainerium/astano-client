@@ -55,10 +55,10 @@ import type {
 	ProductStatus,
 	StockStatus,
 } from "@/types/product"
-
+import useMoney from "@/lib/useMoney"
+import type { MoneyFormatter } from "@/lib/money"
 const ANY = "__any__"
 
-const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" })
 
 /**
  * The price a normal retail customer sees.
@@ -110,14 +110,22 @@ const saleActive = (row: ProductPrice): boolean => {
  * are shown together — a lone number in this column is the price being charged,
  * never an obsolete one.
  */
-const displayPrice = (product: AdminProduct): { regular: string; sale: string | null } | null => {
+const displayPrice = (
+	product: AdminProduct,
+	formatMoney: MoneyFormatter
+): { regular: string; sale: string | null } | null => {
 	const variant = product.variants.find((v) => v.isDefault) ?? product.variants[0]
 	const row = retailRow(variant?.prices) ?? retailRow(product.prices)
 	if (!row) return null
 
+	const regular = formatMoney(Number(row.basePrice))
+	// A row with an unreadable base price has no price to show at all, which is
+	// what the column's own empty state is for.
+	if (!regular) return null
+
 	return {
-		regular: money.format(Number(row.basePrice)),
-		sale: saleActive(row) ? money.format(Number(row.salePrice)) : null,
+		regular,
+		sale: saleActive(row) ? formatMoney(Number(row.salePrice)) : null,
 	}
 }
 
@@ -189,6 +197,10 @@ export const ProductTable = ({
 	onEdit: (product: AdminProduct) => void
 	onCreate: () => void
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const [deleteProduct] = useDeleteProductMutation()
 	const [duplicateProduct] = useDuplicateProductMutation()
 	const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -484,7 +496,7 @@ export const ProductTable = ({
 								const thumbnail = thumbnailOf(product)
 								const productCategories = categoryNamesFor(product)
 								const status = STATUS_CHIP[product.status]
-								const price = displayPrice(product)
+								const price = displayPrice(product, formatMoney)
 
 								return (
 									<TableRow

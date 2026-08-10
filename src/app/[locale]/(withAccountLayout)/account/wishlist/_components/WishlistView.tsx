@@ -11,7 +11,7 @@ import {
 	useWishlistQuery,
 } from "@/redux/api/storefrontApi"
 import { formatDate } from "@/lib/dates"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
@@ -27,6 +27,10 @@ const apiMessage = (error: unknown) => (error as { data?: { message?: string } }
  * went.
  */
 export const WishlistView = () => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("account")
 	const locale = useLocale()
 

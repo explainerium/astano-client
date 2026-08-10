@@ -9,8 +9,7 @@ import { toggleCompare } from "@/redux/slices/compareSlice"
 import { GRID_IMAGE_SIZES, gridSrcOf, srcsetOf } from "@/lib/images"
 import { cn } from "@/lib/utils"
 import type { PublicProduct } from "@/types/storefront"
-
-const money = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" })
+import useMoney from "@/lib/useMoney"
 
 /**
  * One action in the hover rail.
@@ -83,6 +82,10 @@ export const ProductCard = ({
 	/** Omitted where quick view makes no sense, e.g. inside the quick view. */
 	onQuickView?: (product: PublicProduct) => void
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("shop")
 	const image = product.featuredImage
 
@@ -228,7 +231,7 @@ export const ProductCard = ({
 						<p className="text-muted-foreground text-sm italic">{t("priceOnRequest")}</p>
 					) : product.priceFrom ? (
 						<p className="text-[15px] font-bold">
-							{money.format(Number(product.priceFrom))}
+							{formatMoney(Number(product.priceFrom))}
 							<span className="text-muted-foreground ml-1 text-xs font-normal">
 								{t("exclVat")}
 							</span>

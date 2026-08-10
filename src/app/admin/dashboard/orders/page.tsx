@@ -26,16 +26,19 @@ import type { OrderStatus } from "@/types/order"
 import {
 	customerName,
 	formatDate,
-	formatMoney,
 	ORDER_STATUS,
 	ORDER_STATUS_OPTIONS,
 	PAYMENT_STATUS,
 } from "./_components/orderStatus"
-
+import useMoney from "@/lib/useMoney"
 const ANY = "__any__"
 const PER_PAGE = 20
 
 export default function OrdersPage() {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const router = useRouter()
 	const [search, setSearch] = useState("")
 	const [status, setStatus] = useState<OrderStatus | undefined>()

@@ -42,9 +42,15 @@ export const PAYMENT_STATUS_OPTIONS = (Object.keys(PAYMENT_STATUS) as PaymentSta
 	(value) => ({ value, label: PAYMENT_STATUS[value].label })
 )
 
-const money = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" })
-
-export const formatMoney = (value: string) => money.format(Number(value))
+/*
+ * Re-exported, not re-implemented.
+ *
+ * This used to be its own Intl formatter pinned to en-GB and EUR, which meant
+ * the orders table ignored the shop's currency settings entirely — a separator
+ * changed in Settings changed everything except the screens staff look at
+ * most.
+ */
+export { formatMoney } from "@/lib/money"
 
 export const formatDate = (value: string) =>
 	new Date(value).toLocaleDateString("en-GB", {

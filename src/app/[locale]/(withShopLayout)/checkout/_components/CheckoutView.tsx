@@ -21,7 +21,7 @@ import {
 } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { preselectedCountry } from "@/lib/sellingLocations"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
 import AddressFields from "./AddressFields"
 import MethodChoice, { type MethodOption } from "./MethodChoice"
@@ -160,6 +160,10 @@ const toApiAddress = (values: Record<string, string | undefined>): CheckoutAddre
  * disagree with the invoice the customer eventually receives.
  */
 export const CheckoutView = () => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("checkout")
 	const { isLoggedIn, isResolved } = useUserInfo()
 

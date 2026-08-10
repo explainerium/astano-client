@@ -10,7 +10,7 @@ import {
 	useUpdateCartItemMutation,
 } from "@/redux/api/storefrontApi"
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/types/storefront"
 
@@ -45,6 +45,10 @@ const LineRow = ({
 	onQuantity: (quantity: number) => void
 	onRemove: () => void
 }) => {
+	// Its own, rather than threaded from the parent — it is a component, and
+	// the query behind this is shared.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("cart")
 	const min = line.moq > 0 ? line.moq : 1
 
@@ -153,6 +157,10 @@ export const CartDrawer = ({
 	open: boolean
 	onOpenChange: (open: boolean) => void
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("cart")
 
 	const { data: cart, isLoading } = useCartQuery()

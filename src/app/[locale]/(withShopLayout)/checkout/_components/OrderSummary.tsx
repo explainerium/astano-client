@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { AlertCircle, Info, Loader2 } from "lucide-react"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import type { CartView, CheckoutPreview } from "@/types/storefront"
 
 /**
@@ -25,6 +25,10 @@ export const OrderSummary = ({
 	preview: CheckoutPreview | null
 	calculating: boolean
 }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("checkout")
 
 	const row = (label: string, value: string | null, muted = true) => (

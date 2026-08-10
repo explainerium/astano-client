@@ -21,11 +21,11 @@ import OrderStatusDialog from "../_components/OrderStatusDialog"
 import OrderNotes from "./_components/OrderNotes"
 import {
 	formatDate,
-	formatMoney,
 	ORDER_STATUS,
 	PAYMENT_STATUS,
 } from "../_components/orderStatus"
-
+import useMoney from "@/lib/useMoney"
+import type { MoneyFormatter } from "@/lib/money"
 const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
 
 const countryName = (code: string | null) => {
@@ -62,7 +62,9 @@ const AddressBlock = ({ title, address }: { title: string; address?: OrderAddres
 	</section>
 )
 
-const Totals = ({ order }: { order: Order }) => (
+// The formatter is passed in rather than imported: it belongs to the page's
+// render, which is what lets React Compiler see these prices depend on it.
+const Totals = ({ order, formatMoney }: { order: Order; formatMoney: MoneyFormatter }) => (
 	<dl className="space-y-1.5 text-sm">
 		<div className="flex justify-between gap-4">
 			<dt className="text-muted-foreground">Subtotal</dt>
@@ -118,6 +120,10 @@ const Totals = ({ order }: { order: Order }) => (
 )
 
 export default function OrderDetailPage() {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const router = useRouter()
 	const params = useParams<{ id: string }>()
 	const { data: order, isLoading, isError, error } = useAdminOrderQuery(params.id)
@@ -265,7 +271,7 @@ export default function OrderDetailPage() {
 
 						<div className="flex justify-end border-t p-4">
 							<div className="w-full max-w-xs">
-								<Totals order={order} />
+								<Totals order={order} formatMoney={formatMoney} />
 							</div>
 						</div>
 					</section>

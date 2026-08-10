@@ -22,14 +22,22 @@ import StatCard from "@/components/dashboard/shell/StatCard"
 import { Badge } from "@/components/ui/badge"
 import { useDashboardSummaryQuery, type DashboardSummary } from "@/redux/api/dashboardApi"
 import { cn } from "@/lib/utils"
+import useMoney from "@/lib/useMoney"
+import type { MoneyFormatter } from "@/lib/money"
 
-const money = new Intl.NumberFormat("de-DE", {
-	style: "currency",
-	currency: "EUR",
-	maximumFractionDigits: 0,
-})
-
-const moneyExact = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" })
+/**
+ * Every figure on this screen is written with the shop's own separators.
+ *
+ * These were pinned de-DE Intl formatters, so the dashboard ignored the
+ * currency settings entirely. They are built from the hook now rather than
+ * imported, because React Compiler cannot see module state — it memoised a
+ * rendered figure against the data it could see and kept the old string when
+ * only a separator had changed.
+ *
+ * An axis rounds to whole units: a tick label is a scale, not an amount.
+ */
+const axisMoney = (formatMoney: MoneyFormatter) => (value: number) =>
+	formatMoney(Math.round(value)) ?? ""
 const shortDate = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "short" })
 
 /** Windows the screen offers. Anything longer stops being "what is happening now". */
@@ -142,6 +150,8 @@ const deltaOf = (deltaPercent: number | null) =>
 // ─── Charts ─────────────────────────────────────────────────────────────────
 
 const RevenueChart = ({ series }: { series: DashboardSummary["series"] }) => {
+	const formatMoney = useMoney()
+
 	const points = series.map((point) => ({
 		label: shortDate.format(new Date(point.date)),
 		revenue: Number(point.revenue),
@@ -169,13 +179,13 @@ const RevenueChart = ({ series }: { series: DashboardSummary["series"] }) => {
 						tickLine={false}
 						axisLine={false}
 						width={64}
-						tickFormatter={(value: number) => money.format(value)}
+						tickFormatter={axisMoney(formatMoney)}
 						tick={AXIS_TICK}
 					/>
 					<Tooltip
 						cursor={{ stroke: "var(--color-border)" }}
 						contentStyle={TOOLTIP_STYLE}
-						formatter={(value) => [moneyExact.format(Number(value)), "Revenue"]}
+						formatter={(value) => [formatMoney(Number(value)) ?? "", "Revenue"]}
 					/>
 					<Area
 						{...NO_ANIMATION}
@@ -300,8 +310,12 @@ const DonutChart = ({
  */
 const RankingChart = ({
 	rows,
+	formatMoney,
 }: {
 	rows: { id: string; name: string; revenue: string; quantity: number }[]
+	// Passed in: this one is an arrow returning JSX with no body to hold a hook,
+	// and its parent already has the formatter.
+	formatMoney: MoneyFormatter
 }) => (
 	<div className="h-56">
 		<ResponsiveContainer width="100%" height="100%">
@@ -323,7 +337,7 @@ const RankingChart = ({
 				<Tooltip
 					cursor={{ fill: "var(--color-muted)" }}
 					contentStyle={TOOLTIP_STYLE}
-					formatter={(value) => [moneyExact.format(Number(value)), "Revenue"]}
+					formatter={(value) => [formatMoney(Number(value)) ?? "", "Revenue"]}
 				/>
 				<Bar {...NO_ANIMATION} dataKey="value" radius={[0, 3, 3, 0]} barSize={16}>
 					{rows.map((row, index) => (
@@ -344,6 +358,10 @@ const RankingChart = ({
  * loading — it never draws half a dashboard with the other half invented.
  */
 export const DashboardOverview = () => {
+	// Prices follow the shop's currency settings, and this is what re-renders
+	// them when those change. See useMoneyFormat.
+	const formatMoney = useMoney()
+
 	const [days, setDays] = useState(7)
 	const { data, isLoading, isError, refetch, isFetching } = useDashboardSummaryQuery({ days })
 
@@ -382,7 +400,7 @@ export const DashboardOverview = () => {
 			label: CUSTOMER_LABEL[row.type] ?? titleCase(row.type),
 			value: Number(row.revenue),
 			fill: CATEGORICAL[index % CATEGORICAL.length],
-			caption: moneyExact.format(Number(row.revenue)),
+			caption: formatMoney(Number(row.revenue)) ?? "",
 		})) ?? []
 
 	const totalOrders = statusSlices.reduce((sum, slice) => sum + slice.value, 0)
@@ -429,7 +447,7 @@ export const DashboardOverview = () => {
 					<>
 						<StatCard
 							label="Revenue"
-							value={moneyExact.format(Number(data.stats.revenue.value))}
+							value={formatMoney(Number(data.stats.revenue.value)) ?? ""}
 							icon={Wallet}
 							delta={deltaOf(data.stats.revenue.deltaPercent)}
 							caption={caption}
@@ -471,7 +489,7 @@ export const DashboardOverview = () => {
 					) : (
 						<DonutChart
 							slices={customerSlices}
-							total={money.format(Number(data.stats.revenue.value))}
+							total={axisMoney(formatMoney)(Number(data.stats.revenue.value))}
 							unit="total"
 						/>
 					)}
@@ -501,7 +519,7 @@ export const DashboardOverview = () => {
 					) : !data.topProducts.length ? (
 						<Placeholder>Nothing sold in this period.</Placeholder>
 					) : (
-						<RankingChart rows={data.topProducts} />
+						<RankingChart rows={data.topProducts} formatMoney={formatMoney} />
 					)}
 				</Panel>
 
@@ -511,7 +529,7 @@ export const DashboardOverview = () => {
 					) : !data.topCategories.length ? (
 						<Placeholder>Nothing sold in this period.</Placeholder>
 					) : (
-						<RankingChart rows={data.topCategories} />
+						<RankingChart rows={data.topCategories} formatMoney={formatMoney} />
 					)}
 				</Panel>
 
@@ -613,7 +631,7 @@ export const DashboardOverview = () => {
 											</Badge>
 										</td>
 										<td className="py-2.5 pl-3 text-right font-medium tabular-nums">
-											{moneyExact.format(Number(order.grandTotal))}
+											{formatMoney(Number(order.grandTotal)) ?? ""}
 										</td>
 									</tr>
 								))}

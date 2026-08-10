@@ -25,16 +25,19 @@ import { useAdminQuotesQuery } from "@/redux/api/quoteApi"
 import type { QuoteStatus } from "@/types/quote"
 import {
 	formatDate,
-	formatMoney,
 	isFullyPriced,
 	QUOTE_STATUS,
 	QUOTE_STATUS_OPTIONS,
 } from "./_components/quoteStatus"
-
+import useMoney from "@/lib/useMoney"
 const ANY = "__any__"
 const PER_PAGE = 20
 
 export default function QuotesPage() {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const router = useRouter()
 	const [search, setSearch] = useState("")
 	const [status, setStatus] = useState<QuoteStatus | undefined>()

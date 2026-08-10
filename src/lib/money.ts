@@ -44,11 +44,17 @@ let format: MoneyFormat = {
 }
 
 /**
- * Applies the shop's currency settings. Called once, from MoneyFormatProvider.
+ * Applies the shop's currency settings.
  *
  * Module-level rather than context, because `formatMoney` is called from 60-odd
  * places including a few that are not components. Threading a hook through all
  * of them to change a separator would be a large edit for a small setting.
+ *
+ * Module state on its own is not enough, though, and this is worth spelling out
+ * because it was wrong for a while: changing a value here re-renders nothing.
+ * A component that has already drawn a price keeps the string it computed. So
+ * every component that formats money calls `useMoneyFormat`, which subscribes
+ * it to the settings query — that is what makes a saved separator appear.
  */
 export const configureMoney = (next: Partial<MoneyFormat>): void => {
 	format = { ...format, ...next }
@@ -56,6 +62,27 @@ export const configureMoney = (next: Partial<MoneyFormat>): void => {
 }
 
 export const moneyFormat = (): MoneyFormat => format
+
+/** Reads the shop's format out of the public settings block. */
+export const readMoneyFormat = (settings: Record<string, unknown> | undefined): MoneyFormat => {
+	if (!settings) return format
+
+	const position = String(settings["currency.position"] ?? "")
+
+	return {
+		currency: String(settings["currency.code"] ?? "EUR"),
+		position: POSITIONS.includes(position as SymbolPosition)
+			? (position as SymbolPosition)
+			: "right_space",
+		// A separator may legitimately be empty — "1234,56" is a real choice — so
+		// these fall back only when the setting is absent, never when it is blank.
+		thousandSeparator: String(settings["currency.thousandSeparator"] ?? "."),
+		decimalSeparator: String(settings["currency.decimalSeparator"] ?? ","),
+		decimals: Number(settings["currency.decimals"] ?? 2),
+	}
+}
+
+const POSITIONS: SymbolPosition[] = ["left", "right", "left_space", "right_space"]
 
 /** Symbol lookup is the one thing Intl is still asked for, so it is cached. */
 const symbolCache = new Map<string, string>()
@@ -87,13 +114,36 @@ const symbolOf = (currency: string): string => {
 const group = (digits: string, separator: string): string =>
 	separator ? digits.replace(/\B(?=(\d{3})+(?!\d))/g, separator) : digits
 
-export const formatMoney = (value: string | number | null | undefined) => {
+/**
+ * The module-state version, for the few callers that are not components.
+ *
+ * Components must use `useMoney` instead. This one reads a module value, which
+ * React Compiler cannot see — it memoises a rendered price against the data it
+ * can see and reuses the string when only the shop's separators changed. That
+ * is not a bug in the compiler; it is what hidden mutable state costs.
+ */
+export const formatMoney = (value: string | number | null | undefined) =>
+	formatWith(format, value)
+
+/**
+ * What `useMoney` hands back.
+ *
+ * Named so a helper outside a component can take the formatter as an argument
+ * rather than importing the module-state one and quietly falling out of step.
+ */
+export type MoneyFormatter = (value: string | number | null | undefined) => string | null
+
+/** Pure. The format arrives as a value, so a caller's dependency on it is visible. */
+export const formatWith = (
+	active: MoneyFormat,
+	value: string | number | null | undefined
+): string | null => {
 	if (value === null || value === undefined || value === "") return null
 
 	const amount = typeof value === "number" ? value : Number(value)
 	if (!Number.isFinite(amount)) return null
 
-	const { currency, position, thousandSeparator, decimalSeparator, decimals } = format
+	const { currency, position, thousandSeparator, decimalSeparator, decimals } = active
 
 	// toFixed rounds half away from zero, which is what a price list does.
 	const fixed = Math.abs(amount).toFixed(Math.max(0, Math.min(10, decimals)))

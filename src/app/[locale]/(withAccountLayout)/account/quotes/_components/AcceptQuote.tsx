@@ -11,7 +11,7 @@ import {
 	useMyAddressesQuery,
 } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { CheckoutAddress, SavedAddress } from "@/types/storefront"
 
@@ -45,6 +45,10 @@ const toCheckoutAddress = (address: SavedAddress): CheckoutAddress => ({
  * accepts a two-week-old offer needs to know which figure binds.
  */
 export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("account")
 	const locale = useLocale()
 	const router = useRouter()

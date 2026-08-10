@@ -8,7 +8,7 @@ import { Link } from "@/i18n/navigation"
 import { useMyOrderQuery } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
 import { formatDate } from "@/lib/dates"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { openInvoice } from "@/lib/downloadInvoice"
 import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { CheckoutAddress } from "@/types/storefront"
@@ -39,6 +39,10 @@ const AddressBlock = ({ address, locale }: { address: CheckoutAddress; locale: s
 )
 
 export const OrderDetail = ({ id }: { id: string }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("account")
 	const locale = useLocale()
 	const { data: order, isLoading, isError } = useMyOrderQuery(id)

@@ -10,7 +10,7 @@ import {
 	useLazyShopProductQuery,
 	useShopProductQuery,
 } from "@/redux/api/storefrontApi"
-import { formatMoney } from "@/lib/money"
+import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
@@ -42,6 +42,10 @@ const apiMessage = (error: unknown) =>
  *    is multiplied locally — that is spec risk #1.
  */
 export const ProductDetail = ({ slug }: { slug: string }) => {
+	// The shop's own separators and symbol. A function rather than an import,
+	// so React Compiler can see that these prices depend on it.
+	const formatMoney = useMoney()
+
 	const t = useTranslations("shop")
 	const locale = useLocale()
 	const router = useRouter()
