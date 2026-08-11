@@ -22,6 +22,8 @@ export interface QuoteItem {
 	/** The MOQ as it stood when the request was submitted, not today's. */
 	moq: number
 	note: string | null
+	/** Frozen at submission. assetId goes null if the upload is deleted. */
+	files: { id: string; assetId: string | null; name: string }[]
 	quotedUnitPrice: string | null
 	quotedLineTotal: string | null
 }

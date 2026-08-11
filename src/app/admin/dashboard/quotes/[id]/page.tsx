@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProForm from "@/components/form/ProForm"
+import ArtworkLinks from "@/components/shared/ArtworkLinks"
 import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
 import ProSubmit from "@/components/form/ProSubmit"
@@ -103,6 +104,14 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 									<span className="font-medium">{item.name}</span>
 									{item.note && (
 										<p className="text-muted-foreground mt-0.5 text-xs">{item.note}</p>
+									)}
+									{!!item.files.length && (
+										<div className="mt-1.5">
+											<ArtworkLinks
+												files={item.files}
+												labels={{ download: "Download", deleted: "No longer available" }}
+											/>
+										</div>
 									)}
 								</TableCell>
 								<TableCell className="text-muted-foreground font-mono text-xs">

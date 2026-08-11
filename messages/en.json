@@ -190,7 +190,8 @@
 		"loading": "Loading your cart…",
 		"emptyHint": "Browse the catalogue and add something to get started.",
 		"viewCart": "View cart",
-		"close": "Close"
+		"close": "Close",
+		"issueArtworkRequired": "A line needs a design file before you can check out."
 	},
 	"quote": {
 		"title": "Quote request",
@@ -748,7 +749,8 @@
 		"required": "Required",
 		"invalidEmail": "Enter a valid email address",
 		"belowMoq": "Minimum order is {quantity}.",
-		"issueBelowMoq": "One or more items are below their minimum order quantity."
+		"issueBelowMoq": "One or more items are below their minimum order quantity.",
+		"issueArtworkRequired": "A line needs a design file before you can check out."
 	},
 	"checkout": {
 		"title": "Checkout",
@@ -823,5 +825,23 @@
 		"reasonCountryNotAllowed": "Not available for deliveries to this country",
 		"reasonRequiresLogin": "Sign in to use this",
 		"noticeTitle": "Before we can place your order:"
+	},
+	"artwork": {
+		"choose": "Choose files",
+		"remaining": "{count} more can be added",
+		"full": "{max} of {max} attached",
+		"remove": "Remove {name}",
+		"accepted": "Accepted: {types}. Up to 50 MB each.",
+		"requiredHint": "This product is made to your design — a file is needed before it can be ordered.",
+		"signInRequired": "Sign in to attach your design files.",
+		"tooLarge": "{name} is larger than the {limit} limit.",
+		"uploadFailed": "{name} could not be uploaded.",
+		"title": "Your design files",
+		"attached": "Attached files",
+		"saveFailed": "Those files could not be saved.",
+		"missing": "Needs a design file",
+		"none": "No files attached",
+		"download": "Download",
+		"deleted": "No longer available"
 	}
 }

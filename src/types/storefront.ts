@@ -96,6 +96,8 @@ export interface PublicOption {
  * should depend on that — the narrower type keeps card code honest.
  */
 export interface PublicProductDetail extends PublicProduct {
+	/** Whether this product is made to a customer drawing, and how many. */
+	artwork: ArtworkRules
 	description: string | null
 	metaTitle: string | null
 	metaDescription: string | null
@@ -104,7 +106,24 @@ export interface PublicProductDetail extends PublicProduct {
 }
 
 /** Why a basket cannot proceed. The API sends codes, not sentences. */
-export type BasketIssue = "BELOW_MOQ" | "OUT_OF_STOCK"
+export type BasketIssue = "BELOW_MOQ" | "OUT_OF_STOCK" | "ARTWORK_REQUIRED"
+
+/**
+ * A design file the customer attached. astano makes a good part of its
+ * catalogue to order, so for those products this file *is* the specification.
+ */
+export interface ArtworkFile {
+	id: string
+	name: string
+	sizeBytes: number
+	uploadedAt: string
+}
+
+/** What a product allows. A maxFiles of 0 means it takes no artwork at all. */
+export interface ArtworkRules {
+	maxFiles: number
+	required: boolean
+}
 
 export interface CartLine {
 	id: string
@@ -124,6 +143,10 @@ export interface CartLine {
 	listPrice: string | null
 	onSale: boolean
 	lineTotal: string | null
+	files: ArtworkFile[]
+	artwork: ArtworkRules
+	/** Required by the product but not yet supplied. Blocks checkout, not the cart. */
+	artworkMissing: boolean
 	/** Add-ons attached to this line (§4.6). Never present on an option itself. */
 	options?: Omit<CartLine, "options">[]
 }
@@ -157,6 +180,9 @@ export interface QuoteBasketLine {
 	moq: number
 	belowMoq: boolean
 	quoteOnly: boolean
+	files: ArtworkFile[]
+	artwork: ArtworkRules
+	artworkMissing: boolean
 }
 
 export interface QuoteBasketView {
@@ -316,6 +342,11 @@ export interface OrderItem {
 	quantity: number
 	unitPrice: string | null
 	lineTotal: string | null
+	/**
+	 * The design files this line is made from, frozen at placement. `assetId`
+	 * is null once the upload is deleted; the name still records what was sent.
+	 */
+	files: { id: string; assetId: string | null; name: string }[]
 	options?: Omit<OrderItem, "options">[]
 }
 
@@ -341,6 +372,8 @@ export interface QuoteItem {
 	quantity: number
 	moq: number
 	note: string | null
+	/** Frozen at submission. assetId goes null if the upload is deleted. */
+	files: { id: string; assetId: string | null; name: string }[]
 	/** Null until staff have answered — that is the whole point of a quote. */
 	quotedUnitPrice: string | null
 	quotedLineTotal: string | null

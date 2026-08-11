@@ -45,6 +45,11 @@ export interface OrderItem {
 	quantity: number
 	unitPrice: string
 	lineTotal: string
+	/**
+	 * The design files this line is made from, frozen at placement. `assetId`
+	 * is null once the upload is deleted; the name still records what was sent.
+	 */
+	files: { id: string; assetId: string | null; name: string }[]
 	/** Configurator lines, priced and counted separately (§4.6). */
 	options: OrderOptionLine[]
 }

@@ -190,7 +190,8 @@
 		"loading": "Warenkorb wird geladen…",
 		"emptyHint": "Stöbern Sie im Katalog und legen Sie etwas hinein.",
 		"viewCart": "Warenkorb ansehen",
-		"close": "Schließen"
+		"close": "Schließen",
+		"issueArtworkRequired": "Für eine Position wird eine Druckdatei benötigt."
 	},
 	"quote": {
 		"title": "Angebotsanfrage",
@@ -749,7 +750,8 @@
 		"required": "Pflichtfeld",
 		"invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
 		"belowMoq": "Mindestbestellmenge ist {quantity}.",
-		"issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge."
+		"issueBelowMoq": "Mindestens ein Artikel liegt unter der Mindestbestellmenge.",
+		"issueArtworkRequired": "Für eine Position wird eine Druckdatei benötigt."
 	},
 	"checkout": {
 		"title": "Kasse",
@@ -824,5 +826,23 @@
 		"reasonCountryNotAllowed": "Für Lieferungen in dieses Land nicht verfügbar",
 		"reasonRequiresLogin": "Zum Nutzen bitte anmelden",
 		"noticeTitle": "Bevor wir Ihre Bestellung aufgeben können:"
+	},
+	"artwork": {
+		"choose": "Dateien auswählen",
+		"remaining": "Noch {count} möglich",
+		"full": "{max} von {max} angehängt",
+		"remove": "{name} entfernen",
+		"accepted": "Zulässig: {types}. Je bis zu 50 MB.",
+		"requiredHint": "Dieses Produkt wird nach Ihrer Vorlage gefertigt — für die Bestellung wird eine Datei benötigt.",
+		"signInRequired": "Melden Sie sich an, um Ihre Druckdateien anzuhängen.",
+		"tooLarge": "{name} überschreitet das Limit von {limit}.",
+		"uploadFailed": "{name} konnte nicht hochgeladen werden.",
+		"title": "Ihre Druckdateien",
+		"attached": "Angehängte Dateien",
+		"saveFailed": "Die Dateien konnten nicht gespeichert werden.",
+		"missing": "Druckdatei erforderlich",
+		"none": "Keine Dateien angehängt",
+		"download": "Herunterladen",
+		"deleted": "Nicht mehr verfügbar"
 	}
 }

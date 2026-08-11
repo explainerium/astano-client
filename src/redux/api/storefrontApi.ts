@@ -1,5 +1,6 @@
 import type {
 	AccountProfile,
+	ArtworkFile,
 	AvailablePaymentMethod,
 	CartView,
 	CheckoutAddress,
@@ -89,9 +90,25 @@ export const storefrontApi = baseApi.injectEndpoints({
 
 		addToCart: build.mutation<
 			CartView,
-			{ variantId: string; quantity: number; parentItemId?: string | null }
+			{
+				variantId: string
+				quantity: number
+				parentItemId?: string | null
+				/** Files uploaded on the product page, attached as the line is created. */
+				assetIds?: string[]
+			}
 		>({
 			query: (data) => ({ url: "/cart/items", method: "POST", data }),
+			invalidatesTags: [tagTypes.cart],
+		}),
+
+		/** Replaces the whole set on a line — the customer edits a list. */
+		setCartItemFiles: build.mutation<ArtworkFile[], { id: string; assetIds: string[] }>({
+			query: ({ id, assetIds }) => ({
+				url: `/cart/items/${id}/files`,
+				method: "PUT",
+				data: { assetIds },
+			}),
 			invalidatesTags: [tagTypes.cart],
 		}),
 
@@ -165,9 +182,18 @@ export const storefrontApi = baseApi.injectEndpoints({
 
 		addToQuoteBasket: build.mutation<
 			QuoteBasketView,
-			{ variantId: string; quantity: number; note?: string }
+			{ variantId: string; quantity: number; note?: string; assetIds?: string[] }
 		>({
 			query: (data) => ({ url: "/quotes/basket/items", method: "POST", data }),
+			invalidatesTags: [tagTypes.quote],
+		}),
+
+		setQuoteItemFiles: build.mutation<ArtworkFile[], { id: string; assetIds: string[] }>({
+			query: ({ id, assetIds }) => ({
+				url: `/quotes/basket/items/${id}/files`,
+				method: "PUT",
+				data: { assetIds },
+			}),
 			invalidatesTags: [tagTypes.quote],
 		}),
 
@@ -450,6 +476,8 @@ export const {
 
 	useCartQuery,
 	useAddToCartMutation,
+	useSetCartItemFilesMutation,
+	useSetQuoteItemFilesMutation,
 	useUpdateCartItemMutation,
 	useRemoveCartItemMutation,
 	useClearCartMutation,

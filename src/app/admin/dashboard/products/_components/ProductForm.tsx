@@ -112,6 +112,8 @@ const schema = z.object({
 	visibility: z.enum(["SHOP_AND_SEARCH", "SHOP_ONLY", "SEARCH_ONLY", "HIDDEN"]),
 	kind: z.enum(["MAIN", "OPTION"]),
 	quoteEnabled: z.boolean(),
+	artworkMaxFiles: z.number({ message: "Enter a number" }).int().min(0).max(20),
+	artworkRequired: z.boolean(),
 	moq: z.number({ message: "Enter a number" }).int().min(0),
 	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
 	categoryIds: z.array(z.string()),
@@ -409,6 +411,8 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 		visibility: product?.visibility ?? "SHOP_AND_SEARCH",
 		kind: product?.kind ?? "MAIN",
 		quoteEnabled: product?.quoteEnabled ?? false,
+		artworkMaxFiles: product?.artworkMaxFiles ?? 0,
+		artworkRequired: product?.artworkRequired ?? false,
 		moq: product?.moq ?? 0,
 		sortOrder: product?.sortOrder ?? 0,
 		categoryIds: product?.categoryIds ?? [],
@@ -602,6 +606,8 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			status: form.status,
 			visibility: form.visibility,
 			quoteEnabled: form.quoteEnabled,
+			artworkMaxFiles: form.artworkMaxFiles,
+			artworkRequired: form.artworkRequired,
 			taxStatus: form.taxStatus,
 			moq: form.moq,
 			sortOrder: form.sortOrder,
@@ -836,6 +842,22 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								name="quoteEnabled"
 								label="Price on request"
 								description='Hides the price, blocks add-to-cart, and offers "Add to quote request" instead.'
+							/>
+
+							{/* Made-to-order products are cut to a drawing the customer
+							    sends. 0 hides the upload field entirely. */}
+							<ProInput
+								name="artworkMaxFiles"
+								type="number"
+								label="Design files the customer may attach"
+								description="0 means this product takes no uploads. The old shop allowed 6."
+								className="sm:max-w-xs"
+							/>
+
+							<ProCheckbox
+								name="artworkRequired"
+								label="A design file is required"
+								description="Refuses checkout for a line with nothing attached. Ignored while the limit above is 0."
 							/>
 						</div>
 					</TabsContent>

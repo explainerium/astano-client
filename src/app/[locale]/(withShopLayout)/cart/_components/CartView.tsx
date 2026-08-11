@@ -15,6 +15,7 @@ import {
 import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/types/storefront"
+import CartLineArtwork from "./CartLineArtwork"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
 
@@ -124,6 +125,12 @@ export const CartView = () => {
 								{t("issueOutOfStock")}
 							</li>
 						)}
+						{cart.issues.includes("ARTWORK_REQUIRED") && (
+							<li className="flex items-center gap-2">
+								<AlertCircle className="size-4 shrink-0" />
+								{t("issueArtworkRequired")}
+							</li>
+						)}
 					</ul>
 				</div>
 			)}
@@ -213,6 +220,13 @@ export const CartView = () => {
 												{t("onlyLeft", { count: line.availableStock })}
 											</p>
 										)}
+
+									<CartLineArtwork
+										itemId={line.id}
+										files={line.files}
+										artwork={line.artwork}
+										missing={line.artworkMissing}
+									/>
 
 									{!!line.options?.length && (
 										<div className="mt-3 space-y-1">{line.options.map(renderOption)}</div>

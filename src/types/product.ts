@@ -119,6 +119,9 @@ export interface AdminProduct {
 	status: ProductStatus
 	visibility: ProductVisibility
 	quoteEnabled: boolean
+	/** Files a customer may attach to a line. 0 means the product takes none. */
+	artworkMaxFiles: number
+	artworkRequired: boolean
 	taxStatus: TaxStatus
 	moq: number
 	sortOrder: number
@@ -154,6 +157,8 @@ export interface ProductPayload {
 	status?: ProductStatus
 	visibility?: ProductVisibility
 	quoteEnabled?: boolean
+	artworkMaxFiles?: number
+	artworkRequired?: boolean
 	taxStatus?: TaxStatus
 	moq?: number
 	sortOrder?: number

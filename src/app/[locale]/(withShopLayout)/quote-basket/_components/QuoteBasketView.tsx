@@ -13,6 +13,7 @@ import {
 	useUpdateQuoteItemMutation,
 } from "@/redux/api/storefrontApi"
 import { cn } from "@/lib/utils"
+import QuoteLineArtwork from "./QuoteLineArtwork"
 import QuoteSubmitForm from "./QuoteSubmitForm"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
@@ -116,6 +117,13 @@ export const QuoteBasketView = () => {
 				</p>
 			)}
 
+			{basket.issues.includes("ARTWORK_REQUIRED") && (
+				<p className="border-destructive/40 bg-destructive/5 text-destructive mb-6 flex items-center gap-2 border p-4 text-sm">
+					<AlertCircle className="size-4 shrink-0" />
+					{t("issueArtworkRequired")}
+				</p>
+			)}
+
 			{error && (
 				<p className="text-destructive mb-6 flex items-center gap-2 text-sm" role="alert">
 					<AlertCircle className="size-4 shrink-0" />
@@ -184,6 +192,13 @@ export const QuoteBasketView = () => {
 											{t("belowMoq", { quantity: line.moq })}
 										</p>
 									)}
+
+									<QuoteLineArtwork
+										itemId={line.id}
+										files={line.files}
+										artwork={line.artwork}
+										missing={line.artworkMissing}
+									/>
 
 									<label className="mt-3 block">
 										<span className="sr-only">{t("note")}</span>

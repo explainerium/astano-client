@@ -18,6 +18,7 @@ import {
 import { useAdminOrderQuery } from "@/redux/api/orderApi"
 import type { Order, OrderAddress } from "@/types/order"
 import OrderStatusDialog from "../_components/OrderStatusDialog"
+import ArtworkLinks from "@/components/shared/ArtworkLinks"
 import OrderNotes from "./_components/OrderNotes"
 import {
 	formatDate,
@@ -232,7 +233,17 @@ export default function OrderDetailPage() {
 										// sibling <tr>s — the key belongs here, not on the first row.
 										<Fragment key={item.id}>
 											<TableRow>
-												<TableCell className="font-medium">{item.name}</TableCell>
+												<TableCell className="font-medium">
+												{item.name}
+												{!!item.files.length && (
+													<div className="mt-1.5 font-normal">
+														<ArtworkLinks
+															files={item.files}
+															labels={{ download: "Download", deleted: "No longer available" }}
+														/>
+													</div>
+												)}
+											</TableCell>
 												<TableCell className="text-muted-foreground font-mono text-xs">
 													{item.sku}
 												</TableCell>
