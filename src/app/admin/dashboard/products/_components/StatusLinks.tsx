@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import type { ProductStatus } from "@/types/product"
 
@@ -27,11 +28,12 @@ export const StatusLinks = ({
 	onChange: (status?: ProductStatus) => void
 	counts: StatusCounts
 }) => {
+	const t = useTranslations("admin")
 	const items: { label: string; status?: ProductStatus; count?: number }[] = [
-		{ label: "All", status: undefined, count: counts.all },
-		{ label: "Published", status: "PUBLISHED", count: counts.PUBLISHED },
-		{ label: "Drafts", status: "DRAFT", count: counts.DRAFT },
-		{ label: "Archived", status: "ARCHIVED", count: counts.ARCHIVED },
+		{ label: t("filterAll"), status: undefined, count: counts.all },
+		{ label: t("statusPublished"), status: "PUBLISHED", count: counts.PUBLISHED },
+		{ label: t("statusDrafts"), status: "DRAFT", count: counts.DRAFT },
+		{ label: t("statusArchived"), status: "ARCHIVED", count: counts.ARCHIVED },
 	]
 
 	return (

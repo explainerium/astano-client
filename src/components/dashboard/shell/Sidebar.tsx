@@ -4,10 +4,13 @@ import Link from "next/link"
 // next/navigation, not @/i18n/navigation: the dashboard sits outside [locale]
 // and has no translated pathnames to resolve.
 import { usePathname } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { findNavItem, navGroups } from "./navItems"
 
 export const Sidebar = () => {
+	const t = useTranslations("adminNav")
+
 	const pathname = usePathname()
 	const active = findNavItem(pathname)
 
@@ -38,7 +41,7 @@ export const Sidebar = () => {
 						    alone no longer says what they have in common. */}
 						{group.title && (
 							<p className="text-muted-foreground px-3 pt-1 pb-2 text-[11px] font-medium tracking-wider uppercase">
-								{group.title}
+								{t(group.title)}
 							</p>
 						)}
 
@@ -65,7 +68,7 @@ export const Sidebar = () => {
 										)}
 										strokeWidth={1.75}
 									/>
-									{item.label}
+									{t(item.label)}
 								</Link>
 							)
 						})}

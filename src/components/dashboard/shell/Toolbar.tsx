@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import type { ReactNode } from "react"
 import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -38,7 +39,10 @@ export const Toolbar = ({
 	onClearSelection,
 	selectionActions,
 	primaryAction,
-}: ToolbarProps) => (
+}: ToolbarProps) => {
+	const t = useTranslations("admin")
+
+	return (
 	<div className="flex min-h-9 flex-wrap items-center gap-2">
 		{onSearchChange && (
 			<div className="relative min-w-56 flex-1 sm:max-w-xs">
@@ -64,15 +68,14 @@ export const Toolbar = ({
 					{selectionActions}
 					{onClearSelection && (
 						<Button variant="ghost" size="lg" onClick={onClearSelection}>
-							<X />
-							Clear
-						</Button>
+							<X />{t("clear")}</Button>
 					)}
 				</>
 			)}
 			{primaryAction}
 		</div>
 	</div>
-)
+	)
+}
 
 export default Toolbar

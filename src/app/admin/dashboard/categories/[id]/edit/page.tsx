@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { use } from "react"
 import { Loader2 } from "lucide-react"
 import { useAdminCategoriesQuery, useAdminCategoryQuery } from "@/redux/api/categoryApi"
@@ -13,6 +14,7 @@ import CategoryForm from "../../_components/CategoryForm"
  * would not tell it which row to open.
  */
 export default function EditCategoryPage({ params }: { params: Promise<{ id: string }> }) {
+	const t = useTranslations("admin")
 	const { id } = use(params)
 
 	const { data: category, isLoading, isError, error } = useAdminCategoryQuery(id)
@@ -21,9 +23,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
 	if (isLoading || listLoading) {
 		return (
 			<p className="text-muted-foreground py-24 text-center text-sm">
-				<Loader2 className="mr-2 inline size-4 animate-spin" />
-				Loading…
-			</p>
+				<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loading")}</p>
 		)
 	}
 

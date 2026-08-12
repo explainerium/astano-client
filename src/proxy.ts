@@ -4,8 +4,18 @@ import { AUTH_COOKIE } from "@/constants/authKey"
 import { isStaff } from "@/constants/role"
 import { locales, pathnames, routing, type Locale } from "@/i18n/routing"
 import { readAccessToken } from "@/utils/jwt"
+import { readLanguagePolicy } from "@/lib/languagePolicy"
 
-const intlMiddleware = createMiddleware(routing)
+/**
+ * Two middlewares, because `localeDetection` is compiled into one and the
+ * setting that controls it is not. There are only two possible values, so both
+ * are built once here rather than a fresh middleware per request.
+ */
+const intlMiddleware = createMiddleware({ ...routing, localeDetection: false })
+const intlDetectingMiddleware = createMiddleware({ ...routing, localeDetection: true })
+
+/** next-intl writes the visitor's choice here. Its name is part of its API. */
+const LOCALE_COOKIE = "NEXT_LOCALE"
 
 type PathKey = keyof typeof pathnames
 
@@ -111,7 +121,37 @@ export async function proxy(request: NextRequest) {
 		}
 	}
 
-	// Locale detection, prefix handling and the translated-pathname rewrite.
+	/*
+	 * Where an undecided visitor starts.
+	 *
+	 * Only for a request carrying no locale cookie and no locale in the path —
+	 * a visitor who has chosen, or followed a link into a specific language, has
+	 * already answered this and must not be moved.
+	 *
+	 * next-intl's own defaultLocale is compiled in and decides which language is
+	 * served *unprefixed*; changing that is a URL change. This is the softer
+	 * question the admin actually asked for: which language the shop opens in.
+	 */
+	const hasChosen = request.cookies.has(LOCALE_COOKIE)
+	const pathHasLocale = locales.includes(pathname.split("/")[1] as Locale)
+
+	if (!hasChosen && !pathHasLocale) {
+		const policy = await readLanguagePolicy()
+
+		// Reading Accept-Language is next-intl's own job, so this steps aside
+		// entirely rather than trying to second-guess it.
+		if (policy.detectFromBrowser) return intlDetectingMiddleware(request)
+
+		if (policy.defaultLocale !== routing.defaultLocale) {
+			const target = new URL(`/${policy.defaultLocale}${pathname}`, request.url)
+			target.search = request.nextUrl.search
+			return NextResponse.redirect(target)
+		}
+	}
+
+	// Prefix handling and the translated-pathname rewrite. Detection is off on
+	// this one: every path that reaches it has already had the question settled,
+	// by a cookie, by the URL, or by the policy above.
 	return intlMiddleware(request)
 }
 

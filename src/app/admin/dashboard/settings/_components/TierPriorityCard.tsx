@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { ArrowDown, ArrowUp, Loader2, RotateCcw } from "lucide-react"
 import { toast } from "sonner"
@@ -19,6 +20,7 @@ const DEFAULT_ORDER: Source[] = ["customer", "catalogue", "category"]
  * than the decision deserves.
  */
 export const TierPriorityCard = () => {
+	const t = useTranslations("adminPricing")
 	const { data, isLoading } = useTierPriorityQuery()
 	const [savePriority, { isLoading: isSaving }] = useSaveTierPriorityMutation()
 
@@ -48,13 +50,13 @@ export const TierPriorityCard = () => {
 	const save = async () => {
 		try {
 			await savePriority(rows).unwrap()
-			toast.success("Pricing priority saved", {
-				description: "Every price in the shop is resolved in this order from now on.",
+			toast.success(t("saved"), {
+				description: t("savedBody"),
 			})
 		} catch (error) {
-			toast.error("Could not save the priority", {
+			toast.error(t("saveFailed"), {
 				description:
-					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+					(error as { data?: { message?: string } })?.data?.message ?? t("tryAgain"),
 			})
 		}
 	}
@@ -65,18 +67,16 @@ export const TierPriorityCard = () => {
 	return (
 		<section className="bg-card space-y-4 rounded-lg border p-5">
 			<div>
-				<h2 className="text-base font-semibold">Quantity discount priority</h2>
+				<h2 className="text-base font-semibold">{t("title")}</h2>
 				<p className="text-muted-foreground mt-1 max-w-prose text-sm">
-					A product can be covered by more than one quantity ladder at once. The first source
-					in this list that has a rung the order reaches is the one that applies — the others
-					are only consulted if it has none.
+					{t("blurb")}
 				</p>
 			</div>
 
 			{isLoading && !order ? (
 				<div className="text-muted-foreground flex items-center gap-2 py-4 text-sm">
 					<Loader2 className="size-4 animate-spin" />
-					Loading…
+					{t("loading")}
 				</div>
 			) : (
 				<ol className="divide-y rounded-lg border">
@@ -96,7 +96,7 @@ export const TierPriorityCard = () => {
 									type="button"
 									variant="ghost"
 									size="icon"
-									aria-label={`Move ${describe(source)?.label ?? source} up`}
+									aria-label={t("moveUp", { label: describe(source)?.label ?? source })}
 									disabled={index === 0 || isSaving}
 									onClick={() => move(index, -1)}
 								>
@@ -106,7 +106,7 @@ export const TierPriorityCard = () => {
 									type="button"
 									variant="ghost"
 									size="icon"
-									aria-label={`Move ${describe(source)?.label ?? source} down`}
+									aria-label={t("moveDown", { label: describe(source)?.label ?? source })}
 									disabled={index === rows.length - 1 || isSaving}
 									onClick={() => move(index, 1)}
 								>
@@ -121,8 +121,8 @@ export const TierPriorityCard = () => {
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<p className="text-muted-foreground text-xs">
 					{isDefault
-						? "This is the default order — most specific rule first."
-						: "Changed from the default order."}
+						? t("isDefault")
+						: t("isChanged")}
 				</p>
 				<div className="flex gap-2">
 					{!isDefault && (
@@ -132,9 +132,7 @@ export const TierPriorityCard = () => {
 							onClick={() => setOrder(DEFAULT_ORDER)}
 							disabled={isSaving}
 						>
-							<RotateCcw />
-							Reset to default
-						</Button>
+							<RotateCcw />{t("resetToDefault")}</Button>
 					)}
 					<Button type="button" onClick={save} disabled={isSaving || !isDirty}>
 						{isSaving && <Loader2 className="animate-spin" />}

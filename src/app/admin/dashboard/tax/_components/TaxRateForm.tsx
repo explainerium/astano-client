@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -55,6 +56,7 @@ export const TaxRateForm = ({
 	taxClassId: string
 	rate?: TaxRate
 }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createTaxRate] = useCreateTaxRateMutation()
 	const [updateTaxRate] = useUpdateTaxRateMutation()
@@ -87,10 +89,10 @@ export const TaxRateForm = ({
 		try {
 			if (isEdit) {
 				await updateTaxRate({ id: rate.id, data: payload }).unwrap()
-				toast.success("Rate updated.")
+				toast.success(t("rateUpdated"))
 			} else {
 				await createTaxRate({ ...payload, taxClassId }).unwrap()
-				toast.success("Rate added.")
+				toast.success(t("rateAdded"))
 			}
 			router.push(backHref)
 		} catch (error) {
@@ -107,8 +109,7 @@ export const TaxRateForm = ({
 				backLabel="All tax classes"
 				title={isEdit ? `${rate.countryCode} · ${rate.name}` : "New rate"}
 				description={
-					<>
-						Tax is worked out from the <strong>shipping</strong> address (R10).
+					<>{t("taxIsWorkedOutFromThe")}<strong>shipping</strong> address (R10).
 					</>
 				}
 			/>
@@ -124,29 +125,29 @@ export const TaxRateForm = ({
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProCombobox
 							name="countryCode"
-							label="Country"
+							label={t("country")}
 							options={countryOptions("en")}
-							placeholder="Choose a country"
+							placeholder={t("chooseACountry")}
 						/>
 						<ProInput
 							name="state"
-							label="Region"
-							description="Optional. Leave empty for the whole country."
+							label={t("region")}
+							description={t("optionalLeaveEmptyForTheWhole")}
 						/>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="rate"
-							label="Rate (%)"
-							description="19 for the standard German rate, 0 for Switzerland."
+							label={t("rate")}
+							description={t("19ForTheStandardGermanRate")}
 							placeholder="19"
 							required
 						/>
 						<ProInput
 							name="name"
-							label="Invoice label"
-							description="Appears on the invoice line."
+							label={t("invoiceLabel")}
+							description={t("appearsOnTheInvoiceLine")}
 							required
 						/>
 					</div>
@@ -155,33 +156,33 @@ export const TaxRateForm = ({
 						<ProInput
 							name="priority"
 							type="number"
-							label="Priority"
-							description="Lower runs first when several rates match."
+							label={t("priority")}
+							description={t("lowerRunsFirstWhenSeveralRates")}
 						/>
 					</div>
 
 					<div className="space-y-4 border-t pt-4">
 						<ProCheckbox
 							name="appliesToShipping"
-							label="Tax the shipping too"
+							label={t("taxTheShippingToo")}
 							description="On for every EU row on the live site."
 						/>
 						<ProCheckbox
 							name="reverseChargeWithVatId"
-							label="Reverse charge for a validated VAT ID"
-							description="A business in this country with a VAT ID that passes VIES pays 0%. Leave off for Germany — a domestic sale is always taxed (R10)."
+							label={t("reverseChargeForAValidatedVat")}
+							description={t("aBusinessInThisCountryWith")}
 						/>
 						<ProCheckbox
 							name="isActive"
-							label="Active"
-							description="Turn off to retire a rate without deleting its history."
+							label={t("active")}
+							description={t("turnOffToRetireARate")}
 						/>
 					</div>
 				</div>
 
 				<div className="flex justify-end gap-2">
 					<Button asChild type="button" variant="ghost">
-						<Link href={backHref}>Cancel</Link>
+						<Link href={backHref}>{t("cancel")}</Link>
 					</Button>
 					<ProSubmit>{isEdit ? "Save changes" : "Add rate"}</ProSubmit>
 				</div>

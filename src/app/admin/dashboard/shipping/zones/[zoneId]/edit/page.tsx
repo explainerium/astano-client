@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { use } from "react"
 import Link from "next/link"
 import { Loader2, Plus } from "lucide-react"
@@ -17,22 +18,21 @@ import ZoneMethods from "../../../_components/ZoneMethods"
  * leave without ever being shown that half.
  */
 export default function EditZonePage({ params }: { params: Promise<{ zoneId: string }> }) {
+	const t = useTranslations("admin")
 	const { zoneId } = use(params)
 	const { data: zones, isLoading, isError } = useShippingZonesQuery()
 
 	if (isLoading) {
 		return (
 			<p className="text-muted-foreground py-24 text-center text-sm">
-				<Loader2 className="mr-2 inline size-4 animate-spin" />
-				Loading…
-			</p>
+				<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loading")}</p>
 		)
 	}
 
 	const zone = zones?.find((z) => z.id === zoneId)
 
 	if (isError || !zone) {
-		return <p className="text-destructive py-24 text-center text-sm">Could not find that zone.</p>
+		return <p className="text-destructive py-24 text-center text-sm">{t("couldNotFindThatZone")}</p>
 	}
 
 	return (
@@ -42,16 +42,12 @@ export default function EditZonePage({ params }: { params: Promise<{ zoneId: str
 			<div className="bg-card rounded-lg border">
 				<header className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
 					<div>
-						<h2 className="font-heading text-base font-semibold">Methods</h2>
-						<p className="text-muted-foreground mt-1 text-sm">
-							What customers in this zone are offered at checkout.
-						</p>
+						<h2 className="font-heading text-base font-semibold">{t("methods")}</h2>
+						<p className="text-muted-foreground mt-1 text-sm">{t("whatCustomersInThisZoneAre")}</p>
 					</div>
 					<Button asChild variant="outline" size="sm">
 						<Link href={`/admin/dashboard/shipping/zones/${zone.id}/methods/new`}>
-							<Plus />
-							Add method
-						</Link>
+							<Plus />{t("addMethod")}</Link>
 					</Button>
 				</header>
 

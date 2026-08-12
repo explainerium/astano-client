@@ -1,7 +1,8 @@
 import type { QuoteStatus } from "@/types/quote"
 
 export interface Chip {
-	label: string
+	/** A key into the admin catalogue. This module has no locale to resolve one. */
+	labelKey: string
 	className: string
 }
 
@@ -11,18 +12,20 @@ export interface Chip {
  * on this screen that costs money by sitting there.
  */
 export const QUOTE_STATUS: Record<QuoteStatus, Chip> = {
-	OPEN: { label: "Open", className: "border-transparent bg-accent-soft-strong text-primary" },
-	ANSWERED: { label: "Answered", className: "border-transparent bg-muted text-foreground" },
-	ACCEPTED: { label: "Accepted", className: "border-transparent bg-positive-soft text-positive" },
-	DECLINED: { label: "Declined", className: "text-muted-foreground" },
-	EXPIRED: { label: "Expired", className: "text-muted-foreground" },
-	CLOSED: { label: "Closed", className: "text-muted-foreground" },
+	OPEN: { labelKey: "quoteStatusOpen", className: "border-transparent bg-accent-soft-strong text-primary" },
+	ANSWERED: { labelKey: "quoteStatusAnswered", className: "border-transparent bg-muted text-foreground" },
+	ACCEPTED: { labelKey: "quoteStatusAccepted", className: "border-transparent bg-positive-soft text-positive" },
+	DECLINED: { labelKey: "quoteStatusDeclined", className: "text-muted-foreground" },
+	EXPIRED: { labelKey: "quoteStatusExpired", className: "text-muted-foreground" },
+	CLOSED: { labelKey: "quoteStatusClosed", className: "text-muted-foreground" },
 }
 
-export const QUOTE_STATUS_OPTIONS = (Object.keys(QUOTE_STATUS) as QuoteStatus[]).map((value) => ({
-	value,
-	label: QUOTE_STATUS[value].label,
-}))
+/** Built per render, because the labels are translated. */
+export const quoteStatusOptions = (t: (key: string) => string) =>
+	(Object.keys(QUOTE_STATUS) as QuoteStatus[]).map((value) => ({
+		value,
+		label: t(QUOTE_STATUS[value].labelKey),
+	}))
 
 /*
  * Re-exported, not re-implemented.
@@ -34,8 +37,9 @@ export const QUOTE_STATUS_OPTIONS = (Object.keys(QUOTE_STATUS) as QuoteStatus[])
  */
 export { formatMoney } from "@/lib/money"
 
-export const formatDate = (value: string) =>
-	new Date(value).toLocaleDateString("en-GB", {
+/** Dates in the reader's language — this was pinned to en-GB. */
+export const formatDate = (value: string, locale = "de") =>
+	new Date(value).toLocaleDateString(locale, {
 		day: "2-digit",
 		month: "short",
 		year: "numeric",

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { ArrowLeft, Loader2 } from "lucide-react"
@@ -15,6 +16,7 @@ import PaymentMethodForm from "../../_components/PaymentMethodForm"
  * renders instantly instead of showing a spinner for a round trip.
  */
 export default function EditPaymentMethodPage() {
+	const t = useTranslations("admin")
 	const { id } = useParams<{ id: string }>()
 	const { data: methods, isLoading } = usePaymentMethodsQuery()
 
@@ -23,22 +25,18 @@ export default function EditPaymentMethodPage() {
 	if (isLoading) {
 		return (
 			<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading method…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingMethod")}</div>
 		)
 	}
 
 	if (!method) {
 		return (
 			<div className="bg-card rounded-lg border border-dashed p-16 text-center">
-				<p className="text-muted-foreground text-sm">That payment method no longer exists.</p>
+				<p className="text-muted-foreground text-sm">{t("thatPaymentMethodNoLongerExists")}</p>
 				<Link
 					href="/admin/dashboard/payments"
 					className="text-primary mt-3 inline-block text-sm hover:underline"
-				>
-					Back to payments
-				</Link>
+				>{t("backToPayments")}</Link>
 			</div>
 		)
 	}
@@ -48,7 +46,7 @@ export default function EditPaymentMethodPage() {
 			<div className="flex items-start gap-3">
 				<Link
 					href="/admin/dashboard/payments"
-					aria-label="Back to payments"
+					aria-label={t("backToPayments")}
 					className="text-muted-foreground hover:text-foreground p-2"
 				>
 					<ArrowLeft className="size-4" />

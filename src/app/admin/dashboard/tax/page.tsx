@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Loader2, Plus, TriangleAlert } from "lucide-react"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
@@ -8,6 +9,7 @@ import { useTaxClassesQuery } from "@/redux/api/taxApi"
 import TaxClassCard from "./_components/TaxClassCard"
 
 export default function TaxPage() {
+	const t = useTranslations("admin")
 	const { data: classes, isLoading, isError, error } = useTaxClassesQuery()
 
 
@@ -22,18 +24,14 @@ export default function TaxPage() {
 				primaryAction={
 					<Button asChild size="lg">
 						<Link href="/admin/dashboard/tax/classes/new">
-							<Plus />
-							New tax class
-						</Link>
+							<Plus />{t("newTaxClass")}</Link>
 					</Button>
 				}
 			/>
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading tax classes…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingTaxClasses")}</div>
 			)}
 
 			{isError && (
@@ -62,9 +60,7 @@ export default function TaxPage() {
 					</p>
 					<Button asChild>
 						<Link href="/admin/dashboard/tax/classes/new">
-							<Plus />
-							New tax class
-						</Link>
+							<Plus />{t("newTaxClass")}</Link>
 					</Button>
 				</div>
 			)}

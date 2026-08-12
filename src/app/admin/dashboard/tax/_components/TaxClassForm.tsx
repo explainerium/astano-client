@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -49,6 +50,7 @@ const toDefaults = (taxClass?: TaxClass): FormValues => ({
 })
 
 export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createTaxClass] = useCreateTaxClassMutation()
 	const [updateTaxClass] = useUpdateTaxClassMutation()
@@ -72,10 +74,10 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 		try {
 			if (isEdit) {
 				await updateTaxClass({ id: taxClass.id, data: payload }).unwrap()
-				toast.success("Tax class updated.")
+				toast.success(t("taxClassUpdated"))
 			} else {
 				const created = await createTaxClass(payload).unwrap()
-				toast.success("Tax class created.")
+				toast.success(t("taxClassCreated"))
 				// Into the class's own page, where its rates are added. A class with
 				// no rates charges nothing, which is the mistake this avoids.
 				router.replace(`/admin/dashboard/tax/classes/${created.id}/edit`)
@@ -92,7 +94,7 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 				backHref="/admin/dashboard/tax"
 				backLabel="All tax classes"
 				title={isEdit ? taxClass.name : "New tax class"}
-				description="A class groups rates. Products pick a class; the one marked default applies to any product that has not."
+				description={t("aClassGroupsRatesProductsPick")}
 			/>
 
 			<ProForm
@@ -106,11 +108,11 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
-							label="Code"
-							description="Used internally. Cannot contain spaces."
+							label={t("code")}
+							description={t("usedInternallyCannotContainSpaces")}
 							required
 						/>
-						<ProInput name="sortOrder" type="number" label="Sort order" />
+						<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 					</div>
 
 					<Tabs value={activeLocale} onValueChange={setActiveLocale}>
@@ -129,22 +131,22 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label="Name" required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
 							</TabsContent>
 						))}
 					</Tabs>
 
 					<ProCheckbox
 						name="isDefault"
-						label="Use as the default class"
-						description="Applies to every product that has not picked a class of its own. Only one class can be the default — setting this clears the previous one."
+						label={t("useAsTheDefaultClass")}
+						description={t("appliesToEveryProductThatHas")}
 						className="border-t pt-4"
 					/>
 				</div>
 
 				<div className="flex justify-end gap-2">
 					<Button asChild type="button" variant="ghost">
-						<Link href="/admin/dashboard/tax">Cancel</Link>
+						<Link href="/admin/dashboard/tax">{t("cancel")}</Link>
 					</Button>
 					<ProSubmit>{isEdit ? "Save changes" : "Create class"}</ProSubmit>
 				</div>

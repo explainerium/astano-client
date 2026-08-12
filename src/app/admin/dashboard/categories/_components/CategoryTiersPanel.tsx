@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
@@ -25,6 +26,7 @@ const toRungs = (rows: TierRung[] | undefined): LadderRung[] =>
 	(rows ?? []).map((r) => ({ minQuantity: r.minQuantity, type: r.type, amount: r.value }))
 
 export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
+	const t = useTranslations("admin")
 	const { data, isFetching } = useCategoryTiersQuery(categoryId)
 	const [saveTiers, { isLoading: isSaving }] = useSaveCategoryTiersMutation()
 
@@ -66,7 +68,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 				description: "Every product in this category follows it from now on.",
 			})
 		} catch (error) {
-			toast.error("Could not save this ladder", {
+			toast.error(t("couldNotSaveThisLadder"), {
 				description:
 					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
 			})
@@ -76,16 +78,14 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 	if (isFetching && !draft) {
 		return (
 			<div className="text-muted-foreground flex items-center gap-2 py-8 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading ladders…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingLadders")}</div>
 		)
 	}
 
 	return (
 		<div className="space-y-4">
 			<div>
-				<h3 className="text-sm font-medium">Category quantity discounts</h3>
+				<h3 className="text-sm font-medium">{t("categoryQuantityDiscounts")}</h3>
 				<p className="text-muted-foreground mt-1 max-w-prose text-xs">
 					Applies to every product filed under this category. The quantity counted is
 					everything the customer has from the category, not one line — ten each of five

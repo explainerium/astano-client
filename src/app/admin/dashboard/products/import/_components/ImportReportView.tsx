@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { CircleAlert, CircleCheck, CirclePlus, CircleSlash, RefreshCw } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
@@ -7,11 +8,11 @@ import { Button } from "@/components/ui/button"
 import type { ImportReport, RowAction } from "@/types/productIo"
 import { cn } from "@/lib/utils"
 
-const ACTION: Record<RowAction, { label: string; icon: typeof CircleCheck; tone: string }> = {
-	created: { label: "New", icon: CirclePlus, tone: "text-positive" },
-	updated: { label: "Updated", icon: RefreshCw, tone: "text-primary" },
-	skipped: { label: "Skipped", icon: CircleSlash, tone: "text-muted-foreground" },
-	failed: { label: "Failed", icon: CircleAlert, tone: "text-destructive" },
+const ACTION: Record<RowAction, { labelKey: string; icon: typeof CircleCheck; tone: string }> = {
+	created: { labelKey: "importNew", icon: CirclePlus, tone: "text-positive" },
+	updated: { labelKey: "importUpdated", icon: RefreshCw, tone: "text-primary" },
+	skipped: { labelKey: "skipped", icon: CircleSlash, tone: "text-muted-foreground" },
+	failed: { labelKey: "failed", icon: CircleAlert, tone: "text-destructive" },
 }
 
 const Stat = ({ label, value, tone }: { label: string; value: number; tone?: string }) => (
@@ -30,6 +31,7 @@ const Stat = ({ label, value, tone }: { label: string; value: number; tone?: str
  * than the other.
  */
 export const ImportReportView = ({ report }: { report: ImportReport }) => {
+	const t = useTranslations("admin")
 	const [showAll, setShowAll] = useState(false)
 
 	// Everything that failed, then everything with a note, then the quiet ones.
@@ -40,11 +42,11 @@ export const ImportReportView = ({ report }: { report: ImportReport }) => {
 	return (
 		<div className="space-y-4">
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-				<Stat label={report.dryRun ? "Would be new" : "Created"} value={report.created} tone="text-positive" />
-				<Stat label={report.dryRun ? "Would be updated" : "Updated"} value={report.updated} />
-				<Stat label="Skipped" value={report.skipped} />
+				<Stat label={report.dryRun ? t("importWouldBeNew") : t("importCreated")} value={report.created} tone="text-positive" />
+				<Stat label={report.dryRun ? t("importWouldBeUpdated") : t("importUpdated")} value={report.updated} />
+				<Stat label={t("skipped")} value={report.skipped} />
 				<Stat
-					label="Failed"
+					label={t("failed")}
 					value={report.failed}
 					tone={report.failed ? "text-destructive" : undefined}
 				/>
@@ -86,9 +88,7 @@ export const ImportReportView = ({ report }: { report: ImportReport }) => {
 
 			{notable.length === 0 && !showAll && (
 				<p className="text-muted-foreground flex items-center gap-2 rounded-lg border border-dashed p-6 text-sm">
-					<CircleCheck className="size-4" />
-					Every row read cleanly — nothing to report.
-				</p>
+					<CircleCheck className="size-4" />{t("everyRowReadCleanlyNothingTo")}</p>
 			)}
 
 			{rows.length > 0 && (
@@ -96,10 +96,10 @@ export const ImportReportView = ({ report }: { report: ImportReport }) => {
 					<table className="w-full text-sm">
 						<thead className="bg-muted/50 text-muted-foreground text-xs uppercase">
 							<tr>
-								<th className="w-16 px-4 py-2.5 text-left font-medium">Row</th>
-								<th className="w-28 px-4 py-2.5 text-left font-medium">Result</th>
-								<th className="px-4 py-2.5 text-left font-medium">Product</th>
-								<th className="px-4 py-2.5 text-left font-medium">Notes</th>
+								<th className="w-16 px-4 py-2.5 text-left font-medium">{t("importRow")}</th>
+								<th className="w-28 px-4 py-2.5 text-left font-medium">{t("result")}</th>
+								<th className="px-4 py-2.5 text-left font-medium">{t("product")}</th>
+								<th className="px-4 py-2.5 text-left font-medium">{t("notes")}</th>
 							</tr>
 						</thead>
 						<tbody className="divide-y">
@@ -113,7 +113,7 @@ export const ImportReportView = ({ report }: { report: ImportReport }) => {
 										<td className="px-4 py-2">
 											<span className={cn("inline-flex items-center gap-1.5 text-xs", meta.tone)}>
 												<Icon className="size-3.5" />
-												{meta.label}
+												{t(meta.labelKey)}
 											</span>
 										</td>
 										<td className="px-4 py-2">

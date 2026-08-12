@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
@@ -76,6 +77,7 @@ const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
  * spread over two screens that each showed half the picture.
  */
 export default function UserDetailPage() {
+	const t = useTranslations("admin")
 	const { id } = useParams<{ id: string }>()
 	const router = useRouter()
 	const { userInfo } = useUserInfo()
@@ -94,7 +96,7 @@ export default function UserDetailPage() {
 	const [busy, setBusy] = useState(false)
 	const [confirmPurge, setConfirmPurge] = useState(false)
 
-	const run = async (action: () => Promise<unknown>, success: string) => {
+	const run = async (action: () =>Promise<unknown>, success: string) => {
 		setBusy(true)
 		try {
 			await action()
@@ -109,9 +111,7 @@ export default function UserDetailPage() {
 	if (isLoading) {
 		return (
 			<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading account…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingAccount")}</div>
 		)
 	}
 
@@ -144,7 +144,7 @@ export default function UserDetailPage() {
 		<div className="space-y-5">
 			<div className="flex flex-wrap items-start justify-between gap-3">
 				<div className="flex items-start gap-3">
-					<Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="Back">
+					<Button variant="ghost" size="icon" onClick={() => router.back()} aria-label={t("back")}>
 						<ArrowLeft />
 					</Button>
 					<div>
@@ -186,12 +186,12 @@ export default function UserDetailPage() {
 			)}
 
 			<div className="grid gap-5 xl:grid-cols-3">
-				<Panel title="Account" className="xl:col-span-2">
+				<Panel title={t("account")} className="xl:col-span-2">
 					<dl>
-						<Row label="Email" value={user.email} />
-						<Row label="Name" value={[user.salutation, user.firstName, user.lastName].filter(Boolean).join(" ")} />
-						<Row label="Company" value={user.company} />
-						<Row label="Phone" value={user.phone} />
+						<Row label={t("email")} value={user.email} />
+						<Row label={t("name")} value={[user.salutation, user.firstName, user.lastName].filter(Boolean).join(" ")} />
+						<Row label={t("company")} value={user.company} />
+						<Row label={t("phone")} value={user.phone} />
 						<Row
 							label="VAT number"
 							value={
@@ -213,21 +213,21 @@ export default function UserDetailPage() {
 								) : null
 							}
 						/>
-						<Row label="Founded" value={formatDate(user.foundingDate)} />
+						<Row label={t("founded")} value={formatDate(user.foundingDate)} />
 						<Row label="PSI member" value={user.psiMember ? "Yes" : "No"} />
-						<Row label="Language" value={user.locale === "de" ? "Deutsch" : "English"} />
-						<Row label="Terms accepted" value={formatDateTime(user.termsAcceptedAt)} />
-						<Row label="Registered" value={formatDateTime(user.createdAt)} />
-						<Row label="Last sign-in" value={formatDateTime(user.lastLoginAt)} />
+						<Row label={t("language")} value={user.locale === "de" ? "Deutsch" : "English"} />
+						<Row label={t("termsAccepted")} value={formatDateTime(user.termsAcceptedAt)} />
+						<Row label={t("registered")} value={formatDateTime(user.createdAt)} />
+						<Row label={t("lastSignIn")} value={formatDateTime(user.lastLoginAt)} />
 						<Row
-							label="Activity"
+							label={t("activity")}
 							value={`${user.counts.orders} orders · ${user.counts.quotes} quotes · ${user.counts.addresses} addresses`}
 						/>
 					</dl>
 				</Panel>
 
 				<div className="space-y-5">
-					<Panel title="Role">
+					<Panel title={t("role")}>
 						<p className="text-muted-foreground mb-3 text-sm">
 							A role decides what this account pays. Only an administrator can change it, and
 							never their own.
@@ -242,7 +242,7 @@ export default function UserDetailPage() {
 								)
 							}
 						>
-							<SelectTrigger className="w-full" aria-label="Role">
+							<SelectTrigger className="w-full" aria-label={t("role")}>
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent>
@@ -264,7 +264,7 @@ export default function UserDetailPage() {
 						)}
 					</Panel>
 
-					<Panel title="Account state">
+					<Panel title={t("accountState")}>
 						<div className="space-y-2">
 							{STATUS_ACTIONS.map((action) => {
 								const current = user.status === action.value
@@ -322,25 +322,25 @@ export default function UserDetailPage() {
 			    is what makes a separate dealer screen unnecessary. */}
 			{application && (
 				<Panel
-					title="Dealer application"
+					title={t("dealerApplication")}
 					action={
 						application.reviewedAt ? (
 							<span className="text-muted-foreground text-xs">
 								Reviewed {formatDate(application.reviewedAt)}
 							</span>
 						) : (
-							<span className="text-primary text-xs font-medium">Awaiting review</span>
+							<span className="text-primary text-xs font-medium">{t("awaitingReview")}</span>
 						)
 					}
 				>
 					<div className="grid gap-6 md:grid-cols-2">
 						<dl>
-							<Row label="Company" value={application.companyName} />
+							<Row label={t("company")} value={application.companyName} />
 							<Row label="VAT number" value={application.vatNumber} />
-							<Row label="Register number" value={application.registerNumber} />
-							<Row label="Founded" value={formatDate(application.foundingDate)} />
+							<Row label={t("registerNumber")} value={application.registerNumber} />
+							<Row label={t("founded")} value={formatDate(application.foundingDate)} />
 							<Row
-								label="Website"
+								label={t("website")}
 								value={
 									application.website ? (
 										<a
@@ -354,21 +354,21 @@ export default function UserDetailPage() {
 									) : null
 								}
 							/>
-							<Row label="Business type" value={application.businessType} />
-							<Row label="Expected volume" value={application.expectedVolume} />
+							<Row label={t("businessType")} value={application.businessType} />
+							<Row label={t("expectedVolume")} value={application.expectedVolume} />
 							<Row label="PSI member" value={application.psiMember ? "Yes" : "No"} />
 						</dl>
 
 						<dl>
 							<Row
-								label="Contact"
+								label={t("contact")}
 								value={[application.salutation, application.firstName, application.lastName]
 									.filter(Boolean)
 									.join(" ")}
 							/>
-							<Row label="Phone" value={application.phone} />
+							<Row label={t("phone")} value={application.phone} />
 							<Row
-								label="Address"
+								label={t("address")}
 								value={[
 									application.street,
 									application.street2,
@@ -378,14 +378,14 @@ export default function UserDetailPage() {
 									.filter(Boolean)
 									.join(", ")}
 							/>
-							<Row label="Submitted" value={formatDateTime(application.createdAt)} />
-							<Row label="Review note" value={application.reviewNote} />
+							<Row label={t("submitted")} value={formatDateTime(application.createdAt)} />
+							<Row label={t("reviewNote")} value={application.reviewNote} />
 						</dl>
 					</div>
 
 					{application.message && (
 						<div className="bg-muted mt-4 rounded-md p-3">
-							<p className="text-muted-foreground mb-1 text-xs">Their message</p>
+							<p className="text-muted-foreground mb-1 text-xs">{t("theirMessage")}</p>
 							<p className="text-sm whitespace-pre-wrap">{application.message}</p>
 						</div>
 					)}
@@ -404,9 +404,7 @@ export default function UserDetailPage() {
 									)
 								}
 							>
-								<Check />
-								Approve as dealer
-							</Button>
+								<Check />{t("approveAsDealer")}</Button>
 							<Button
 								variant="outline"
 								disabled={busy}
@@ -417,9 +415,7 @@ export default function UserDetailPage() {
 									)
 								}
 							>
-								<X />
-								Reject
-							</Button>
+								<X />{t("reject")}</Button>
 						</div>
 					)}
 				</Panel>
@@ -428,28 +424,24 @@ export default function UserDetailPage() {
 			{/* Pending without an application — a retail registration awaiting a
 			    decision. Nothing to annotate, so the plain endpoints. */}
 			{user.status === "PENDING" && !application && canModerate && (
-				<Panel title="Registration awaiting review">
+				<Panel title={t("registrationAwaitingReview")}>
 					<div className="flex gap-2">
 						<Button
 							disabled={busy}
 							onClick={() => run(() => approve(user.id).unwrap(), `${name} approved.`)}
 						>
-							<Check />
-							Approve
-						</Button>
+							<Check />{t("approve")}</Button>
 						<Button
 							variant="outline"
 							disabled={busy}
 							onClick={() => run(() => reject(user.id).unwrap(), `${name} rejected.`)}
 						>
-							<X />
-							Reject
-						</Button>
+							<X />{t("reject")}</Button>
 					</div>
 				</Panel>
 			)}
 
-			<Panel title="Deletion">
+			<Panel title={t("deletion")}>
 				{user.deletedAt ? (
 					<div className="flex flex-wrap items-center gap-3">
 						<p className="text-muted-foreground flex-1 text-sm">
@@ -460,9 +452,7 @@ export default function UserDetailPage() {
 							disabled={busy}
 							onClick={() => run(() => restore(user.id).unwrap(), `${name} restored.`)}
 						>
-							<RotateCcw />
-							Restore
-						</Button>
+							<RotateCcw />{t("restore")}</Button>
 					</div>
 				) : (
 					<div className="space-y-3">
@@ -481,9 +471,7 @@ export default function UserDetailPage() {
 									)
 								}
 							>
-								<Trash2 />
-								Delete
-							</Button>
+								<Trash2 />{t("delete")}</Button>
 						</div>
 
 						{/* Admin only, and behind a confirmation, because orders lose their
@@ -498,9 +486,7 @@ export default function UserDetailPage() {
 									variant="destructive"
 									disabled={busy}
 									onClick={() => setConfirmPurge(true)}
-								>
-									Delete permanently
-								</Button>
+								>{t("deletePermanently")}</Button>
 							</div>
 						)}
 					</div>
@@ -518,24 +504,20 @@ export default function UserDetailPage() {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel>Cancel</AlertDialogCancel>
+						<AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={async () => {
 								setConfirmPurge(false)
 								await run(() => purge(user.id).unwrap(), `${name} permanently deleted.`)
 								router.push("/admin/dashboard/users")
 							}}
-						>
-							Delete permanently
-						</AlertDialogAction>
+						>{t("deletePermanently")}</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
 
 			<p className="text-muted-foreground text-xs">
-				<Link href="/admin/dashboard/users" className="hover:text-foreground underline">
-					Back to all users
-				</Link>
+				<Link href="/admin/dashboard/users" className="hover:text-foreground underline">{t("backToAllUsers")}</Link>
 			</p>
 		</div>
 	)

@@ -3,7 +3,7 @@ import type { ReactNode } from "react"
 import { NextIntlClientProvider } from "next-intl"
 import { Mulish, Poppins } from "next/font/google"
 import Providers from "@/lib/providers/Providers"
-import messages from "../../../messages/en.json"
+import { adminMessages, readAdminLocale } from "@/lib/adminLocale"
 import "../globals.css"
 
 const mulish = Mulish({ subsets: ["latin"], variable: "--font-mulish", display: "swap" })
@@ -26,14 +26,19 @@ export const metadata: Metadata = {
 /**
  * The dashboard's own document shell.
  *
- * Staff-only and English-only, so it sits outside [locale]: no locale prefix,
- * no translated slugs, no language switcher. The English catalogue is imported
- * directly rather than resolved per request — there is nothing to resolve.
+ * Staff-only, so it sits outside [locale]: no locale prefix and no translated
+ * slugs — /de/admin/produkte would be URL machinery for an audience of four.
+ * The language is a cookie instead, set from the switcher in the topbar, and
+ * is independent of the shop's own Site Language: the person managing the
+ * catalogue need not speak the language the shop sells in.
  */
-export default function AdminLayout({ children }: { children: ReactNode }) {
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+	const locale = await readAdminLocale()
+	const messages = adminMessages(locale)
+
 	return (
 		<html
-			lang="en"
+			lang={locale}
 			// admin-theme carries the dashboard's own tokens — orange accent,
 			// rounded cards, grey canvas. Scoped here so the storefront's §6.1
 			// identity is unaffected.
@@ -52,7 +57,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 			className={`admin-theme ${mulish.variable} ${poppins.variable} h-full overflow-hidden antialiased`}
 		>
 			<body className="flex h-full flex-col overflow-hidden">
-				<NextIntlClientProvider locale="en" messages={messages}>
+				<NextIntlClientProvider locale={locale} messages={messages}>
 					<Providers>{children}</Providers>
 				</NextIntlClientProvider>
 			</body>

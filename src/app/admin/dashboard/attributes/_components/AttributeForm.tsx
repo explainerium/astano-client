@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -84,9 +85,7 @@ const ValuesEditor = () => {
 			<div className="flex items-center justify-between">
 				<div>
 					<p className="text-sm font-medium">Values</p>
-					<p className="text-muted-foreground text-xs">
-						Order here is the order shoppers see. English is required.
-					</p>
+					<p className="text-muted-foreground text-xs">Order here is the order shoppers see. English is required.</p>
 				</div>
 				<Button
 					type="button"
@@ -94,9 +93,7 @@ const ValuesEditor = () => {
 					size="sm"
 					onClick={() => append({ code: "", labelEn: "", labelDe: "" })}
 				>
-					<Plus />
-					Add value
-				</Button>
+					<Plus />Add value</Button>
 			</div>
 
 			{!fields.length && (
@@ -136,6 +133,7 @@ const ValuesEditor = () => {
 }
 
 export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createAttribute] = useCreateAttributeMutation()
 	const [updateAttribute] = useUpdateAttributeMutation()
@@ -168,10 +166,10 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 		try {
 			if (isEdit) {
 				await updateAttribute({ id: attribute.id, data: payload }).unwrap()
-				toast.success("Attribute updated.")
+				toast.success(t("attributeUpdated"))
 			} else {
 				await createAttribute(payload).unwrap()
-				toast.success("Attribute created.")
+				toast.success(t("attributeCreated"))
 				router.push("/admin/dashboard/attributes")
 			}
 		} catch (error) {
@@ -191,7 +189,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 							attribute.code)
 						: "New attribute"
 				}
-				description="Variant axes build product variants. Descriptive attributes only appear as information on the product page."
+				description={t("variantAxesBuildProductVariantsDescriptive")}
 			/>
 
 			<ProForm
@@ -205,11 +203,11 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
-							label="Code"
-							description="Used internally and in URLs. Cannot contain spaces."
+							label={t("code")}
+							description={t("usedInternallyAndInUrlsCannot")}
 							required
 						/>
-						<ProInput name="sortOrder" type="number" label="Sort order" />
+						<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 					</div>
 
 					{/* No "used for variations" here, deliberately.
@@ -239,7 +237,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label="Name" required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
 							</TabsContent>
 						))}
 					</Tabs>
@@ -251,7 +249,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 
 				<div className="flex justify-end gap-2">
 					<Button asChild type="button" variant="ghost">
-						<Link href="/admin/dashboard/attributes">Cancel</Link>
+						<Link href="/admin/dashboard/attributes">{t("cancel")}</Link>
 					</Button>
 					<ProSubmit>{isEdit ? "Save changes" : "Create attribute"}</ProSubmit>
 				</div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Eye, Loader2 } from "lucide-react"
@@ -26,14 +27,16 @@ import type { QuoteStatus } from "@/types/quote"
 import {
 	formatDate,
 	isFullyPriced,
+	quoteStatusOptions,
 	QUOTE_STATUS,
-	QUOTE_STATUS_OPTIONS,
 } from "./_components/quoteStatus"
 import useMoney from "@/lib/useMoney"
 const ANY = "__any__"
 const PER_PAGE = 20
 
 export default function QuotesPage() {
+	const t = useTranslations("admin")
+	const locale = useLocale()
 	// The shop's own separators and symbol. A function rather than an import,
 	// so React Compiler can see that these prices depend on it.
 	const formatMoney = useMoney()
@@ -63,7 +66,7 @@ export default function QuotesPage() {
 			<Toolbar
 				searchValue={search}
 				onSearchChange={(value) => reset(() => setSearch(value))}
-				searchPlaceholder="Search name, company or email…"
+				searchPlaceholder={t("searchQuotes")}
 				filters={
 					<Select
 						value={status ?? ANY}
@@ -71,12 +74,12 @@ export default function QuotesPage() {
 							reset(() => setStatus(value === ANY ? undefined : (value as QuoteStatus)))
 						}
 					>
-						<SelectTrigger className="w-44" aria-label="Filter by status">
-							<SelectValue placeholder="Any status" />
+						<SelectTrigger className="w-44" aria-label={t("filterByStatus")}>
+							<SelectValue placeholder={t("anyStatus")} />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value={ANY}>Any status</SelectItem>
-							{QUOTE_STATUS_OPTIONS.map((option) => (
+							<SelectItem value={ANY}>{t("anyStatus")}</SelectItem>
+							{quoteStatusOptions(t).map((option) => (
 								<SelectItem key={option.value} value={option.value}>
 									{option.label}
 								</SelectItem>
@@ -88,15 +91,13 @@ export default function QuotesPage() {
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading quote requests…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingQuoteRequests")}</div>
 			)}
 
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load quote requests."}
+						t("couldNotLoadQuoteRequests")}
 				</div>
 			)}
 
@@ -106,7 +107,7 @@ export default function QuotesPage() {
 						<Table>
 							<TableHeader className="bg-muted/50">
 								<TableRow className="hover:bg-transparent">
-									{["Request", "Subject", "Contact", "Submitted", "Lines", "Quoted", "Status"].map(
+									{[t("request"), t("subject"), t("contact"), t("submitted"), t("lines"), t("quoted"), t("status")].map(
 										(head) => (
 											<TableHead
 												key={head}
@@ -126,8 +127,8 @@ export default function QuotesPage() {
 										<TableCell colSpan={8} className="h-40 text-center">
 											<p className="text-muted-foreground text-sm">
 												{search || status
-													? "No requests match these filters."
-													: "No quote requests yet. They arrive from the Anfragekorb on the shop."}
+													? t("noRequestsMatchTheseFilters")
+													: t("noQuoteRequestsYet")}
 											</p>
 										</TableCell>
 									</TableRow>
@@ -155,7 +156,7 @@ export default function QuotesPage() {
 													.join(" · ") || "—"}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-xs">
-												{formatDate(quote.submittedAt)}
+												{formatDate(quote.submittedAt, locale)}
 											</TableCell>
 											<TableCell className="tabular-nums">{quote.items.length}</TableCell>
 											<TableCell className="tabular-nums">
@@ -169,7 +170,7 @@ export default function QuotesPage() {
 											</TableCell>
 											<TableCell>
 												<Badge variant="outline" className={chip.className}>
-													{chip.label}
+													{t(chip.labelKey)}
 												</Badge>
 											</TableCell>
 											<TableCell className="pr-4">
@@ -197,8 +198,7 @@ export default function QuotesPage() {
 					{!!meta && meta.total > 0 && (
 						<div className="text-muted-foreground flex flex-wrap items-center gap-3 border-t px-4 py-2.5 text-xs">
 							<span>
-								{meta.total} {meta.total === 1 ? "request" : "requests"} · page {meta.page} of{" "}
-								{meta.totalPages}
+								{t("paginationQuotes", { count: meta.total, page: meta.page, pages: meta.totalPages })}
 							</span>
 							{isFetching && <Loader2 className="size-3 animate-spin" />}
 							<div className="ml-auto flex gap-2">
@@ -207,17 +207,13 @@ export default function QuotesPage() {
 									size="sm"
 									disabled={meta.page <= 1 || isFetching}
 									onClick={() => setPage((p) => Math.max(1, p - 1))}
-								>
-									Previous
-								</Button>
+								>{t("previous")}</Button>
 								<Button
 									variant="outline"
 									size="sm"
 									disabled={meta.page >= meta.totalPages || isFetching}
 									onClick={() => setPage((p) => p + 1)}
-								>
-									Next
-								</Button>
+								>{t("next")}</Button>
 							</div>
 						</div>
 					)}

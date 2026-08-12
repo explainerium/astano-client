@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -44,6 +45,7 @@ import {
 const editHref = (id: string) => `/admin/dashboard/categories/${id}/edit`
 
 export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [deleteCategory] = useDeleteCategoryMutation()
 	const [duplicateCategory] = useDuplicateCategoryMutation()
@@ -69,7 +71,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 			// needs a new name before it is any use.
 			router.push(editHref(copy.id))
 		} catch (error) {
-			toast.error("Could not duplicate this category", {
+			toast.error(t("couldNotDuplicateThisCategory"), {
 				description:
 					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
 			})
@@ -161,7 +163,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 		setSelected(new Set())
 
 		if (deleted) {
-			toast.success(`${deleted} ${deleted === 1 ? "category" : "categories"} deleted.`)
+			toast.success(t("deletedCategories", { count: deleted }))
 		}
 		if (failures.length) {
 			toast.error(
@@ -186,16 +188,12 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 						size="lg"
 						onClick={() => setPending(tree.filter((row) => selected.has(row.id)))}
 					>
-						<Trash2 />
-						Delete
-					</Button>
+						<Trash2 />{t("delete")}</Button>
 				}
 				primaryAction={
 					<Button asChild size="lg">
 						<Link href="/admin/dashboard/categories/new">
-							<Plus />
-							New category
-						</Link>
+							<Plus />{t("newCategory")}</Link>
 					</Button>
 				}
 			/>
@@ -215,19 +213,13 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 												checked ? new Set(rows.map((r) => r.id)) : new Set()
 											)
 										}
-										aria-label="Select all categories"
+										aria-label={t("selectAllCategories")}
 										disabled={!rows.length}
 									/>
 								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Category
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Slug
-								</TableHead>
-								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
-									Products
-								</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("category")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("slug")}</TableHead>
+								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">{t("products")}</TableHead>
 								<TableHead className="w-32 pr-4" />
 							</TableRow>
 						</TableHeader>
@@ -290,14 +282,10 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 												)}
 
 												{row.isHidden && (
-													<Badge variant="secondary" className="font-normal">
-														Hidden
-													</Badge>
+													<Badge variant="secondary" className="font-normal">{t("hidden")}</Badge>
 												)}
 												{row.isOptionCategory && (
-													<Badge variant="outline" className="font-normal">
-														Option
-													</Badge>
+													<Badge variant="outline" className="font-normal">{t("option")}</Badge>
 												)}
 											</div>
 										</TableCell>
@@ -328,7 +316,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 													variant="ghost"
 													size="icon"
 													aria-label={`Duplicate ${displayName(row)}`}
-													title="Duplicate"
+													title={t("duplicate")}
 													disabled={duplicatingId !== null}
 													onClick={() => runDuplicate(row)}
 												>
@@ -358,7 +346,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 
 				{rows.length > 0 && (
 					<div className="text-muted-foreground border-t px-4 py-2.5 text-xs">
-						{rows.length} {rows.length === 1 ? "category" : "categories"}
+						{t("countCategories", { count: rows.length })}
 						{isSearching && ` matching “${query}”`}
 						{selected.size > 0 && ` · ${selected.size} selected`}
 					</div>
@@ -376,8 +364,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 						<AlertDialogDescription asChild>
 							<div className="space-y-2">
 								<p>
-									This removes {pending?.length === 1 ? "it" : "them"} in every
-									language and cannot be undone.
+									{t("removesInEveryLanguage", { count: pending?.length ?? 0 })}
 								</p>
 								{blockingChildren.length > 0 && (
 									<p className="text-destructive">
@@ -395,7 +382,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={isDeleting}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								// Stay open until the run finishes so a partial failure is read

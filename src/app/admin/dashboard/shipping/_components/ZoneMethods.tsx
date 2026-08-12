@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { Pencil, Trash2 } from "lucide-react"
@@ -61,14 +62,10 @@ const MethodBlock = ({
 					{TYPE_LABEL[method.type] ?? method.type}
 				</Badge>
 				{!method.taxable && (
-					<Badge variant="outline" className="text-muted-foreground">
-						Not taxed
-					</Badge>
+					<Badge variant="outline" className="text-muted-foreground">Not taxed</Badge>
 				)}
 				{!method.isActive && (
-					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">
-						Inactive
-					</Badge>
+					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">Inactive</Badge>
 				)}
 
 				<div className="ml-auto flex gap-1">
@@ -129,6 +126,7 @@ const MethodBlock = ({
 }
 
 export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
+	const t = useTranslations("admin")
 	const [deleteMethod] = useDeleteShippingMethodMutation()
 	const [pending, setPending] = useState<ShippingMethod | null>(null)
 	const [busy, setBusy] = useState(false)
@@ -163,9 +161,7 @@ export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
 					))}
 				</div>
 			) : (
-				<p className="text-muted-foreground p-6 text-center text-sm">
-					No methods. Customers in this zone are offered no shipping and cannot check out.
-				</p>
+				<p className="text-muted-foreground p-6 text-center text-sm">{t("noMethodsCustomersInThisZone")}</p>
 			)}
 
 			<AlertDialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>
@@ -178,7 +174,7 @@ export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={busy}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()

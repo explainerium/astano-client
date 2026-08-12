@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -45,39 +46,46 @@ const EDITOR_LOCALES = [
 	{ code: "de", label: "Deutsch" },
 ] as const
 
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-const slugField = z
-	.string()
-	.trim()
-	.refine((value) => value === "" || SLUG_PATTERN.test(value), {
-		message: "Lowercase words separated by hyphens",
-	})
+const slugField = (t: T) =>
+	z
+		.string()
+		.trim()
+		.refine((value) => value === "" || SLUG_PATTERN.test(value), {
+			message: t("lowercaseWordsSeparatedByHyphens"),
+		})
 
 /** Empty, or a plain decimal. Matches the API's own money regex. */
-const moneyField = z
-	.string()
-	.trim()
-	.refine((value) => value === "" || /^\d+(\.\d{1,4})?$/.test(value), {
-		message: "Use a number like 12.50",
-	})
+const moneyField = (t: T) =>
+	z
+		.string()
+		.trim()
+		.refine((value) => value === "" || /^\d+(\.\d{1,4})?$/.test(value), {
+			message: t("useANumberLike1250"),
+		})
 
-const priceFields = z.object({ basePrice: moneyField, salePrice: moneyField })
+const priceFields = (t: T) => z.object({ basePrice: moneyField(t), salePrice: moneyField(t) })
 
 /** Empty, or a decimal with up to three places — the column is Decimal(10,3). */
-const weightField = z
-	.string()
+const weightField = (t: T) =>
+	z
+		.string()
 	.trim()
 	.refine((value) => value === "" || /^\d+(\.\d{1,3})?$/.test(value), {
-		message: "Use a number like 0.25",
+		message: t("useANumberLike025"),
 	})
 
 /** Empty, or a decimal with up to two places — the columns are Decimal(10,2). */
-const sizeField = z
-	.string()
+const sizeField = (t: T) =>
+	z
+		.string()
 	.trim()
 	.refine((value) => value === "" || /^\d+(\.\d{1,2})?$/.test(value), {
-		message: "Use a number like 12.5",
+		message: t("useANumberLike125"),
 	})
 
 /**
@@ -87,35 +95,37 @@ const sizeField = z
  * `_discount_amount` (§4.2) — so a migrated ladder round-trips through this
  * form unchanged.
  */
-const tierRow = z.object({
-	minQuantity: z.number({ message: "Enter a quantity" }).int().min(1, "At least 1"),
-	type: z.enum(["FIXED_PRICE", "PERCENTAGE", "FIXED_AMOUNT"]),
-	amount: moneyField,
-})
+const tierRow = (t: T) =>
+	z.object({
+		minQuantity: z.number({ message: t("enterAQuantity") }).int().min(1, t("atLeastOne")),
+		type: z.enum(["FIXED_PRICE", "PERCENTAGE", "FIXED_AMOUNT"]),
+		amount: moneyField(t),
+	})
 
-const localeBlock = (nameRequired: boolean) =>
+const localeBlock = (nameRequired: boolean, t: T) =>
 	z.object({
 		name: nameRequired
-			? z.string().trim().min(1, "An English name is required")
+			? z.string().trim().min(1, t("anEnglishNameIsRequired"))
 			: z.string().trim(),
-		slug: slugField,
+		slug: slugField(t),
 		shortDescription: z.string().trim(),
 		description: z.string().trim(),
 	})
 
-const schema = z.object({
-	en: localeBlock(true),
-	de: localeBlock(false),
+const buildSchema = (t: T) =>
+	z.object({
+	en: localeBlock(true, t),
+	de: localeBlock(false, t),
 
 	// General
 	status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
 	visibility: z.enum(["SHOP_AND_SEARCH", "SHOP_ONLY", "SEARCH_ONLY", "HIDDEN"]),
 	kind: z.enum(["MAIN", "OPTION"]),
 	quoteEnabled: z.boolean(),
-	artworkMaxFiles: z.number({ message: "Enter a number" }).int().min(0).max(20),
+	artworkMaxFiles: z.number({ message: t("enterANumber") }).int().min(0).max(20),
 	artworkRequired: z.boolean(),
-	moq: z.number({ message: "Enter a number" }).int().min(0),
-	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
+	moq: z.number({ message: t("enterANumber") }).int().min(0),
+	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 	categoryIds: z.array(z.string()),
 
 	// Media. Ids only — the thumbnails to draw them with live in the panel's
@@ -135,16 +145,16 @@ const schema = z.object({
 	 */
 	sku: z.string().trim().max(100),
 	manageStock: z.boolean(),
-	stock: z.number({ message: "Enter a number" }).int().min(0),
+	stock: z.number({ message: t("enterANumber") }).int().min(0),
 	allowBackorder: z.boolean(),
 
 	// Shipping. Stored on the default variant alongside SKU and stock, so a
 	// simple product keeps them in exactly one place. Empty means "not set",
 	// and the cart counts an unset weight as 0 kg when it picks a rate band.
-	weightKg: weightField,
-	lengthCm: sizeField,
-	widthCm: sizeField,
-	heightCm: sizeField,
+	weightKg: weightField(t),
+	lengthCm: sizeField(t),
+	widthCm: sizeField(t),
+	heightCm: sizeField(t),
 
 	// Pricing. Money stays a string all the way to the API — these are
 	// Decimal(12,4) and a float would lose cents on the way through.
@@ -155,8 +165,8 @@ const schema = z.object({
 	// awaiting approval (R5b). So one retail price covers both, and the second
 	// row is the dealer price.
 	prices: z.object({
-		GUEST: priceFields,
-		RESELLER: priceFields,
+		GUEST: priceFields(t),
+		RESELLER: priceFields(t),
 	}),
 	taxStatus: z.enum(["TAXABLE", "SHIPPING_ONLY", "NONE"]),
 
@@ -169,9 +179,9 @@ const schema = z.object({
 	 * column a lie.
 	 */
 	tiers: z.object({
-		GUEST: z.array(tierRow),
-		B2C: z.array(tierRow),
-		RESELLER: z.array(tierRow),
+		GUEST: z.array(tierRow(t)),
+		B2C: z.array(tierRow(t)),
+		RESELLER: z.array(tierRow(t)),
 	}),
 
 	/**
@@ -193,7 +203,7 @@ const schema = z.object({
 		z.object({
 			optionProductId: z.string(),
 			groupLabel: z.string().trim().max(120),
-			sortOrder: z.number({ message: "Enter a number" }).int().min(0),
+			sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 			preselected: z.boolean(),
 		})
 	),
@@ -235,7 +245,7 @@ const schema = z.object({
 				ctx.addIssue({
 					code: "custom",
 					path: ["prices", role, "salePrice"],
-					message: "Set a regular price for this sale price to discount.",
+					message: t("setARegularPriceForThis"),
 				})
 				continue
 			}
@@ -304,7 +314,7 @@ const schema = z.object({
 					ctx.addIssue({
 						code: "custom",
 						path: ["tiers", role, index, "amount"],
-						message: "A discount cannot be more than 100 %.",
+						message: t("discountOverHundred"),
 					})
 				}
 			})
@@ -346,7 +356,7 @@ const schema = z.object({
 		}
 	})
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const translationFor = (product: AdminProduct | undefined, locale: string) =>
 	product?.translations.find((t) => t.locale === locale)
@@ -452,6 +462,7 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 }
 
 export const ProductForm = ({ product }: { product?: AdminProduct }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createProduct] = useCreateProductMutation()
 	const [updateProduct] = useUpdateProductMutation()
@@ -662,23 +673,23 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 		try {
 			if (isEdit) {
 				await updateProduct({ id: product.id, data: payload }).unwrap()
-				toast.success("Product saved.")
+				toast.success(t("productSaved"))
 			} else {
 				const created = await createProduct(payload).unwrap()
-				toast.success("Product created.")
+				toast.success(t("productCreated"))
 				router.replace(`/admin/dashboard/products/${created.id}/edit`)
 			}
 		} catch (error) {
 			// The API names the offending SKU and the product that owns it.
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the product.")
+			toast.error(message ?? t("couldNotSaveTheProduct"))
 		}
 	}
 
 	return (
 		<ProForm
 			onSubmit={onSubmit}
-			resolver={zodResolver(schema)}
+			resolver={zodResolver(buildSchema(t))}
 			defaultValues={toDefaults(product)}
 			className="space-y-5"
 		>
@@ -695,14 +706,12 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					size="lg"
 					onClick={() => router.push("/admin/dashboard/products")}
 				>
-					<ArrowLeft />
-					Products
-				</Button>
+					<ArrowLeft />{t("products")}</Button>
 				{isEdit && (
 					<span className="text-muted-foreground font-mono text-xs">{product.id}</span>
 				)}
 				<div className="ml-auto">
-					<ProSubmit>{isEdit ? "Save changes" : "Create product"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("createProduct")}</ProSubmit>
 				</div>
 			</div>
 
@@ -739,7 +748,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						<TabsContent key={code} value={code} className="space-y-4 pt-4">
 							<ProInput
 								name={`${code}.name`}
-								label="Product name"
+								label={t("productName")}
 								required={code === "en"}
 							/>
 							<ProPermalink
@@ -753,14 +762,14 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 							/>
 							<ProRichText
 								name={`${code}.shortDescription`}
-								label="Short description"
-								description="The summary beside the gallery."
+								label={t("shortDescription")}
+								description={t("theSummaryBesideTheGallery")}
 								minHeight="6rem"
 							/>
 							<ProRichText
 								name={`${code}.description`}
-								label="Description"
-								description="The full description tab on the product page."
+								label={t("description")}
+								description={t("theFullDescriptionTabOnThe")}
 								minHeight="14rem"
 							/>
 						</TabsContent>
@@ -770,7 +779,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 
 			<section className="bg-card rounded-lg border">
 				<div className="border-b px-5 py-3">
-					<h2 className="font-heading text-sm font-semibold">Product data</h2>
+					<h2 className="font-heading text-sm font-semibold">{t("productData")}</h2>
 				</div>
 
 				{/* Controlled, so a failed save can open the tab holding the error.
@@ -779,11 +788,11 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				<Tabs value={tab} onValueChange={changeTab} className="gap-0">
 					<div ref={tabStripRef} className="scroll-mt-4 px-5 pt-4">
 						<TabsList>
-							<TabsTrigger value="general">General</TabsTrigger>
-							<TabsTrigger value="inventory">Inventory</TabsTrigger>
-							<TabsTrigger value="shipping">Shipping</TabsTrigger>
-							<TabsTrigger value="attributes">Attributes</TabsTrigger>
-							<TabsTrigger value="options">Options</TabsTrigger>
+							<TabsTrigger value="general">{t("general")}</TabsTrigger>
+							<TabsTrigger value="inventory">{t("inventory")}</TabsTrigger>
+							<TabsTrigger value="shipping">{t("shipping")}</TabsTrigger>
+							<TabsTrigger value="attributes">{t("attributes")}</TabsTrigger>
+							<TabsTrigger value="options">{t("options")}</TabsTrigger>
 						</TabsList>
 					</div>
 
@@ -794,25 +803,25 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						<div className="grid gap-4 sm:grid-cols-2">
 							<ProInput
 								name="prices.GUEST.basePrice"
-								label="Regular price"
-								description="What a customer pays for one."
+								label={t("regularPrice")}
+								description={t("whatACustomerPaysForOne")}
 								placeholder="0.00"
 							/>
 							<ProInput
 								name="prices.GUEST.salePrice"
-								label="Sale price"
-								description="Leave empty for no sale."
+								label={t("salePrice")}
+								description={t("leaveEmptyForNoSale")}
 								placeholder="—"
 							/>
 							<ProInput
 								name="prices.RESELLER.basePrice"
-								label="Reseller price"
-								description="For approved dealers. Leave empty and they pay the regular price."
+								label={t("resellerPrice")}
+								description={t("forApprovedDealersLeaveEmptyAnd")}
 								placeholder="—"
 							/>
 							<ProInput
 								name="prices.RESELLER.salePrice"
-								label="Reseller sale price"
+								label={t("resellerSalePrice")}
 								placeholder="—"
 							/>
 						</div>
@@ -828,19 +837,19 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						<div className="space-y-4 border-t pt-5">
 							<ProSelect
 								name="taxStatus"
-								label="Tax status"
-								description="Whether tax applies at all. Which rate is decided by the tax class."
+								label={t("taxStatus")}
+								description={t("whetherTaxAppliesAtAllWhich")}
 								options={[
-									{ label: "Taxable", value: "TAXABLE" },
-									{ label: "Only during shipping", value: "SHIPPING_ONLY" },
-									{ label: "None", value: "NONE" },
+									{ label: t("taxTaxable"), value: "TAXABLE" },
+									{ label: t("taxShippingOnly"), value: "SHIPPING_ONLY" },
+									{ label: t("taxNone"), value: "NONE" },
 								]}
 								className="sm:max-w-xs"
 							/>
 
 							<ProCheckbox
 								name="quoteEnabled"
-								label="Price on request"
+								label={t("priceOnRequest")}
 								description='Hides the price, blocks add-to-cart, and offers "Add to quote request" instead.'
 							/>
 
@@ -849,15 +858,15 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 							<ProInput
 								name="artworkMaxFiles"
 								type="number"
-								label="Design files the customer may attach"
-								description="0 means this product takes no uploads. The old shop allowed 6."
+								label={t("designFilesTheCustomerMayAttach")}
+								description={t("0MeansThisProductTakesNo")}
 								className="sm:max-w-xs"
 							/>
 
 							<ProCheckbox
 								name="artworkRequired"
-								label="A design file is required"
-								description="Refuses checkout for a line with nothing attached. Ignored while the limit above is 0."
+								label={t("aDesignFileIsRequired")}
+								description={t("refusesCheckoutForALineWith")}
 							/>
 						</div>
 					</TabsContent>
@@ -869,34 +878,34 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						<ProInput
 							name="sku"
 							label="SKU"
-							description="Optional. Leave it empty and the product simply has none. If you do set one, it must be unique across the whole catalogue."
+							description={t("optionalLeaveItEmptyAndThe")}
 						/>
 
-						<ProCheckbox name="manageStock" label="Track stock for this product" />
+						<ProCheckbox name="manageStock" label={t("trackStockForThisProduct")} />
 
 						<div className="grid gap-4 sm:grid-cols-2">
-							<ProInput name="stock" type="number" label="Stock quantity" />
+							<ProInput name="stock" type="number" label={t("stockQuantity")} />
 						</div>
 
 						<ProCheckbox
 							name="allowBackorder"
-							label="Allow backorders"
-							description="Customers may order while stock is zero."
+							label={t("allowBackorders")}
+							description={t("customersMayOrderWhileStockIs")}
 						/>
 					</TabsContent>
 
 					<TabsContent value="shipping" className="min-h-[26rem] space-y-6 p-5">
 						<ProInput
 							name="weightKg"
-							label="Weight (kg)"
-							description="Per item. Shipping is priced by the total weight of the cart, so a product left empty counts as 0 kg and can win a cheaper rate than it should."
+							label={t("weightKg")}
+							description={t("perItemShippingIsPricedBy")}
 							placeholder="0.000"
 							className="sm:max-w-xs"
 						/>
 
 						<div className="space-y-3 border-t pt-5">
 							<div>
-								<h3 className="text-sm font-medium">Dimensions (cm)</h3>
+								<h3 className="text-sm font-medium">{t("dimensionsCm")}</h3>
 								<p className="text-muted-foreground mt-1 max-w-prose text-xs">
 									Length, width and height of one packed item. Shipping is
 									priced by weight, not by size, so these are for packing and
@@ -905,9 +914,9 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 							</div>
 
 							<div className="grid gap-4 sm:grid-cols-3">
-								<ProInput name="lengthCm" label="Length" placeholder="—" />
-								<ProInput name="widthCm" label="Width" placeholder="—" />
-								<ProInput name="heightCm" label="Height" placeholder="—" />
+								<ProInput name="lengthCm" label={t("length")} placeholder="—" />
+								<ProInput name="widthCm" label={t("width")} placeholder="—" />
+								<ProInput name="heightCm" label={t("height")} placeholder="—" />
 							</div>
 						</div>
 					</TabsContent>
@@ -924,74 +933,66 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 
 				<aside className="space-y-5 lg:sticky lg:top-4">
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">
-							Publish
-						</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("publish")}</h2>
 						<div className="space-y-4 p-4">
 							<ProSelect
 								name="status"
-								label="Status"
+								label={t("status")}
 								options={[
-									{ label: "Draft", value: "DRAFT" },
-									{ label: "Published", value: "PUBLISHED" },
-									{ label: "Archived", value: "ARCHIVED" },
+									{ label: t("statusDraft"), value: "DRAFT" },
+									{ label: t("statusPublished"), value: "PUBLISHED" },
+									{ label: t("statusArchived"), value: "ARCHIVED" },
 								]}
 							/>
 							<ProSelect
 								name="visibility"
-								label="Catalogue visibility"
-								description="Never derived from anything else — always your explicit choice."
+								label={t("catalogueVisibility")}
+								description={t("neverDerivedFromAnythingElseAlways")}
 								options={[
-									{ label: "Shop and search", value: "SHOP_AND_SEARCH" },
-									{ label: "Shop only", value: "SHOP_ONLY" },
-									{ label: "Search only", value: "SEARCH_ONLY" },
-									{ label: "Hidden", value: "HIDDEN" },
+									{ label: t("visibilityShopAndSearch"), value: "SHOP_AND_SEARCH" },
+									{ label: t("visibilityShopOnly"), value: "SHOP_ONLY" },
+									{ label: t("visibilitySearchOnly"), value: "SEARCH_ONLY" },
+									{ label: t("hidden"), value: "HIDDEN" },
 								]}
 							/>
 							<ProInput
 								name="sortOrder"
 								type="number"
-								label="Sort order"
-								description="Lower numbers appear first."
+								label={t("sortOrder")}
+								description={t("lowerNumbersAppearFirst")}
 							/>
 
 						</div>
 					</section>
 
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">
-							Categories
-						</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("categories")}</h2>
 						<div className="p-4">
 							<ProCombobox
 								name="categoryIds"
 								multiple
 								options={categoryOptions}
-								placeholder="No categories"
+								placeholder={t("noCategories")}
 							/>
 						</div>
 					</section>
 
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">
-							Images
-						</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("images")}</h2>
 						<div className="p-4">
 							<ProductImages product={product} />
 						</div>
 					</section>
 
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">
-							Dashboard label
-						</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("dashboardLabel")}</h2>
 						<div className="p-4">
 							<ProSelect
 								name="kind"
-								description="Tells staff a main product from a configurator option at a glance. Changes no behaviour and never reaches the storefront."
+								description={t("tellsStaffAMainProductFrom")}
 								options={[
-									{ label: "Main product", value: "MAIN" },
-									{ label: "Option", value: "OPTION" },
+									{ label: t("mainProduct"), value: "MAIN" },
+									{ label: t("option"), value: "OPTION" },
 								]}
 							/>
 						</div>

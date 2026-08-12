@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Check, FileLock2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { MediaAsset } from "@/types/media"
@@ -23,11 +24,10 @@ export const MediaGrid = ({
 	selected: Set<string>
 	onToggle: (id: string) => void
 }) => {
+	const t = useTranslations("admin")
 	if (!assets.length) {
 		return (
-			<div className="text-muted-foreground bg-card rounded-lg border border-dashed p-16 text-center text-sm">
-				Nothing here yet. Drop images above to add them.
-			</div>
+			<div className="text-muted-foreground bg-card rounded-lg border border-dashed p-16 text-center text-sm">{t("nothingHereYetDropImagesAbove")}</div>
 		)
 	}
 
@@ -65,7 +65,7 @@ export const MediaGrid = ({
 							) : (
 								<div className="text-muted-foreground flex flex-col items-center gap-1 p-4 text-center">
 									<FileLock2 className="size-6" />
-									<span className="text-[11px]">Private file</span>
+									<span className="text-[11px]">{t("privateFile")}</span>
 								</div>
 							)}
 						</div>

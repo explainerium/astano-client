@@ -1,7 +1,14 @@
 import type { OrderStatus, PaymentStatus } from "@/types/order"
 
 export interface Chip {
-	label: string
+	/**
+	 * A key into the admin catalogue, not a finished word.
+	 *
+	 * The colour beside it is not text and stays here; the label cannot,
+	 * because this module is evaluated once at import time and has no locale
+	 * to resolve against.
+	 */
+	labelKey: string
 	className: string
 }
 
@@ -16,31 +23,40 @@ export interface Chip {
  * transfer has not landed, so it is the status most likely to need chasing.
  */
 export const ORDER_STATUS: Record<OrderStatus, Chip> = {
-	PENDING: { label: "Pending", className: "border-transparent bg-accent-soft-strong text-primary" },
-	PROCESSING: { label: "Processing", className: "border-transparent bg-muted text-foreground" },
-	ON_HOLD: { label: "On hold", className: "border-transparent bg-accent-soft-strong text-primary" },
-	COMPLETED: { label: "Completed", className: "border-transparent bg-positive-soft text-positive" },
-	CANCELLED: { label: "Cancelled", className: "text-muted-foreground" },
-	REFUNDED: { label: "Refunded", className: "text-muted-foreground" },
-	FAILED: { label: "Failed", className: "border-transparent bg-negative-soft text-negative" },
+	PENDING: { labelKey: "orderStatusPending", className: "border-transparent bg-accent-soft-strong text-primary" },
+	PROCESSING: { labelKey: "orderStatusProcessing", className: "border-transparent bg-muted text-foreground" },
+	ON_HOLD: { labelKey: "orderStatusOnHold", className: "border-transparent bg-accent-soft-strong text-primary" },
+	COMPLETED: { labelKey: "orderStatusCompleted", className: "border-transparent bg-positive-soft text-positive" },
+	CANCELLED: { labelKey: "orderStatusCancelled", className: "text-muted-foreground" },
+	REFUNDED: { labelKey: "orderStatusRefunded", className: "text-muted-foreground" },
+	FAILED: { labelKey: "orderStatusFailed", className: "border-transparent bg-negative-soft text-negative" },
 }
 
 export const PAYMENT_STATUS: Record<PaymentStatus, Chip> = {
-	UNPAID: { label: "Unpaid", className: "text-muted-foreground" },
-	PAID: { label: "Paid", className: "border-transparent bg-positive-soft text-positive" },
-	PARTIALLY_REFUNDED: { label: "Part refunded", className: "text-muted-foreground" },
-	REFUNDED: { label: "Refunded", className: "text-muted-foreground" },
-	FAILED: { label: "Failed", className: "border-transparent bg-negative-soft text-negative" },
+	UNPAID: { labelKey: "paymentUnpaid", className: "text-muted-foreground" },
+	PAID: { labelKey: "paymentPaid", className: "border-transparent bg-positive-soft text-positive" },
+	PARTIALLY_REFUNDED: { labelKey: "paymentPartRefunded", className: "text-muted-foreground" },
+	REFUNDED: { labelKey: "orderStatusRefunded", className: "text-muted-foreground" },
+	FAILED: { labelKey: "orderStatusFailed", className: "border-transparent bg-negative-soft text-negative" },
 }
 
-export const ORDER_STATUS_OPTIONS = (Object.keys(ORDER_STATUS) as OrderStatus[]).map((value) => ({
-	value,
-	label: ORDER_STATUS[value].label,
-}))
+/**
+ * Select options, built per render because their labels are translated.
+ *
+ * A module-level constant cannot hold them: it is evaluated once at import,
+ * before any locale exists.
+ */
+export const orderStatusOptions = (t: (key: string) => string) =>
+	(Object.keys(ORDER_STATUS) as OrderStatus[]).map((value) => ({
+		value,
+		label: t(ORDER_STATUS[value].labelKey),
+	}))
 
-export const PAYMENT_STATUS_OPTIONS = (Object.keys(PAYMENT_STATUS) as PaymentStatus[]).map(
-	(value) => ({ value, label: PAYMENT_STATUS[value].label })
-)
+export const paymentStatusOptions = (t: (key: string) => string) =>
+	(Object.keys(PAYMENT_STATUS) as PaymentStatus[]).map((value) => ({
+		value,
+		label: t(PAYMENT_STATUS[value].labelKey),
+	}))
 
 /*
  * Re-exported, not re-implemented.
@@ -52,8 +68,14 @@ export const PAYMENT_STATUS_OPTIONS = (Object.keys(PAYMENT_STATUS) as PaymentSta
  */
 export { formatMoney } from "@/lib/money"
 
-export const formatDate = (value: string) =>
-	new Date(value).toLocaleDateString("en-GB", {
+/**
+ * Dates in the reader's language.
+ *
+ * Was pinned to en-GB, which printed "12 Aug 2026" on a German dashboard —
+ * the one screen staff read most, ignoring the language they had chosen.
+ */
+export const formatDate = (value: string, locale = "de") =>
+	new Date(value).toLocaleDateString(locale, {
 		day: "2-digit",
 		month: "short",
 		year: "numeric",

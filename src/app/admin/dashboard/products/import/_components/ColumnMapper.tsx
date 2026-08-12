@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { CircleCheck, CircleSlash } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import type { AnalyseResult } from "@/types/productIo"
@@ -23,6 +24,7 @@ export const ColumnMapper = ({
 	mapping: Record<string, string>
 	onChange: (mapping: Record<string, string>) => void
 }) => {
+	const t = useTranslations("admin")
 	// Handled by shape rather than by the admin — the count is a property of
 	// their file, so there is nothing here to decide.
 	const attributeHeaders = new Set(
@@ -51,18 +53,16 @@ export const ColumnMapper = ({
 						{analysis.attributeColumns.length} attribute columns detected
 					</Badge>
 				)}
-				<span className="text-muted-foreground">
-					Anything left as “Ignore” is not imported.
-				</span>
+				<span className="text-muted-foreground">{t("anythingLeftAsIgnoreIsNot")}</span>
 			</div>
 
 			<div className="overflow-x-auto rounded-lg border">
 				<table className="w-full text-sm">
 					<thead className="bg-muted/50 text-muted-foreground text-xs uppercase">
 						<tr>
-							<th className="px-4 py-2.5 text-left font-medium">Column in your file</th>
-							<th className="px-4 py-2.5 text-left font-medium">First row</th>
-							<th className="w-64 px-4 py-2.5 text-left font-medium">Import as</th>
+							<th className="px-4 py-2.5 text-left font-medium">{t("columnInYourFile")}</th>
+							<th className="px-4 py-2.5 text-left font-medium">{t("firstRow")}</th>
+							<th className="w-64 px-4 py-2.5 text-left font-medium">{t("importAs")}</th>
 						</tr>
 					</thead>
 					<tbody className="divide-y">
@@ -79,9 +79,7 @@ export const ColumnMapper = ({
 									<td className="px-4 py-2">
 										{isAttribute ? (
 											<span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
-												<CircleCheck className="size-3.5" />
-												Product attribute
-											</span>
+												<CircleCheck className="size-3.5" />{t("productAttribute")}</span>
 										) : (
 											<select
 												value={mapping[header] ?? ""}
@@ -89,7 +87,7 @@ export const ColumnMapper = ({
 												className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
 												aria-label={`Import ${header} as`}
 											>
-												<option value="">Ignore</option>
+												<option value="">{t("ignore")}</option>
 												{analysis.fields.map((field) => (
 													<option
 														key={field.key}

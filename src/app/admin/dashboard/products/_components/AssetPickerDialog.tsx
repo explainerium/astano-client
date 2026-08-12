@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { CloudUpload, Loader2 } from "lucide-react"
 import Reveal from "@/components/dashboard/shell/Reveal"
@@ -26,10 +27,13 @@ const Picker = ({
 	onClose,
 }: {
 	multiple: boolean
-	confirmLabel: string
+	confirmLabel?: string
 	onConfirm: (assets: MediaAsset[]) => void
 	onClose: () => void
 }) => {
+	const t = useTranslations("admin")
+	// Not a parameter default — that is evaluated before any hook has run.
+	const confirmText = confirmLabel ?? t("useSelected")
 	/** undefined = All media · UNFILED = unfiled · otherwise a folder id. */
 	const [folderId, setFolderId] = useState<string | undefined>(undefined)
 	const [search, setSearch] = useState("")
@@ -72,7 +76,7 @@ const Picker = ({
 	const folderName =
 		folderId && folderId !== UNFILED
 			? (folders.find((f) => f.id === folderId)?.name ?? "this folder")
-			: "Unfiled"
+			: t("unfiled")
 
 	/** Single mode keeps one; multiple mode toggles within the set. */
 	const select = (asset: MediaAsset) =>
@@ -99,7 +103,7 @@ const Picker = ({
 				<Input
 					value={search}
 					onChange={(event) => setSearch(event.target.value)}
-					placeholder="Search by file name"
+					placeholder={t("searchByFileName")}
 					className="max-w-xs"
 				/>
 				<Button
@@ -109,9 +113,7 @@ const Picker = ({
 					aria-expanded={uploadOpen}
 					onClick={() => setUploadOpen((open) => !open)}
 				>
-					<CloudUpload />
-					Upload files
-				</Button>
+					<CloudUpload />{t("uploadFiles")}</Button>
 			</div>
 
 			<Reveal open={uploadOpen}>
@@ -138,9 +140,7 @@ const Picker = ({
 				<div className="min-w-0 flex-1 overflow-y-auto">
 					{isLoading ? (
 						<div className="text-muted-foreground flex items-center justify-center gap-2 p-16 text-sm">
-							<Loader2 className="size-4 animate-spin" />
-							Loading media…
-						</div>
+							<Loader2 className="size-4 animate-spin" />{t("loadingMedia")}</div>
 					) : (
 						<MediaGrid assets={assets} selected={new Set(chosen.keys())} onToggle={toggle} />
 					)}
@@ -149,14 +149,12 @@ const Picker = ({
 
 			<DialogFooter className="sm:justify-between">
 				<span className="text-muted-foreground self-center text-xs">
-					{chosen.size ? `${chosen.size} selected` : "Nothing selected"}
+					{chosen.size ? `${chosen.size} selected` : t("nothingSelected")}
 				</span>
 				<div className="flex gap-2">
-					<Button type="button" variant="ghost" onClick={onClose}>
-						Cancel
-					</Button>
+					<Button type="button" variant="ghost" onClick={onClose}>{t("cancel")}</Button>
 					<Button type="button" disabled={!chosen.size} onClick={confirm}>
-						{confirmLabel}
+						{confirmText}
 					</Button>
 				</div>
 			</DialogFooter>
@@ -181,7 +179,7 @@ export const AssetPickerDialog = ({
 	multiple = false,
 	title,
 	description,
-	confirmLabel = "Use selected",
+	confirmLabel,
 	onConfirm,
 }: {
 	open: boolean

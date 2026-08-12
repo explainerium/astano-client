@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFormContext, useFormState } from "react-hook-form"
 import { AlertCircle } from "lucide-react"
 
@@ -29,30 +30,35 @@ const FIELD_TAB: Record<string, string> = {
 	options: "options",
 }
 
-/** Field names as the form labels them, so the message matches what is on screen. */
+/**
+ * Field names as the form labels them, so the message matches what is on
+ * screen. Keys, not words — this map is built at import time, where there is
+ * no locale to resolve one.
+ */
 const FIELD_LABEL: Record<string, string> = {
-	sku: "SKU",
-	stock: "Stock quantity",
-	weightKg: "Weight",
-	lengthCm: "Length",
-	widthCm: "Width",
-	heightCm: "Height",
-	moq: "Minimum order quantity",
-	sortOrder: "Sort order",
-	tiers: "Quantity discounts",
-	prices: "Pricing",
-	attributes: "Attributes",
-	options: "Options",
-	en: "English content",
-	de: "German content",
+	sku: "sku",
+	stock: "stockQuantity",
+	weightKg: "weight",
+	lengthCm: "length",
+	widthCm: "width",
+	heightCm: "height",
+	moq: "minimumOrderQuantity",
+	sortOrder: "sortOrder",
+	tiers: "quantityDiscounts",
+	prices: "sectionPricing",
+	attributes: "attributes",
+	options: "options",
+	en: "englishContent",
+	de: "germanContent",
 }
 
+/** Keys, resolved at render — this map is built at import time. */
 const TAB_LABEL: Record<string, string> = {
-	general: "General",
-	inventory: "Inventory",
-	shipping: "Shipping",
-	attributes: "Attributes",
-	options: "Options",
+	general: "general",
+	inventory: "inventory",
+	shipping: "shipping",
+	attributes: "attributes",
+	options: "options",
 }
 
 /** Pulls the first human-readable message out of a nested RHF error node. */
@@ -75,6 +81,7 @@ const firstMessage = (node: unknown): string | null => {
  * in sync — it simply is not there until a submit has failed.
  */
 export const ValidationSummary = ({ onJump }: { onJump: (tab: string) => void }) => {
+	const t = useTranslations("admin")
 	/**
 	 * `useFormState({ control })`, not `useFormContext().formState`.
 	 *
@@ -92,8 +99,8 @@ export const ValidationSummary = ({ onJump }: { onJump: (tab: string) => void })
 	const items = Object.entries(errors).map(([field, node]) => ({
 		field,
 		tab: FIELD_TAB[field] ?? "general",
-		label: FIELD_LABEL[field] ?? field,
-		message: firstMessage(node) ?? "Please check this field",
+		label: FIELD_LABEL[field] ? t(FIELD_LABEL[field]) : field,
+		message: firstMessage(node) ?? t("pleaseCheckThisField"),
 	}))
 
 	return (
@@ -102,9 +109,7 @@ export const ValidationSummary = ({ onJump }: { onJump: (tab: string) => void })
 			className="border-destructive/40 bg-destructive/5 text-destructive rounded-lg border p-4 text-sm"
 		>
 			<p className="flex items-center gap-2 font-semibold">
-				<AlertCircle className="size-4 shrink-0" />
-				This product could not be saved
-			</p>
+				<AlertCircle className="size-4 shrink-0" />{t("thisProductCouldNotBeSaved")}</p>
 
 			<ul className="mt-2 space-y-1">
 				{items.map((item) => (
@@ -116,7 +121,7 @@ export const ValidationSummary = ({ onJump }: { onJump: (tab: string) => void })
 						>
 							{item.label}: {item.message}
 							{item.tab !== "general" && (
-								<span className="ml-1 opacity-70">({TAB_LABEL[item.tab]} tab)</span>
+								<span className="ml-1 opacity-70">({t(TAB_LABEL[item.tab])} tab)</span>
 							)}
 						</button>
 					</li>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
@@ -63,6 +64,7 @@ const TABS: { value: UserStatus | undefined; label: string }[] = [
  * page where the decision is made.
  */
 export default function UsersPage() {
+	const t = useTranslations("admin")
 	/*
 	 * The dashboard's "Review" link lands here with ?status=PENDING, so the tab
 	 * it opens on comes from the URL. Only the initial value — after that the
@@ -103,7 +105,7 @@ export default function UsersPage() {
 		setPage(1)
 	}
 
-	const run = async (id: string, action: () => Promise<unknown>, success: string) => {
+	const run = async (id: string, action: () =>Promise<unknown>, success: string) => {
 		setBusy(id)
 		try {
 			await action()
@@ -119,10 +121,8 @@ export default function UsersPage() {
 		<div className="space-y-4">
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h1 className="font-heading text-xl font-semibold tracking-tight">Users</h1>
-					<p className="text-muted-foreground text-sm">
-						Customers, dealers and staff. Roles and account state are set here.
-					</p>
+					<h1 className="font-heading text-xl font-semibold tracking-tight">{t("users")}</h1>
+					<p className="text-muted-foreground text-sm">{t("customersDealersAndStaffRolesAnd")}</p>
 				</div>
 
 				{/* The recycle bin is a mode, not a filter — it replaces the list rather
@@ -184,11 +184,11 @@ export default function UsersPage() {
 							reset(() => setRole(value === ANY ? undefined : (value as UserRole)))
 						}
 					>
-						<SelectTrigger className="w-40" aria-label="Filter by role">
-							<SelectValue placeholder="Any role" />
+						<SelectTrigger className="w-40" aria-label={t("filterByRole")}>
+							<SelectValue placeholder={t("anyRole")} />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value={ANY}>Any role</SelectItem>
+							<SelectItem value={ANY}>{t("anyRole")}</SelectItem>
 							{ASSIGNABLE_ROLES.map((value) => (
 								<SelectItem key={value} value={value}>
 									{ROLE_LABEL[value]}
@@ -201,9 +201,7 @@ export default function UsersPage() {
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading accounts…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingAccounts")}</div>
 			)}
 
 			{isError && (
@@ -292,9 +290,7 @@ export default function UsersPage() {
 																)
 															}
 														>
-															<RotateCcw />
-															Restore
-														</Button>
+															<RotateCcw />{t("restore")}</Button>
 													) : (
 														<>
 															{/* Only a pending account has a decision waiting. */}
@@ -375,8 +371,7 @@ export default function UsersPage() {
 					{!!meta && meta.total > 0 && (
 						<div className="text-muted-foreground flex flex-wrap items-center gap-3 border-t px-4 py-2.5 text-xs">
 							<span>
-								{meta.total} {meta.total === 1 ? "account" : "accounts"} · page {meta.page} of{" "}
-								{meta.totalPages}
+								{t("paginationAccounts", { count: meta.total, page: meta.page, pages: meta.totalPages })}
 							</span>
 							{isFetching && <Loader2 className="size-3 animate-spin" />}
 							<div className="ml-auto flex gap-2">
@@ -385,17 +380,13 @@ export default function UsersPage() {
 									size="sm"
 									disabled={meta.page <= 1 || isFetching}
 									onClick={() => setPage((p) => Math.max(1, p - 1))}
-								>
-									Previous
-								</Button>
+								>{t("previous")}</Button>
 								<Button
 									variant="outline"
 									size="sm"
 									disabled={meta.page >= meta.totalPages || isFetching}
 									onClick={() => setPage((p) => p + 1)}
-								>
-									Next
-								</Button>
+								>{t("next")}</Button>
 							</div>
 						</div>
 					)}

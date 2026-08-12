@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
 import ProCheckbox from "@/components/form/ProCheckbox"
@@ -19,6 +20,7 @@ import { useAdminProductsQuery } from "@/redux/api/productApi"
  * product, and the optional group label gives page headings without needing one.
  */
 export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const { fields, append, remove } = useFieldArray({ control, name: "options" })
 	const rows = useWatch({ control, name: "options" }) as
@@ -35,8 +37,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-wrap items-start justify-between gap-3">
-				<p className="text-muted-foreground max-w-prose text-xs">
-					Options start <strong>unselected</strong> for the customer, and each one
+				<p className="text-muted-foreground max-w-prose text-xs">{t("optionsStart")}<strong>unselected</strong> for the customer, and each one
 					begins at its own minimum order quantity — not this product&apos;s, and
 					not 1.
 				</p>
@@ -56,15 +57,13 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 						})
 					}
 				>
-					<Plus />
-					Add option
-				</Button>
+					<Plus />{t("addOption")}</Button>
 			</div>
 
 			{optionProducts.length === 0 && (
 				<p className="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-xs">
 					No option products exist yet. Create a product and set its dashboard
-					label to <strong>Option</strong> — engraving, coating, packaging and so
+					label to <strong>{t("option")}</strong> — engraving, coating, packaging and so
 					on — then attach it here.
 				</p>
 			)}
@@ -85,7 +84,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 						<div className="grid flex-1 gap-3 sm:grid-cols-2">
 							<ProCombobox
 								name={`options.${index}.optionProductId`}
-								label="Option product"
+								label={t("optionProduct")}
 								className="sm:col-span-2"
 								options={optionProducts.map((product) => ({
 									value: product.id,
@@ -97,19 +96,19 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 
 							<ProInput
 								name={`options.${index}.groupLabel`}
-								label="Group heading"
-								description="Groups options under a heading, e.g. Packaging."
+								label={t("groupHeading")}
+								description={t("groupsOptionsUnderAHeadingE")}
 							/>
 							<ProInput
 								name={`options.${index}.sortOrder`}
 								type="number"
-								label="Order"
+								label={t("order")}
 							/>
 
 							<ProCheckbox
 								name={`options.${index}.preselected`}
-								label="Ticked by default"
-								description="The live site starts every option unticked."
+								label={t("tickedByDefault")}
+								description={t("theLiveSiteStartsEveryOption")}
 								className="sm:col-span-2"
 							/>
 						</div>

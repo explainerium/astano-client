@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { Loader2, Lock, MailOpen, Palette, Settings2 } from "lucide-react"
 import { toast } from "sonner"
@@ -62,15 +63,11 @@ const EmailRow = ({ template }: { template: EmailTemplate }) => {
 						{template.label}
 					</Link>
 					{!!customised && (
-						<Badge variant="secondary" className="font-normal">
-							Edited
-						</Badge>
+						<Badge variant="secondary" className="font-normal">Edited</Badge>
 					)}
 					{!template.canDisable && (
 						<Badge variant="outline" className="gap-1 font-normal">
-							<Lock className="size-3" />
-							Always on
-						</Badge>
+							<Lock className="size-3" />Always on</Badge>
 					)}
 				</div>
 				<p className="text-muted-foreground mt-1 text-sm">{template.description}</p>
@@ -79,9 +76,7 @@ const EmailRow = ({ template }: { template: EmailTemplate }) => {
 			<div className="flex shrink-0 items-center gap-3">
 				<Button asChild variant="ghost" size="sm">
 					<Link href={`/admin/dashboard/emails/${template.key}`}>
-						<Settings2 className="size-4" />
-						Edit
-					</Link>
+						<Settings2 className="size-4" />Edit</Link>
 				</Button>
 				<Switch
 					checked={template.override.enabled}
@@ -97,19 +92,18 @@ const EmailRow = ({ template }: { template: EmailTemplate }) => {
 }
 
 export default function EmailsPage() {
+	const t = useTranslations("admin")
 	const { data, isLoading, isError } = useEmailTemplatesQuery()
 
 	if (isLoading) {
 		return (
 			<p className="text-muted-foreground py-24 text-center text-sm">
-				<Loader2 className="mr-2 inline size-4 animate-spin" />
-				Loading emails…
-			</p>
+				<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loadingEmails")}</p>
 		)
 	}
 
 	if (isError || !data) {
-		return <p className="text-destructive py-24 text-center text-sm">Could not load the emails.</p>
+		return <p className="text-destructive py-24 text-center text-sm">{t("couldNotLoadTheEmails")}</p>
 	}
 
 	return (
@@ -117,19 +111,13 @@ export default function EmailsPage() {
 			<div className="flex flex-wrap items-end justify-between gap-3">
 				<div>
 					<h1 className="flex items-center gap-2 text-xl font-semibold">
-						<MailOpen className="size-5" />
-						Emails
-					</h1>
-					<p className="text-muted-foreground mt-1 text-sm">
-						What the shop sends, and what each message says.
-					</p>
+						<MailOpen className="size-5" />{t("emails")}</h1>
+					<p className="text-muted-foreground mt-1 text-sm">{t("whatTheShopSendsAndWhat")}</p>
 				</div>
 
 				<Button asChild variant="outline" size="sm">
 					<Link href="/admin/dashboard/settings/email">
-						<Palette className="size-4" />
-						Logo &amp; colours
-					</Link>
+						<Palette className="size-4" />{t("logoAndColours")}</Link>
 				</Button>
 			</div>
 

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Check, Loader2, Mail } from "lucide-react"
 import { toast } from "sonner"
@@ -28,6 +29,7 @@ const formatDate = (value: string) =>
 	})
 
 export default function ContactPage() {
+	const t = useTranslations("admin")
 	const [handled, setHandled] = useState<"true" | "false" | undefined>("false")
 	const [page, setPage] = useState(1)
 	const [busy, setBusy] = useState<string | null>(null)
@@ -47,7 +49,7 @@ export default function ContactPage() {
 		setBusy(id)
 		try {
 			await markHandled({ id }).unwrap()
-			toast.success("Marked as handled.")
+			toast.success(t("markedAsHandled"))
 		} catch (err) {
 			const message = (err as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not update the message.")
@@ -66,13 +68,13 @@ export default function ContactPage() {
 							setPage(1)
 						}}
 					>
-						<SelectTrigger className="w-44" aria-label="Filter by handled">
+						<SelectTrigger className="w-44" aria-label={t("filterByHandled")}>
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="false">Needs a reply</SelectItem>
-							<SelectItem value="true">Handled</SelectItem>
-							<SelectItem value={ANY}>Everything</SelectItem>
+							<SelectItem value="false">{t("needsAReply")}</SelectItem>
+							<SelectItem value="true">{t("handled")}</SelectItem>
+							<SelectItem value={ANY}>{t("everything")}</SelectItem>
 						</SelectContent>
 					</Select>
 				}
@@ -80,9 +82,7 @@ export default function ContactPage() {
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading messages…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingMessages")}</div>
 			)}
 
 			{isError && (
@@ -133,16 +133,12 @@ export default function ContactPage() {
 								<Badge
 									variant="outline"
 									className="border-transparent bg-positive-soft text-positive"
-								>
-									Handled
-								</Badge>
+								>{t("handled")}</Badge>
 							) : (
 								<Badge
 									variant="outline"
 									className="border-transparent bg-accent-soft-strong text-primary"
-								>
-									Needs a reply
-								</Badge>
+								>{t("needsAReply")}</Badge>
 							)}
 						</div>
 					</header>
@@ -160,9 +156,7 @@ export default function ContactPage() {
 										message.subject ? `Re: ${message.subject}` : "Your enquiry"
 									)}`}
 								>
-									<Mail />
-									Reply by email
-								</a>
+									<Mail />{t("replyByEmail")}</a>
 							</Button>
 							{!message.handledAt && (
 								<Button
@@ -170,9 +164,7 @@ export default function ContactPage() {
 									disabled={busy === message.id}
 									onClick={() => handle(message.id)}
 								>
-									<Check />
-									Mark handled
-								</Button>
+									<Check />{t("markHandled")}</Button>
 							)}
 						</div>
 					</div>
@@ -182,8 +174,7 @@ export default function ContactPage() {
 			{!!meta && meta.total > 0 && (
 				<div className="text-muted-foreground bg-card flex flex-wrap items-center gap-3 rounded-lg border px-4 py-2.5 text-xs">
 					<span>
-						{meta.total} {meta.total === 1 ? "message" : "messages"} · page {meta.page} of{" "}
-						{meta.totalPages}
+						{t("paginationMessages", { count: meta.total, page: meta.page, pages: meta.totalPages })}
 					</span>
 					{isFetching && <Loader2 className="size-3 animate-spin" />}
 					<div className="ml-auto flex gap-2">
@@ -192,17 +183,13 @@ export default function ContactPage() {
 							size="sm"
 							disabled={meta.page <= 1 || isFetching}
 							onClick={() => setPage((p) => Math.max(1, p - 1))}
-						>
-							Previous
-						</Button>
+						>{t("previous")}</Button>
 						<Button
 							variant="outline"
 							size="sm"
 							disabled={meta.page >= meta.totalPages || isFetching}
 							onClick={() => setPage((p) => p + 1)}
-						>
-							Next
-						</Button>
+						>{t("next")}</Button>
 					</div>
 				</div>
 			)}

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Loader2 } from "lucide-react"
@@ -13,13 +14,31 @@ import {
 import type { AdminProduct } from "@/types/product"
 import ProductTable, { type ProductFilters } from "./_components/ProductTable"
 
+/** Fifty is the API's own default and about two screens of rows. */
+const PAGE_SIZE = 50
+
 export default function ProductsPage() {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [filters, setFilters] = useState<ProductFilters>({ search: "" })
+	const [page, setPage] = useState(1)
+
+	/**
+	 * A filter change resets to the first page.
+	 *
+	 * Page 4 of a narrowed list is usually not there, and an empty table with no
+	 * explanation reads as "the filter found nothing" rather than "you are past
+	 * the end". The orders list already does this.
+	 */
+	const changeFilters = (next: ProductFilters) => {
+		setFilters(next)
+		setPage(1)
+	}
 
 	const {
 		data: result,
 		isLoading,
+		isFetching,
 		isError,
 		error,
 	} = useAdminProductsQuery({
@@ -28,7 +47,8 @@ export default function ProductsPage() {
 		kind: filters.kind,
 		categoryId: filters.categoryId,
 		stockStatus: filters.stockStatus,
-		limit: 100,
+		page,
+		limit: PAGE_SIZE,
 	})
 
 	// Flattened to a tree order so the filter reads like the catalogue does.
@@ -62,15 +82,13 @@ export default function ProductsPage() {
 		<div className="space-y-4">
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading products…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingProducts")}</div>
 			)}
 
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load products."}
+						t("couldNotLoadProducts")}
 				</div>
 			)}
 
@@ -78,7 +96,7 @@ export default function ProductsPage() {
 				<ProductTable
 					products={products}
 					filters={filters}
-					onFiltersChange={setFilters}
+					onFiltersChange={changeFilters}
 					categories={categories}
 					statusCounts={{
 						all: allCount?.meta?.total,
@@ -86,6 +104,9 @@ export default function ProductsPage() {
 						DRAFT: draftCount?.meta?.total,
 						ARCHIVED: archivedCount?.meta?.total,
 					}}
+					meta={result.meta}
+					isFetching={isFetching}
+					onPageChange={setPage}
 					onCreate={() => router.push("/admin/dashboard/products/create")}
 					onEdit={(product: AdminProduct) =>
 						router.push(`/admin/dashboard/products/${product.id}/edit`)

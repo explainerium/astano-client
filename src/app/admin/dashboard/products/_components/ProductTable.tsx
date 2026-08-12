@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import {
@@ -47,7 +48,9 @@ import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
 import { useDeleteProductMutation, useDuplicateProductMutation } from "@/redux/api/productApi"
 import { downloadFile } from "@/lib/downloadFile"
+import { pickTranslation } from "@/lib/pickTranslation"
 import { cn } from "@/lib/utils"
+import type { IMeta } from "@/types"
 import type {
 	AdminProduct,
 	ProductKind,
@@ -153,11 +156,14 @@ const thumbnailOf = (product: AdminProduct): string | null => {
  * All four use the admin theme's own tokens rather than raw palette colours, so
  * a change to the theme carries through here.
  */
-const STATUS_CHIP: Record<ProductStatus, { label: string; className: string }> = {
-	PUBLISHED: { label: "Published", className: "border-transparent bg-positive-soft text-positive" },
-	DRAFT: { label: "Draft", className: "border-transparent bg-muted text-foreground" },
+const STATUS_CHIP: Record<ProductStatus, { labelKey: string; className: string }> = {
+	PUBLISHED: {
+		labelKey: "statusPublished",
+		className: "border-transparent bg-positive-soft text-positive",
+	},
+	DRAFT: { labelKey: "statusDraft", className: "border-transparent bg-muted text-foreground" },
 	// Outline kept, so retired reads fainter than merely unpublished.
-	ARCHIVED: { label: "Archived", className: "text-muted-foreground" },
+	ARCHIVED: { labelKey: "statusArchived", className: "text-muted-foreground" },
 }
 
 /** Shoppers cannot find it. The one genuine warning in this column. */
@@ -185,6 +191,9 @@ export const ProductTable = ({
 	filters,
 	onFiltersChange,
 	statusCounts,
+	meta,
+	isFetching,
+	onPageChange,
 	categories,
 	onEdit,
 	onCreate,
@@ -193,10 +202,15 @@ export const ProductTable = ({
 	filters: ProductFilters
 	onFiltersChange: (filters: ProductFilters) => void
 	statusCounts: StatusCounts
+	/** Absent while the first page is still loading. */
+	meta?: IMeta
+	isFetching?: boolean
+	onPageChange?: (page: number) => void
 	categories: { id: string; name: string; depth: number; productCount: number }[]
 	onEdit: (product: AdminProduct) => void
 	onCreate: () => void
 }) => {
+	const t = useTranslations("admin")
 	// The shop's own separators and symbol. A function rather than an import,
 	// so React Compiler can see that these prices depend on it.
 	const formatMoney = useMoney()
@@ -215,7 +229,7 @@ export const ProductTable = ({
 			const stamp = new Date().toISOString().slice(0, 10)
 			await downloadFile("/admin/products-io/export", `astano-products-${stamp}.csv`)
 		} catch {
-			toast.error("Could not build the export.")
+			toast.error(t("couldNotBuildTheExport"))
 		}
 
 		setExporting(false)
@@ -245,13 +259,13 @@ export const ProductTable = ({
 		try {
 			const copy = await duplicateProduct(product.id).unwrap()
 			toast.success(`“${product.name}” duplicated`, {
-				description: "The copy is a draft. Give it a SKU and publish it when it is ready.",
+				description: t("copyIsADraft"),
 			})
 			onEdit(copy)
 		} catch (error) {
-			toast.error("Could not duplicate this product", {
+			toast.error(t("couldNotDuplicateThisProduct"), {
 				description:
-					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+					(error as { data?: { message?: string } })?.data?.message ?? t("pleaseTryAgain"),
 			})
 		} finally {
 			setDuplicatingId(null)
@@ -285,7 +299,7 @@ export const ProductTable = ({
 					name: product.name,
 					message:
 						(error as { data?: { message?: string } })?.data?.message ??
-						"Could not be deleted.",
+						t("couldNotBeDeleted"),
 				})
 			}
 		}
@@ -294,7 +308,7 @@ export const ProductTable = ({
 		setPending(null)
 		setSelected(new Set())
 
-		if (deleted) toast.success(`${deleted} ${deleted === 1 ? "product" : "products"} deleted.`)
+		if (deleted) toast.success(t("deletedProducts", { count: deleted }))
 		// The API refuses a product still attached to another as an option.
 		if (failures.length) toast.error(`“${failures[0].name}” — ${failures[0].message}`)
 	}
@@ -324,7 +338,7 @@ export const ProductTable = ({
 			<Toolbar
 				searchValue={filters.search}
 				onSearchChange={(search) => onFiltersChange({ ...filters, search })}
-				searchPlaceholder="Search name or SKU…"
+				searchPlaceholder={t("searchProducts")}
 				filters={
 					<div className="flex flex-wrap items-center gap-2">
 						{/* Status lives in the links above the table, WordPress-style. */}
@@ -337,11 +351,11 @@ export const ProductTable = ({
 								})
 							}
 						>
-							<SelectTrigger className="w-44" aria-label="Filter by category">
-								<SelectValue placeholder="All categories" />
+							<SelectTrigger className="w-44" aria-label={t("filterByCategory")}>
+								<SelectValue placeholder={t("allCategories")} />
 							</SelectTrigger>
 							<SelectContent className="max-h-72">
-								<SelectItem value={ANY}>All categories</SelectItem>
+								<SelectItem value={ANY}>{t("allCategories")}</SelectItem>
 								{categories.map((category) => (
 									<SelectItem key={category.id} value={category.id}>
 										{/* Non-breaking spaces, because Radix renders the label
@@ -366,14 +380,14 @@ export const ProductTable = ({
 								})
 							}
 						>
-							<SelectTrigger className="w-40" aria-label="Filter by stock status">
-								<SelectValue placeholder="Any stock status" />
+							<SelectTrigger className="w-40" aria-label={t("filterByStockStatus")}>
+								<SelectValue placeholder={t("anyStockStatus")} />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value={ANY}>Any stock status</SelectItem>
-								<SelectItem value="IN_STOCK">In stock</SelectItem>
-								<SelectItem value="OUT_OF_STOCK">Out of stock</SelectItem>
-								<SelectItem value="ON_BACKORDER">On backorder</SelectItem>
+								<SelectItem value={ANY}>{t("anyStockStatus")}</SelectItem>
+								<SelectItem value="IN_STOCK">{t("stockInStock")}</SelectItem>
+								<SelectItem value="OUT_OF_STOCK">{t("outOfStock")}</SelectItem>
+								<SelectItem value="ON_BACKORDER">{t("stockOnBackorder")}</SelectItem>
 							</SelectContent>
 						</Select>
 
@@ -386,13 +400,13 @@ export const ProductTable = ({
 								})
 							}
 						>
-							<SelectTrigger className="w-36" aria-label="Filter by kind">
-								<SelectValue placeholder="Any kind" />
+							<SelectTrigger className="w-36" aria-label={t("filterByKind")}>
+								<SelectValue placeholder={t("anyKind")} />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem value={ANY}>Any kind</SelectItem>
-								<SelectItem value="MAIN">Main product</SelectItem>
-								<SelectItem value="OPTION">Option</SelectItem>
+								<SelectItem value={ANY}>{t("anyKind")}</SelectItem>
+								<SelectItem value="MAIN">{t("mainProduct")}</SelectItem>
+								<SelectItem value="OPTION">{t("option")}</SelectItem>
 							</SelectContent>
 						</Select>
 					</div>
@@ -405,9 +419,7 @@ export const ProductTable = ({
 						size="lg"
 						onClick={() => setPending(products.filter((p) => selected.has(p.id)))}
 					>
-						<Trash2 />
-						Delete
-					</Button>
+						<Trash2 />{t("delete")}</Button>
 				}
 				primaryAction={
 					<div className="flex flex-wrap gap-2">
@@ -418,14 +430,10 @@ export const ProductTable = ({
 						</Button>
 						<Button asChild variant="outline" size="lg">
 							<Link href="/admin/dashboard/products/import">
-								<Upload />
-								Import
-							</Link>
+								<Upload />{t("import")}</Link>
 						</Button>
 						<Button size="lg" onClick={onCreate}>
-							<Plus />
-							New product
-						</Button>
+							<Plus />{t("newProduct")}</Button>
 					</div>
 				}
 			/>
@@ -441,37 +449,25 @@ export const ProductTable = ({
 										onCheckedChange={(checked) =>
 											setSelected(checked ? new Set(products.map((p) => p.id)) : new Set())
 										}
-										aria-label="Select all products"
+										aria-label={t("selectAllProducts")}
 										disabled={!products.length}
 									/>
 								</TableHead>
 								<TableHead className="w-16">
-									<span className="sr-only">Image</span>
+									<span className="sr-only">{t("image")}</span>
 								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Product
-								</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("product")}</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 									SKU
 								</TableHead>
-								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
-									Price
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Categories
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Author
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Status
-								</TableHead>
+								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">{t("price")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("categories")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("author")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("status")}</TableHead>
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									MOQ
 								</TableHead>
-								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
-									Stock
-								</TableHead>
+								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">{t("stock")}</TableHead>
 								<TableHead className="w-32 pr-4" />
 							</TableRow>
 						</TableHeader>
@@ -482,8 +478,8 @@ export const ProductTable = ({
 									<TableCell colSpan={11} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{filters.search || filters.status || filters.kind
-												? "Nothing matches these filters."
-												: "No products yet. Create the first one to start the catalogue."}
+												? t("nothingMatchesTheseFilters")
+												: t("noProductsYet")}
 										</p>
 									</TableCell>
 								</TableRow>
@@ -492,7 +488,7 @@ export const ProductTable = ({
 							{products.map((product) => {
 								const isSelected = selected.has(product.id)
 								const variant = defaultVariant(product)
-								const en = product.translations.find((t) => t.locale === "en")
+								const listing = pickTranslation(product.translations)
 								const thumbnail = thumbnailOf(product)
 								const productCategories = categoryNamesFor(product)
 								const status = STATUS_CHIP[product.status]
@@ -539,12 +535,12 @@ export const ProductTable = ({
 										    be compared at a glance instead of trailing off after
 										    names of wildly different lengths. */}
 										<TableCell>
-											{en?.slug ? (
+											{listing?.slug ? (
 												<Link
 													href={getPathname({
 														href: {
 															pathname: "/products/[slug]",
-															params: { slug: en.slug },
+															params: { slug: listing.slug },
 														},
 														locale: "en",
 													})}
@@ -574,7 +570,7 @@ export const ProductTable = ({
 										<TableCell className="text-right tabular-nums">
 											{product.quoteEnabled ? (
 												<span className="text-muted-foreground text-xs">
-													On request
+													{t("stockOnRequest")}
 												</span>
 											) : price ? (
 												price.sale ? (
@@ -609,7 +605,7 @@ export const ProductTable = ({
 													{productCategories.join(", ")}
 												</span>
 											) : (
-												<span>Uncategorised</span>
+												<span>{t("uncategorised")}</span>
 											)}
 										</TableCell>
 
@@ -645,22 +641,18 @@ export const ProductTable = ({
 										<TableCell>
 											<div className="flex flex-wrap items-center gap-1">
 												<Badge variant="outline" className={status.className}>
-													{status.label}
+													{t(status.labelKey)}
 												</Badge>
 
 												{/* Orthogonal to status — a product can be published
 												    and still invisible to shoppers, which is exactly
 												    the combination worth catching. */}
 												{product.visibility === "HIDDEN" && (
-													<Badge variant="outline" className={HIDDEN_CHIP}>
-														Hidden
-													</Badge>
+													<Badge variant="outline" className={HIDDEN_CHIP}>{t("hidden")}</Badge>
 												)}
 
 												{product.kind === "OPTION" && (
-													<Badge variant="outline" className={OPTION_CHIP}>
-														Option
-													</Badge>
+													<Badge variant="outline" className={OPTION_CHIP}>{t("option")}</Badge>
 												)}
 											</div>
 										</TableCell>
@@ -699,7 +691,7 @@ export const ProductTable = ({
 													variant="ghost"
 													size="icon"
 													aria-label={`Duplicate ${product.name}`}
-													title="Duplicate"
+													title={t("duplicate")}
 													// Every copy button, not just this row's: two copies
 													// started at once would open two editors, and the
 													// second would win.
@@ -731,9 +723,40 @@ export const ProductTable = ({
 				</div>
 
 				{products.length > 0 && (
-					<div className="text-muted-foreground border-t px-4 py-2.5 text-xs">
-						{products.length} {products.length === 1 ? "product" : "products"}
-						{selected.size > 0 && ` · ${selected.size} selected`}
+					<div className="text-muted-foreground flex flex-wrap items-center gap-3 border-t px-4 py-2.5 text-xs">
+						<span>
+							{meta
+								? t("paginationProducts", {
+										count: meta.total,
+										page: meta.page,
+										pages: meta.totalPages,
+									})
+								: t("countProducts", { count: products.length })}
+							{selected.size > 0 && ` · ${selected.size} selected`}
+						</span>
+
+						{isFetching && <Loader2 className="size-3 animate-spin" />}
+
+						{meta && meta.totalPages > 1 && onPageChange && (
+							<div className="ml-auto flex gap-2">
+								<Button
+									variant="outline"
+									size="sm"
+									disabled={meta.page <= 1 || isFetching}
+									onClick={() => onPageChange(Math.max(1, meta.page - 1))}
+								>
+									{t("previous")}
+								</Button>
+								<Button
+									variant="outline"
+									size="sm"
+									disabled={meta.page >= meta.totalPages || isFetching}
+									onClick={() => onPageChange(meta.page + 1)}
+								>
+									{t("next")}
+								</Button>
+							</div>
+						)}
 					</div>
 				)}
 			</div>
@@ -753,7 +776,7 @@ export const ProductTable = ({
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={isDeleting}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()
@@ -761,7 +784,7 @@ export const ProductTable = ({
 							}}
 							disabled={isDeleting}
 						>
-							{isDeleting ? "Deleting…" : "Delete"}
+							{isDeleting ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

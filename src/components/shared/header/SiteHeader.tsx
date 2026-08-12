@@ -10,6 +10,7 @@ import {
 	useShopCategoriesQuery,
 } from "@/redux/api/storefrontApi"
 import CartDrawer from "./CartDrawer"
+import LanguageSwitcher from "./LanguageSwitcher"
 import { cn } from "@/lib/utils"
 
 /**
@@ -156,6 +157,10 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 					</nav>
 
 					<div className="ml-auto flex items-center gap-4 sm:gap-5 lg:ml-0">
+						{/* Before the account icons rather than after: language is a
+						    decision about the whole page, not another account action. */}
+						<LanguageSwitcher className="hidden sm:flex" />
+						<span className="text-border hidden sm:inline">|</span>
 						<IconLink href="/account" label="Account">
 							<User className="size-5" strokeWidth={1.5} />
 						</IconLink>
@@ -207,6 +212,12 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 									</Link>
 								</li>
 							))}
+
+							{/* The icon row hides the switcher below `sm`, so the collapsed
+							    menu is where a phone gets to change language at all. */}
+							<li className="py-3.5">
+								<LanguageSwitcher />
+							</li>
 						</ul>
 					</nav>
 				)}

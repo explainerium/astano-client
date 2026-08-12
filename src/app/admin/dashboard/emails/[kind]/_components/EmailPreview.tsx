@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Loader2, Monitor, Smartphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils"
  * fitting a phone.
  */
 export const EmailPreview = ({ kind }: { kind: string }) => {
+	const t = useTranslations("admin")
 	const [locale, setLocale] = useState("en")
 	const [narrow, setNarrow] = useState(false)
 	const [showText, setShowText] = useState(false)
@@ -70,11 +72,11 @@ export const EmailPreview = ({ kind }: { kind: string }) => {
 
 			{!!data && (
 				<p className="text-muted-foreground truncate text-sm">
-					<span className="font-medium">Subject:</span> {data.subject}
+					<span className="font-medium">{t("subject2")}</span> {data.subject}
 				</p>
 			)}
 
-			{isError && <p className="text-destructive text-sm">Could not render this email.</p>}
+			{isError && <p className="text-destructive text-sm">{t("couldNotRenderThisEmail")}</p>}
 
 			{!!data &&
 				(showText ? (
@@ -86,7 +88,7 @@ export const EmailPreview = ({ kind }: { kind: string }) => {
 				) : (
 					<div className="bg-muted flex justify-center overflow-hidden rounded-md">
 						<iframe
-							title="Email preview"
+							title={t("emailPreview")}
 							srcDoc={data.html}
 							sandbox=""
 							className={cn(

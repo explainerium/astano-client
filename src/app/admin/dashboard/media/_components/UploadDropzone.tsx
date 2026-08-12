@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useCallback, useState } from "react"
 import { useDropzone, type FileRejection } from "react-dropzone"
 import { CloudUpload, Loader2 } from "lucide-react"
@@ -34,6 +35,7 @@ export const UploadDropzone = ({
 	 */
 	onUploaded?: (asset: MediaAsset) => void
 }) => {
+	const t = useTranslations("admin")
 	const [uploadImage] = useUploadImageMutation()
 	const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
 
@@ -68,13 +70,13 @@ export const UploadDropzone = ({
 			const ok = accepted.length - failed
 			if (ok > 0) {
 				toast.success(
-					`${ok} ${ok === 1 ? "image" : "images"} uploaded${
-						targetFolder ? ` to ${folderName}` : ""
-					}.`
+					targetFolder
+						? t("uploadedImagesToFolder", { count: ok, folder: folderName })
+						: t("uploadedImages", { count: ok })
 				)
 			}
 		},
-		[uploadImage, targetFolder, folderName, onUploaded]
+		[uploadImage, targetFolder, folderName, onUploaded, t]
 	)
 
 	const { getRootProps, getInputProps, isDragActive } = useDropzone({

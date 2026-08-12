@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { DropdownMenu } from "radix-ui"
 import { ChevronDown, LogOut } from "lucide-react"
@@ -14,6 +15,7 @@ const ROLE_LABEL: Partial<Record<UserRole, string>> = {
 }
 
 export const UserMenu = () => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const { role } = useUserInfo()
 	const { data: user } = useMeQuery()
@@ -58,9 +60,7 @@ export const UserMenu = () => {
 						onSelect={signOut}
 						className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-sm outline-none"
 					>
-						<LogOut className="size-4" />
-						Sign out
-					</DropdownMenu.Item>
+						<LogOut className="size-4" />{t("signOut")}</DropdownMenu.Item>
 				</DropdownMenu.Content>
 			</DropdownMenu.Portal>
 		</DropdownMenu.Root>

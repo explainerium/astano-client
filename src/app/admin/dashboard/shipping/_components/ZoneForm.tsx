@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -56,6 +57,7 @@ const toDefaults = (zone?: ShippingZone): FormValues => ({
 })
 
 export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createZone] = useCreateShippingZoneMutation()
 	const [updateZone] = useUpdateShippingZoneMutation()
@@ -78,10 +80,10 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 		try {
 			if (isEdit) {
 				await updateZone({ id: zone.id, data: payload }).unwrap()
-				toast.success("Zone updated.")
+				toast.success(t("zoneUpdated"))
 			} else {
 				const created = await createZone(payload).unwrap()
-				toast.success("Zone created.")
+				toast.success(t("zoneCreated"))
 				// Into the new zone's own page, where its first method is added. A
 				// zone with no methods offers no shipping, so leaving the admin on
 				// the list would hide the half-finished state behind a scroll.
@@ -100,7 +102,7 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 				backHref="/admin/dashboard/shipping"
 				backLabel="All shipping zones"
 				title={isEdit ? zone.name : "New zone"}
-				description="A zone is a group of countries that share the same rates. Each country belongs to exactly one zone."
+				description={t("aZoneIsAGroupOf")}
 			/>
 
 			<ProForm
@@ -114,11 +116,11 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"
-							label="Code"
-							description="Used internally. Cannot contain spaces."
+							label={t("code")}
+							description={t("usedInternallyCannotContainSpaces")}
 							required
 						/>
-						<ProInput name="sortOrder" type="number" label="Sort order" />
+						<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 					</div>
 
 					<Tabs value={activeLocale} onValueChange={setActiveLocale}>
@@ -137,23 +139,23 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label="Name" required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
 							</TabsContent>
 						))}
 					</Tabs>
 
 					<ProCombobox
 						name="countries"
-						label="Countries"
+						label={t("countries")}
 						multiple
 						options={countryOptions("en")}
 						placeholder="No countries"
-						description="A country can only be in one zone. Adding one that already belongs elsewhere is refused."
+						description={t("aCountryCanOnlyBeIn")}
 					/>
 
 					<ProCheckbox
 						name="isActive"
-						label="Active"
+						label={t("active")}
 						description="An inactive zone offers no shipping at all to its countries."
 						className="border-t pt-4"
 					/>
@@ -161,7 +163,7 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 
 				<div className="flex justify-end gap-2">
 					<Button asChild type="button" variant="ghost">
-						<Link href="/admin/dashboard/shipping">Cancel</Link>
+						<Link href="/admin/dashboard/shipping">{t("cancel")}</Link>
 					</Button>
 					<ProSubmit>{isEdit ? "Save changes" : "Create zone"}</ProSubmit>
 				</div>

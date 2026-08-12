@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 import Reveal from "@/components/dashboard/shell/Reveal"
@@ -11,6 +12,7 @@ import MediaToolbar from "./_components/MediaToolbar"
 import UploadDropzone from "./_components/UploadDropzone"
 
 export default function MediaPage() {
+	const t = useTranslations("admin")
 	/** undefined = All media · UNFILED = unfiled · otherwise a folder id. */
 	const [folderId, setFolderId] = useState<string | undefined>(undefined)
 	const [search, setSearch] = useState("")
@@ -85,9 +87,7 @@ export default function MediaPage() {
 
 				{isLoading ? (
 					<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-						<Loader2 className="size-4 animate-spin" />
-						Loading media…
-					</div>
+						<Loader2 className="size-4 animate-spin" />{t("loadingMedia")}</div>
 				) : (
 					<MediaGrid assets={assets} selected={selected} onToggle={toggle} />
 				)}

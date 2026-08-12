@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { Plus, Trash2, Wand2 } from "lucide-react"
@@ -48,6 +49,7 @@ const optionsFor = (type: TierType | undefined) =>
  * again when the form is flattened for the API.
  */
 const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => {
+	const t = useTranslations("admin")
 	// Its own, rather than threaded from the parent — it is a component, and
 	// the query behind this is shared.
 	const formatMoney = useMoney()
@@ -103,35 +105,27 @@ const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => 
 		<div className="space-y-3">
 			<div className="flex justify-end gap-2">
 				<Button type="button" variant="outline" size="sm" onClick={addStandardLadder}>
-					<Wand2 />
-					Standard ladder
-				</Button>
+					<Wand2 />{t("standardLadder")}</Button>
 				<Button
 					type="button"
 					variant="outline"
 					size="sm"
 					onClick={() => append(emptyRow(nextQuantity()))}
 				>
-					<Plus />
-					Add row
-				</Button>
+					<Plus />{t("addRow")}</Button>
 			</div>
 
 			{!fields.length ? (
-				<p className="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-xs">
-					No quantity discounts for this group. Every order pays the normal price.
-				</p>
+				<p className="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-xs">No quantity discounts for this group. Every order pays the normal price.</p>
 			) : (
 				<div className="overflow-x-auto">
 					<table className="w-full min-w-2xl text-sm">
 						<thead>
 							<tr className="text-muted-foreground text-left text-xs uppercase">
-								<th className="w-44 pb-2 font-medium">Discount type</th>
-								<th className="w-36 pb-2 font-medium">Amount</th>
-								<th className="w-40 pb-2 font-medium">Minimum quantity</th>
-								<th className="pb-2 font-medium">
-									Per unit
-									<span className="block text-[10px] normal-case">what the customer pays</span>
+								<th className="w-44 pb-2 font-medium">{t("discountType")}</th>
+								<th className="w-36 pb-2 font-medium">{t("amount")}</th>
+								<th className="w-40 pb-2 font-medium">{t("minimumQuantity")}</th>
+								<th className="pb-2 font-medium">{t("perUnit")}<span className="block text-[10px] normal-case">what the customer pays</span>
 								</th>
 								<th className="w-12 pb-2" />
 							</tr>
@@ -182,9 +176,7 @@ const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => 
 														<span className="text-[10px]">{suffix}</span>
 													</>
 												) : amount ? (
-													<span className="text-[10px]">
-														Set a price above to see this
-													</span>
+													<span className="text-[10px]">{t("setAPriceAboveToSee")}</span>
 												) : (
 													<span>—</span>
 												)}
@@ -227,6 +219,7 @@ const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => 
  * through this form unchanged.
  */
 export const QuantityPricing = () => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const [role, setRole] = useState<TierRole>("GUEST")
 
@@ -260,7 +253,7 @@ export const QuantityPricing = () => {
 	return (
 		<div className="space-y-3">
 			<div>
-				<h3 className="text-sm font-medium">Quantity discounts</h3>
+				<h3 className="text-sm font-medium">{t("quantityDiscounts")}</h3>
 				<p className="text-muted-foreground mt-1 max-w-prose text-xs">
 					The price per unit once the customer orders that many. Each row applies from
 					its quantity upwards, and the last row covers everything above it. Below the

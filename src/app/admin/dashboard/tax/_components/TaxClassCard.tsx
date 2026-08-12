@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { Check, Minus, Pencil, Plus, Trash2, Wand2 } from "lucide-react"
@@ -67,6 +68,7 @@ const rateHref = (classId: string, rateId: string) =>
 const newRateHref = (classId: string) => `/admin/dashboard/tax/classes/${classId}/rates/new`
 
 export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
+	const t = useTranslations("admin")
 	const [createRate] = useCreateTaxRateMutation()
 	const [deleteClass] = useDeleteTaxClassMutation()
 	const [deleteRate] = useDeleteTaxRateMutation()
@@ -113,8 +115,8 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 		}
 
 		setBusy(false)
-		if (added) toast.success(`${added} ${added === 1 ? "rate" : "rates"} added.`)
-		else toast.info("Every country in the live matrix already has a rate here.")
+		if (added) toast.success(t("addedRates", { count: added }))
+		else toast.info(t("everyCountryInTheLiveMatrix"))
 	}
 
 	const runDelete = async () => {
@@ -145,9 +147,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 				<h2 className="font-heading text-sm font-semibold">{taxClass.name}</h2>
 				<span className="text-muted-foreground font-mono text-xs">{taxClass.code}</span>
 				{taxClass.isDefault && (
-					<Badge variant="outline" className="border-transparent bg-positive-soft text-positive">
-						Default
-					</Badge>
+					<Badge variant="outline" className="border-transparent bg-positive-soft text-positive">{t("default")}</Badge>
 				)}
 
 				<div className="ml-auto flex gap-1">
@@ -177,14 +177,10 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 					<div className="flex flex-wrap justify-center gap-2">
 						<Button asChild variant="outline" size="sm">
 							<Link href={newRateHref(taxClass.id)}>
-								<Plus />
-								Add rate
-							</Link>
+								<Plus />{t("addRate")}</Link>
 						</Button>
 						<Button size="sm" disabled={busy} onClick={seedLiveRates}>
-							<Wand2 />
-							Add the live matrix
-						</Button>
+							<Wand2 />{t("addTheLiveMatrix")}</Button>
 					</div>
 				</div>
 			) : (
@@ -260,18 +256,14 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 
 					<div className="flex flex-wrap items-center gap-2 border-t px-4 py-2.5">
 						<span className="text-muted-foreground text-xs">
-							{taxClass.rates.length} {taxClass.rates.length === 1 ? "rate" : "rates"}
+							{t("countRates", { count: taxClass.rates.length })}
 						</span>
 						<div className="ml-auto flex gap-2">
 							<Button variant="outline" size="sm" disabled={busy} onClick={seedLiveRates}>
-								<Wand2 />
-								Fill gaps from the live matrix
-							</Button>
+								<Wand2 />{t("fillGapsFromTheLiveMatrix")}</Button>
 							<Button asChild variant="outline" size="sm">
 								<Link href={newRateHref(taxClass.id)}>
-									<Plus />
-									Add rate
-								</Link>
+									<Plus />{t("addRate")}</Link>
 							</Button>
 						</div>
 					</div>
@@ -293,7 +285,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={busy}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()

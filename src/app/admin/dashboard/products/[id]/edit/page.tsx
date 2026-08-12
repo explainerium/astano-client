@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { use } from "react"
 import { Loader2 } from "lucide-react"
 import { useAdminProductQuery } from "@/redux/api/productApi"
@@ -10,15 +11,14 @@ export default function EditProductPage({
 }: {
 	params: Promise<{ id: string }>
 }) {
+	const t = useTranslations("admin")
 	const { id } = use(params)
 	const { data: product, isLoading, isError, error } = useAdminProductQuery(id)
 
 	if (isLoading) {
 		return (
 			<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading product…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingProduct")}</div>
 		)
 	}
 
@@ -26,7 +26,7 @@ export default function EditProductPage({
 		return (
 			<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 				{(error as { data?: { message?: string } })?.data?.message ??
-					"Could not load this product."}
+					t("couldNotLoadThisProduct")}
 			</div>
 		)
 	}

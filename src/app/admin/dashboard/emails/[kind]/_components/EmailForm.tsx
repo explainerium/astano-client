@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Lock, RotateCcw } from "lucide-react"
 import { toast } from "sonner"
@@ -32,13 +33,14 @@ const schema = z.object({
 })
 
 export const EmailForm = ({ template }: { template: EmailTemplate }) => {
+	const t = useTranslations("admin")
 	const [save] = useSaveEmailTemplateMutation()
 	const [reset, { isLoading: isResetting }] = useResetEmailTemplateMutation()
 
 	const onSubmit = async (values: z.infer<typeof schema>) => {
 		try {
 			await save({ kind: template.key, data: values }).unwrap()
-			toast.success("Saved.")
+			toast.success(t("saved"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not save that.")
@@ -48,7 +50,7 @@ export const EmailForm = ({ template }: { template: EmailTemplate }) => {
 	const onReset = async () => {
 		try {
 			await reset(template.key).unwrap()
-			toast.success("Back to the default wording.")
+			toast.success(t("backToTheDefaultWording"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? "Could not reset that.")
@@ -68,50 +70,48 @@ export const EmailForm = ({ template }: { template: EmailTemplate }) => {
 			{template.canDisable ? (
 				<ProCheckbox
 					name="enabled"
-					label="Send this email"
-					description="Off means it is never sent, to anyone."
+					label={t("sendThisEmail")}
+					description={t("offMeansItIsNeverSent")}
 				/>
 			) : (
 				<div className="bg-accent-soft flex items-start gap-3 rounded-lg border p-4 text-sm">
 					<Lock className="text-primary mt-0.5 size-4 shrink-0" />
 					<p>
-						<strong>Always sent.</strong> {template.description}
+						<strong>{t("alwaysSent")}</strong> {template.description}
 					</p>
 				</div>
 			)}
 
 			<ProInput
 				name="subject"
-				label="Subject"
-				description="Leave empty for the built-in wording, which is already translated. {shop} and the values shown below can be used."
+				label={t("subject")}
+				description={t("leaveEmptyForTheBuiltIn")}
 			/>
 
 			<ProInput
 				name="heading"
-				label="Heading"
-				description="The large line inside the message. Leave empty for the default."
+				label={t("heading")}
+				description={t("theLargeLineInsideTheMessage")}
 			/>
 
 			<ProTextarea
 				name="additionalContent"
-				label="Additional content"
-				description="Appended above the footer — a returns policy, holiday despatch dates. Blank lines start a new paragraph."
+				label={t("additionalContent")}
+				description={t("appendedAboveTheFooterAReturns")}
 			/>
 
 			{!!template.recipientSetting && (
 				<ProInput
 					name="recipient"
-					label="Send to"
-					description="Leave empty to use the address configured in Settings."
+					label={t("sendTo")}
+					description={t("leaveEmptyToUseTheAddress")}
 				/>
 			)}
 
 			<div className="flex items-center justify-between gap-3">
 				<Button type="button" variant="ghost" size="sm" onClick={onReset} disabled={isResetting}>
-					<RotateCcw className="size-4" />
-					Reset to default
-				</Button>
-				<ProSubmit>Save</ProSubmit>
+					<RotateCcw className="size-4" />{t("resetToDefault")}</Button>
+				<ProSubmit>{t("save")}</ProSubmit>
 			</div>
 		</ProForm>
 	)

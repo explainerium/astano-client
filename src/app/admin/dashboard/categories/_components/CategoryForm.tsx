@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -115,6 +116,7 @@ export const CategoryForm = ({
 	category?: AdminCategory
 	allCategories: AdminCategory[]
 }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createCategory] = useCreateCategoryMutation()
 	const [updateCategory] = useUpdateCategoryMutation()
@@ -172,10 +174,10 @@ export const CategoryForm = ({
 		try {
 			if (isEdit) {
 				await updateCategory({ id: category.id, data: payload }).unwrap()
-				toast.success("Category updated.")
+				toast.success(t("categoryUpdated"))
 			} else {
 				const created = await createCategory(payload).unwrap()
-				toast.success("Category created.")
+				toast.success(t("categoryCreated"))
 				// Straight into the editor for the thing just made, so the price
 				// ladders below become reachable without hunting for it in the list.
 				router.replace(`/admin/dashboard/categories/${created.id}/edit`)
@@ -196,9 +198,7 @@ export const CategoryForm = ({
 					href="/admin/dashboard/categories"
 					className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
 				>
-					<ArrowLeft className="size-4" />
-					All categories
-				</Link>
+					<ArrowLeft className="size-4" />{t("allCategories")}</Link>
 
 				<h1 className="mt-2 text-xl font-semibold">
 					{isEdit
@@ -240,64 +240,64 @@ export const CategoryForm = ({
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="space-y-4 pt-4">
-								<ProInput name={`${code}.name`} label="Name" required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
 								<ProInput
 									name={`${code}.slug`}
-									label="Slug"
-									description="Leave empty to generate it from the name. German umlauts become ue, oe, ae."
+									label={t("slug")}
+									description={t("leaveEmptyToGenerateItFrom")}
 								/>
-								<ProTextarea name={`${code}.description`} label="Description" rows={3} />
+								<ProTextarea name={`${code}.description`} label={t("description")} rows={3} />
 							</TabsContent>
 						))}
 					</Tabs>
 				</div>
 
 				<div className="bg-card space-y-5 rounded-lg border p-5">
-					<h2 className="font-heading text-base font-semibold">Pictures</h2>
+					<h2 className="font-heading text-base font-semibold">{t("pictures")}</h2>
 
 					<CategoryAssetField
 						name="imageAssetId"
 						previewName="imagePreview"
-						label="Category image"
-						description="Optional. The banner on the category's own page and in a category grid."
+						label={t("categoryImage")}
+						description={t("optionalTheBannerOnTheCategory")}
 						pickerTitle="Category image"
 					/>
 
 					<CategoryAssetField
 						name="iconAssetId"
 						previewName="iconPreview"
-						label="Icon"
-						description="Optional. A small mark for menus and filter lists, where the banner would be too detailed to read. A square SVG or PNG works best."
+						label={t("icon")}
+						description={t("optionalASmallMarkForMenus")}
 						pickerTitle="Category icon"
 						square
 					/>
 				</div>
 
 				<div className="bg-card space-y-4 rounded-lg border p-5">
-					<h2 className="font-heading text-base font-semibold">Placement</h2>
+					<h2 className="font-heading text-base font-semibold">{t("placement")}</h2>
 
-					<ProCombobox name="parentId" label="Parent category" options={parentOptions} />
+					<ProCombobox name="parentId" label={t("parentCategory")} options={parentOptions} />
 					<ProInput
 						name="sortOrder"
 						type="number"
-						label="Sort order"
-						description="Lower numbers appear first among siblings."
+						label={t("sortOrder")}
+						description={t("lowerNumbersAppearFirstAmongSiblings")}
 					/>
 					<ProCheckbox
 						name="isHidden"
-						label="Hidden"
-						description="Removed from every list, filter and menu, and its page returns 404."
+						label={t("hidden")}
+						description={t("removedFromEveryListFilterAnd")}
 					/>
 					<ProCheckbox
 						name="isOptionCategory"
-						label="Option category"
-						description="Holds add-ons sold through the configurator rather than on their own."
+						label={t("optionCategory")}
+						description={t("holdsAddOnsSoldThroughThe")}
 					/>
 				</div>
 
 				<div className="flex justify-end gap-2">
 					<Button asChild type="button" variant="ghost">
-						<Link href="/admin/dashboard/categories">Cancel</Link>
+						<Link href="/admin/dashboard/categories">{t("cancel")}</Link>
 					</Button>
 					<ProSubmit>{isEdit ? "Save changes" : "Create category"}</ProSubmit>
 				</div>

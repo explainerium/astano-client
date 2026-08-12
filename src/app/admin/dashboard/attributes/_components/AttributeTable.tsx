@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -32,16 +33,16 @@ import {
 	useDuplicateAttributeMutation,
 } from "@/redux/api/attributeApi"
 import { cn } from "@/lib/utils"
+import { pickTranslation } from "@/lib/pickTranslation"
 import type { AdminAttribute } from "@/types/attribute"
 
 const nameOf = (attribute: AdminAttribute): string =>
-	attribute.translations.find((t) => t.locale === "en")?.name ??
-	attribute.translations[0]?.name ??
-	attribute.code
+	pickTranslation(attribute.translations)?.name ?? attribute.code
 
 const editHref = (id: string) => `/admin/dashboard/attributes/${id}/edit`
 
 export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [deleteAttribute] = useDeleteAttributeMutation()
 	const [duplicateAttribute] = useDuplicateAttributeMutation()
@@ -59,15 +60,13 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 		setDuplicatingId(attribute.id)
 		try {
 			const copy = await duplicateAttribute(attribute.id).unwrap()
-			toast.success(`“${nameOf(attribute)}” duplicated`, {
-				description: `${copy.values.length} ${
-					copy.values.length === 1 ? "value" : "values"
-				} copied. The new code is “${copy.code}”.`,
+			toast.success(t("nameDuplicated", { name: nameOf(attribute) }), {
+				description: t("copiedValues", { count: copy.values.length, code: copy.code }),
 			})
 			// Straight into the copy — it needs a new code before it is any use.
 			router.push(editHref(copy.id))
 		} catch (error) {
-			toast.error("Could not duplicate this attribute", {
+			toast.error(t("couldNotDuplicateThisAttribute"), {
 				description:
 					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
 			})
@@ -127,7 +126,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 		setPending(null)
 		setSelected(new Set())
 
-		if (deleted) toast.success(`${deleted} ${deleted === 1 ? "attribute" : "attributes"} deleted.`)
+		if (deleted) toast.success(t("deletedAttributes", { count: deleted }))
 		// The API refuses an attribute a product still uses, and says so.
 		if (failures.length) toast.error(`“${failures[0].name}” — ${failures[0].message}`)
 	}
@@ -146,16 +145,12 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 						size="lg"
 						onClick={() => setPending(rows.filter((r) => selected.has(r.id)))}
 					>
-						<Trash2 />
-						Delete
-					</Button>
+						<Trash2 />{t("delete")}</Button>
 				}
 				primaryAction={
 					<Button asChild size="lg">
 						<Link href="/admin/dashboard/attributes/new">
-							<Plus />
-							New attribute
-						</Link>
+							<Plus />{t("newAttribute")}</Link>
 					</Button>
 				}
 			/>
@@ -171,19 +166,13 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 										onCheckedChange={(checked) =>
 											setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set())
 										}
-										aria-label="Select all attributes"
+										aria-label={t("selectAllAttributes")}
 										disabled={!rows.length}
 									/>
 								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Attribute
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Code
-								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-									Values
-								</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("attribute")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("code")}</TableHead>
+								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("values")}</TableHead>
 								<TableHead className="w-24 pr-4" />
 							</TableRow>
 						</TableHeader>
@@ -243,8 +232,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 															variant="secondary"
 															className="font-normal"
 														>
-															{value.translations.find((t) => t.locale === "en")
-																?.label ?? value.code}
+															{pickTranslation(value.translations)?.label ?? value.code}
 														</Badge>
 													))}
 													{attribute.values.length > 6 && (
@@ -272,7 +260,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 													variant="ghost"
 													size="icon"
 													aria-label={`Duplicate ${nameOf(attribute)}`}
-													title="Duplicate"
+													title={t("duplicate")}
 													disabled={duplicatingId !== null}
 													onClick={() => runDuplicate(attribute)}
 												>
@@ -293,7 +281,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 
 				{rows.length > 0 && (
 					<div className="text-muted-foreground border-t px-4 py-2.5 text-xs">
-						{rows.length} {rows.length === 1 ? "attribute" : "attributes"}
+						{t("countAttributes", { count: rows.length })}
 						{selected.size > 0 && ` · ${selected.size} selected`}
 					</div>
 				)}
@@ -314,7 +302,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={isDeleting}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()

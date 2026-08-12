@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -238,15 +239,11 @@ const TypeFields = () => {
 					</p>
 				</div>
 				<Button type="button" variant="outline" size="sm" onClick={appendBand}>
-					<Plus />
-					Add band
-				</Button>
+					<Plus />Add band</Button>
 			</div>
 
 			{!fields.length ? (
-				<p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-xs">
-					No bands yet. Nothing can be quoted until there is at least one.
-				</p>
+				<p className="text-muted-foreground rounded-lg border border-dashed p-6 text-center text-xs">No bands yet. Nothing can be quoted until there is at least one.</p>
 			) : (
 				<div className="overflow-x-auto">
 					<table className="w-full min-w-lg text-sm">
@@ -302,6 +299,7 @@ export const MethodForm = ({
 	zoneName: string
 	method?: ShippingMethod
 }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [createMethod] = useCreateShippingMethodMutation()
 	const [updateMethod] = useUpdateShippingMethodMutation()
@@ -355,10 +353,10 @@ export const MethodForm = ({
 		try {
 			if (isEdit) {
 				await updateMethod({ id: method.id, data: payload }).unwrap()
-				toast.success("Method updated.")
+				toast.success(t("methodUpdated"))
 			} else {
 				await createMethod({ ...payload, zoneId }).unwrap()
-				toast.success("Method added.")
+				toast.success(t("methodAdded"))
 			}
 			// Back to the zone either way: a method is only meaningful beside the
 			// others in its zone, and the gap-free ladder is checked across them.
@@ -375,7 +373,7 @@ export const MethodForm = ({
 				backHref={zoneHref}
 				backLabel={zoneName}
 				title={isEdit ? (translationFor(method, "en")?.name ?? method.code) : "New method"}
-				description="What the customer is offered at checkout, and what it costs."
+				description={t("whatTheCustomerIsOfferedAt")}
 			/>
 
 			<ProForm
@@ -387,9 +385,9 @@ export const MethodForm = ({
 				>
 					<div className="bg-card space-y-6 rounded-lg border p-5">
 						<div className="grid gap-4 sm:grid-cols-3">
-							<ProInput name="code" label="Code" required />
-							<ProSelect name="type" label="Cost is based on" options={TYPES} />
-							<ProInput name="sortOrder" type="number" label="Sort order" />
+							<ProInput name="code" label={t("code")} required />
+							<ProSelect name="type" label={t("costIsBasedOn")} options={TYPES} />
+							<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 						</div>
 
 					<Tabs value={activeLocale} onValueChange={setActiveLocale}>
@@ -410,14 +408,14 @@ export const MethodForm = ({
 							<TabsContent key={code} value={code} className="space-y-4 pt-4">
 								<ProInput
 									name={`${code}.name`}
-									label="Name"
-									description="Shown to the customer at checkout."
+									label={t("name")}
+									description={t("shownToTheCustomerAtCheckout")}
 									required={code === "en"}
 								/>
 								<ProTextarea
 									name={`${code}.description`}
-									label="Description"
-									description="Optional line under the name — delivery time, customs notes."
+									label={t("description")}
+									description={t("optionalLineUnderTheNameDelivery")}
 								/>
 							</TabsContent>
 						))}
@@ -430,12 +428,12 @@ export const MethodForm = ({
 						<div className="space-y-4 border-t pt-5">
 							<ProCheckbox
 								name="taxable"
-								label="Tax the shipping charge"
-								description="On for the EU zones on the live site, off for Switzerland."
+								label={t("taxTheShippingCharge")}
+								description={t("onForTheEuZonesOn")}
 							/>
 							<ProCheckbox
 								name="isActive"
-								label="Active"
+								label={t("active")}
 								description="An inactive method is never offered at checkout."
 							/>
 						</div>
@@ -443,7 +441,7 @@ export const MethodForm = ({
 
 					<div className="flex justify-end gap-2">
 						<Button asChild type="button" variant="ghost">
-							<Link href={zoneHref}>Cancel</Link>
+							<Link href={zoneHref}>{t("cancel")}</Link>
 						</Button>
 						<ProSubmit>{isEdit ? "Save changes" : "Add method"}</ProSubmit>
 					</div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Loader2, Send } from "lucide-react"
 import { toast } from "sonner"
@@ -20,6 +21,7 @@ import { useSendEmailTestMutation } from "@/redux/api/emailApi"
  * has no business holding them.
  */
 export const TestSend = ({ kind }: { kind: string }) => {
+	const t = useTranslations("admin")
 	const [to, setTo] = useState("")
 	const [locale, setLocale] = useState("en")
 	const [send, { isLoading }] = useSendEmailTestMutation()
@@ -39,9 +41,7 @@ export const TestSend = ({ kind }: { kind: string }) => {
 
 	return (
 		<form onSubmit={submit} className="space-y-3">
-			<p className="text-muted-foreground text-sm">
-				Sends this message with sample content, so you can see how it arrives.
-			</p>
+			<p className="text-muted-foreground text-sm">{t("sendsThisMessageWithSampleContent")}</p>
 
 			<div className="flex flex-wrap gap-2">
 				<Input
@@ -50,17 +50,17 @@ export const TestSend = ({ kind }: { kind: string }) => {
 					onChange={(event) => setTo(event.target.value)}
 					placeholder="you@example.com"
 					className="min-w-[200px] flex-1"
-					aria-label="Send the test to"
+					aria-label={t("sendTheTestTo")}
 				/>
 
 				<select
 					value={locale}
 					onChange={(event) => setLocale(event.target.value)}
-					aria-label="Language"
+					aria-label={t("language")}
 					className="border-input bg-background h-9 rounded-md border px-3 text-sm"
 				>
-					<option value="en">English</option>
-					<option value="de">Deutsch</option>
+					<option value="en">{t("english")}</option>
+					<option value="de">{t("deutsch")}</option>
 				</select>
 
 				<Button type="submit" disabled={isLoading || !to.trim()}>

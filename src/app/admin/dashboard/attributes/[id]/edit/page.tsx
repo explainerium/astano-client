@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { use } from "react"
 import { Loader2 } from "lucide-react"
 import { useAdminAttributesQuery } from "@/redux/api/attributeApi"
@@ -14,15 +15,14 @@ import AttributeForm from "../../_components/AttributeForm"
  * not inherited from the page behind.
  */
 export default function EditAttributePage({ params }: { params: Promise<{ id: string }> }) {
+	const t = useTranslations("admin")
 	const { id } = use(params)
 	const { data: attributes, isLoading, isError } = useAdminAttributesQuery()
 
 	if (isLoading) {
 		return (
 			<p className="text-muted-foreground py-24 text-center text-sm">
-				<Loader2 className="mr-2 inline size-4 animate-spin" />
-				Loading…
-			</p>
+				<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loading")}</p>
 		)
 	}
 
@@ -30,9 +30,7 @@ export default function EditAttributePage({ params }: { params: Promise<{ id: st
 
 	if (isError || !attribute) {
 		return (
-			<p className="text-destructive py-24 text-center text-sm">
-				Could not find that attribute.
-			</p>
+			<p className="text-destructive py-24 text-center text-sm">{t("couldNotFindThatAttribute")}</p>
 		)
 	}
 

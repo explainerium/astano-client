@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useFormContext, useFormState } from "react-hook-form"
@@ -241,6 +242,7 @@ const BankAccountsPanel = ({ type }: { type: PaymentMethodType }) => {
 }
 
 export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
+	const t = useTranslations("admin")
 	const router = useRouter()
 	const [updateMethod] = useUpdatePaymentMethodMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -291,7 +293,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 
 		try {
 			await updateMethod({ id: method.id, data: payload }).unwrap()
-			toast.success("Payment method updated.")
+			toast.success(t("paymentMethodUpdated"))
 			router.push("/admin/dashboard/payments")
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
@@ -307,7 +309,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			defaultValues={toDefaults(method)}
 			className="space-y-5"
 		>
-			<Panel title="What the customer reads">
+			<Panel title={t("whatTheCustomerReads")}>
 				<Tabs value={activeLocale} onValueChange={setActiveLocale}>
 					<TabsList>
 						{EDITOR_LOCALES.map(({ code, label }) => (
@@ -326,19 +328,19 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 						<TabsContent key={code} value={code} className="space-y-4 pt-4">
 							<ProInput
 								name={`${code}.title`}
-								label="Title"
-								description="The name shown at checkout."
+								label={t("title")}
+								description={t("theNameShownAtCheckout")}
 								required={code === "en"}
 							/>
 							<ProTextarea
 								name={`${code}.description`}
-								label="Description"
-								description="The line under the title at checkout."
+								label={t("description")}
+								description={t("theLineUnderTheTitleAt")}
 							/>
 							<ProTextarea
 								name={`${code}.instructions`}
-								label="Instructions after ordering"
-								description="Shown on the thank-you page and in the confirmation email. Bank account details belong here — this is the text the customer actually reads."
+								label={t("instructionsAfterOrdering")}
+								description={t("shownOnTheThankYouPage")}
 							/>
 						</TabsContent>
 					))}
@@ -347,7 +349,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 
 			<BankAccountsPanel type={method.type} />
 
-			<Panel title="Who can use it">
+			<Panel title={t("whoCanUseIt")}>
 				<p className="text-muted-foreground mb-4 max-w-prose text-xs">
 					Every setting narrows. Leaving a list empty places no restriction at all rather than
 					excluding everyone.
@@ -356,38 +358,38 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 				<div className="space-y-4">
 					<ProCombobox
 						name="allowedCountries"
-						label="Countries"
+						label={t("countries")}
 						multiple
 						options={countryOptions("en")}
-						placeholder="Every country"
+						placeholder={t("everyCountry")}
 					/>
 
 					<ProCombobox
 						name="allowedRoles"
-						label="Customer types"
+						label={t("customerTypes")}
 						multiple
 						options={ROLE_OPTIONS}
-						placeholder="Every customer type"
+						placeholder={t("everyCustomerType")}
 					/>
 
 					<div className="grid gap-4 sm:grid-cols-2">
-						<ProInput name="minOrderTotal" label="Minimum order total" placeholder="No minimum" />
-						<ProInput name="maxOrderTotal" label="Maximum order total" placeholder="No maximum" />
+						<ProInput name="minOrderTotal" label={t("minimumOrderTotal")} placeholder="No minimum" />
+						<ProInput name="maxOrderTotal" label={t("maximumOrderTotal")} placeholder="No maximum" />
 					</div>
 
 					<ProInput
 						name="minCompletedOrders"
 						type="number"
-						label="Completed orders required"
-						description="0 offers it to first-time buyers. The live site sets this to 1 for the invoice gateway, so only returning customers see it."
+						label={t("completedOrdersRequired")}
+						description={t("0OffersItToFirstTime")}
 						className="sm:max-w-xs"
 					/>
 
-					<ProCheckbox name="requiresLogin" label="Signed-in customers only" />
+					<ProCheckbox name="requiresLogin" label={t("signedInCustomersOnly")} />
 					<ProCheckbox
 						name="requiresValidatedVatId"
-						label="Requires a validated VAT ID"
-						description="Only businesses whose VAT number has passed VIES."
+						label={t("requiresAValidatedVatId")}
+						description={t("onlyBusinessesWhoseVatNumberHas")}
 					/>
 				</div>
 			</Panel>
@@ -395,15 +397,13 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			<Panel>
 				<ProCheckbox
 					name="isActive"
-					label="Offer at checkout"
+					label={t("offerAtCheckout")}
 					description="An inactive method is never offered, whatever the rules say."
 				/>
 
 				<div className="mt-5 flex justify-end gap-2 border-t pt-4">
-					<Button type="button" variant="outline" onClick={() => router.push("/admin/dashboard/payments")}>
-						Cancel
-					</Button>
-					<ProSubmit>Save changes</ProSubmit>
+					<Button type="button" variant="outline" onClick={() => router.push("/admin/dashboard/payments")}>{t("cancel")}</Button>
+					<ProSubmit>{t("saveChanges")}</ProSubmit>
 				</div>
 			</Panel>
 		</ProForm>

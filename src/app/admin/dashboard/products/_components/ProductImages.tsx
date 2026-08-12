@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useFormContext, useWatch } from "react-hook-form"
 import { ChevronLeft, ChevronRight, ImagePlus, X } from "lucide-react"
@@ -15,17 +16,20 @@ const thumbOfAsset = (asset: MediaAsset) =>
 const thumbOfImage = (image: ProductImage) =>
 	image.srcset.thumb ?? image.srcset.grid ?? image.url
 
-const Tile = ({ src, alt }: { src?: string; alt: string }) =>
-	src ? (
+const Tile = ({ src, alt }: { src?: string; alt: string }) => {
+	const t = useTranslations("admin")
+
+	return src ? (
 		// Plain img, not next/image: these are already sized WebP derivatives, so
 		// re-optimising them costs time and gains nothing.
 		// eslint-disable-next-line @next/next/no-img-element
 		<img src={src} alt={alt} loading="lazy" className="size-full object-cover" />
 	) : (
 		<div className="text-muted-foreground flex size-full items-center justify-center text-[10px]">
-			No preview
+			{t("noPreview")}
 		</div>
 	)
+}
 
 const seedThumbs = (product?: AdminProduct) => {
 	const map: Record<string, string> = {}
@@ -43,6 +47,7 @@ const seedThumbs = (product?: AdminProduct) => {
  * so nothing is ever re-fetched just to show a picture the page already has.
  */
 export const ProductImages = ({ product }: { product?: AdminProduct }) => {
+	const t = useTranslations("admin")
 	const { control, setValue } = useFormContext()
 
 	/**
@@ -105,25 +110,23 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 	return (
 		<div className="space-y-5">
 			<div className="space-y-2">
-				<p className="text-muted-foreground text-xs">
-					Shown in listings, search results and the cart.
-				</p>
+				<p className="text-muted-foreground text-xs">{t("shownInListingsSearchResultsAnd")}</p>
 
 				{featuredAssetId ? (
 					<div className="relative">
 						<button
 							type="button"
 							onClick={() => setPicking("featured")}
-							aria-label="Replace the product image"
+							aria-label={t("replaceTheProductImage")}
 							className="bg-muted block aspect-square w-full overflow-hidden rounded-lg border"
 						>
-							<Tile src={thumbs[featuredAssetId]} alt="Product image" />
+							<Tile src={thumbs[featuredAssetId]} alt={t("productImage")} />
 						</button>
 						<Button
 							type="button"
 							variant="secondary"
 							size="icon"
-							aria-label="Remove the product image"
+							aria-label={t("removeTheProductImage")}
 							className="absolute top-2 right-2 size-7"
 							onClick={() => write("featuredAssetId", null)}
 						>
@@ -137,18 +140,14 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 						className="w-full"
 						onClick={() => setPicking("featured")}
 					>
-						<ImagePlus />
-						Set product image
-					</Button>
+						<ImagePlus />{t("setProductImage")}</Button>
 				)}
 			</div>
 
 			<div className="space-y-2 border-t pt-4">
 				<div>
-					<h3 className="text-sm font-medium">Gallery</h3>
-					<p className="text-muted-foreground mt-1 text-xs">
-						The extra images on the product page, in this order.
-					</p>
+					<h3 className="text-sm font-medium">{t("gallery")}</h3>
+					<p className="text-muted-foreground mt-1 text-xs">{t("theExtraImagesOnTheProduct")}</p>
 				</div>
 
 				{assetIds.length > 0 && (
@@ -207,16 +206,16 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 					onClick={() => setPicking("gallery")}
 				>
 					<ImagePlus />
-					{assetIds.length ? "Add more images" : "Add gallery images"}
+					{assetIds.length ? t("addMoreImages") : t("addGalleryImages")}
 				</Button>
 			</div>
 
 			<AssetPickerDialog
 				open={picking === "featured"}
 				onOpenChange={(open) => !open && setPicking(null)}
-				title="Product image"
-				description="The main image, shown wherever this product appears in a list."
-				confirmLabel="Use image"
+				title={t("productImage")}
+				description={t("theMainImageShownWhereverThis")}
+				confirmLabel={t("useImage")}
 				onConfirm={chooseFeatured}
 			/>
 
@@ -224,9 +223,9 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 				open={picking === "gallery"}
 				onOpenChange={(open) => !open && setPicking(null)}
 				multiple
-				title="Gallery images"
-				description="Pick as many as you like. They are added in the order you see them here."
-				confirmLabel="Add to gallery"
+				title={t("galleryImages")}
+				description={t("pickAsManyAsYouLike")}
+				confirmLabel={t("addToGallery")}
 				onConfirm={addToGallery}
 			/>
 		</div>

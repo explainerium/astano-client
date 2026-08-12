@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { Plus, Trash2 } from "lucide-react"
 import ProInput from "@/components/form/ProInput"
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button"
  * show both.
  */
 export const BankAccountsField = () => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const { fields, append, remove } = useFieldArray({ control, name: "bankAccounts" })
 
@@ -52,28 +54,28 @@ export const BankAccountsField = () => {
 						{fields.length > 1 && (
 							<ProInput
 								name={`bankAccounts.${index}.label`}
-								label="Label"
+								label={t("label")}
 								placeholder="EUR account"
-								description="Shown above this account so the customer picks the right one."
+								description={t("shownAboveThisAccountSoThe")}
 							/>
 						)}
 
 						<ProInput
 							name={`bankAccounts.${index}.accountName`}
-							label="Account holder"
-							placeholder="ASSCA GmbH"
+							label={t("accountHolder")}
+							placeholder={t("asscaGmbh")}
 							required
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.bankName`}
-							label="Bank name"
-							placeholder="Sparkasse Schwarzwald-Baar"
+							label={t("bankName")}
+							placeholder={t("sparkasseSchwarzwaldBaar")}
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.iban`}
 							label="IBAN"
 							placeholder="DE00 0000 0000 0000 0000 00"
-							description="The one thing a customer inside SEPA actually needs."
+							description={t("theOneThingACustomerInside")}
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.bic`}
@@ -82,15 +84,15 @@ export const BankAccountsField = () => {
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.accountNumber`}
-							label="Account number"
-							placeholder="Optional"
-							description="Only needed outside SEPA — the IBAN has replaced it within."
+							label={t("accountNumber")}
+							placeholder={t("optional")}
+							description={t("onlyNeededOutsideSepaTheIban")}
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.countryCode`}
-							label="Country"
+							label={t("country")}
 							placeholder="DE"
-							description="Two-letter code. Tells an international customer where the money is going."
+							description={t("twoLetterCodeTellsAnInternational")}
 						/>
 					</div>
 				</div>

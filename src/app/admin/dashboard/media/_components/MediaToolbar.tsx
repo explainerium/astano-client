@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { DropdownMenu } from "radix-ui"
 import { FolderInput, Trash2, Upload, X } from "lucide-react"
@@ -38,6 +39,7 @@ export const MediaToolbar = ({
 	uploadOpen: boolean
 	onToggleUpload: () => void
 }) => {
+	const t = useTranslations("admin")
 	const [updateMedia] = useUpdateMediaMutation()
 	const [deleteMedia] = useDeleteMediaMutation()
 	const [confirmingDelete, setConfirmingDelete] = useState(false)
@@ -90,7 +92,7 @@ export const MediaToolbar = ({
 		setConfirmingDelete(false)
 		onClearSelection()
 
-		if (deleted) toast.success(`${deleted} ${deleted === 1 ? "file" : "files"} deleted.`)
+		if (deleted) toast.success(t("deletedFiles", { count: deleted }))
 		// The API refuses a file still attached to a product, and says which.
 		if (failures.length) toast.error(`“${failures[0].name}” — ${failures[0].message}`)
 	}
@@ -108,9 +110,7 @@ export const MediaToolbar = ({
 						<DropdownMenu.Root>
 							<DropdownMenu.Trigger asChild>
 								<Button variant="outline" size="lg" disabled={isBusy}>
-									<FolderInput />
-									Move to…
-								</Button>
+									<FolderInput />{t("moveTo")}</Button>
 							</DropdownMenu.Trigger>
 							<DropdownMenu.Portal>
 								<DropdownMenu.Content
@@ -121,9 +121,7 @@ export const MediaToolbar = ({
 									<DropdownMenu.Item
 										onSelect={() => move(null)}
 										className="hover:bg-muted rounded-md px-2.5 py-2 text-sm outline-none"
-									>
-										Unfiled
-									</DropdownMenu.Item>
+									>{t("unfiled")}</DropdownMenu.Item>
 									{folders.length > 0 && (
 										<DropdownMenu.Separator className="bg-border my-1 h-px" />
 									)}
@@ -146,9 +144,7 @@ export const MediaToolbar = ({
 							disabled={isBusy}
 							onClick={() => setConfirmingDelete(true)}
 						>
-							<Trash2 />
-							Delete
-						</Button>
+							<Trash2 />{t("delete")}</Button>
 					</>
 				}
 				primaryAction={
@@ -169,7 +165,7 @@ export const MediaToolbar = ({
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>
-							Delete {selected.size} {selected.size === 1 ? "file" : "files"}?
+							{t("deleteFilesTitle", { count: selected.size })}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							This also removes every generated size. A file still attached to a
@@ -177,7 +173,7 @@ export const MediaToolbar = ({
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={isBusy}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={isBusy}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { Pencil, Plus, Trash2 } from "lucide-react"
@@ -38,6 +39,7 @@ const countryName = (code: string) => {
 }
 
 export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
+	const t = useTranslations("admin")
 	const [deleteZone] = useDeleteShippingZoneMutation()
 	const [confirming, setConfirming] = useState(false)
 	const [busy, setBusy] = useState(false)
@@ -69,9 +71,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 				</h2>
 				<span className="text-muted-foreground font-mono text-xs">{zone.code}</span>
 				{!zone.isActive && (
-					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">
-						Inactive
-					</Badge>
+					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">{t("inactive")}</Badge>
 				)}
 
 				<div className="ml-auto flex gap-1">
@@ -108,9 +108,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 			<div className="flex justify-end border-t px-4 py-2.5">
 				<Button asChild variant="outline" size="sm">
 					<Link href={`/admin/dashboard/shipping/zones/${zone.id}/methods/new`}>
-						<Plus />
-						Add method
-					</Link>
+						<Plus />{t("addMethod")}</Link>
 				</Button>
 			</div>
 
@@ -119,14 +117,11 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete “{zone.name}”?</AlertDialogTitle>
 						<AlertDialogDescription>
-							This removes the zone, its methods and every band. Customers in{" "}
-							{zone.countries.length}{" "}
-							{zone.countries.length === 1 ? "country" : "countries"} would be offered no
-							shipping until another zone claims them.
+							{t("deleteZoneWarning", { count: zone.countries.length })}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
-						<AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+						<AlertDialogCancel disabled={busy}>{t("cancel")}</AlertDialogCancel>
 						<AlertDialogAction
 							onClick={(event) => {
 								event.preventDefault()

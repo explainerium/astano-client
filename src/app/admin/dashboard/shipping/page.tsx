@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { Loader2, Plus, Wand2 } from "lucide-react"
@@ -15,6 +16,7 @@ import ZoneCard from "./_components/ZoneCard"
 import { LIVE_MATRIX, MATRIX_BAND_COUNT } from "./_components/liveMatrix"
 
 export default function ShippingPage() {
+	const t = useTranslations("admin")
 	const { data: zones, isLoading, isError, error } = useShippingZonesQuery()
 	const [createZone] = useCreateShippingZoneMutation()
 	const [createMethod] = useCreateShippingMethodMutation()
@@ -91,8 +93,8 @@ export default function ShippingPage() {
 		}
 
 		setSeeding(false)
-		if (added) toast.success(`${added} ${added === 1 ? "zone" : "zones"} created.`)
-		else toast.info("Every zone in the live matrix already exists.")
+		if (added) toast.success(t("createdZones", { count: added }))
+		else toast.info(t("everyZoneInTheLiveMatrix"))
 	}
 
 	return (
@@ -102,15 +104,11 @@ export default function ShippingPage() {
 					<div className="flex gap-2">
 						{zones && zones.length > 0 && (
 							<Button variant="outline" size="lg" disabled={seeding} onClick={seedLiveMatrix}>
-								<Wand2 />
-								Fill gaps from the live matrix
-							</Button>
+								<Wand2 />{t("fillGapsFromTheLiveMatrix")}</Button>
 						)}
 						<Button asChild size="lg">
 							<Link href="/admin/dashboard/shipping/zones/new">
-								<Plus />
-								New zone
-							</Link>
+								<Plus />{t("newZone")}</Link>
 						</Button>
 					</div>
 				}
@@ -118,9 +116,7 @@ export default function ShippingPage() {
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading shipping zones…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingShippingZones")}</div>
 			)}
 
 			{isError && (
@@ -144,9 +140,7 @@ export default function ShippingPage() {
 					<div className="flex flex-wrap justify-center gap-2">
 						<Button asChild variant="outline">
 							<Link href="/admin/dashboard/shipping/zones/new">
-								<Plus />
-								New zone
-							</Link>
+								<Plus />{t("newZone")}</Link>
 						</Button>
 						<Button disabled={seeding} onClick={seedLiveMatrix}>
 							<Wand2 />

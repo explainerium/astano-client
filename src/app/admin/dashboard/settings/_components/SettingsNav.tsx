@@ -1,10 +1,12 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
+import useSettingText from "./useSettingText"
 
 /**
  * The settings sub-navigation.
@@ -22,6 +24,8 @@ import { cn } from "@/lib/utils"
  * "Invoices" tells nobody where to look for a question about VAT.
  */
 export const SettingsNav = () => {
+	const t = useTranslations("admin")
+	const text = useSettingText()
 	const pathname = usePathname()
 	const { data, isLoading } = useSettingsQuery()
 
@@ -34,7 +38,7 @@ export const SettingsNav = () => {
 	}
 
 	return (
-		<nav aria-label="Settings sections" className="bg-card rounded-lg border p-2">
+		<nav aria-label={t("settingsSections")} className="bg-card rounded-lg border p-2">
 			{(data?.sections ?? []).map((section, index) => {
 				const groups = (data?.groups ?? []).filter((g) => g.section === section.key)
 				if (!groups.length) return null
@@ -42,7 +46,7 @@ export const SettingsNav = () => {
 				return (
 					<div key={section.key} className={cn(index > 0 && "border-border mt-2 border-t pt-2")}>
 						<p className="text-muted-foreground px-3 pt-1 pb-1.5 text-[11px] font-medium tracking-wider uppercase">
-							{section.title}
+							{text.sectionTitle(section.key, section.title)}
 						</p>
 
 						<ul className="space-y-0.5">
@@ -62,9 +66,9 @@ export const SettingsNav = () => {
 													: "text-muted-foreground hover:text-foreground hover:bg-muted"
 											)}
 										>
-											<span className="block text-sm font-medium">{group.title}</span>
+											<span className="block text-sm font-medium">{text.groupTitle(group.key, group.title)}</span>
 											{group.blurb && (
-												<span className="mt-0.5 block text-xs opacity-80">{group.blurb}</span>
+												<span className="mt-0.5 block text-xs opacity-80">{text.groupBlurb(group.key, group.blurb)}</span>
 											)}
 										</Link>
 									</li>

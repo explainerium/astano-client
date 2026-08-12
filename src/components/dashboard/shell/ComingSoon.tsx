@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from "next-intl"
 import { Construction } from "lucide-react"
 
 /**
@@ -17,7 +20,10 @@ export const ComingSoon = ({
 	title: string
 	description: string
 	willInclude?: string[]
-}) => (
+}) => {
+	const t = useTranslations("admin")
+
+	return (
 	<div className="bg-card rounded-lg border border-dashed p-12 text-center">
 		<Construction className="text-muted-foreground mx-auto size-8" strokeWidth={1.5} />
 		<h2 className="font-heading mt-4 text-lg font-semibold">{title}</h2>
@@ -25,9 +31,7 @@ export const ComingSoon = ({
 
 		{willInclude && willInclude.length > 0 && (
 			<div className="mx-auto mt-6 max-w-md text-left">
-				<p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
-					Will include
-				</p>
+				<p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">{t("willInclude")}</p>
 				<ul className="text-muted-foreground space-y-1 text-sm">
 					{willInclude.map((item) => (
 						<li key={item} className="flex gap-2">
@@ -39,6 +43,7 @@ export const ComingSoon = ({
 			</div>
 		)}
 	</div>
-)
+	)
+}
 
 export default ComingSoon

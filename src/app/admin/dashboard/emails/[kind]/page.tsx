@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { use } from "react"
 import Link from "next/link"
 import { ArrowLeft, Loader2 } from "lucide-react"
@@ -18,20 +19,19 @@ import TestSend from "./_components/TestSend"
  * save, so the change is visible where the admin is already looking.
  */
 export default function EmailDetailPage({ params }: { params: Promise<{ kind: string }> }) {
+	const t = useTranslations("admin")
 	const { kind } = use(params)
 	const { data, isLoading, isError } = useEmailTemplateQuery(kind)
 
 	if (isLoading) {
 		return (
 			<p className="text-muted-foreground py-24 text-center text-sm">
-				<Loader2 className="mr-2 inline size-4 animate-spin" />
-				Loading…
-			</p>
+				<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loading")}</p>
 		)
 	}
 
 	if (isError || !data) {
-		return <p className="text-destructive py-24 text-center text-sm">Could not load that email.</p>
+		return <p className="text-destructive py-24 text-center text-sm">{t("couldNotLoadThatEmail")}</p>
 	}
 
 	return (
@@ -41,9 +41,7 @@ export default function EmailDetailPage({ params }: { params: Promise<{ kind: st
 					href="/admin/dashboard/emails"
 					className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm"
 				>
-					<ArrowLeft className="size-4" />
-					All emails
-				</Link>
+					<ArrowLeft className="size-4" />{t("allEmails")}</Link>
 
 				<div className="mt-2 flex flex-wrap items-center gap-2">
 					<h1 className="text-xl font-semibold">{data.label}</h1>
@@ -60,16 +58,16 @@ export default function EmailDetailPage({ params }: { params: Promise<{ kind: st
 
 			<div className="grid gap-6 xl:grid-cols-2">
 				<div className="space-y-6">
-					<Panel title="Wording">
+					<Panel title={t("wording")}>
 						<EmailForm template={data} />
 					</Panel>
 
-					<Panel title="Send a test">
+					<Panel title={t("sendATest")}>
 						<TestSend kind={kind} />
 					</Panel>
 				</div>
 
-				<Panel title="Preview" className="xl:sticky xl:top-6 xl:self-start">
+				<Panel title={t("preview")} className="xl:sticky xl:top-6 xl:self-start">
 					<EmailPreview kind={kind} />
 				</Panel>
 			</div>

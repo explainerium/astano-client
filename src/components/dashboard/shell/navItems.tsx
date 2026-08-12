@@ -18,6 +18,13 @@ import {
 } from "lucide-react"
 
 export interface NavItem {
+	/**
+	 * A key under the adminNav namespace, not a finished string.
+	 *
+	 * The topbar derives the page heading from whichever item is active, so
+	 * holding the English here would have printed an English heading above a
+	 * German page. Both consumers translate it instead.
+	 */
 	label: string
 	href: string
 	icon: LucideIcon
@@ -34,14 +41,14 @@ export interface NavItem {
  * configured. Groups are separated by a rule, matching the reference design.
  */
 export interface NavGroup {
-	/** Absent on the first group — the overview needs no heading above it. */
+	/** Absent on the first group — the overview needs no heading above it. A key, as above. */
 	title?: string
 	items: NavItem[]
 }
 
 export const navGroups: NavGroup[] = [
 	{
-		items: [{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutGrid }],
+		items: [{ label: "dashboard", href: "/admin/dashboard", icon: LayoutGrid }],
 	},
 	{
 		/*
@@ -53,25 +60,25 @@ export const navGroups: NavGroup[] = [
 		 * running the shop reaches for a shipping rate while looking at an order,
 		 * not while tidying the company address.
 		 */
-		title: "Shop",
+		title: "shop",
 		items: [
-			{ label: "Orders", href: "/admin/dashboard/orders", icon: ShoppingCart, nested: true },
-			{ label: "Quotes", href: "/admin/dashboard/quotes", icon: FileText, nested: true },
-			{ label: "Products", href: "/admin/dashboard/products", icon: Package, nested: true },
-			{ label: "Categories", href: "/admin/dashboard/categories", icon: FolderTree, nested: true },
+			{ label: "orders", href: "/admin/dashboard/orders", icon: ShoppingCart, nested: true },
+			{ label: "quotes", href: "/admin/dashboard/quotes", icon: FileText, nested: true },
+			{ label: "products", href: "/admin/dashboard/products", icon: Package, nested: true },
+			{ label: "categories", href: "/admin/dashboard/categories", icon: FolderTree, nested: true },
 			{
-				label: "Attributes",
+				label: "attributes",
 				href: "/admin/dashboard/attributes",
 				icon: SlidersHorizontal,
 				nested: true,
 			},
-			{ label: "Payments", href: "/admin/dashboard/payments", icon: CreditCard, nested: true },
-			{ label: "Shipping", href: "/admin/dashboard/shipping", icon: Truck, nested: true },
-			{ label: "Tax", href: "/admin/dashboard/tax", icon: Percent, nested: true },
+			{ label: "payments", href: "/admin/dashboard/payments", icon: CreditCard, nested: true },
+			{ label: "shipping", href: "/admin/dashboard/shipping", icon: Truck, nested: true },
+			{ label: "tax", href: "/admin/dashboard/tax", icon: Percent, nested: true },
 		],
 	},
 	{
-		title: "Site",
+		title: "site",
 		items: [
 			/*
 			 * One entry, not two.
@@ -80,17 +87,17 @@ export const navGroups: NavGroup[] = [
 			 * and a dealer who also buys at retail existed on both. Role is a column
 			 * on the Users screen now.
 			 */
-			{ label: "Users", href: "/admin/dashboard/users", icon: Users, nested: true },
-			{ label: "Media", href: "/admin/dashboard/media", icon: ImageIcon, nested: true },
-			{ label: "Contact", href: "/admin/dashboard/contact", icon: Mail, nested: true },
-			{ label: "Newsletter", href: "/admin/dashboard/newsletter", icon: Send, nested: true },
+			{ label: "users", href: "/admin/dashboard/users", icon: Users, nested: true },
+			{ label: "media", href: "/admin/dashboard/media", icon: ImageIcon, nested: true },
+			{ label: "contact", href: "/admin/dashboard/contact", icon: Mail, nested: true },
+			{ label: "newsletter", href: "/admin/dashboard/newsletter", icon: Send, nested: true },
 			/*
 			 * Beside Settings rather than inside it. What an email says is edited far
 			 * more often than what colour it is, and burying twenty templates behind
 			 * a settings tab makes the common job the harder one to find.
 			 */
-			{ label: "Emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
-			{ label: "Settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
+			{ label: "emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
+			{ label: "settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
 		],
 	},
 ]

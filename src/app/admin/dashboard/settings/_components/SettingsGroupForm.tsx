@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TriangleAlert } from "lucide-react"
 import { toast } from "sonner"
@@ -15,6 +16,7 @@ import ProTextarea from "@/components/form/ProTextarea"
 import { countryOptions } from "@/constants/countries"
 import { useSaveSettingsMutation } from "@/redux/api/settingApi"
 import type { SettingDefinition, SettingsResponse } from "@/types/setting"
+import useSettingText from "./useSettingText"
 
 /**
  * One group of settings, on its own page.
@@ -61,6 +63,9 @@ export const SettingsGroupForm = ({
 	data: SettingsResponse
 	groupKey: string
 }) => {
+	const c = useTranslations("adminCommon")
+	const a = useTranslations("admin")
+	const text = useSettingText()
 	const [saveSettings] = useSaveSettingsMutation()
 
 	const stored = new Map(data.settings.map((s) => [s.key, s.value]))
@@ -76,7 +81,7 @@ export const SettingsGroupForm = ({
 				definition.type === "boolean"
 					? z.boolean()
 					: definition.type === "number"
-						? z.coerce.number({ message: "Enter a number" })
+						? z.coerce.number({ message: c("enterNumber") })
 						: definition.type === "countries"
 							? z.array(z.string())
 							: z.string().trim(),
@@ -112,10 +117,10 @@ export const SettingsGroupForm = ({
 					isPublic: definition.isPublic ?? false,
 				})),
 			}).unwrap()
-			toast.success("Saved.")
+			toast.success(c("saved"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the settings.")
+			toast.error(message ?? c("saveFailed"))
 		}
 	}
 
@@ -128,22 +133,22 @@ export const SettingsGroupForm = ({
 		const name = fieldName(key)
 
 		if (definition.type === "boolean") {
-			return <ProCheckbox name={name} label={definition.label} description={definition.help} />
+			return <ProCheckbox name={name} label={text.label(key, definition.label)} description={text.help(key, definition.help)} />
 		}
 
 		if (definition.type === "select") {
 			return (
 				<ProSelect
 					name={name}
-					label={definition.label}
-					description={definition.help}
+					label={text.label(key, definition.label)}
+					description={text.help(key, definition.help)}
 					options={definition.options ?? []}
 				/>
 			)
 		}
 
 		if (definition.type === "color") {
-			return <ProColor name={name} label={definition.label} description={definition.help} />
+			return <ProColor name={name} label={text.label(key, definition.label)} description={text.help(key, definition.help)} />
 		}
 
 		if (definition.type === "country" || definition.type === "countries") {
@@ -152,25 +157,25 @@ export const SettingsGroupForm = ({
 			return (
 				<ProCombobox
 					name={name}
-					label={definition.label}
-					description={definition.help}
+					label={text.label(key, definition.label)}
+					description={text.help(key, definition.help)}
 					multiple={definition.type === "countries"}
 					options={countryOptions("en")}
-					placeholder={definition.type === "countries" ? "No countries selected" : "Choose a country"}
+					placeholder={definition.type === "countries" ? c("noCountries") : c("chooseCountry")}
 				/>
 			)
 		}
 
 		if (MULTILINE.has(key)) {
-			return <ProTextarea name={name} label={definition.label} description={definition.help} />
+			return <ProTextarea name={name} label={text.label(key, definition.label)} description={text.help(key, definition.help)} />
 		}
 
 		return (
 			<ProInput
 				name={name}
 				type={definition.type === "number" ? "number" : "text"}
-				label={definition.label}
-				description={definition.help}
+				label={text.label(key, definition.label)}
+				description={text.help(key, definition.help)}
 			/>
 		)
 	}
@@ -191,11 +196,12 @@ export const SettingsGroupForm = ({
 				<div className="bg-accent-soft flex items-start gap-3 rounded-lg border p-4 text-sm">
 					<TriangleAlert className="text-primary mt-0.5 size-4 shrink-0" />
 					<p>
+						{/* ICU plural, so the German form is chosen inside the message
+						    rather than by a ternary this file would have to know about. */}
 						<strong>
-							{missing} {missing === 1 ? "field is" : "fields are"} empty.
+							{a("fieldsEmpty", { count: missing })}
 						</strong>{" "}
-						Invoices are generated from these, so a blank one prints as a blank line on a
-						document the customer keeps.
+						{c("invoiceFieldsWarning")}
 					</p>
 				</div>
 			)}
@@ -218,7 +224,7 @@ export const SettingsGroupForm = ({
 			</div>
 
 			<div className="flex justify-end">
-				<ProSubmit>Save</ProSubmit>
+				<ProSubmit>{c("save")}</ProSubmit>
 			</div>
 		</ProForm>
 	)

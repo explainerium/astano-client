@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { FileUp, Loader2, TriangleAlert } from "lucide-react"
@@ -53,6 +54,7 @@ const Option = ({
 )
 
 export default function ImportProductsPage() {
+	const t = useTranslations("admin")
 	const [file, setFile] = useState<File | null>(null)
 	const [analysis, setAnalysis] = useState<AnalyseResult | null>(null)
 	const [mapping, setMapping] = useState<Record<string, string>>({})
@@ -79,7 +81,7 @@ export default function ImportProductsPage() {
 		} catch (error) {
 			setAnalysis(null)
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not read that file.")
+			toast.error(message ?? t("couldNotReadThatFile"))
 		}
 	}
 
@@ -105,7 +107,7 @@ export default function ImportProductsPage() {
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "The import failed.")
+			toast.error(message ?? t("theImportFailed"))
 		}
 	}
 
@@ -115,21 +117,19 @@ export default function ImportProductsPage() {
 		<div className="space-y-6">
 			<EditorHeader
 				backHref="/admin/dashboard/products"
-				backLabel="All products"
-				title="Import products"
-				description="Any CSV. Rows are matched to products by SKU — a match is updated, anything else is created."
+				backLabel={t("allProducts")}
+				title={t("importProducts")}
+				description={t("anyCsvRowsAreMatchedTo")}
 			/>
 
-			<Panel title="1 · The file">
+			<Panel title={t("1TheFile")}>
 				<div className="space-y-3">
 					<label className="border-input hover:border-primary/50 flex cursor-pointer flex-col items-center gap-2 rounded-lg border border-dashed p-8 text-center transition-colors">
 						<FileUp className="text-muted-foreground size-6" />
 						<span className="text-sm font-medium">
-							{file ? file.name : "Choose a CSV file"}
+							{file ? file.name : t("chooseACsvFile")}
 						</span>
-						<span className="text-muted-foreground text-xs">
-							Comma, semicolon or tab separated. UTF-8.
-						</span>
+						<span className="text-muted-foreground text-xs">{t("commaSemicolonOrTabSeparatedUtf")}</span>
 						<input
 							type="file"
 							accept=".csv,text/csv"
@@ -143,9 +143,7 @@ export default function ImportProductsPage() {
 
 					{analysing && (
 						<p className="text-muted-foreground text-sm">
-							<Loader2 className="mr-2 inline size-4 animate-spin" />
-							Reading…
-						</p>
+							<Loader2 className="mr-2 inline size-4 animate-spin" />{t("reading")}</p>
 					)}
 
 					{analysis && (
@@ -159,44 +157,44 @@ export default function ImportProductsPage() {
 
 			{analysis && (
 				<>
-					<Panel title="2 · The columns">
+					<Panel title={t("2TheColumns")}>
 						<ColumnMapper analysis={analysis} mapping={mapping} onChange={setMapping} />
 					</Panel>
 
-					<Panel title="3 · How to import">
+					<Panel title={t("3HowToImport")}>
 						<div className="space-y-4">
 							<Option
 								checked={options.quoteWhenNoPrice}
 								onChange={(quoteWhenNoPrice) => setOptions((o) => ({ ...o, quoteWhenNoPrice }))}
-								label="A row with no price is price-on-request"
-								description="Without this a product with an empty price column imports as costing nothing."
+								label={t("rowWithNoPriceIsOnRequest")}
+								description={t("withoutThisAProductWithAn")}
 							/>
 							<Option
 								checked={options.onExisting === "update"}
 								onChange={(update) =>
 									setOptions((o) => ({ ...o, onExisting: update ? "update" : "skip" }))
 								}
-								label="Update products that already exist"
-								description="Matched by SKU. Only the columns you mapped are written; the rest are left alone."
+								label={t("updateProductsThatAlreadyExist")}
+								description={t("matchedBySkuOnlyTheColumns")}
 							/>
 							<Option
 								checked={options.onNew === "create"}
 								onChange={(create) => setOptions((o) => ({ ...o, onNew: create ? "create" : "skip" }))}
-								label="Create products that are not in the catalogue"
-								description="Turn off to update existing products only — a price list, say."
+								label={t("createProductsThatAreNotIn")}
+								description={t("turnOffToUpdateExistingProducts")}
 							/>
 							<Option
 								checked={options.downloadImages}
 								onChange={(downloadImages) => setOptions((o) => ({ ...o, downloadImages }))}
-								label="Download the images"
-								description="Fetches every image URL into the media library. Considerably slower, and an image that cannot be fetched is reported rather than failing its row."
+								label={t("downloadTheImages")}
+								description={t("fetchesEveryImageUrlIntoThe")}
 							/>
 						</div>
 					</Panel>
 
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<Button asChild variant="ghost">
-							<Link href="/admin/dashboard/products">Cancel</Link>
+							<Link href="/admin/dashboard/products">{t("cancel")}</Link>
 						</Button>
 
 						<div className="flex flex-wrap gap-2">
@@ -220,13 +218,13 @@ export default function ImportProductsPage() {
 					)}
 
 					{preview && (
-						<Panel title="Preview — nothing has been written">
+						<Panel title={t("previewNothingHasBeenWritten")}>
 							<ImportReportView report={preview} />
 						</Panel>
 					)}
 
 					{result && (
-						<Panel title="Imported">
+						<Panel title={t("imported")}>
 							<ImportReportView report={result} />
 						</Panel>
 					)}

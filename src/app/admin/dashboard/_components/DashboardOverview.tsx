@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { FileText, Package, ShoppingCart, Wallet } from "lucide-react"
@@ -358,6 +359,7 @@ const RankingChart = ({
  * loading — it never draws half a dashboard with the other half invented.
  */
 export const DashboardOverview = () => {
+	const t = useTranslations("admin")
 	// Prices follow the shop's currency settings, and this is what re-renders
 	// them when those change. See useMoneyFormat.
 	const formatMoney = useMoney()
@@ -372,14 +374,12 @@ export const DashboardOverview = () => {
 		return (
 			<Panel>
 				<div className="py-16 text-center">
-					<p className="text-muted-foreground text-sm">Could not load the dashboard.</p>
+					<p className="text-muted-foreground text-sm">{t("couldNotLoadTheDashboard")}</p>
 					<button
 						type="button"
 						onClick={() => refetch()}
 						className="bg-primary text-primary-foreground mt-4 rounded-md px-5 py-2 text-sm font-medium"
-					>
-						Try again
-					</button>
+					>{t("tryAgain")}</button>
 				</div>
 			</Panel>
 		)
@@ -409,7 +409,7 @@ export const DashboardOverview = () => {
 		<div className="space-y-5">
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<div>
-					<h1 className="font-heading text-xl font-semibold tracking-tight">Overview</h1>
+					<h1 className="font-heading text-xl font-semibold tracking-tight">{t("overview")}</h1>
 					<p className="text-muted-foreground text-sm">
 						Orders, quotes and revenue for the last {days} days.
 					</p>
@@ -446,7 +446,7 @@ export const DashboardOverview = () => {
 				) : (
 					<>
 						<StatCard
-							label="Revenue"
+							label={t("revenue")}
 							value={formatMoney(Number(data.stats.revenue.value)) ?? ""}
 							icon={Wallet}
 							delta={deltaOf(data.stats.revenue.deltaPercent)}
@@ -454,21 +454,21 @@ export const DashboardOverview = () => {
 							highlighted
 						/>
 						<StatCard
-							label="Orders"
+							label={t("orders")}
 							value={String(data.stats.orders.value)}
 							icon={ShoppingCart}
 							delta={deltaOf(data.stats.orders.deltaPercent)}
 							caption={caption}
 						/>
 						<StatCard
-							label="Quote requests"
+							label={t("quoteRequests")}
 							value={String(data.stats.quotes.value)}
 							icon={FileText}
 							delta={deltaOf(data.stats.quotes.deltaPercent)}
 							caption={caption}
 						/>
 						<StatCard
-							label="Products"
+							label={t("products")}
 							value={String(data.stats.products.value)}
 							icon={Package}
 						/>
@@ -477,15 +477,15 @@ export const DashboardOverview = () => {
 			</div>
 
 			<div className="grid gap-5 xl:grid-cols-3">
-				<Panel title="Revenue analytics" className="xl:col-span-2">
+				<Panel title={t("revenueAnalytics")} className="xl:col-span-2">
 					{pending ? <Skeleton className="h-56" /> : <RevenueChart series={data.series} />}
 				</Panel>
 
-				<Panel title="Revenue by customer">
+				<Panel title={t("revenueByCustomer")}>
 					{pending ? (
 						<Skeleton className="h-56" />
 					) : !customerSlices.length ? (
-						<Placeholder>Nothing sold in this period.</Placeholder>
+						<Placeholder>{t("nothingSoldInThisPeriod")}</Placeholder>
 					) : (
 						<DonutChart
 							slices={customerSlices}
@@ -497,11 +497,11 @@ export const DashboardOverview = () => {
 			</div>
 
 			<div className="grid gap-5 xl:grid-cols-3">
-				<Panel title="Orders & quotes" className="xl:col-span-2">
+				<Panel title={t("ordersQuotes")} className="xl:col-span-2">
 					{pending ? <Skeleton className="h-52" /> : <ActivityChart series={data.series} />}
 				</Panel>
 
-				<Panel title="Order status">
+				<Panel title={t("orderStatus")}>
 					{pending ? (
 						<Skeleton className="h-56" />
 					) : !statusSlices.length ? (
@@ -513,21 +513,21 @@ export const DashboardOverview = () => {
 			</div>
 
 			<div className="grid gap-5 xl:grid-cols-3">
-				<Panel title="Top products">
+				<Panel title={t("topProducts")}>
 					{pending ? (
 						<Skeleton className="h-56" />
 					) : !data.topProducts.length ? (
-						<Placeholder>Nothing sold in this period.</Placeholder>
+						<Placeholder>{t("nothingSoldInThisPeriod")}</Placeholder>
 					) : (
 						<RankingChart rows={data.topProducts} formatMoney={formatMoney} />
 					)}
 				</Panel>
 
-				<Panel title="Top categories">
+				<Panel title={t("topCategories")}>
 					{pending ? (
 						<Skeleton className="h-56" />
 					) : !data.topCategories.length ? (
-						<Placeholder>Nothing sold in this period.</Placeholder>
+						<Placeholder>{t("nothingSoldInThisPeriod")}</Placeholder>
 					) : (
 						<RankingChart rows={data.topCategories} formatMoney={formatMoney} />
 					)}
@@ -536,7 +536,7 @@ export const DashboardOverview = () => {
 				<Panel
 					title={
 						<span className="flex items-center gap-2">
-							<h2 className="font-heading text-base font-semibold">Pending dealers</h2>
+							<h2 className="font-heading text-base font-semibold">{t("pendingDealers")}</h2>
 							{!!data?.pendingDealerCount && (
 								<Badge className="bg-accent-soft text-accent-foreground">
 									{data.pendingDealerCount}
@@ -548,9 +548,7 @@ export const DashboardOverview = () => {
 						<Link
 							href="/admin/dashboard/users?status=PENDING"
 							className="text-primary text-sm hover:underline"
-						>
-							Review
-						</Link>
+						>{t("review")}</Link>
 					}
 				>
 					{pending ? (
@@ -580,11 +578,9 @@ export const DashboardOverview = () => {
 			</div>
 
 			<Panel
-				title="Recent orders"
+				title={t("recentOrders")}
 				action={
-					<Link href="/admin/dashboard/orders" className="text-primary text-sm hover:underline">
-						View all
-					</Link>
+					<Link href="/admin/dashboard/orders" className="text-primary text-sm hover:underline">{t("viewAll")}</Link>
 				}
 			>
 				{pending ? (
@@ -596,10 +592,10 @@ export const DashboardOverview = () => {
 						<table className="w-full text-sm">
 							<thead>
 								<tr className="text-muted-foreground border-b text-left text-xs">
-									<th scope="col" className="py-2 pr-3 font-medium">Order</th>
-									<th scope="col" className="py-2 pr-3 font-medium">Customer</th>
-									<th scope="col" className="py-2 pr-3 font-medium">Status</th>
-									<th scope="col" className="py-2 pl-3 text-right font-medium">Total</th>
+									<th scope="col" className="py-2 pr-3 font-medium">{t("order")}</th>
+									<th scope="col" className="py-2 pr-3 font-medium">{t("customer")}</th>
+									<th scope="col" className="py-2 pr-3 font-medium">{t("status")}</th>
+									<th scope="col" className="py-2 pl-3 text-right font-medium">{t("total")}</th>
 								</tr>
 							</thead>
 							<tbody>

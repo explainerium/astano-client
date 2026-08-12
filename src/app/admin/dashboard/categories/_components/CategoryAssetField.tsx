@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { useController, useFormContext } from "react-hook-form"
 import { ImagePlus, X } from "lucide-react"
@@ -34,6 +35,7 @@ export const CategoryAssetField = ({
 	pickerTitle: string
 	square?: boolean
 }) => {
+	const t = useTranslations("admin")
 	const { control, setValue } = useFormContext()
 	const [picking, setPicking] = useState(false)
 
@@ -96,9 +98,7 @@ export const CategoryAssetField = ({
 						</Button>
 						{!!url && (
 							<Button type="button" variant="ghost" size="sm" onClick={clear}>
-								<X className="size-4" />
-								Remove
-							</Button>
+								<X className="size-4" />{t("remove")}</Button>
 						)}
 					</div>
 				</div>
@@ -112,7 +112,7 @@ export const CategoryAssetField = ({
 					open
 					onOpenChange={(open) => !open && setPicking(false)}
 					title={pickerTitle}
-					confirmLabel="Use this"
+					confirmLabel={t("useThis")}
 					onConfirm={choose}
 				/>
 			)}

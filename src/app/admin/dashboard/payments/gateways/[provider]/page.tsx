@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
@@ -46,6 +47,7 @@ const errorMessage = (error: unknown, fallback: string) =>
  * modal in the wrong place.
  */
 export default function PaymentGatewayPage() {
+	const t = useTranslations("admin")
 	const { provider } = useParams<{ provider: string }>()
 	const gatewayProvider = provider.toUpperCase() as GatewayProvider
 
@@ -63,9 +65,7 @@ export default function PaymentGatewayPage() {
 	if (isLoading) {
 		return (
 			<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading gateway…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingGateway")}</div>
 		)
 	}
 
@@ -91,7 +91,7 @@ export default function PaymentGatewayPage() {
 		)
 
 		if (!Object.keys(credentials).length) {
-			toast.error("Nothing to save — fill in at least one field.")
+			toast.error(t("nothingToSaveFillInAt"))
 			return
 		}
 
@@ -99,7 +99,7 @@ export default function PaymentGatewayPage() {
 			await saveCredentials({ provider: gatewayProvider, mode, credentials }).unwrap()
 			setDraft({})
 			setResult(null)
-			toast.success("Saved. Run a connection test next.")
+			toast.success(t("savedRunAConnectionTestNext"))
 		} catch (err) {
 			toast.error(errorMessage(err, "Could not save the credentials."))
 		}
@@ -131,7 +131,7 @@ export default function PaymentGatewayPage() {
 				<div className="flex items-start gap-3">
 					<Link
 						href="/admin/dashboard/payments"
-						aria-label="Back to gateways"
+						aria-label={t("backToGateways")}
 						className="text-muted-foreground hover:text-foreground p-2"
 					>
 						<ArrowLeft className="size-4" />
@@ -179,9 +179,7 @@ export default function PaymentGatewayPage() {
 								)
 							}
 						/>
-						<Label htmlFor="gateway-active" className="text-sm">
-							Offer at checkout
-						</Label>
+						<Label htmlFor="gateway-active" className="text-sm">{t("offerAtCheckout")}</Label>
 					</div>
 				</div>
 			</div>
@@ -194,7 +192,7 @@ export default function PaymentGatewayPage() {
 				</div>
 			)}
 
-			<Panel title="Mode">
+			<Panel title={t("mode")}>
 				<div className="grid gap-3 sm:grid-cols-2">
 					{MODES.map((option) => {
 						const current = gateway.mode === option.value
@@ -333,7 +331,7 @@ export default function PaymentGatewayPage() {
 				</div>
 			</Panel>
 
-			<Panel title="Webhook">
+			<Panel title={t("webhook")}>
 				<p className="text-muted-foreground text-sm">
 					Create an endpoint with this URL in your {gateway.label} dashboard, then paste its
 					signing secret above. Without it, a payment made by a customer who closes the tab
@@ -349,16 +347,14 @@ export default function PaymentGatewayPage() {
 						size="sm"
 						onClick={async () => {
 							await navigator.clipboard.writeText(gateway.webhookUrl)
-							toast.success("Webhook URL copied.")
+							toast.success(t("webhookUrlCopied"))
 						}}
 					>
-						<Copy />
-						Copy
-					</Button>
+						<Copy />{t("copy")}</Button>
 				</div>
 			</Panel>
 
-			<Panel title="Payment methods">
+			<Panel title={t("paymentMethods")}>
 				<p className="text-muted-foreground mb-4 text-sm">
 					Which of {gateway.label}’s methods customers may choose. Each one also has to be
 					switched on in your {gateway.label} account.
@@ -377,9 +373,7 @@ export default function PaymentGatewayPage() {
 									<div className="flex flex-wrap items-center gap-2">
 										<span className="text-sm font-medium">{method.label}</span>
 										{method.redirects && (
-											<Badge variant="outline" className="text-muted-foreground text-xs">
-												Leaves the site
-											</Badge>
+											<Badge variant="outline" className="text-muted-foreground text-xs">{t("leavesTheSite")}</Badge>
 										)}
 									</div>
 									<p className="text-muted-foreground mt-0.5 text-xs">{method.description}</p>

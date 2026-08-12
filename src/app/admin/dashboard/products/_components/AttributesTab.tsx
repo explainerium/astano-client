@@ -1,8 +1,10 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { Plus, Trash2 } from "lucide-react"
 import ProCheckbox from "@/components/form/ProCheckbox"
+import { pickTranslation } from "@/lib/pickTranslation"
 import ProCombobox from "@/components/form/ProCombobox"
 import ProSelect from "@/components/form/ProSelect"
 import { Button } from "@/components/ui/button"
@@ -10,14 +12,12 @@ import { useAdminAttributesQuery } from "@/redux/api/attributeApi"
 import type { AdminAttribute } from "@/types/attribute"
 
 const nameOf = (attribute: AdminAttribute) =>
-	attribute.translations.find((t) => t.locale === "en")?.name ??
-	attribute.translations[0]?.name ??
-	attribute.code
+	pickTranslation(attribute.translations)?.name ?? attribute.code
 
 const labelOf = (attribute: AdminAttribute, valueId: string) => {
 	const value = attribute.values.find((v) => v.id === valueId)
 	return (
-		value?.translations.find((t) => t.locale === "en")?.label ?? value?.code ?? valueId
+		pickTranslation(value?.translations)?.label ?? value?.code ?? valueId
 	)
 }
 
@@ -30,6 +30,7 @@ const labelOf = (attribute: AdminAttribute, valueId: string) => {
  * split one product into versions and be a plain specification on another.
  */
 export const AttributesTab = () => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const { fields, append, remove } = useFieldArray({ control, name: "attributes" })
 	const rows = useWatch({ control, name: "attributes" }) as
@@ -45,8 +46,7 @@ export const AttributesTab = () => {
 	return (
 		<div className="space-y-4">
 			<div className="flex flex-wrap items-start justify-between gap-3">
-				<p className="text-muted-foreground max-w-prose text-xs">
-					Attributes marked <strong>used for variations</strong> split this product
+				<p className="text-muted-foreground max-w-prose text-xs">{t("attributesMarked")}<strong>used for variations</strong> split this product
 					into separate versions, each with its own SKU and stock. The rest appear
 					as specifications on the product page.
 				</p>
@@ -64,9 +64,7 @@ export const AttributesTab = () => {
 						})
 					}
 				>
-					<Plus />
-					Add attribute
-				</Button>
+					<Plus />{t("addAttribute")}</Button>
 			</div>
 
 			{attributes.length === 0 && (
@@ -91,7 +89,7 @@ export const AttributesTab = () => {
 						<div className="flex items-start gap-3">
 							<ProSelect
 								name={`attributes.${index}.attributeId`}
-								label="Attribute"
+								label={t("attribute")}
 								className="flex-1"
 								options={attributes.map((attribute) => ({
 									label: nameOf(attribute),
@@ -116,9 +114,9 @@ export const AttributesTab = () => {
 							<>
 								<ProCombobox
 									name={`attributes.${index}.attributeValueIds`}
-									label="Values"
+									label={t("values")}
 									multiple
-									placeholder="No values selected"
+									placeholder={t("noValuesSelected")}
 									options={chosen.values.map((value) => ({
 										value: value.id,
 										label: labelOf(chosen, value.id),
@@ -129,12 +127,12 @@ export const AttributesTab = () => {
 								<div className="grid gap-3 sm:grid-cols-2">
 									<ProCheckbox
 										name={`attributes.${index}.isVisible`}
-										label="Visible on the product page"
+										label={t("visibleOnTheProductPage")}
 									/>
 									<ProCheckbox
 										name={`attributes.${index}.isVariation`}
-										label="Used for variations"
-										description="Each value becomes a separate version with its own SKU."
+										label={t("usedForVariations")}
+										description={t("eachValueBecomesASeparateVersion")}
 									/>
 								</div>
 							</>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Download, Loader2 } from "lucide-react"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
@@ -75,6 +76,7 @@ const exportCsv = (rows: NewsletterSubscriber[]) => {
 }
 
 export default function NewsletterPage() {
+	const t = useTranslations("admin")
 	const [status, setStatus] = useState<SubscriptionStatus | undefined>()
 	const [page, setPage] = useState(1)
 
@@ -99,11 +101,11 @@ export default function NewsletterPage() {
 							setPage(1)
 						}}
 					>
-						<SelectTrigger className="w-44" aria-label="Filter by status">
-							<SelectValue placeholder="Any status" />
+						<SelectTrigger className="w-44" aria-label={t("filterByStatus")}>
+							<SelectValue placeholder={t("anyStatus")} />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value={ANY}>Any status</SelectItem>
+							<SelectItem value={ANY}>{t("anyStatus")}</SelectItem>
 							{(Object.keys(STATUS_CHIP) as SubscriptionStatus[]).map((value) => (
 								<SelectItem key={value} value={value}>
 									{STATUS_CHIP[value].label}
@@ -127,9 +129,7 @@ export default function NewsletterPage() {
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading subscribers…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingSubscribers")}</div>
 			)}
 
 			{isError && (
@@ -162,9 +162,7 @@ export default function NewsletterPage() {
 								{!subscribers.length && (
 									<TableRow className="hover:bg-transparent">
 										<TableCell colSpan={7} className="h-40 text-center">
-											<p className="text-muted-foreground text-sm">
-												No subscribers yet. They arrive from the storefront sign-up form.
-											</p>
+											<p className="text-muted-foreground text-sm">{t("noSubscribersYetTheyArriveFrom")}</p>
 										</TableCell>
 									</TableRow>
 								)}
@@ -200,9 +198,13 @@ export default function NewsletterPage() {
 
 					<div className="text-muted-foreground flex flex-wrap items-center gap-3 border-t px-4 py-2.5 text-xs">
 						<span>
-							{meta?.total ?? subscribers.length}{" "}
-							{(meta?.total ?? subscribers.length) === 1 ? "subscriber" : "subscribers"}
-							{meta && ` · page ${meta.page} of ${meta.totalPages}`}
+							{meta
+								? t("paginationSubscribers", {
+										count: meta.total,
+										page: meta.page,
+										pages: meta.totalPages,
+									})
+								: t("countSubscribers", { count: subscribers.length })}
 						</span>
 						{isFetching && <Loader2 className="size-3 animate-spin" />}
 						<span className="text-muted-foreground">
@@ -216,17 +218,13 @@ export default function NewsletterPage() {
 									size="sm"
 									disabled={meta.page <= 1 || isFetching}
 									onClick={() => setPage((p) => Math.max(1, p - 1))}
-								>
-									Previous
-								</Button>
+								>{t("previous")}</Button>
 								<Button
 									variant="outline"
 									size="sm"
 									disabled={meta.page >= meta.totalPages || isFetching}
 									onClick={() => setPage((p) => p + 1)}
-								>
-									Next
-								</Button>
+								>{t("next")}</Button>
 							</div>
 						)}
 					</div>

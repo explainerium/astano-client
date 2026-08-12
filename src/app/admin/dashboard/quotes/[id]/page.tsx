@@ -1,5 +1,6 @@
 "use client"
 
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -28,17 +29,28 @@ import type { Quote, QuoteStatus } from "@/types/quote"
 import {
 	formatDate,
 	isFullyPriced,
+	quoteStatusOptions,
 	QUOTE_STATUS,
-	QUOTE_STATUS_OPTIONS,
 } from "../_components/quoteStatus"
 import useMoney from "@/lib/useMoney"
-const money = z
-	.string()
-	.trim()
-	.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), { message: "Use a number like 12.50" })
+/**
+ * A function of `t`, not a constant.
+ *
+ * The schema is built inside the component anyway; only the message needed a
+ * locale, and a module-level constant is evaluated at import time where there
+ * is none.
+ */
+const money = (t: (key: string) => string) =>
+	z
+		.string()
+		.trim()
+		.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), {
+			message: t("useANumberLike1250"),
+		})
 
 /** Pricing the lines. Empty clears a price rather than sending zero. */
 const PricingForm = ({ quote }: { quote: Quote }) => {
+	const t = useTranslations("admin")
 	// Its own, rather than threaded from the parent — it is a component, and
 	// the query behind this is shared.
 	const formatMoney = useMoney()
@@ -47,7 +59,7 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 
 	const schema = z.object({
 		status: z.enum(["OPEN", "ANSWERED", "ACCEPTED", "DECLINED", "EXPIRED", "CLOSED"]),
-		items: z.array(z.object({ id: z.string(), price: money })),
+		items: z.array(z.object({ id: z.string(), price: money(t) })),
 	})
 
 	type FormValues = z.infer<typeof schema>
@@ -64,10 +76,10 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 					})),
 				},
 			}).unwrap()
-			toast.success("Quote updated.")
+			toast.success(t("quoteUpdated"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not update the quote.")
+			toast.error(message ?? t("couldNotUpdateTheQuote"))
 		}
 	}
 
@@ -87,7 +99,7 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 				<Table>
 					<TableHeader className="bg-muted/50">
 						<TableRow className="hover:bg-transparent">
-							{["Product", "SKU", "Qty", "MOQ", "Unit price", "Line total"].map((head) => (
+							{[t("product"), t("sku"), t("qty"), t("moq"), t("unitPrice"), t("lineTotal")].map((head) => (
 								<TableHead
 									key={head}
 									className="text-muted-foreground text-xs font-medium tracking-wide uppercase"
@@ -109,7 +121,7 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 										<div className="mt-1.5">
 											<ArtworkLinks
 												files={item.files}
-												labels={{ download: "Download", deleted: "No longer available" }}
+												labels={{ download: t("download"), deleted: t("noLongerAvailable") }}
 											/>
 										</div>
 									)}
@@ -143,30 +155,31 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 				<div className="flex items-end gap-4">
 					<ProSelect
 						name="status"
-						label="Status"
-						options={QUOTE_STATUS_OPTIONS}
+						label={t("status")}
+						options={quoteStatusOptions(t)}
 						className="w-44"
 					/>
 					{quote.quotedSubtotal && (
 						<p className="pb-2 text-sm">
-							<span className="text-muted-foreground">Quoted subtotal </span>
+							<span className="text-muted-foreground">{t("quotedSubtotal")}</span>
 							<span className="font-semibold tabular-nums">
 								{formatMoney(quote.quotedSubtotal)}
 							</span>
 						</p>
 					)}
 				</div>
-				<ProSubmit>Save prices</ProSubmit>
+				<ProSubmit>{t("savePrices")}</ProSubmit>
 			</div>
 		</ProForm>
 	)
 }
 
 const ReplyForm = ({ quote }: { quote: Quote }) => {
+	const t = useTranslations("admin")
 	const [reply] = useReplyToQuoteMutation()
 
 	const schema = z.object({
-		body: z.string().trim().min(1, "Write something first").max(10000),
+		body: z.string().trim().min(1, t("writeSomethingFirst")).max(10000),
 		isInternal: z.boolean(),
 	})
 
@@ -178,10 +191,10 @@ const ReplyForm = ({ quote }: { quote: Quote }) => {
 				id: quote.id,
 				data: { body: form.body.trim(), isInternal: form.isInternal },
 			}).unwrap()
-			toast.success(form.isInternal ? "Note added." : "Reply sent.")
+			toast.success(form.isInternal ? t("noteAdded") : t("replySent"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not send the reply.")
+			toast.error(message ?? t("couldNotSendTheReply"))
 		}
 	}
 
@@ -193,23 +206,23 @@ const ReplyForm = ({ quote }: { quote: Quote }) => {
 			resetOnSubmit
 			className="space-y-3 p-4"
 		>
-			<ProTextarea name="body" label="Reply" />
+			<ProTextarea name="body" label={t("reply")} />
 			<div className="flex flex-wrap items-center justify-between gap-3">
 				<ProCheckbox
 					name="isInternal"
-					label="Internal note"
-					description="Kept on the thread for staff. The customer never sees it and no email goes out."
+					label={t("internalNote")}
+					description={t("keptOnTheThreadForStaffThe")}
 				/>
 				<ProSubmit>
-					<Send />
-					Send
-				</ProSubmit>
+					<Send />{t("send")}</ProSubmit>
 			</div>
 		</ProForm>
 	)
 }
 
 export default function QuoteDetailPage() {
+	const t = useTranslations("admin")
+	const locale = useLocale()
 	const router = useRouter()
 	const params = useParams<{ id: string }>()
 	const { data: quote, isLoading, isError, error } = useAdminQuoteQuery(params.id)
@@ -218,16 +231,14 @@ export default function QuoteDetailPage() {
 	if (isLoading) {
 		return (
 			<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-				<Loader2 className="size-4 animate-spin" />
-				Loading quote…
-			</div>
+				<Loader2 className="size-4 animate-spin" />{t("loadingQuote")}</div>
 		)
 	}
 
 	if (isError || !quote) {
 		return (
 			<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
-				{(error as { data?: { message?: string } })?.data?.message ?? "Could not load the quote."}
+				{(error as { data?: { message?: string } })?.data?.message ?? t("couldNotLoadTheQuote")}
 			</div>
 		)
 	}
@@ -245,17 +256,13 @@ export default function QuoteDetailPage() {
 					size="lg"
 					onClick={() => router.push("/admin/dashboard/quotes")}
 				>
-					<ArrowLeft />
-					Quotes
-				</Button>
+					<ArrowLeft />{t("quotes")}</Button>
 				<h1 className="font-heading text-sm font-semibold">{quote.quoteNumber}</h1>
 				<Badge variant="outline" className={chip.className}>
-					{chip.label}
+					{t(chip.labelKey)}
 				</Badge>
 				{!priced && quote.status === "OPEN" && (
-					<span className="text-muted-foreground text-xs">
-						Not every line has a price yet
-					</span>
+					<span className="text-muted-foreground text-xs">{t("notEveryLineHasAPrice")}</span>
 				)}
 			</div>
 
@@ -273,21 +280,19 @@ export default function QuoteDetailPage() {
 
 					<section className="bg-card overflow-hidden rounded-lg border">
 						<div className="flex flex-wrap items-center gap-3 border-b px-4 py-3">
-							<h2 className="font-heading text-sm font-semibold">Thread</h2>
+							<h2 className="font-heading text-sm font-semibold">{t("thread")}</h2>
 							<Button
 								variant="ghost"
 								size="sm"
 								className="ml-auto"
 								onClick={() => setShowInternal((v) => !v)}
 							>
-								{showInternal ? "Hide internal notes" : "Show internal notes"}
+								{showInternal ? t("hideInternalNotes") : t("showInternalNotes")}
 							</Button>
 						</div>
 
 						{!messages.length ? (
-							<p className="text-muted-foreground p-6 text-center text-sm">
-								Nothing on the thread yet.
-							</p>
+							<p className="text-muted-foreground p-6 text-center text-sm">{t("nothingOnTheThreadYet")}</p>
 						) : (
 							<ol className="divide-y">
 								{messages.map((message) => (
@@ -297,16 +302,14 @@ export default function QuoteDetailPage() {
 									>
 										<div className="flex flex-wrap items-center gap-2 text-xs">
 											<span className="font-medium">
-												{message.author === "CUSTOMER" ? "Customer" : "Staff"}
+												{message.author === "CUSTOMER" ? t("customer") : t("authorStaff")}
 											</span>
 											{message.isInternal && (
 												<Badge variant="outline" className="text-muted-foreground gap-1">
-													<Lock className="size-3" />
-													Internal
-												</Badge>
+													<Lock className="size-3" />{t("internal")}</Badge>
 											)}
 											<span className="text-muted-foreground ml-auto">
-												{formatDate(message.createdAt)}
+												{formatDate(message.createdAt, locale)}
 											</span>
 										</div>
 										<p className="mt-1 text-sm whitespace-pre-line">{message.body}</p>
@@ -323,7 +326,7 @@ export default function QuoteDetailPage() {
 
 				<aside className="space-y-5">
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">Contact</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("contact")}</h2>
 						<div className="space-y-1 p-4 text-sm">
 							{quote.contact.company && (
 								<p className="font-medium">{quote.contact.company}</p>
@@ -339,26 +342,26 @@ export default function QuoteDetailPage() {
 					</section>
 
 					<section className="bg-card rounded-lg border">
-						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">Request</h2>
+						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("request")}</h2>
 						<dl className="space-y-2 p-4 text-sm">
 							<div className="flex justify-between gap-3">
-								<dt className="text-muted-foreground">Submitted</dt>
-								<dd className="text-right text-xs">{formatDate(quote.submittedAt)}</dd>
+								<dt className="text-muted-foreground">{t("submitted")}</dt>
+								<dd className="text-right text-xs">{formatDate(quote.submittedAt, locale)}</dd>
 							</div>
 							{quote.answeredAt && (
 								<div className="flex justify-between gap-3">
-									<dt className="text-muted-foreground">Answered</dt>
-									<dd className="text-right text-xs">{formatDate(quote.answeredAt)}</dd>
+									<dt className="text-muted-foreground">{t("answered")}</dt>
+									<dd className="text-right text-xs">{formatDate(quote.answeredAt, locale)}</dd>
 								</div>
 							)}
 							{quote.expiresAt && (
 								<div className="flex justify-between gap-3">
-									<dt className="text-muted-foreground">Expires</dt>
-									<dd className="text-right text-xs">{formatDate(quote.expiresAt)}</dd>
+									<dt className="text-muted-foreground">{t("expires")}</dt>
+									<dd className="text-right text-xs">{formatDate(quote.expiresAt, locale)}</dd>
 								</div>
 							)}
 							<div className="flex justify-between gap-3">
-								<dt className="text-muted-foreground">Language</dt>
+								<dt className="text-muted-foreground">{t("language")}</dt>
 								<dd className="text-right text-xs uppercase">{quote.locale}</dd>
 							</div>
 						</dl>
@@ -367,7 +370,7 @@ export default function QuoteDetailPage() {
 					{quote.status === "ACCEPTED" && (
 						<div className="bg-accent-soft rounded-lg border p-4 text-sm">
 							<p>
-								<strong>Accepted.</strong> The customer turns this into an order from
+								<strong>{t("accepted")}</strong> The customer turns this into an order from
 								their own account — conversion carries their addresses and chosen
 								payment method, which staff do not hold.
 							</p>

@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useFormContext, useWatch } from "react-hook-form"
 import ProInput from "@/components/form/ProInput"
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,7 @@ const PRESETS = [10, 50, 100, 500, 1000]
  * one variant has nothing to override.
  */
 export const MoqField = () => {
+	const t = useTranslations("admin")
 	const { control, setValue } = useFormContext()
 
 	// useWatch, not `watch()` — the latter re-renders ProForm rather than this
@@ -31,13 +33,13 @@ export const MoqField = () => {
 			<ProInput
 				name="moq"
 				type="number"
-				label="Minimum order quantity"
-				description="Customers cannot buy fewer than this. It applies to every customer, in every language. 0 means no minimum."
+				label={t("minimumOrderQuantity")}
+				description={t("customersCannotBuyFewerThanThis")}
 				className="sm:max-w-xs"
 			/>
 
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="text-muted-foreground text-xs">Quick set</span>
+				<span className="text-muted-foreground text-xs">{t("quickSet")}</span>
 				{PRESETS.map((preset) => (
 					<Button
 						key={preset}
@@ -55,7 +57,7 @@ export const MoqField = () => {
 					variant={current === 0 ? "secondary" : "outline"}
 					onClick={() => set(0)}
 				>
-					No minimum
+					{t("noMinimum")}
 				</Button>
 			</div>
 		</div>

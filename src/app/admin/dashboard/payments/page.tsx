@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import {
@@ -29,6 +30,7 @@ import {
 	useUpdateGatewaySettingsMutation,
 } from "@/redux/api/paymentGatewayApi"
 import { cn } from "@/lib/utils"
+import { pickTranslation } from "@/lib/pickTranslation"
 import type { PaymentMethod } from "@/types/payment"
 import type { PaymentGatewayView } from "@/types/paymentGateway"
 
@@ -59,8 +61,17 @@ const ROLE_LABEL: Record<string, string> = {
 	ADMIN: "admins",
 }
 
-/** The eligibility rules as a sentence, so nobody has to open the editor to read them. */
-const describeRules = (method: PaymentMethod): string[] => {
+/**
+ * The eligibility rules as a sentence, so nobody has to open the editor to read
+ * them.
+ *
+ * Takes  rather than reaching for it: this is a plain function outside any
+ * component, so there is no hook to call here.
+ */
+const describeRules = (
+	method: PaymentMethod,
+	t: (key: string, values?: Record<string, string | number | Date>) => string
+): string[] => {
 	const { rules } = method
 	const lines: string[] = []
 
@@ -73,7 +84,7 @@ const describeRules = (method: PaymentMethod): string[] => {
 	if (rules.requiresLogin) lines.push("Signed-in customers only")
 	if (rules.minCompletedOrders > 0) {
 		lines.push(
-			`After ${rules.minCompletedOrders} completed ${rules.minCompletedOrders === 1 ? "order" : "orders"}`
+			t("afterCompletedOrders", { count: rules.minCompletedOrders })
 		)
 	}
 	if (rules.minOrderTotal) lines.push(`Orders from €${Number(rules.minOrderTotal)}`)
@@ -133,6 +144,7 @@ const errorMessage = (error: unknown, fallback: string) =>
  * inside the Bank transfer settings offering to turn it into an invoice.
  */
 export default function PaymentsPage() {
+	const t = useTranslations("admin")
 	const gateways = usePaymentGatewaysQuery()
 	const methods = usePaymentMethodsQuery()
 
@@ -145,7 +157,7 @@ export default function PaymentsPage() {
 	const isLoading = gateways.isLoading || methods.isLoading
 	const loadError = gateways.error ?? methods.error
 
-	const run = async (id: string, action: () => Promise<unknown>, success: string) => {
+	const run = async (id: string, action: () =>Promise<unknown>, success: string) => {
 		setBusy(id)
 		try {
 			await action()
@@ -163,18 +175,15 @@ export default function PaymentsPage() {
 	return (
 		<div className="space-y-5">
 			<div>
-				<h1 className="font-heading text-xl font-semibold tracking-tight">Payments</h1>
+				<h1 className="font-heading text-xl font-semibold tracking-tight">{t("payments")}</h1>
 				<p className="text-muted-foreground text-sm">
-					Everything a customer can pay with. {activeCount}{" "}
-					{activeCount === 1 ? "option is" : "options are"} offered at checkout.
+					{t("paymentOptionsOffered", { count: activeCount })}
 				</p>
 			</div>
 
 			{isLoading && (
 				<div className="bg-card text-muted-foreground flex items-center justify-center gap-2 rounded-lg border p-16 text-sm">
-					<Loader2 className="size-4 animate-spin" />
-					Loading payment options…
-				</div>
+					<Loader2 className="size-4 animate-spin" />{t("loadingPaymentOptions")}</div>
 			)}
 
 			{/* `!!` because the base query types its error as `unknown`, and an
@@ -187,7 +196,7 @@ export default function PaymentsPage() {
 
 			{/* ── Gateways ──────────────────────────────────────────────────── */}
 			{!!gateways.data?.length && (
-				<Panel title="Card and wallet payments">
+				<Panel title={t("cardAndWalletPayments")}>
 					<p className="text-muted-foreground mb-4 text-sm">
 						Paid online, through a provider. Connect your own account, run a connection test,
 						then switch it on.
@@ -278,22 +287,19 @@ export default function PaymentsPage() {
 
 			{/* ── Offline methods ───────────────────────────────────────────── */}
 			{!!methods.data?.length && (
-				<Panel title="Offline payments">
-					<p className="text-muted-foreground mb-4 text-sm">
-						Paid outside the shop. The order is placed and waits for the money to arrive.
-					</p>
+				<Panel title={t("offlinePayments")}>
+					<p className="text-muted-foreground mb-4 text-sm">{t("paidOutsideTheShopTheOrder")}</p>
 
 					<ul className="divide-y">
 						{methods.data.map((method) => {
-							const rules = describeRules(method)
+							const rules = describeRules(method, t)
 							const Icon = METHOD_ICON[method.type] ?? Landmark
 							const incomplete = missingBankDetails(method)
 
 							// `title` is resolved for the request locale; the description only
 							// exists per translation. The admin is English, so English first.
 							const description =
-								method.translations.find((row) => row.locale === "en")?.description ??
-								method.translations[0]?.description
+								pickTranslation(method.translations)?.description
 
 							return (
 								<li key={method.id} className="flex items-start gap-4 py-4 first:pt-0">
@@ -353,9 +359,7 @@ export default function PaymentsPage() {
 
 										<Button asChild variant="outline" size="sm">
 											<Link href={`/admin/dashboard/payments/methods/${method.id}`}>
-												<Settings2 />
-												Manage
-											</Link>
+												<Settings2 />{t("manage")}</Link>
 										</Button>
 
 										{/* Only a leftover from the old builder can be removed. The

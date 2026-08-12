@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import { FolderIcon, FolderPlus, Images, Inbox, Trash2 } from "lucide-react"
 import { toast } from "sonner"
@@ -109,6 +110,7 @@ export const FolderSidebar = ({
 	totalCount: number
 	unfiledCount: number
 }) => {
+	const t = useTranslations("admin")
 	const [createFolder, { isLoading: isCreating }] = useCreateMediaFolderMutation()
 	const [deleteFolder] = useDeleteMediaFolderMutation()
 	const [newName, setNewName] = useState("")
@@ -147,14 +149,14 @@ export const FolderSidebar = ({
 			<Item
 				active={selected === undefined}
 				icon={Images}
-				label="All media"
+				label={t("allMedia")}
 				count={totalCount}
 				onClick={() => onSelect(undefined)}
 			/>
 			<Item
 				active={selected === UNFILED}
 				icon={Inbox}
-				label="Unfiled"
+				label={t("unfiled")}
 				count={unfiledCount}
 				onClick={() => onSelect(UNFILED)}
 			/>
@@ -188,13 +190,11 @@ export const FolderSidebar = ({
 									setNewName("")
 								}
 							}}
-							placeholder="Folder name"
+							placeholder={t("folderName")}
 							className="h-8 text-sm"
 						/>
 						<div className="flex gap-1">
-							<Button size="sm" onClick={submitFolder} disabled={isCreating}>
-								Create
-							</Button>
+							<Button size="sm" onClick={submitFolder} disabled={isCreating}>{t("create")}</Button>
 							<Button
 								size="sm"
 								variant="ghost"
@@ -202,16 +202,12 @@ export const FolderSidebar = ({
 									setAdding(false)
 									setNewName("")
 								}}
-							>
-								Cancel
-							</Button>
+							>{t("cancel")}</Button>
 						</div>
 					</div>
 				) : (
 					<Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => setAdding(true)}>
-						<FolderPlus />
-						New folder
-					</Button>
+						<FolderPlus />{t("newFolder")}</Button>
 				)}
 			</div>
 		</aside>

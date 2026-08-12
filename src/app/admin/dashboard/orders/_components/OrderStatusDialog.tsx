@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -16,7 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { useUpdateOrderStatusMutation } from "@/redux/api/orderApi"
 import type { Order, OrderStatus, PaymentStatus } from "@/types/order"
-import { ORDER_STATUS_OPTIONS, PAYMENT_STATUS_OPTIONS } from "./orderStatus"
+import { orderStatusOptions, paymentStatusOptions } from "./orderStatus"
 
 const schema = z.object({
 	status: z.enum([
@@ -43,6 +44,7 @@ export const OrderStatusDialog = ({
 	onOpenChange: (open: boolean) => void
 	order: Order
 }) => {
+	const t = useTranslations("admin")
 	const [updateStatus] = useUpdateOrderStatusMutation()
 
 	const onSubmit = async (form: FormValues) => {
@@ -55,11 +57,11 @@ export const OrderStatusDialog = ({
 					...(form.note.trim() ? { note: form.note.trim() } : {}),
 				},
 			}).unwrap()
-			toast.success("Order updated.")
+			toast.success(t("orderUpdated"))
 			onOpenChange(false)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not update the order.")
+			toast.error(message ?? t("couldNotUpdateTheOrder"))
 		}
 	}
 
@@ -67,10 +69,9 @@ export const OrderStatusDialog = ({
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle>Update {order.orderNumber}</DialogTitle>
+					<DialogTitle>{t("updateOrderNumber", { number: order.orderNumber })}</DialogTitle>
 					<DialogDescription>
-						Say what the order <em>is</em> now. Stock, refunds and the customer
-						email are the server&rsquo;s business, not a second thing to remember.
+						{t.rich("statusDialogBody", { em: (chunks) => <em>{chunks}</em> })}
 					</DialogDescription>
 				</DialogHeader>
 
@@ -85,22 +86,22 @@ export const OrderStatusDialog = ({
 					className="space-y-5"
 				>
 					<div className="grid gap-4 sm:grid-cols-2">
-						<ProSelect name="status" label="Order status" options={ORDER_STATUS_OPTIONS} />
+						<ProSelect name="status" label={t("orderStatus")} options={orderStatusOptions(t)} />
 						<ProSelect
 							name="paymentStatus"
-							label="Payment status"
-							options={PAYMENT_STATUS_OPTIONS}
+							label={t("paymentStatus")}
+							options={paymentStatusOptions(t)}
 						/>
 					</div>
 
 					<ProTextarea
 						name="note"
-						label="Note"
-						description="Recorded against this change in the order's history. Internal — the customer never sees it."
+						label={t("note")}
+						description={t("recordedAgainstThisChangeInThe")}
 					/>
 
 					<div className="flex justify-end border-t pt-4">
-						<ProSubmit>Update order</ProSubmit>
+						<ProSubmit>{t("updateOrder")}</ProSubmit>
 					</div>
 				</ProForm>
 			</DialogContent>

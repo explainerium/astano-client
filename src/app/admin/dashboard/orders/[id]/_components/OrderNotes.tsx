@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState } from "react"
 import { Loader2, Lock, Mail, StickyNote } from "lucide-react"
 import { toast } from "sonner"
@@ -17,6 +18,7 @@ import { useAddOrderNoteMutation, useOrderNotesQuery } from "@/redux/api/orderAp
  * emailing a customer a remark that was meant for a colleague.
  */
 export const OrderNotes = ({ orderId }: { orderId: string }) => {
+	const t = useTranslations("admin")
 	const [body, setBody] = useState("")
 	const { data: notes, isLoading } = useOrderNotesQuery(orderId)
 	const [addNote, { isLoading: isSaving }] = useAddOrderNoteMutation()
@@ -28,28 +30,24 @@ export const OrderNotes = ({ orderId }: { orderId: string }) => {
 		try {
 			await addNote({ id: orderId, data: { body: text, isCustomerVisible } }).unwrap()
 			setBody("")
-			toast.success(isCustomerVisible ? "Sent to the customer." : "Note added.")
+			toast.success(isCustomerVisible ? t("sentToTheCustomer") : t("noteAdded"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not add that note.")
+			toast.error(message ?? t("couldNotAddThatNote"))
 		}
 	}
 
 	return (
 		<section className="bg-card rounded-lg border">
-			<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">Notes</h2>
+			<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("notes")}</h2>
 			<div className="space-y-4 p-4">
 				{isLoading && (
 					<p className="text-muted-foreground text-sm">
-						<Loader2 className="mr-2 inline size-4 animate-spin" />
-						Loading notes…
-					</p>
+						<Loader2 className="mr-2 inline size-4 animate-spin" />{t("loadingNotes")}</p>
 				)}
 
 				{!isLoading && !notes?.length && (
-					<p className="text-muted-foreground text-sm">
-						No notes yet. Private notes stay here; the other kind is emailed.
-					</p>
+					<p className="text-muted-foreground text-sm">{t("noNotesYetPrivateNotesStay")}</p>
 				)}
 
 				{!!notes?.length && (
@@ -71,14 +69,10 @@ export const OrderNotes = ({ orderId }: { orderId: string }) => {
 									<Badge variant="outline" className="gap-1 font-normal">
 										{note.isCustomerVisible ? (
 											<>
-												<Mail className="size-3" />
-												Emailed
-											</>
+												<Mail className="size-3" />{t("emailed")}</>
 										) : (
 											<>
-												<Lock className="size-3" />
-												Private
-											</>
+												<Lock className="size-3" />{t("private")}</>
 										)}
 									</Badge>
 								</div>
@@ -92,9 +86,9 @@ export const OrderNotes = ({ orderId }: { orderId: string }) => {
 					<Textarea
 						value={body}
 						onChange={(event) => setBody(event.target.value)}
-						placeholder="Despatch update, a query, anything worth recording…"
+						placeholder={t("despatchUpdateAQueryAnythingWorth")}
 						rows={3}
-						aria-label="New note"
+						aria-label={t("newNote")}
 					/>
 
 					<div className="flex flex-wrap justify-end gap-2">
@@ -105,9 +99,7 @@ export const OrderNotes = ({ orderId }: { orderId: string }) => {
 							disabled={isSaving || !body.trim()}
 							onClick={() => add(false)}
 						>
-							<StickyNote className="size-4" />
-							Add private note
-						</Button>
+							<StickyNote className="size-4" />{t("addPrivateNote")}</Button>
 						<Button
 							type="button"
 							size="sm"
