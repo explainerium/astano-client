@@ -161,7 +161,10 @@
 		"viewCompare": "Compare now",
 		"pagination": "Pagination",
 		"goToPage": "Page {page}",
-		"compareEmpty": "Pick a few products with the compare button and they will line up here."
+		"compareEmpty": "Pick a few products with the compare button and they will line up here.",
+		"goToCheckout": "Checkout",
+		"keepShopping": "Keep shopping",
+		"viewQuoteBasket": "View inquiry basket"
 	},
 	"cart": {
 		"title": "Shopping cart",

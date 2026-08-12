@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
+import { richTextClass } from "@/lib/richText"
 import { convertDimension, dimensionUnitOf, formatWeight, weightUnitOf } from "@/lib/units"
 import type { PublicProductDetail, PublicVariant } from "@/types/storefront"
 
@@ -122,7 +123,7 @@ export const ProductTabs = ({
 					className="pt-8"
 				>
 					<div
-						className="[&_p]:text-muted-foreground max-w-3xl [&_li]:text-muted-foreground [&_a]:text-primary [&_a]:underline [&_li]:mt-1 [&_li]:text-sm [&_p]:mb-4 [&_p]:text-sm [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6"
+						className={cn("max-w-3xl", richTextClass)}
 						// Product copy is written by staff in the admin editor, not by
 						// shoppers, and is stored as the TipTap HTML they authored.
 						dangerouslySetInnerHTML={{ __html: product.description }}

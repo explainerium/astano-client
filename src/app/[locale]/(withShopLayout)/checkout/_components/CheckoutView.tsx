@@ -43,15 +43,17 @@ const buildAddress = (t: (key: string) => string) =>
 	z.object({
 		firstName: z.string().trim().min(1, t("required")).max(100),
 		lastName: z.string().trim().min(1, t("required")).max(100),
-		company: z.string().trim().max(200),
+		// Required on the billing address at the client's request: made-to-order
+		// goods usually need a question asked before they are made.
+		company: z.string().trim().min(1, t("required")).max(200),
 		street1: z.string().trim().min(1, t("required")).max(200),
 		street2: z.string().trim().max(200),
 		postcode: z.string().trim().min(1, t("required")).max(30),
 		city: z.string().trim().min(1, t("required")).max(120),
 		state: z.string().trim().max(120),
 		countryCode: z.string().trim().length(2, t("required")),
-		phone: z.string().trim().max(50),
-		email: z.union([z.literal(""), z.string().trim().email(t("invalidEmail"))]),
+		phone: z.string().trim().min(1, t("required")).max(50),
+		email: z.string().trim().min(1, t("required")).email(t("invalidEmail")),
 	})
 
 /**

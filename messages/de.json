@@ -130,7 +130,7 @@
 		"addedToCart": "Zum Warenkorb hinzugefügt.",
 		"addedToQuote": "Zur Angebotsanfrage hinzugefügt.",
 		"addFailed": "Das konnte nicht hinzugefügt werden. Bitte versuchen Sie es erneut.",
-		"viewCart": "Zum Warenkorb",
+		"viewCart": "Warenkorb ansehen",
 		"viewQuote": "Zur Angebotsanfrage",
 		"belowMoq": "Die Mindestbestellmenge für diesen Artikel beträgt {quantity}.",
 		"unavailable": "Derzeit nicht verfügbar",
@@ -161,7 +161,10 @@
 		"viewCompare": "Jetzt vergleichen",
 		"pagination": "Seitennummerierung",
 		"goToPage": "Seite {page}",
-		"compareEmpty": "Wählen Sie einige Produkte über die Vergleichen-Schaltfläche aus."
+		"compareEmpty": "Wählen Sie einige Produkte über die Vergleichen-Schaltfläche aus.",
+		"goToCheckout": "Zur Kasse",
+		"keepShopping": "Weiter einkaufen",
+		"viewQuoteBasket": "Anfragekorb ansehen"
 	},
 	"cart": {
 		"title": "Warenkorb",

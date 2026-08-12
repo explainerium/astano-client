@@ -56,7 +56,12 @@ export const AddressFields = ({ prefix }: { prefix: "billing" | "shipping" }) =>
 			<ProInput name={`${prefix}.lastName`} label={t("lastName")} autoComplete="family-name" required />
 
 			<div className="sm:col-span-2">
-				<ProInput name={`${prefix}.company`} label={t("company")} autoComplete="organization" />
+				<ProInput
+					name={`${prefix}.company`}
+					label={t("company")}
+					autoComplete="organization"
+					required={prefix === "billing"}
+				/>
 			</div>
 
 			<div className="sm:col-span-2">
@@ -82,8 +87,20 @@ export const AddressFields = ({ prefix }: { prefix: "billing" | "shipping" }) =>
 			/>
 			<ProInput name={`${prefix}.state`} label={t("state")} autoComplete="address-level1" />
 
-			<ProInput name={`${prefix}.phone`} type="tel" label={t("phone")} autoComplete="tel" />
-			<ProInput name={`${prefix}.email`} type="email" label={t("email")} autoComplete="email" />
+			<ProInput
+				name={`${prefix}.phone`}
+				type="tel"
+				label={t("phone")}
+				autoComplete="tel"
+				required={prefix === "billing"}
+			/>
+			<ProInput
+				name={`${prefix}.email`}
+				type="email"
+				label={t("email")}
+				autoComplete="email"
+				required={prefix === "billing"}
+			/>
 		</div>
 	)
 }

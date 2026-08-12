@@ -30,8 +30,14 @@ const CartLineArtwork = ({ itemId, files, artwork, missing }: Props) => {
 	const [setFiles, { isLoading }] = useSetCartItemFilesMutation()
 	const [error, setError] = useState<string | null>(null)
 
-	// The product does not take artwork at all, so there is nothing to show.
-	if (artwork.maxFiles <= 0) return null
+	/*
+	 * Only where a drawing is actually required.
+	 *
+	 * A product that merely tolerates one used to render an empty box on every
+	 * line, which read as a demand rather than an offer. A line that already
+	 * carries files still shows them, so nothing already attached disappears.
+	 */
+	if (artwork.maxFiles <= 0 || (!artwork.required && files.length === 0)) return null
 
 	const handleChange = async (next: ArtworkFile[]) => {
 		setError(null)

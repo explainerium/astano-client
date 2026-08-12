@@ -30,7 +30,7 @@ const QuoteLineArtwork = ({ itemId, files, artwork, missing }: Props) => {
 	const [setFiles, { isLoading }] = useSetQuoteItemFilesMutation()
 	const [error, setError] = useState<string | null>(null)
 
-	if (artwork.maxFiles <= 0) return null
+	if (artwork.maxFiles <= 0 || (!artwork.required && files.length === 0)) return null
 
 	const handleChange = async (next: ArtworkFile[]) => {
 		setError(null)

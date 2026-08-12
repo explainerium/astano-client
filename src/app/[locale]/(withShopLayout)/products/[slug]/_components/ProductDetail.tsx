@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import ArtworkUpload from "@/components/shared/ArtworkUpload"
-import type { ArtworkFile } from "@/types/storefront"
 import { AlertCircle, Check, Loader2, Minus, Package, Plus } from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
+import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
 import {
 	useAddToCartMutation,
 	useAddToQuoteBasketMutation,
@@ -49,20 +48,18 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const formatMoney = useMoney()
 
 	const t = useTranslations("shop")
-	const tArtwork = useTranslations("artwork")
 	const locale = useLocale()
 	const router = useRouter()
 
 	const [variantId, setVariantId] = useState<string | null>(null)
 	const [quantity, setQuantity] = useState(1)
-	/**
-	 * Design files chosen before the add, not after.
-	 *
-	 * They are uploaded as they are picked and only pointed at a line when the
-	 * add succeeds — so an abandoned page leaves an unreferenced upload rather
-	 * than a half-made line, which is the cheaper of the two to be left with.
-	 */
-	const [artwork, setArtwork] = useState<ArtworkFile[]>([])
+	/// The confirmation dialog. Null while closed; holds what was added while open.
+	const [added, setAdded] = useState<{
+		name: string
+		image: string | null
+		quantity: number
+		quote: boolean
+	} | null>(null)
 	const [pricedQuantity, setPricedQuantity] = useState(1)
 	/**
 	 * The chosen options and how many of each.
@@ -145,9 +142,6 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 	const busy = cartState.isLoading || quoteState.isLoading || attaching
 	const belowMoq = quantity < minQuantity
-	const artworkRules = product?.artwork ?? { maxFiles: 0, required: false }
-	/// Stops the add rather than the checkout, so the customer is told where the field is.
-	const artworkMissing = artworkRules.required && artwork.length === 0
 
 	/**
 	 * An option under its own minimum blocks the whole add, not just itself.
@@ -190,20 +184,22 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	}
 
 	const handleAdd = async () => {
-		if (!product || !variant || belowMoq || optionBelowMoq || artworkMissing) return
+		if (!product || !variant || belowMoq || optionBelowMoq) return
 		setFeedback(null)
-
-		const assetIds = artwork.map((file) => file.id)
 
 		try {
 			if (product.quoteOnly) {
-				await addToQuoteBasket({ variantId: variant.id, quantity, assetIds }).unwrap()
-				setFeedback({ ok: true, message: t("addedToQuote") })
-				setArtwork([])
+				await addToQuoteBasket({ variantId: variant.id, quantity }).unwrap()
+				setAdded({
+					name: product.name,
+					image: product.featuredImage?.url ?? null,
+					quantity,
+					quote: true,
+				})
 				return
 			}
 
-			const cart = await addToCart({ variantId: variant.id, quantity, assetIds }).unwrap()
+			const cart = await addToCart({ variantId: variant.id, quantity }).unwrap()
 
 			if (chosenOptions.size) {
 				setAttaching(true)
@@ -230,12 +226,19 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				}
 			}
 
-			setFeedback({ ok: true, message: t("addedToCart") })
-			setArtwork([])
+			setAdded({
+				name: product.name,
+				image: product.featuredImage?.url ?? null,
+				quantity,
+				quote: false,
+			})
 
 			// After the options are attached, not before: leaving mid-way would
 			// take the customer to a cart still missing half of what they picked.
-			if (shopSettings?.["cart.redirectAfterAdd"] === true) router.push("/cart")
+			if (shopSettings?.["cart.redirectAfterAdd"] === true) {
+				setAdded(null)
+				router.push("/cart")
+			}
 		} catch (error) {
 			setFeedback({ ok: false, message: apiMessage(error) ?? t("addFailed") })
 		} finally {
@@ -361,22 +364,6 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</div>
 					)}
 
-					{artworkRules.maxFiles > 0 && (
-						<div className="mt-8">
-							<h2 className="font-heading mb-3 text-base font-semibold">
-								{tArtwork("title")}
-								{artworkRules.required && <span className="text-destructive ml-1">*</span>}
-							</h2>
-							<ArtworkUpload
-								files={artwork}
-								onChange={setArtwork}
-								maxFiles={artworkRules.maxFiles}
-								required={artworkRules.required}
-								busy={busy}
-							/>
-						</div>
-					)}
-
 					<div className="mt-8">
 						<label htmlFor="quantity" className="font-heading mb-3 block text-base font-semibold">
 							{t("quantity")}
@@ -441,7 +428,6 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							busy ||
 							belowMoq ||
 							optionBelowMoq ||
-							artworkMissing ||
 							(!product.quoteOnly && !variant?.inStock)
 						}
 						className="bg-primary text-primary-foreground mt-8 inline-flex w-full items-center justify-center gap-2 px-8 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
@@ -691,6 +677,13 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			</div>
 
 			<ProductTabs product={product} variant={variant} />
+
+			<AddedToCartDialog
+				open={!!added}
+				onClose={() => setAdded(null)}
+				product={added}
+				quote={added?.quote}
+			/>
 		</div>
 	)
 }

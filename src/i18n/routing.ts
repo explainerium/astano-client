@@ -3,13 +3,14 @@ import { defineRouting } from "next-intl/routing"
 /**
  * THE LANGUAGE REGISTRY (frontend side).
  *
- * Mirrors backend/src/config/locales.ts. English is primary and is served at
- * the site root; every other locale gets a prefix (German at /de/). If that
- * decision is ever reversed, change `defaultLocale` here AND `DEFAULT_LOCALE`
- * in the backend — they must agree or the API will answer in one language
- * while the page renders in another.
+ * Mirrors backend/src/config/locales.ts. German is primary and is served at
+ * the site root; every other locale gets a prefix (English at /en/). astano is
+ * a German business and the catalogue is written in German — English is the
+ * translation. If that is ever reversed, change `defaultLocale` here AND
+ * `DEFAULT_LOCALE` in the backend — they must agree or the API will answer in
+ * one language while the page renders in another.
  */
-export const locales = ["en", "de"] as const
+export const locales = ["de", "en"] as const
 export type Locale = (typeof locales)[number]
 
 /**
@@ -104,7 +105,7 @@ export const pathnames = {
 
 export const routing = defineRouting({
 	locales,
-	defaultLocale: "en",
+	defaultLocale: "de",
 	// English has no prefix, German is served under /de. Matches the backend's
 	// localePrefix() helper exactly.
 	localePrefix: "as-needed",
