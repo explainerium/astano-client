@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { Download, Loader2 } from "lucide-react"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
@@ -27,22 +27,22 @@ import type { NewsletterSubscriber, SubscriptionStatus } from "@/types/inbox"
 const ANY = "__any__"
 const PER_PAGE = 50
 
-const STATUS_CHIP: Record<SubscriptionStatus, { label: string; className: string }> = {
+const STATUS_CHIP: Record<SubscriptionStatus, { labelKey: string; className: string }> = {
 	CONFIRMED: {
-		label: "Confirmed",
+		labelKey: "subscriberConfirmed",
 		className: "border-transparent bg-positive-soft text-positive",
 	},
 	/** Signed up but never clicked the link — no consent, so not mailable. */
 	PENDING: {
-		label: "Unconfirmed",
+		labelKey: "subscriberUnconfirmed",
 		className: "border-transparent bg-accent-soft-strong text-primary",
 	},
-	UNSUBSCRIBED: { label: "Unsubscribed", className: "text-muted-foreground" },
+	UNSUBSCRIBED: { labelKey: "subscriberUnsubscribed", className: "text-muted-foreground" },
 }
 
-const formatDate = (value: string | null) =>
+const formatDate = (value: string | null, locale = "de") =>
 	value
-		? new Date(value).toLocaleDateString("en-GB", {
+		? new Date(value).toLocaleDateString(locale, {
 				day: "2-digit",
 				month: "short",
 				year: "numeric",
@@ -77,6 +77,7 @@ const exportCsv = (rows: NewsletterSubscriber[]) => {
 
 export default function NewsletterPage() {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const [status, setStatus] = useState<SubscriptionStatus | undefined>()
 	const [page, setPage] = useState(1)
 
@@ -108,7 +109,7 @@ export default function NewsletterPage() {
 							<SelectItem value={ANY}>{t("anyStatus")}</SelectItem>
 							{(Object.keys(STATUS_CHIP) as SubscriptionStatus[]).map((value) => (
 								<SelectItem key={value} value={value}>
-									{STATUS_CHIP[value].label}
+									{t(STATUS_CHIP[value].labelKey)}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -122,7 +123,7 @@ export default function NewsletterPage() {
 						onClick={() => exportCsv(subscribers)}
 					>
 						<Download />
-						Export confirmed ({confirmedOnPage})
+						{t("exportConfirmed", { count: confirmedOnPage })}
 					</Button>
 				}
 			/>
@@ -135,7 +136,7 @@ export default function NewsletterPage() {
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load subscribers."}
+						t("couldNotLoadSubscribers")}
 				</div>
 			)}
 
@@ -145,7 +146,15 @@ export default function NewsletterPage() {
 						<Table>
 							<TableHeader className="bg-muted/50">
 								<TableRow className="hover:bg-transparent">
-									{["Email", "Name", "Language", "Source", "Signed up", "Confirmed", "Status"].map(
+									{[
+									t("email"),
+									t("name"),
+									t("language"),
+									t("source"),
+									t("signedUp"),
+									t("subscriberConfirmed"),
+									t("status"),
+								].map(
 										(head) => (
 											<TableHead
 												key={head}
@@ -179,14 +188,14 @@ export default function NewsletterPage() {
 												{subscriber.source ?? "—"}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-xs">
-												{formatDate(subscriber.createdAt)}
+												{formatDate(subscriber.createdAt, locale)}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-xs">
-												{formatDate(subscriber.confirmedAt)}
+												{formatDate(subscriber.confirmedAt, locale)}
 											</TableCell>
 											<TableCell>
 												<Badge variant="outline" className={chip.className}>
-													{chip.label}
+													{t(chip.labelKey)}
 												</Badge>
 											</TableCell>
 										</TableRow>
@@ -208,8 +217,7 @@ export default function NewsletterPage() {
 						</span>
 						{isFetching && <Loader2 className="size-3 animate-spin" />}
 						<span className="text-muted-foreground">
-							Only confirmed addresses may be mailed — the confirmation timestamp is the
-							evidence of consent.
+							{t("consentEvidence")}
 						</span>
 						{!!meta && (
 							<div className="ml-auto flex gap-2">

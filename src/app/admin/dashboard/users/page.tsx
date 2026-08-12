@@ -46,13 +46,14 @@ const ANY = "__any__"
 const PER_PAGE = 20
 
 /** The tab strip. "All" first, then the states that need somebody to do something. */
-const TABS: { value: UserStatus | undefined; label: string }[] = [
-	{ value: undefined, label: "All" },
-	{ value: "PENDING", label: "Awaiting review" },
-	{ value: "ACTIVE", label: "Active" },
-	{ value: "SUSPENDED", label: "Suspended" },
-	{ value: "DRAFT", label: "Draft" },
-	{ value: "REJECTED", label: "Rejected" },
+/** Keys, resolved at render — this list is built at import time. */
+const TABS: { value: UserStatus | undefined; labelKey: string }[] = [
+	{ value: undefined, labelKey: "filterAll" },
+	{ value: "PENDING", labelKey: "userStatusPending" },
+	{ value: "ACTIVE", labelKey: "userStatusActive" },
+	{ value: "SUSPENDED", labelKey: "userStatusSuspended" },
+	{ value: "DRAFT", labelKey: "userStatusDraft" },
+	{ value: "REJECTED", labelKey: "userStatusRejected" },
 ]
 
 /**
@@ -112,7 +113,7 @@ export default function UsersPage() {
 			toast.success(success)
 		} catch (err) {
 			const message = (err as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not update the account.")
+			toast.error(message ?? t("couldNotUpdateTheAccount"))
 		}
 		setBusy(null)
 	}
@@ -133,7 +134,7 @@ export default function UsersPage() {
 					onClick={() => reset(() => setDeleted((value) => !value))}
 				>
 					<Trash2 />
-					{deleted ? "Viewing deleted" : "Deleted"}
+					{deleted ? t("viewingDeleted") : t("userStatusDeleted")}
 				</Button>
 			</div>
 
@@ -145,7 +146,7 @@ export default function UsersPage() {
 
 						return (
 							<button
-								key={tab.label}
+								key={tab.labelKey}
 								type="button"
 								onClick={() => reset(() => setStatus(tab.value))}
 								aria-pressed={active}
@@ -156,7 +157,7 @@ export default function UsersPage() {
 										: "text-muted-foreground hover:text-foreground"
 								)}
 							>
-								{tab.label}
+								{t(tab.labelKey)}
 								{count !== undefined && (
 									<span
 										className={cn(
@@ -176,7 +177,7 @@ export default function UsersPage() {
 			<Toolbar
 				searchValue={search}
 				onSearchChange={(value) => reset(() => setSearch(value))}
-				searchPlaceholder="Search email, company or name…"
+				searchPlaceholder={t("searchAccounts")}
 				filters={
 					<Select
 						value={role ?? ANY}
@@ -191,7 +192,7 @@ export default function UsersPage() {
 							<SelectItem value={ANY}>{t("anyRole")}</SelectItem>
 							{ASSIGNABLE_ROLES.map((value) => (
 								<SelectItem key={value} value={value}>
-									{ROLE_LABEL[value]}
+									{t(ROLE_LABEL[value])}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -206,7 +207,7 @@ export default function UsersPage() {
 
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
-					{(error as { data?: { message?: string } })?.data?.message ?? "Could not load accounts."}
+					{(error as { data?: { message?: string } })?.data?.message ?? t("couldNotLoadAccounts")}
 				</div>
 			)}
 
@@ -216,7 +217,7 @@ export default function UsersPage() {
 						<Table>
 							<TableHeader className="bg-muted/50">
 								<TableRow className="hover:bg-transparent">
-									{["Account", "Company", "Role", "Registered", "Last sign-in", "Status"].map(
+									{[t("account"), t("company"), t("role"), t("registered"), t("lastSignIn"), t("status")].map(
 										(head) => (
 											<TableHead
 												key={head}
@@ -236,8 +237,8 @@ export default function UsersPage() {
 										<TableCell colSpan={7} className="h-40 text-center">
 											<p className="text-muted-foreground text-sm">
 												{deleted
-													? "Nothing has been deleted."
-													: "No accounts match these filters."}
+													? t("nothingHasBeenDeleted")
+													: t("noAccountsMatchTheseFilters")}
 											</p>
 										</TableCell>
 									</TableRow>
@@ -263,7 +264,7 @@ export default function UsersPage() {
 												</span>
 											</TableCell>
 											<TableCell className="text-sm">{user.company ?? "—"}</TableCell>
-											<TableCell className="text-sm">{ROLE_LABEL[user.role]}</TableCell>
+											<TableCell className="text-sm">{t(ROLE_LABEL[user.role])}</TableCell>
 											<TableCell className="text-muted-foreground text-xs">
 												{formatDate(user.createdAt)}
 											</TableCell>
@@ -272,7 +273,7 @@ export default function UsersPage() {
 											</TableCell>
 											<TableCell>
 												<Badge variant="outline" className={chip.className}>
-													{chip.label}
+													{t(chip.labelKey)}
 												</Badge>
 											</TableCell>
 											<TableCell className="pr-4">
@@ -299,7 +300,7 @@ export default function UsersPage() {
 																	<Button
 																		variant="ghost"
 																		size="icon"
-																		aria-label={`Approve ${user.email}`}
+																		aria-label={t("approveThing", { thing: user.email })}
 																		disabled={busy === user.id}
 																		onClick={() =>
 																			run(
@@ -314,7 +315,7 @@ export default function UsersPage() {
 																	<Button
 																		variant="ghost"
 																		size="icon"
-																		aria-label={`Reject ${user.email}`}
+																		aria-label={t("rejectThing", { thing: user.email })}
 																		disabled={busy === user.id || isSelf}
 																		onClick={() =>
 																			run(
@@ -336,13 +337,13 @@ export default function UsersPage() {
 																<Button
 																	variant="ghost"
 																	size="icon"
-																	aria-label={`Delete ${user.email}`}
+																	aria-label={t("deleteThing", { thing: user.email })}
 																	disabled={busy === user.id}
 																	onClick={() =>
 																		run(
 																			user.id,
 																			() => remove(user.id).unwrap(),
-																			`${name} deleted. You can restore them from Deleted.`
+																			t("userDeletedRestorable", { name })
 																		)
 																	}
 																>
@@ -352,7 +353,7 @@ export default function UsersPage() {
 
 															<Link
 																href={`/admin/dashboard/users/${user.id}`}
-																aria-label={`Open ${user.email}`}
+																aria-label={t("openThing", { thing: user.email })}
 																className="text-muted-foreground hover:text-foreground p-2"
 															>
 																<ChevronRight className="size-4" />

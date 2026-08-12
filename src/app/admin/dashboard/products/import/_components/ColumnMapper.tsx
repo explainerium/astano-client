@@ -85,7 +85,7 @@ export const ColumnMapper = ({
 												value={mapping[header] ?? ""}
 												onChange={(event) => set(header, event.target.value)}
 												className="border-input bg-background h-9 w-full rounded-md border px-2 text-sm"
-												aria-label={`Import ${header} as`}
+												aria-label={t("importColumnAs", { header })}
 											>
 												<option value="">{t("ignore")}</option>
 												{analysis.fields.map((field) => (
@@ -112,8 +112,7 @@ export const ColumnMapper = ({
 			{!Object.values(mapping).includes("sku") && (
 				<p className="text-muted-foreground flex items-start gap-2 text-sm">
 					<CircleSlash className="mt-0.5 size-4 shrink-0" />
-					No column is mapped to SKU. Without one, nothing can be matched to a product that
-					already exists and every row creates a new one.
+					{t("noSkuColumnMapped")}
 				</p>
 			)}
 		</div>

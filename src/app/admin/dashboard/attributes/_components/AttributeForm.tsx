@@ -26,29 +26,34 @@ const EDITOR_LOCALES = [
 
 const CODE_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
 
-const codeField = z
-	.string()
-	.trim()
-	.min(1, "Required")
-	.max(60)
-	.regex(CODE_PATTERN, "Lowercase letters, digits, - or _")
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
 
-const schema = z.object({
-	code: codeField,
-	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
-	en: z.object({ name: z.string().trim().min(1, "An English name is required") }),
-	de: z.object({ name: z.string().trim() }),
-	values: z.array(
-		z.object({
-			id: z.string().optional(),
-			code: codeField,
-			labelEn: z.string().trim().min(1, "Required"),
-			labelDe: z.string().trim(),
-		})
-	),
-})
+const codeField = (t: T) =>
+	z
+		.string()
+		.trim()
+		.min(1, t("required"))
+		.max(60)
+		.regex(CODE_PATTERN, t("codePattern"))
 
-type FormValues = z.infer<typeof schema>
+const buildSchema = (t: T) =>
+	z.object({
+		code: codeField(t),
+		sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
+		en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
+		de: z.object({ name: z.string().trim() }),
+		values: z.array(
+			z.object({
+				id: z.string().optional(),
+				code: codeField(t),
+				labelEn: z.string().trim().min(1, t("required")),
+				labelDe: z.string().trim(),
+			})
+		),
+	})
+
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const translationFor = (rows: { locale: string }[] | undefined, locale: string) =>
 	rows?.find((r) => r.locale === locale)
@@ -77,6 +82,7 @@ const toDefaults = (attribute?: AdminAttribute): FormValues => ({
  * which desyncs the moment a row is added from one tab.
  */
 const ValuesEditor = () => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext<FormValues>()
 	const { fields, append, remove } = useFieldArray({ control, name: "values" })
 
@@ -84,7 +90,7 @@ const ValuesEditor = () => {
 		<div className="space-y-3">
 			<div className="flex items-center justify-between">
 				<div>
-					<p className="text-sm font-medium">Values</p>
+					<p className="text-sm font-medium">{t("values")}</p>
 					<p className="text-muted-foreground text-xs">Order here is the order shoppers see. English is required.</p>
 				</div>
 				<Button
@@ -93,7 +99,7 @@ const ValuesEditor = () => {
 					size="sm"
 					onClick={() => append({ code: "", labelEn: "", labelDe: "" })}
 				>
-					<Plus />Add value</Button>
+					<Plus />{t("addValue")}</Button>
 			</div>
 
 			{!fields.length && (
@@ -108,12 +114,12 @@ const ValuesEditor = () => {
 					<ProInput name={`values.${index}.code`} placeholder="code" className="w-32" />
 					<ProInput
 						name={`values.${index}.labelEn`}
-						placeholder="Label (English)"
+						placeholder={t("labelEnglish")}
 						className="flex-1"
 					/>
 					<ProInput
 						name={`values.${index}.labelDe`}
-						placeholder="Label (Deutsch)"
+						placeholder={t("labelDeutsch")}
 						className="flex-1"
 					/>
 					<Button
@@ -121,7 +127,7 @@ const ValuesEditor = () => {
 						variant="ghost"
 						size="icon"
 						className="text-muted-foreground hover:text-destructive mt-0.5"
-						aria-label={`Remove value ${index + 1}`}
+						aria-label={t("removeNumbered", { thing: t("valueWord"), index: index + 1 })}
 						onClick={() => remove(index)}
 					>
 						<Trash2 />
@@ -174,7 +180,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the attribute.")
+			toast.error(message ?? t("couldNotSaveTheAttribute"))
 		}
 	}
 
@@ -182,12 +188,12 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 		<div className="space-y-6">
 			<EditorHeader
 				backHref="/admin/dashboard/attributes"
-				backLabel="All attributes"
+				backLabel={t("allAttributes")}
 				title={
 					isEdit
 						? ((translationFor(attribute.translations, "en") as { name?: string })?.name ??
 							attribute.code)
-						: "New attribute"
+						: t("newAttribute")
 				}
 				description={t("variantAxesBuildProductVariantsDescriptive")}
 			/>
@@ -195,7 +201,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 			<ProForm
 				key={attribute?.id ?? "new"}
 				onSubmit={onSubmit}
-				resolver={zodResolver(schema)}
+				resolver={zodResolver(buildSchema(t))}
 				defaultValues={toDefaults(attribute)}
 				className="space-y-6"
 			>
@@ -251,7 +257,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 					<Button asChild type="button" variant="ghost">
 						<Link href="/admin/dashboard/attributes">{t("cancel")}</Link>
 					</Button>
-					<ProSubmit>{isEdit ? "Save changes" : "Create attribute"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("createAttribute")}</ProSubmit>
 				</div>
 			</ProForm>
 		</div>

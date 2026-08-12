@@ -62,9 +62,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 
 			{optionProducts.length === 0 && (
 				<p className="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-xs">
-					No option products exist yet. Create a product and set its dashboard
-					label to <strong>{t("option")}</strong> — engraving, coating, packaging and so
-					on — then attach it here.
+					{t.rich("noOptionProductsYet", { b: (chunks) => <strong>{chunks}</strong> })}
 				</p>
 			)}
 
@@ -118,7 +116,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 							variant="ghost"
 							size="icon"
 							className="text-muted-foreground hover:text-destructive mt-7"
-							aria-label={`Remove option ${index + 1}`}
+							aria-label={t("removeNumbered", { thing: t("optionWord"), index: index + 1 })}
 							onClick={() => remove(index)}
 						>
 							<Trash2 />

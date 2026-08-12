@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -17,24 +17,28 @@ import { countryOptions } from "@/constants/countries"
 import { useCreateTaxRateMutation, useUpdateTaxRateMutation } from "@/redux/api/taxApi"
 import type { TaxRate, TaxRatePayload } from "@/types/tax"
 
-const schema = z.object({
-	countryCode: z.string().trim().length(2, "Choose a country"),
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const buildSchema = (t: T) =>
+	z.object({
+	countryCode: z.string().trim().length(2, t("chooseACountry")),
 	state: z.string().trim().max(60),
-	name: z.string().trim().min(1, "Required").max(120),
+	name: z.string().trim().min(1, t("required")).max(120),
 	// Decimal(9,4) on the column, so up to four places. Stays a string all the
 	// way to the API — a float would round 19.0000 into something else.
 	rate: z
 		.string()
 		.trim()
-		.min(1, "Required")
-		.refine((value) => /^\d+(\.\d{1,4})?$/.test(value), { message: "Use a number like 19" }),
+		.min(1, t("required"))
+		.refine((value) => /^\d+(\.\d{1,4})?$/.test(value), { message: t("useANumberLike19") }),
 	appliesToShipping: z.boolean(),
-	priority: z.number({ message: "Enter a number" }).int().min(1, "At least 1"),
+	priority: z.number({ message: t("enterANumber") }).int().min(1, t("atLeastOne")),
 	reverseChargeWithVatId: z.boolean(),
 	isActive: z.boolean(),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const toDefaults = (rate?: TaxRate): FormValues => ({
 	countryCode: rate?.countryCode ?? "",
@@ -57,6 +61,7 @@ export const TaxRateForm = ({
 	rate?: TaxRate
 }) => {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const router = useRouter()
 	const [createTaxRate] = useCreateTaxRateMutation()
 	const [updateTaxRate] = useUpdateTaxRateMutation()
@@ -98,7 +103,7 @@ export const TaxRateForm = ({
 		} catch (error) {
 			// The API refuses a duplicate (class, country, state, priority).
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the rate.")
+			toast.error(message ?? t("couldNotSaveTheRate"))
 		}
 	}
 
@@ -106,8 +111,8 @@ export const TaxRateForm = ({
 		<div className="space-y-6">
 			<EditorHeader
 				backHref={backHref}
-				backLabel="All tax classes"
-				title={isEdit ? `${rate.countryCode} · ${rate.name}` : "New rate"}
+				backLabel={t("allTaxClasses")}
+				title={isEdit ? `${rate.countryCode} · ${rate.name}` : t("newRate")}
 				description={
 					<>{t("taxIsWorkedOutFromThe")}<strong>shipping</strong> address (R10).
 					</>
@@ -117,7 +122,7 @@ export const TaxRateForm = ({
 			<ProForm
 				key={rate?.id ?? "new"}
 				onSubmit={onSubmit}
-				resolver={zodResolver(schema)}
+				resolver={zodResolver(buildSchema(t))}
 				defaultValues={toDefaults(rate)}
 				className="space-y-6"
 			>
@@ -126,7 +131,7 @@ export const TaxRateForm = ({
 						<ProCombobox
 							name="countryCode"
 							label={t("country")}
-							options={countryOptions("en")}
+							options={countryOptions(locale)}
 							placeholder={t("chooseACountry")}
 						/>
 						<ProInput
@@ -165,7 +170,7 @@ export const TaxRateForm = ({
 						<ProCheckbox
 							name="appliesToShipping"
 							label={t("taxTheShippingToo")}
-							description="On for every EU row on the live site."
+							description={t("euRowsBlurb")}
 						/>
 						<ProCheckbox
 							name="reverseChargeWithVatId"
@@ -184,7 +189,7 @@ export const TaxRateForm = ({
 					<Button asChild type="button" variant="ghost">
 						<Link href={backHref}>{t("cancel")}</Link>
 					</Button>
-					<ProSubmit>{isEdit ? "Save changes" : "Add rate"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("addRate")}</ProSubmit>
 				</div>
 			</ProForm>
 		</div>

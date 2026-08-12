@@ -189,7 +189,7 @@ const RoleLadder = ({ role, base }: { role: TierRole; base: number | null }) => 
 												variant="ghost"
 												size="icon"
 												className="text-muted-foreground hover:text-destructive"
-												aria-label={`Remove row ${index + 1}`}
+												aria-label={t("removeNumbered", { thing: t("rowWord"), index: index + 1 })}
 												onClick={() => remove(index)}
 											>
 												<Trash2 />
@@ -255,9 +255,7 @@ export const QuantityPricing = () => {
 			<div>
 				<h3 className="text-sm font-medium">{t("quantityDiscounts")}</h3>
 				<p className="text-muted-foreground mt-1 max-w-prose text-xs">
-					The price per unit once the customer orders that many. Each row applies from
-					its quantity upwards, and the last row covers everything above it. Below the
-					first row, the normal price applies.
+					{t("quantityLadderBlurb")}
 				</p>
 			</div>
 

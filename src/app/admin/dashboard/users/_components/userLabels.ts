@@ -8,7 +8,8 @@ import type { AssignableRole, AssignableStatus, UserRole, UserStatus } from "@/t
  */
 
 export interface Chip {
-	label: string
+	/** A key into the admin catalogue — this module has no locale to resolve one. */
+	labelKey: string
 	className: string
 }
 
@@ -22,47 +23,40 @@ export interface Chip {
  * are the states nobody is coming back from without a decision.
  */
 export const STATUS_CHIP: Record<UserStatus, Chip> = {
-	ACTIVE: { label: "Active", className: "border-transparent bg-positive-soft text-positive" },
+	ACTIVE: { labelKey: "userStatusActive", className: "border-transparent bg-positive-soft text-positive" },
 	PENDING: {
-		label: "Awaiting review",
+		labelKey: "userStatusPending",
 		className: "border-transparent bg-accent-soft-strong text-primary",
 	},
 	SUSPENDED: {
-		label: "Suspended",
+		labelKey: "userStatusSuspended",
 		className: "border-transparent bg-accent-soft text-accent-foreground",
 	},
-	DRAFT: { label: "Draft", className: "border-transparent bg-muted text-muted-foreground" },
-	REJECTED: { label: "Rejected", className: "border-transparent bg-negative-soft text-negative" },
+	DRAFT: { labelKey: "userStatusDraft", className: "border-transparent bg-muted text-muted-foreground" },
+	REJECTED: { labelKey: "userStatusRejected", className: "border-transparent bg-negative-soft text-negative" },
 }
 
 /** GUEST is never stored on a row — it exists so pricing has a role for anonymous requests. */
+/** Keys, resolved at render. */
 export const ROLE_LABEL: Record<UserRole, string> = {
-	GUEST: "Guest",
-	B2C: "Retail",
-	RESELLER: "Dealer",
-	SHOP_MANAGER: "Shop manager",
-	ADMIN: "Admin",
+	GUEST: "userRoleGuest",
+	B2C: "userRoleB2C",
+	RESELLER: "userRoleReseller",
+	SHOP_MANAGER: "userRoleShopManager",
+	ADMIN: "userRoleAdmin",
 }
 
 export const ASSIGNABLE_ROLES: AssignableRole[] = ["B2C", "RESELLER", "SHOP_MANAGER", "ADMIN"]
 
 /** What each hand-set status does, in the words the person clicking it needs. */
-export const STATUS_ACTIONS: { value: AssignableStatus; label: string; hint: string }[] = [
-	{
-		value: "ACTIVE",
-		label: "Active",
-		hint: "Can sign in, order, and — if a dealer — see wholesale prices.",
-	},
-	{
-		value: "SUSPENDED",
-		label: "Suspended",
-		hint: "Keeps their account and history but cannot order. A dealer pays guest prices.",
-	},
-	{
-		value: "DRAFT",
-		label: "Draft",
-		hint: "Prepared but not live. Sign-in is refused until you activate it.",
-	},
+export const STATUS_ACTIONS: {
+	value: AssignableStatus
+	labelKey: string
+	hintKey: string
+}[] = [
+	{ value: "ACTIVE", labelKey: "userStatusActive", hintKey: "statusHintActive" },
+	{ value: "SUSPENDED", labelKey: "userStatusSuspended", hintKey: "statusHintSuspended" },
+	{ value: "DRAFT", labelKey: "userStatusDraft", hintKey: "statusHintDraft" },
 ]
 
 /** Roles whose accounts only an admin may act on. */
@@ -76,18 +70,19 @@ export const nameOf = (user: {
 }): string =>
 	[user.firstName, user.lastName].filter(Boolean).join(" ") || user.company || user.email
 
-export const formatDate = (value: string | null): string =>
+/** Dates in the reader’s language — this was pinned to en-GB. */
+export const formatDate = (value: string | null, locale = "de"): string =>
 	value
-		? new Date(value).toLocaleDateString("en-GB", {
+		? new Date(value).toLocaleDateString(locale, {
 				day: "2-digit",
 				month: "short",
 				year: "numeric",
 			})
 		: "—"
 
-export const formatDateTime = (value: string | null): string =>
+export const formatDateTime = (value: string | null, locale = "de"): string =>
 	value
-		? new Date(value).toLocaleString("en-GB", {
+		? new Date(value).toLocaleString(locale, {
 				day: "2-digit",
 				month: "short",
 				year: "numeric",

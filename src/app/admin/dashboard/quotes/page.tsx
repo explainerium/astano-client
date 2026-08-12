@@ -178,7 +178,7 @@ export default function QuotesPage() {
 													<Button
 														variant="ghost"
 														size="icon"
-														aria-label={`Open ${quote.quoteNumber}`}
+														aria-label={t("openThing", { thing: quote.quoteNumber })}
 														onClick={(event) => {
 															event.stopPropagation()
 															router.push(`/admin/dashboard/quotes/${quote.id}`)

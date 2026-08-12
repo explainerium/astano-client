@@ -27,8 +27,7 @@ export const BankAccountsField = () => {
 		<div className="space-y-4">
 			{!fields.length && (
 				<p className="text-muted-foreground rounded-md border border-dashed p-6 text-center text-sm">
-					No account added yet. Until one is, the customer is told to pay by transfer with
-					nowhere to send it.
+					{t("noBankAccountYet")}
 				</p>
 			)}
 
@@ -36,13 +35,13 @@ export const BankAccountsField = () => {
 				<div key={field.id} className="relative rounded-md border p-4">
 					<div className="mb-3 flex items-center justify-between gap-2">
 						<span className="text-sm font-medium">
-							{fields.length > 1 ? `Account ${index + 1}` : "Bank account"}
+							{fields.length > 1 ? `Account ${index + 1}` : t("bankAccount")}
 						</span>
 						<Button
 							type="button"
 							variant="ghost"
 							size="icon"
-							aria-label={`Remove account ${index + 1}`}
+							aria-label={t("removeNumbered", { thing: t("accountWord"), index: index + 1 })}
 							onClick={() => remove(index)}
 						>
 							<Trash2 className="text-muted-foreground" />
@@ -55,7 +54,7 @@ export const BankAccountsField = () => {
 							<ProInput
 								name={`bankAccounts.${index}.label`}
 								label={t("label")}
-								placeholder="EUR account"
+								placeholder={t("eurAccountExample")}
 								description={t("shownAboveThisAccountSoThe")}
 							/>
 						)}
@@ -79,7 +78,7 @@ export const BankAccountsField = () => {
 						/>
 						<ProInput
 							name={`bankAccounts.${index}.bic`}
-							label="BIC / SWIFT"
+							label={t("bicSwift")}
 							placeholder="SOLADES1VSS"
 						/>
 						<ProInput
@@ -115,7 +114,7 @@ export const BankAccountsField = () => {
 				}
 			>
 				<Plus />
-				{fields.length ? "Add another account" : "Add bank account"}
+				{fields.length ? t("addAnotherAccount") : t("addBankAccount")}
 			</Button>
 		</div>
 	)

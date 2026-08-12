@@ -16,6 +16,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+import useCountryName from "@/lib/useCountryName"
 import { Button } from "@/components/ui/button"
 import { useDeleteShippingZoneMutation } from "@/redux/api/shippingApi"
 import type { ShippingZone } from "@/types/shipping"
@@ -28,17 +29,8 @@ import ZoneMethods from "./ZoneMethods"
  * own; what stays here is deleting, which is a confirmation rather than a form.
  */
 
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-
-const countryName = (code: string) => {
-	try {
-		return regionNames.of(code) ?? code
-	} catch {
-		return code
-	}
-}
-
 export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
+	const countryName = useCountryName()
 	const t = useTranslations("admin")
 	const [deleteZone] = useDeleteShippingZoneMutation()
 	const [confirming, setConfirming] = useState(false)
@@ -53,7 +45,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 			setConfirming(false)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not delete.")
+			toast.error(message ?? t("couldNotDelete"))
 		}
 
 		setBusy(false)
@@ -76,7 +68,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 
 				<div className="ml-auto flex gap-1">
 					<Button asChild variant="ghost" size="icon">
-						<Link href={zoneHref} aria-label={`Edit ${zone.name}`}>
+						<Link href={zoneHref} aria-label={t("editThing", { thing: zone.name })}>
 							<Pencil />
 						</Link>
 					</Button>
@@ -84,7 +76,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 						variant="ghost"
 						size="icon"
 						className="text-muted-foreground hover:text-destructive"
-						aria-label={`Delete ${zone.name}`}
+						aria-label={t("deleteThing", { thing: zone.name })}
 						onClick={() => setConfirming(true)}
 					>
 						<Trash2 />
@@ -96,7 +88,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 				{zone.countries.length ? (
 					<>
 						<span className="font-medium">{zone.countries.length} countries: </span>
-						{zone.countries.map(countryName).join(", ")}
+						{zone.countries.map((code) => countryName(code) ?? code).join(", ")}
 					</>
 				) : (
 					<span className="text-negative">No countries — this zone is never matched.</span>
@@ -129,7 +121,7 @@ export const ZoneCard = ({ zone }: { zone: ShippingZone }) => {
 							}}
 							disabled={busy}
 						>
-							{busy ? "Deleting…" : "Delete"}
+							{busy ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

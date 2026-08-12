@@ -37,7 +37,26 @@ export const TierPriorityCard = () => {
 	if (data && order === null) setOrder(data.order)
 
 	const rows = order ?? DEFAULT_ORDER
-	const describe = (value: string) => data?.sources.find((s) => s.value === value)
+	/**
+	 * A source, in the reader's language.
+	 *
+	 * The API serves the vocabulary so a source added later needs no frontend
+	 * release — which means the words arrive in English. The German lives in the
+	 * catalogue keyed by the source's own value, with the English as fallback,
+	 * the same arrangement the settings and email screens use.
+	 */
+	const describe = (value: string) => {
+		const served = data?.sources.find((s) => s.value === value)
+		if (!served) return undefined
+
+		return {
+			...served,
+			label: t.has(`sources.${value}.label`) ? t(`sources.${value}.label`) : served.label,
+			description: t.has(`sources.${value}.description`)
+				? t(`sources.${value}.description`)
+				: served.description,
+		}
+	}
 
 	const move = (index: number, by: -1 | 1) => {
 		const next = [...rows]

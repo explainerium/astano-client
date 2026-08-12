@@ -22,7 +22,8 @@
 		"yes": "Ja",
 		"no": "Nein",
 		"selectDate": "Datum wählen",
-		"somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+		"somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+		"selectedCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}"
 	},
 	"nav": {
 		"home": "Startseite",
@@ -926,179 +927,218 @@
 			}
 		},
 		"keys": {
-			"language.default": {
+			"language__default": {
 				"label": "Sprache der Website",
 				"help": "Was ein Erstbesucher sieht. Wer eine Sprache wählt, behält seine Wahl."
 			},
-			"language.showSwitcher": {
+			"language__showSwitcher": {
 				"label": "Sprachumschalter anzeigen",
 				"help": "Ausschalten, um den Shop einsprachig zu betreiben."
 			},
-			"language.detectFromBrowser": {
+			"language__detectFromBrowser": {
 				"label": "Browsersprache berücksichtigen",
 				"help": "Aus bedeutet: alle starten in der oben gewählten Sprache."
 			},
-			"company.name": {
+			"company__name": {
 				"label": "Firmierung auf Rechnungen"
 			},
-			"company.street": {
+			"company__street": {
 				"label": "Adresszeile 1"
 			},
-			"company.street2": {
+			"company__street2": {
 				"label": "Adresszeile 2",
 				"help": "Optional — Etage, Einheit, c/o-Zeile."
 			},
-			"company.postcode": {
+			"company__postcode": {
 				"label": "Postleitzahl"
 			},
-			"company.city": {
+			"company__city": {
 				"label": "Ort"
 			},
-			"company.countryCode": {
+			"company__countryCode": {
 				"label": "Land",
 				"help": "Steuersätze und Versandkosten werden aus dieser Adresse ermittelt."
 			},
-			"company.state": {
+			"company__state": {
 				"label": "Bundesland oder Region",
 				"help": "Optional. Nur nötig, wo die Steuer innerhalb eines Landes abweicht."
 			},
-			"company.vatId": {
+			"company__vatId": {
 				"label": "Umsatzsteuer-Identifikationsnummer"
 			},
-			"company.registerNumber": {
+			"company__registerNumber": {
 				"label": "Handelsregisternummer"
 			},
-			"company.email": {
+			"company__email": {
 				"label": "Kontaktadresse für Kunden"
 			},
-			"company.phone": {
+			"company__phone": {
 				"label": "Telefon"
 			},
-			"company.website": {
+			"company__website": {
 				"label": "Shop-URL"
 			},
-			"invoice.footer": {
+			"invoice__footer": {
 				"label": "Rechnungsfußzeile",
 				"help": "Freier Text am Fuß jeder Rechnung."
 			},
-			"invoice.numberPrefix": {
+			"invoice__numberPrefix": {
 				"label": "Präfix der Rechnungsnummer"
 			},
-			"mail.fromName": {
+			"mail__fromName": {
 				"label": "Absendername ausgehender E-Mails"
 			},
-			"mail.fromAddress": {
+			"mail__fromAddress": {
 				"label": "Absenderadresse ausgehender E-Mails"
 			},
-			"mail.adminNotifyAddress": {
+			"mail__adminNotifyAddress": {
 				"label": "Wohin neue Bestellungen und Anfragen gemeldet werden"
 			},
-			"email.headerImage": {
+			"email__headerImage": {
 				"label": "URL des Kopf-Logos",
 				"help": "Erscheint oben in jeder E-Mail. Muss eine vollständige https://-Adresse sein — ein Postfach kann keinen Pfad Ihrer eigenen Website auflösen. Leer lassen, um stattdessen den Firmennamen zu drucken."
 			},
-			"email.baseColour": {
+			"email__baseColour": {
 				"label": "Schaltflächenfarbe",
 				"help": "Schaltflächen und Links. Die Schrift darauf wird automatisch schwarz oder weiß, je nachdem was lesbar ist."
 			},
-			"email.backgroundColour": {
+			"email__backgroundColour": {
 				"label": "Seitenhintergrund"
 			},
-			"email.bodyBackgroundColour": {
+			"email__bodyBackgroundColour": {
 				"label": "Nachrichtenhintergrund",
 				"help": "Die Fläche, auf der die Nachricht liegt."
 			},
-			"email.textColour": {
+			"email__textColour": {
 				"label": "Schriftfarbe"
 			},
-			"email.footerText": {
+			"email__footerText": {
 				"label": "Fußzeilentext",
 				"help": "Ersetzt die Firmenadresse am Ende jeder E-Mail. Leer lassen, um die Adresse zu behalten."
 			},
-			"currency.code": {
+			"currency__code": {
 				"label": "Währung",
 				"help": "ISO 4217. Wird auf jeder Bestellung festgeschrieben — eine Änderung schreibt vergangene Bestellungen nicht um."
 			},
-			"currency.position": {
+			"currency__position": {
 				"label": "Position des Währungssymbols"
 			},
-			"currency.thousandSeparator": {
+			"currency__thousandSeparator": {
 				"label": "Tausendertrennzeichen",
 				"help": "Deutsch schreibt 1.234,56 — hier ein Punkt und unten ein Komma."
 			},
-			"currency.decimalSeparator": {
+			"currency__decimalSeparator": {
 				"label": "Dezimaltrennzeichen"
 			},
-			"currency.decimals": {
+			"currency__decimals": {
 				"label": "Anzahl der Nachkommastellen"
 			},
-			"units.weight": {
+			"units__weight": {
 				"label": "Gewichtseinheit",
 				"help": "Wie Gewichte Kunden angezeigt werden. Gespeichert und versendet wird ohnehin in Kilogramm."
 			},
-			"units.dimension": {
+			"units__dimension": {
 				"label": "Maßeinheit",
 				"help": "Wie Maße Kunden angezeigt werden. Gespeichert wird ohnehin in Zentimetern."
 			},
-			"stock.lowThreshold": {
+			"stock__lowThreshold": {
 				"label": "Warnung bei geringem Bestand ab",
 				"help": "Produkte auf oder unter diesem Wert erscheinen in der Liste knapper Bestände. Der Live-Shop nutzt 2."
 			},
-			"stock.outOfStockThreshold": {
+			"stock__outOfStockThreshold": {
 				"label": "Nicht auf Lager ab",
 				"help": "Bestand auf oder unter diesem Wert gilt als nicht verfügbar. Üblicherweise 0."
 			},
-			"stock.notifyAddress": {
+			"stock__notifyAddress": {
 				"label": "Bestandswarnungen senden an",
 				"help": "Leer lassen, um die Benachrichtigungsadresse der Verwaltung zu verwenden."
 			},
-			"cart.redirectAfterAdd": {
+			"cart__redirectAfterAdd": {
 				"label": "Nach dem Hinzufügen zum Warenkorb wechseln",
 				"help": "Der Live-Shop tut das. Aus bleibt der Kunde auf der Seite, die er gerade ansieht."
 			},
-			"shop.productsPerPage": {
+			"shop__productsPerPage": {
 				"label": "Produkte pro Seite"
 			},
-			"shop.productColumns": {
+			"shop__productColumns": {
 				"label": "Produkte pro Zeile",
 				"help": "Auf einem Desktop-Raster in voller Breite. Schmalere Bildschirme zeigen immer weniger."
 			},
-			"selling.locations": {
+			"selling__locations": {
 				"label": "Verkauf an"
 			},
-			"selling.countries": {
+			"selling__countries": {
 				"label": "Länder",
 				"help": "Wird nur von den beiden Optionen oben genutzt, die eine Liste nennen. Bei Verkauf an alle ohne Wirkung."
 			},
-			"shipping.locations": {
+			"shipping__locations": {
 				"label": "Lieferung nach"
 			},
-			"shipping.countries": {
+			"shipping__countries": {
 				"label": "In diese Länder liefern",
 				"help": "Wird nur von „Nur die unten aufgeführten Länder“ genutzt. Ein Land hier braucht zusätzlich eine Versandzone, um einen Preis zu haben."
 			},
-			"selling.customerDefault": {
+			"selling__customerDefault": {
 				"label": "Voreingestelltes Gebiet für Kunden"
 			},
-			"selling.defaultCountry": {
+			"selling__defaultCountry": {
 				"label": "Vorausgewähltes Land an der Kasse",
 				"help": "Wird nur von „Ein Land meiner Wahl“ genutzt."
 			},
-			"tax.enabled": {
+			"tax__enabled": {
 				"label": "Steuer berechnen",
 				"help": "Aus bedeutet keine Umsatzsteuer auf irgendeine Bestellung, überall. Schweiz, EU-Reverse-Charge und nicht konfigurierte Länder regelt bereits die Steuermatrix — dafür ist dieser Schalter nicht da."
 			},
-			"coupons.enabled": {
+			"coupons__enabled": {
 				"label": "Gutscheincodes annehmen",
 				"help": "Blendet das Gutscheinfeld an der Kasse ein. Ohne Wirkung, bis Gutscheine gebaut sind."
 			},
-			"coupons.sequential": {
+			"coupons__sequential": {
 				"label": "Gutscheinrabatte nacheinander anwenden",
 				"help": "Bei mehreren Gutscheinen wird der erste vom vollen Preis abgezogen und der nächste vom Rest. Ohne Wirkung, bis Gutscheine gebaut sind."
 			},
-			"pricing.tierPriority": {
+			"pricing__tierPriority": {
 				"label": "Priorität der Mengenstaffeln",
 				"help": "Reihenfolge, in der die Staffelquellen geprüft werden. Die spezifischste zuerst."
+			}
+		},
+		"options": {
+			"currency__position": {
+				"left": "Links — €1.234,56",
+				"right": "Rechts — 1.234,56€",
+				"left_space": "Links mit Leerzeichen — € 1.234,56",
+				"right_space": "Rechts mit Leerzeichen — 1.234,56 €"
+			},
+			"units__weight": {
+				"kg": "Kilogramm (kg)",
+				"g": "Gramm (g)",
+				"lb": "Pfund (lb)"
+			},
+			"units__dimension": {
+				"cm": "Zentimeter (cm)",
+				"mm": "Millimeter (mm)",
+				"in": "Zoll (in)"
+			},
+			"selling__locations": {
+				"all": "Alle Länder",
+				"all_except": "Alle Länder außer den unten aufgeführten",
+				"specific": "Nur die unten aufgeführten Länder"
+			},
+			"shipping__locations": {
+				"selling": "Überall, wohin ich verkaufe",
+				"all": "Alle Länder",
+				"specific": "Nur die unten aufgeführten Länder",
+				"disabled": "Nirgendwohin — kein Versand"
+			},
+			"selling__customerDefault": {
+				"shop": "Das Land des Shops",
+				"specific": "Ein Land meiner Wahl",
+				"none": "Keine Vorauswahl — der Kunde wählt"
+			},
+			"pricing__tierPriority": {
+				"customer,catalogue,category": "Kunde → Produkt → Kategorie",
+				"customer,category,catalogue": "Kunde → Kategorie → Produkt",
+				"catalogue,customer,category": "Produkt → Kunde → Kategorie"
 			}
 		}
 	},
@@ -1123,7 +1163,21 @@
 		"saved": "Priorität gespeichert",
 		"savedBody": "Ab sofort wird jeder Preis im Shop in dieser Reihenfolge ermittelt.",
 		"saveFailed": "Die Priorität konnte nicht gespeichert werden",
-		"tryAgain": "Bitte erneut versuchen."
+		"tryAgain": "Bitte erneut versuchen.",
+		"sources": {
+			"customer": {
+				"label": "Kunde",
+				"description": "Eine mit einem einzelnen Kunden vereinbarte Staffel. Die spezifischste Regel überhaupt."
+			},
+			"catalogue": {
+				"label": "Produkt",
+				"description": "Die Staffel am Produkt selbst oder an einer seiner Varianten."
+			},
+			"category": {
+				"label": "Kategorie",
+				"description": "Eine von einer Kategorie geerbte Staffel. Gemessen an allem, was der Kunde aus dieser Kategorie hat, nicht an einer einzelnen Position."
+			}
+		}
 	},
 	"admin": {
 		"0MeansThisProductTakesNo": "0 bedeutet, dass dieses Produkt keine Uploads annimmt. Der alte Shop erlaubte 6.",
@@ -1507,7 +1561,7 @@
 		"saved": "Gespeichert.",
 		"savedRunAConnectionTestNext": "Gespeichert. Führen Sie als Nächstes einen Verbindungstest durch.",
 		"search": "Suchen",
-		"searchByFileName": "Nach Dateiname suchen",
+		"searchByFileName": "Nach Dateiname suchen …",
 		"searchStockOrderEtc": "Bestand, Bestellung usw. suchen",
 		"selectAllAttributes": "Alle Attribute auswählen",
 		"selectAllCategories": "Alle Kategorien auswählen",
@@ -1747,6 +1801,337 @@
 		"importNew": "Neu",
 		"importUpdated": "Aktualisiert",
 		"importCreated": "Angelegt",
-		"paginationProducts": "{count, plural, one {# Produkt} other {# Produkte}} · Seite {page} von {pages}"
+		"paginationProducts": "{count, plural, one {# Produkt} other {# Produkte}} · Seite {page} von {pages}",
+		"categoryIcon": "Kategoriesymbol",
+		"change": "Ändern",
+		"choose": "Auswählen",
+		"changeThing": "{thing} ändern",
+		"chooseThing": "{thing} auswählen",
+		"couldNotLoadCategories": "Die Kategorien konnten nicht geladen werden.",
+		"couldNotLoadThatCategory": "Diese Kategorie konnte nicht geladen werden.",
+		"couldNotSaveTheCategory": "Die Kategorie konnte nicht gespeichert werden.",
+		"createCategory": "Kategorie anlegen",
+		"editCategory": "Kategorie bearbeiten",
+		"searchCategories": "Kategorien suchen …",
+		"noCategoriesYet": "Noch keine Kategorien. Legen Sie die erste an, um den Katalog aufzubauen.",
+		"categoryCopyHasNoProducts": "Nur Einstellungen und Texte — die Kopie hat noch keine Produkte.",
+		"dependsOnOwnPrice": "Richtet sich nach dem Preis des jeweiligen Produkts",
+		"ladderAppliesToCategory": "Jedes Produkt dieser Kategorie folgt ihr ab sofort.",
+		"ladderSaved": "Staffel für {role} gespeichert",
+		"selectThing": "{thing} auswählen",
+		"editThing": "{thing} bearbeiten",
+		"duplicateThing": "{thing} duplizieren",
+		"deleteThing": "{thing} löschen",
+		"openThing": "{thing} öffnen",
+		"removeNumbered": "{thing} {index} entfernen",
+		"moveImageEarlier": "Galeriebild {index} nach vorne",
+		"moveImageLater": "Galeriebild {index} nach hinten",
+		"importColumnAs": "{header} importieren als",
+		"attributeWord": "Attribut",
+		"optionWord": "Option",
+		"galleryImageWord": "Galeriebild",
+		"rowWord": "Zeile",
+		"allAttributes": "Alle Attribute",
+		"couldNotLoadAttributes": "Die Attribute konnten nicht geladen werden.",
+		"couldNotSaveTheAttribute": "Das Attribut konnte nicht gespeichert werden.",
+		"createAttribute": "Attribut anlegen",
+		"searchAttributes": "Attribute suchen …",
+		"noAttributesYet": "Noch keine Attribute. Legen Sie Größe oder Farbe an, um Varianten zu bilden.",
+		"codePattern": "Kleinbuchstaben, Ziffern, - oder _",
+		"valueWord": "Wert",
+		"nothingMatchesQuery": "Nichts entspricht „{query}“.",
+		"notTranslated": "nicht übersetzt",
+		"deleteFailureOne": "„{name}“ — {message}",
+		"deleteFailureMany": "{count} konnten nicht gelöscht werden. „{name}“ — {message}",
+		"importAnalysed": "{rows, plural, one {# Zeile} other {# Zeilen}}, {matched} von {columns} Spalten erkannt.",
+		"importedProducts": "{count, plural, one {# Produkt} other {# Produkte}} importiert.",
+		"imagesFetched": "Bilder: {fetched} geladen.",
+		"imagesFetchedWithFailures": "Bilder: {fetched} geladen, {failed} nicht.",
+		"mustNotBeAbovePrice": "Darf nicht über dem {label}-Preis von {base} liegen.",
+		"setRegularPriceFirst": "Setzen Sie einen regulären Preis, bevor Sie Mengenrabatte für {label} anlegen.",
+		"rowAlreadyCovers": "Zeile {row} deckt {quantity} bereits ab.",
+		"galleryImageNumbered": "Galeriebild {index}",
+		"gatewayLive": "Live",
+		"gatewayTestMode": "Testmodus",
+		"gatewayNotSetUp": "Nicht eingerichtet",
+		"gatewayReadyOff": "Bereit, ausgeschaltet",
+		"gatewayNeedsTesting": "Test ausstehend",
+		"gatewaySwitchedOn": "Zahlungsdienst eingeschaltet.",
+		"gatewaySwitchedOff": "Zahlungsdienst ausgeschaltet.",
+		"switchedOnThing": "{name} eingeschaltet.",
+		"switchedOffThing": "{name} ausgeschaltet.",
+		"offerThingAtCheckout": "{name} an der Kasse anbieten",
+		"modeTest": "Test",
+		"modeLive": "Live",
+		"modeCredentials": "{mode}-Zugangsdaten",
+		"nowUsingKeys": "Es werden jetzt {mode}-Schlüssel verwendet.",
+		"keysStored": "Schlüssel hinterlegt",
+		"noKeysYet": "Noch keine Schlüssel",
+		"storedLeaveBlank": "Hinterlegt — leer lassen, um ihn zu behalten",
+		"activeTest": "Aktiv · Test",
+		"off": "Aus",
+		"testModeBlurb": "Es wird nichts belastet. Verwenden Sie die Testkarten von Stripe.",
+		"liveModeBlurb": "Echtes Geld. Erst umschalten, wenn der Testmodus funktioniert.",
+		"stripeBlurb": "Karten, SEPA, Klarna und giropay.",
+		"paypalBlurb": "Kunden bestätigen die Zahlung bei PayPal.",
+		"setUp": "Einrichten",
+		"noBankDetails": "Keine Bankverbindung",
+		"bankAccount": "Bankkonto",
+		"addBankAccount": "Bankkonto hinzufügen",
+		"addAnotherAccount": "Weiteres Konto hinzufügen",
+		"eurAccountExample": "EUR-Konto",
+		"bicSwift": "BIC / SWIFT",
+		"accountWord": "Konto",
+		"noMaximum": "Kein Maximum",
+		"inactiveMethodNeverOffered": "Eine inaktive Zahlungsart wird nie angeboten, unabhängig von den Regeln.",
+		"bicFormat": "Ein BIC besteht aus 8 oder 11 Buchstaben und Ziffern",
+		"anEnglishTitleIsRequired": "Ein englischer Titel ist erforderlich",
+		"couldNotSaveThePaymentMethod": "Die Zahlungsart konnte nicht gespeichert werden.",
+		"roleGuests": "Gäste",
+		"roleRetailCustomers": "Privatkunden",
+		"roleDealers": "Händler",
+		"roleShopManagers": "Shop-Manager",
+		"roleAdmins": "Administratoren",
+		"roleGuestNotSignedIn": "Gast (nicht angemeldet)",
+		"roleRetailCustomer": "Privatkunde",
+		"roleApprovedDealer": "Freigegebener Händler",
+		"roleShopManager": "Shop-Manager",
+		"roleAdmin": "Administrator",
+		"onlyCountries": "Nur {countries}",
+		"onlyRoles": "Nur {roles}",
+		"ordersFrom": "Bestellungen ab {amount}",
+		"ordersUpTo": "Bestellungen bis {amount}",
+		"validatedVatIdRequired": "Geprüfte USt-IdNr. erforderlich",
+		"bankDetailsBlurb": "Erscheint auf der Dankesseite und noch einmal in der Bestellbestätigung — das ist, was der Kunde in seine Banking-App überträgt.",
+		"noBankAccountYet": "Noch kein Konto hinterlegt. Bis dahin wird dem Kunden Zahlung per Überweisung angeboten, ohne Empfänger.",
+		"everySettingNarrows": "Jede Einstellung schränkt ein. Eine leere Liste bedeutet keine Einschränkung — nicht den Ausschluss aller.",
+		"importMayTakeMinutes": "Bei einer großen Datei kann das einige Minuten dauern, mit Bildern noch länger. Lassen Sie die Seite geöffnet.",
+		"noSkuColumnMapped": "Keine Spalte ist der SKU zugeordnet. Ohne sie kann nichts einem bestehenden Produkt zugeordnet werden und jede Zeile legt ein neues an.",
+		"noAttributesExistYet": "Es gibt noch keine Attribute. Legen Sie zuerst Größe oder Material an und hängen Sie sie dann hier ein.",
+		"dimensionsBlurb": "Länge, Breite und Höhe eines verpackten Artikels. Der Versand wird nach Gewicht berechnet, nicht nach Größe — diese Angaben dienen der Verpackung und Ihren eigenen Unterlagen.",
+		"quantityLadderBlurb": "Der Stückpreis, sobald der Kunde diese Menge bestellt. Jede Zeile gilt ab ihrer Menge aufwärts, die letzte deckt alles darüber ab. Unterhalb der ersten Zeile gilt der normale Preis.",
+		"englishRequiredGermanOptional": "Der englische Name ist erforderlich. Deutsch ist optional, aber eine Kategorie ohne ihn fällt auf der deutschen Seite auf Englisch zurück.",
+		"categoryLadderBlurb": "Gilt für jedes Produkt dieser Kategorie. Gezählt wird alles, was der Kunde aus der Kategorie hat, nicht eine einzelne Position — je zehn von fünf Produkten erreichen eine Schwelle von 50, die keine einzelne Position erreicht.",
+		"noOptionProductsYet": "Es gibt noch keine Optionsprodukte. Legen Sie ein Produkt an, setzen Sie seine Bezeichnung in der Verwaltung auf <b>Option</b> — Gravur, Beschichtung, Verpackung und so weiter — und hängen Sie es dann hier ein.",
+		"methodWeightBands": "Gewichtsstaffeln",
+		"methodFlatRate": "Pauschale",
+		"methodFreeShipping": "Kostenloser Versand",
+		"methodPriceBands": "Bestellwert-Staffeln",
+		"allShippingZones": "Alle Versandzonen",
+		"couldNotLoadShippingZones": "Die Versandzonen konnten nicht geladen werden.",
+		"couldNotSaveTheZone": "Die Zone konnte nicht gespeichert werden.",
+		"createZone": "Zone anlegen",
+		"noCountries": "Keine Länder",
+		"pickAtLeastOneCountry": "Wählen Sie mindestens ein Land",
+		"inactiveZoneOffersNothing": "Eine inaktive Zone bietet ihren Ländern überhaupt keinen Versand an.",
+		"buildTheLiveMatrix": "Live-Matrix aufbauen",
+		"building": "Wird aufgebaut …",
+		"zoneCreateFailed": "{zone} — {message}",
+		"couldNotBeCreated": "konnte nicht angelegt werden",
+		"newMethod": "Neue Versandart",
+		"couldNotSaveTheMethod": "Die Versandart konnte nicht gespeichert werden.",
+		"inactiveMethodNeverOfferedAtCheckout": "Eine inaktive Versandart wird an der Kasse nie angeboten.",
+		"flatRateNeedsACost": "Eine Pauschale braucht einen Betrag.",
+		"bandedNeedsABand": "Eine gestaffelte Versandart braucht mindestens eine Staffel, sonst kann nichts berechnet werden.",
+		"bandLeavesGap": "Lässt eine Lücke: {from}–{to} ist nicht abgedeckt.",
+		"bandOverlaps": "Überschneidet die Staffel, die bei {previous} endet.",
+		"bandsRunUpwards": "Jede Staffel gilt von ihrem Beginn bis — aber ohne — die nächste. Lassen Sie das letzte <b>Bis</b> leer, damit alles darüber abgedeckt ist. Die Staffeln müssen lückenlos aneinander anschließen: eine Lücke bedeutet, dass eine Bestellung darin gar keinen Versand angeboten bekommt.",
+		"toWord": "Bis",
+		"bandWord": "Staffel",
+		"couldNotDelete": "Konnte nicht gelöscht werden.",
+		"alwaysFree": "Immer kostenlos",
+		"fromWeightUpwards": "Ab {amount} {unit}",
+		"freeAboveAmount": "Kostenlos ab {amount}",
+		"deleteMethodWarning": "Ihre Staffeln werden mitgelöscht. War es die einzige Versandart der Zone, kann dort niemand mehr bestellen.",
+		"deleteThingTitle": "„{name}“ löschen?",
+		"no": "Nein",
+		"allTaxClasses": "Alle Steuerklassen",
+		"couldNotLoadTaxClasses": "Die Steuerklassen konnten nicht geladen werden.",
+		"couldNotSaveTheTaxClass": "Die Steuerklasse konnte nicht gespeichert werden.",
+		"couldNotSaveTheRate": "Der Steuersatz konnte nicht gespeichert werden.",
+		"createClass": "Klasse anlegen",
+		"newRate": "Neuer Steuersatz",
+		"noTaxClassesYet": "Noch keine Steuerklassen. Die Kasse kann nichts berechnen, solange nicht eine Klasse und ein passender Steuersatz vorhanden sind.",
+		"noRatesYet": "Noch keine Steuersätze. Solange keiner zum Lieferland passt, berechnet diese Klasse nichts.",
+		"deleteClassWarning": "Damit werden die Klasse und alle ihre Steuersätze entfernt. Eine Klasse, die noch an Produkten hängt, kann nicht gelöscht werden.",
+		"deleteRateWarning": "Bestellungen in diesem Land fallen auf den nächsten passenden Steuersatz zurück — oder ganz auf keine Steuer.",
+		"euRowsBlurb": "Auf der Live-Website für jede EU-Zeile aktiv.",
+		"editCountryRate": "Steuersatz für {country} bearbeiten",
+		"deleteCountryRate": "Steuersatz für {country} löschen",
+		"deleteCountryRateTitle": "Steuersatz für {country} löschen?",
+		"countryRateDeleted": "Steuersatz für {country} gelöscht.",
+		"rateAddFailed": "{country} — {message}",
+		"couldNotBeAdded": "konnte nicht hinzugefügt werden",
+		"userStatusActive": "Aktiv",
+		"userStatusPending": "Wartet auf Prüfung",
+		"userStatusSuspended": "Gesperrt",
+		"userStatusDraft": "Entwurf",
+		"userStatusRejected": "Abgelehnt",
+		"userStatusDeleted": "Gelöscht",
+		"userRoleGuest": "Gast",
+		"userRoleB2C": "Privat",
+		"userRoleReseller": "Händler",
+		"userRoleShopManager": "Shop-Manager",
+		"userRoleAdmin": "Administrator",
+		"statusHintActive": "Kann sich anmelden, bestellen und — als Händler — Großhandelspreise sehen.",
+		"statusHintSuspended": "Behält Konto und Historie, kann aber nicht bestellen. Ein Händler zahlt Gastpreise.",
+		"statusHintDraft": "Vorbereitet, aber nicht aktiv. Die Anmeldung wird verweigert, bis Sie es freischalten.",
+		"searchAccounts": "E-Mail, Firma oder Name suchen …",
+		"couldNotLoadAccounts": "Die Konten konnten nicht geladen werden.",
+		"couldNotUpdateTheAccount": "Das Konto konnte nicht aktualisiert werden.",
+		"couldNotLoadThisAccount": "Dieses Konto konnte nicht geladen werden.",
+		"viewingDeleted": "Gelöschte anzeigen",
+		"nothingHasBeenDeleted": "Es wurde nichts gelöscht.",
+		"noAccountsMatchTheseFilters": "Keine Konten entsprechen diesen Filtern.",
+		"approveThing": "{thing} freigeben",
+		"rejectThing": "{thing} ablehnen",
+		"userDeletedRestorable": "{name} gelöscht. Sie können das Konto unter „Gelöscht“ wiederherstellen.",
+		"vatNumber": "USt-IdNr.",
+		"psiMember": "PSI-Mitglied",
+		"viesValidated": "VIES-geprüft",
+		"unvalidated": "Ungeprüft",
+		"administratorsOnly": "Nur für Administratoren.",
+		"onlyAdminCanActOnStaff": "Nur ein Administrator kann ein Mitarbeiterkonto bearbeiten.",
+		"cannotChangeOwnRole": "Sie können Ihre eigene Rolle nicht ändern.",
+		"cannotChangeOwnStatus": "Sie können den Status Ihres eigenen Kontos nicht ändern.",
+		"restoreTheAccountFirst": "Stellen Sie das Konto zuerst wieder her.",
+		"userApprovedDealerPrices": "{name} freigegeben — sieht ab sofort Händlerpreise.",
+		"userDeletedRestoreFromList": "{name} gelöscht. Wiederherstellung über die Liste „Gelöscht“.",
+		"userPermanentlyDeleted": "{name} endgültig gelöscht.",
+		"suspendedExplanation": "Gesperrt. Anmeldung, Historie und Korrektur der eigenen Daten bleiben möglich, aber Bestellungen und Anfragen nicht — und als Händler werden Gastpreise angezeigt.",
+		"ownAccountExplanation": "Das ist Ihr eigenes Konto. Rolle und Status kann nur ein anderer Administrator ändern — niemand moderiert sich selbst.",
+		"roleExplanation": "Die Rolle entscheidet, was dieses Konto zahlt. Nur ein Administrator kann sie ändern — und nie die eigene.",
+		"deleteExplanation": "Löschen blendet das Konto aus, beendet seine Sitzungen und verweigert die Anmeldung. Die E-Mail-Adresse bleibt reserviert und der Schritt lässt sich rückgängig machen.",
+		"permanentDeleteExplanation": "Die endgültige Löschung entfernt den Datensatz. Vergangene Bestellungen bleiben erhalten, verlieren aber ihre Verknüpfung zu diesem Kunden — nichts davon ist wiederherstellbar.",
+		"userIsNow": "{name} ist jetzt {what}.",
+		"close": "Schließen",
+		"upload": "Hochladen",
+		"couldNotCreateTheFolder": "Der Ordner konnte nicht angelegt werden.",
+		"couldNotDeleteTheFolder": "Der Ordner konnte nicht gelöscht werden.",
+		"deleteFolderThing": "Ordner {name} löschen",
+		"dropToUpload": "Zum Hochladen loslassen",
+		"dragImagesHere": "Bilder hierher ziehen oder klicken zum Auswählen",
+		"uploadFailedFor": "{name} — {message}",
+		"uploadFailed": "Upload fehlgeschlagen",
+		"dropzoneHint": "JPEG, PNG, WebP, AVIF oder GIF · bis 10 MB · wird automatisch in WebP umgewandelt · nicht abgelegt",
+		"dropzoneHintInFolder": "JPEG, PNG, WebP, AVIF oder GIF · bis 10 MB · wird automatisch in WebP umgewandelt · abgelegt unter {folder}",
+		"movedToFolder": "{count, plural, one {# Datei} other {# Dateien}} nach {folder} verschoben.",
+		"couldNotBeMoved": "{count, plural, one {# Datei} other {# Dateien}} konnte nicht verschoben werden.",
+		"folderWord": "Ordner",
+		"uploadingProgress": "{done} von {total} werden hochgeladen …",
+		"couldNotUpdateTheMessage": "Die Nachricht konnte nicht aktualisiert werden.",
+		"couldNotLoadMessages": "Die Nachrichten konnten nicht geladen werden.",
+		"nothingWaitingForAReply": "Nichts wartet auf eine Antwort.",
+		"noMessagesHere": "Hier sind keine Nachrichten.",
+		"noSubject": "(kein Betreff)",
+		"noParentTopLevel": "— Keine übergeordnete Kategorie —",
+		"untitled": "(ohne Titel)",
+		"noMethodsEnabled": "Keine Versandarten aktiv",
+		"subscriberConfirmed": "Bestätigt",
+		"subscriberUnconfirmed": "Unbestätigt",
+		"subscriberUnsubscribed": "Abgemeldet",
+		"source": "Quelle",
+		"signedUp": "Angemeldet",
+		"couldNotLoadSubscribers": "Die Abonnenten konnten nicht geladen werden.",
+		"exportConfirmed": "Bestätigte exportieren ({count})",
+		"consentEvidence": "Nur bestätigte Adressen dürfen angeschrieben werden — der Zeitstempel der Bestätigung ist der Nachweis der Einwilligung.",
+		"on": "An",
+		"toCustomers": "An Kunden",
+		"toYou": "An Sie",
+		"toCustomersBlurb": "Geht an die Person, die bestellt, sich registriert oder ein Angebot angefragt hat.",
+		"toYouBlurb": "Benachrichtigungen darüber, was im Shop passiert.",
+		"sendThing": "{name} senden",
+		"couldNotChangeThat": "Das konnte nicht geändert werden.",
+		"couldNotSaveThat": "Das konnte nicht gespeichert werden.",
+		"couldNotResetThat": "Das konnte nicht zurückgesetzt werden.",
+		"couldNotSendTheTest": "Der Test konnte nicht gesendet werden.",
+		"previewPhone": "Handy",
+		"previewDesktop": "Desktop",
+		"previewPlainText": "Nur Text",
+		"emailIsOn": "{name} ist eingeschaltet.",
+		"emailIsOff": "{name} ist ausgeschaltet.",
+		"invoice": "Rechnung"
+	},
+	"adminEmails": {
+		"order-placed": {
+			"label": "Bestellbestätigung",
+			"description": "An den Kunden, sobald eine Bestellung aufgegeben wurde. Enthält die Bankverbindung für eine Überweisung."
+		},
+		"order-completed": {
+			"label": "Bestellung abgeschlossen",
+			"description": "Wenn eine Bestellung als abgeschlossen markiert wird."
+		},
+		"order-cancelled": {
+			"label": "Bestellung storniert",
+			"description": "Wenn eine Bestellung storniert wird. Der Bestand wird im selben Moment wieder freigegeben."
+		},
+		"order-refunded": {
+			"label": "Bestellung erstattet",
+			"description": "Wenn eine Bestellung als erstattet markiert wird."
+		},
+		"order-failed": {
+			"label": "Bestellung fehlgeschlagen",
+			"description": "Wenn die Zahlung nicht eingezogen werden konnte."
+		},
+		"order-status": {
+			"label": "Bestellstatus geändert",
+			"description": "Jede andere Änderung — ausstehend, in Bearbeitung, wartend. Die vier oben haben Vorrang."
+		},
+		"customer-note": {
+			"label": "Notiz an den Kunden",
+			"description": "Wird gesendet, wenn ein Mitarbeiter eine Notiz zur Bestellung hinzufügt und sie als sichtbar markiert."
+		},
+		"account-welcome": {
+			"label": "Willkommen",
+			"description": "An einen Kunden, der sich gerade registriert hat."
+		},
+		"account-approved": {
+			"label": "Händlerantrag freigegeben",
+			"description": "An einen B2B-Antragsteller, der angenommen wurde."
+		},
+		"account-rejected": {
+			"label": "Händlerantrag abgelehnt",
+			"description": "An einen B2B-Antragsteller, der abgelehnt wurde."
+		},
+		"password-reset": {
+			"label": "Passwort zurücksetzen",
+			"description": "Der Link zum Zurücksetzen. Nicht abschaltbar — ohne ihn kommt ein ausgesperrter Kunde nicht zurück."
+		},
+		"email-change": {
+			"label": "Neue E-Mail-Adresse bestätigen",
+			"description": "Der Bestätigungslink an die neue Adresse. Nicht abschaltbar — er ist der Nachweis, dass die Adresse ihnen gehört."
+		},
+		"email-changed": {
+			"label": "E-Mail-Adresse wurde geändert",
+			"description": "Warnung an die alte Adresse. Nicht abschaltbar — so erfährt jemand, dass sein Konto übernommen wurde."
+		},
+		"quote-submitted": {
+			"label": "Angebotsanfrage eingegangen",
+			"description": "Bestätigt den Eingang einer Angebotsanfrage."
+		},
+		"quote-answered": {
+			"label": "Angebot beantwortet",
+			"description": "Teilt dem Kunden mit, dass sein Angebot bereitliegt."
+		},
+		"staff-new-order": {
+			"label": "Neue Bestellung",
+			"description": "Meldet den Mitarbeitern eine eingegangene Bestellung."
+		},
+		"staff-new-quote": {
+			"label": "Neue Angebotsanfrage",
+			"description": "Meldet den Mitarbeitern eine eingegangene Angebotsanfrage."
+		},
+		"staff-new-contact": {
+			"label": "Anfrage über das Kontaktformular",
+			"description": "Meldet den Mitarbeitern, dass jemand das Kontaktformular benutzt hat."
+		},
+		"staff-b2b-application": {
+			"label": "Neuer Händlerantrag",
+			"description": "Meldet den Mitarbeitern, dass ein B2B-Antrag auf Entscheidung wartet."
+		},
+		"staff-low-stock": {
+			"label": "Geringer Bestand",
+			"description": "Wird gesendet, wenn eine Bestellung eine Variante auf ihre Meldeschwelle bringt."
+		}
 	}
 }

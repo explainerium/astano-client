@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useFormContext, useFormState } from "react-hook-form"
@@ -42,18 +42,24 @@ const EDITOR_LOCALES = [
 	{ code: "de", label: "Deutsch" },
 ] as const
 
-const ROLE_OPTIONS = [
-	{ label: "Guest (not signed in)", value: "GUEST" },
-	{ label: "Retail customer", value: "B2C" },
-	{ label: "Approved dealer", value: "RESELLER" },
-	{ label: "Shop manager", value: "SHOP_MANAGER" },
-	{ label: "Admin", value: "ADMIN" },
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const roleOptions = (t: T) => [
+	{ label: t("roleGuestNotSignedIn"), value: "GUEST" },
+	{ label: t("roleRetailCustomer"), value: "B2C" },
+	{ label: t("roleApprovedDealer"), value: "RESELLER" },
+	{ label: t("roleShopManager"), value: "SHOP_MANAGER" },
+	{ label: t("roleAdmin"), value: "ADMIN" },
 ]
 
-const money = z
-	.string()
-	.trim()
-	.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), { message: "Use a number like 250.00" })
+const money = (t: T) =>
+	z
+		.string()
+		.trim()
+		.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), {
+			message: t("useANumberLike25000"),
+		})
 
 /**
  * Mirrors the backend's bankAccountSchema, with one difference: every field is
@@ -64,7 +70,8 @@ const money = z
  * reject perfectly good test values and make the field feel broken during
  * setup — and the bank rejects a wrong one anyway.
  */
-const bankAccount = z.object({
+const bankAccount = (t: T) =>
+	z.object({
 	label: z.string().trim().max(80),
 	accountName: z.string().trim().max(120),
 	bankName: z.string().trim().max(120),
@@ -74,28 +81,28 @@ const bankAccount = z.object({
 		.trim()
 		.max(42)
 		.refine((v) => v === "" || /^[A-Za-z]{2}[0-9A-Za-z\s]{10,40}$/.test(v), {
-			message: "That does not look like an IBAN",
+			message: t("thatDoesNotLookLikeAn"),
 		}),
 	bic: z
 		.string()
 		.trim()
 		.max(11)
 		.refine((v) => v === "" || /^[A-Za-z]{6}[0-9A-Za-z]{2}([0-9A-Za-z]{3})?$/.test(v), {
-			message: "A BIC is 8 or 11 letters and digits",
+			message: t("bicFormat"),
 		}),
 	countryCode: z
 		.string()
 		.trim()
 		.max(2)
-		.refine((v) => v === "" || v.length === 2, { message: "Use a 2-letter country code" }),
+		.refine((v) => v === "" || v.length === 2, { message: t("useA2LetterCountryCode") }),
 })
 
-const buildSchema = (type: PaymentMethodType) =>
+const buildSchema = (type: PaymentMethodType, t: T) =>
 	z
 		.object({
 		isActive: z.boolean(),
 		en: z.object({
-			title: z.string().trim().min(1, "An English title is required"),
+			title: z.string().trim().min(1, t("anEnglishTitleIsRequired")),
 			description: z.string().trim().max(2000),
 			instructions: z.string().trim().max(4000),
 		}),
@@ -107,11 +114,11 @@ const buildSchema = (type: PaymentMethodType) =>
 		allowedCountries: z.array(z.string()),
 		allowedRoles: z.array(z.string()),
 		requiresLogin: z.boolean(),
-		minCompletedOrders: z.number({ message: "Enter a number" }).int().min(0),
-		minOrderTotal: money,
-		maxOrderTotal: money,
+		minCompletedOrders: z.number({ message: t("enterANumber") }).int().min(0),
+		minOrderTotal: money(t),
+		maxOrderTotal: money(t),
 		requiresValidatedVatId: z.boolean(),
-		bankAccounts: z.array(bankAccount),
+		bankAccounts: z.array(bankAccount(t)),
 	})
 	.superRefine((values, ctx) => {
 		/*
@@ -131,7 +138,7 @@ const buildSchema = (type: PaymentMethodType) =>
 				ctx.addIssue({
 					code: "custom",
 					path: ["bankAccounts"],
-					message: "Add an account with an IBAN before offering this at checkout.",
+					message: t("addAnAccountWithAnIban"),
 				})
 			}
 		}
@@ -143,7 +150,7 @@ const buildSchema = (type: PaymentMethodType) =>
 			ctx.addIssue({
 				code: "custom",
 				path: ["maxOrderTotal"],
-				message: "Must be above the minimum, or no order can ever qualify.",
+				message: t("mustBeAboveTheMinimumOr"),
 			})
 		}
 
@@ -153,7 +160,7 @@ const buildSchema = (type: PaymentMethodType) =>
 			ctx.addIssue({
 				code: "custom",
 				path: ["requiresLogin"],
-				message: "Counting past orders needs a signed-in customer.",
+				message: t("countingPastOrdersNeedsASigned"),
 			})
 		}
 	})
@@ -190,7 +197,7 @@ const toDefaults = (method: PaymentMethod): FormValues => ({
  * key defensively and fills every field — an input bound to `undefined` becomes
  * uncontrolled and React complains the moment somebody types.
  */
-const readAccounts = (config: unknown): z.infer<typeof bankAccount>[] => {
+const readAccounts = (config: unknown): z.infer<ReturnType<typeof bankAccount>>[] => {
 	const raw = (config as { bankAccounts?: unknown } | null)?.bankAccounts
 	if (!Array.isArray(raw)) return []
 
@@ -219,16 +226,16 @@ const readAccounts = (config: unknown): z.infer<typeof bankAccount>[] => {
  * keystroke in every field.
  */
 const BankAccountsPanel = ({ type }: { type: PaymentMethodType }) => {
+	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const error = useFormState({ control, name: "bankAccounts" }).errors.bankAccounts
 
 	if (type !== "BANK_TRANSFER") return null
 
 	return (
-		<Panel title="Bank details">
+		<Panel title={t("bankDetails")}>
 			<p className="text-muted-foreground mb-4 max-w-prose text-sm">
-				Shown on the thank-you page and repeated in the confirmation email — this is what the
-				customer copies into their banking app.
+				{t("bankDetailsBlurb")}
 			</p>
 
 			<BankAccountsField />
@@ -243,6 +250,7 @@ const BankAccountsPanel = ({ type }: { type: PaymentMethodType }) => {
 
 export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const router = useRouter()
 	const [updateMethod] = useUpdatePaymentMethodMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -297,7 +305,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			router.push("/admin/dashboard/payments")
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the payment method.")
+			toast.error(message ?? t("couldNotSaveThePaymentMethod"))
 		}
 	}
 
@@ -305,7 +313,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 		<ProForm
 			key={method.id}
 			onSubmit={onSubmit}
-			resolver={zodResolver(buildSchema(method.type))}
+			resolver={zodResolver(buildSchema(method.type, t))}
 			defaultValues={toDefaults(method)}
 			className="space-y-5"
 		>
@@ -351,8 +359,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 
 			<Panel title={t("whoCanUseIt")}>
 				<p className="text-muted-foreground mb-4 max-w-prose text-xs">
-					Every setting narrows. Leaving a list empty places no restriction at all rather than
-					excluding everyone.
+					{t("everySettingNarrows")}
 				</p>
 
 				<div className="space-y-4">
@@ -360,7 +367,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 						name="allowedCountries"
 						label={t("countries")}
 						multiple
-						options={countryOptions("en")}
+						options={countryOptions(locale)}
 						placeholder={t("everyCountry")}
 					/>
 
@@ -368,13 +375,13 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 						name="allowedRoles"
 						label={t("customerTypes")}
 						multiple
-						options={ROLE_OPTIONS}
+						options={roleOptions(t)}
 						placeholder={t("everyCustomerType")}
 					/>
 
 					<div className="grid gap-4 sm:grid-cols-2">
-						<ProInput name="minOrderTotal" label={t("minimumOrderTotal")} placeholder="No minimum" />
-						<ProInput name="maxOrderTotal" label={t("maximumOrderTotal")} placeholder="No maximum" />
+						<ProInput name="minOrderTotal" label={t("minimumOrderTotal")} placeholder={t("noMinimum")} />
+						<ProInput name="maxOrderTotal" label={t("maximumOrderTotal")} placeholder={t("noMaximum")} />
 					</div>
 
 					<ProInput
@@ -398,7 +405,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 				<ProCheckbox
 					name="isActive"
 					label={t("offerAtCheckout")}
-					description="An inactive method is never offered, whatever the rules say."
+					description={t("inactiveMethodNeverOffered")}
 				/>
 
 				<div className="mt-5 flex justify-end gap-2 border-t pt-4">

@@ -35,7 +35,7 @@ export const TestSend = ({ kind }: { kind: string }) => {
 			toast.success(`Sent to ${to.trim()}.`)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not send the test.")
+			toast.error(message ?? t("couldNotSendTheTest"))
 		}
 	}
 

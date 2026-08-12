@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import useEmailText from "./_components/useEmailText"
 import Link from "next/link"
 import { Loader2, Lock, MailOpen, Palette, Settings2 } from "lucide-react"
 import { toast } from "sonner"
@@ -20,29 +21,30 @@ import type { EmailTemplate } from "@/types/email"
  * something off does not need two page loads.
  */
 
-const GROUPS: { audience: EmailTemplate["audience"]; title: string; blurb: string }[] = [
-	{
-		audience: "customer",
-		title: "To customers",
-		blurb: "Sent to the person who bought, registered or asked for a quote.",
-	},
-	{
-		audience: "staff",
-		title: "To you",
-		blurb: "Notifications about what is happening in the shop.",
-	},
+/** Built per render — the titles are translated, and this has no locale. */
+const groups = (
+	t: (key: string) => string
+): { audience: EmailTemplate["audience"]; title: string; blurb: string }[] => [
+	{ audience: "customer", title: t("toCustomers"), blurb: t("toCustomersBlurb") },
+	{ audience: "staff", title: t("toYou"), blurb: t("toYouBlurb") },
 ]
 
 const EmailRow = ({ template }: { template: EmailTemplate }) => {
+	const t = useTranslations("admin")
+	const text = useEmailText()
 	const [save, { isLoading }] = useSaveEmailTemplateMutation()
 
 	const toggle = async (enabled: boolean) => {
 		try {
 			await save({ kind: template.key, data: { ...template.override, enabled } }).unwrap()
-			toast.success(enabled ? `${template.label} is on.` : `${template.label} is off.`)
+			toast.success(
+				enabled
+					? t("emailIsOn", { name: text.label(template.key, template.label) })
+					: t("emailIsOff", { name: text.label(template.key, template.label) })
+			)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not change that.")
+			toast.error(message ?? t("couldNotChangeThat"))
 		}
 	}
 
@@ -60,23 +62,23 @@ const EmailRow = ({ template }: { template: EmailTemplate }) => {
 						href={`/admin/dashboard/emails/${template.key}`}
 						className="font-medium hover:underline"
 					>
-						{template.label}
+						{text.label(template.key, template.label)}
 					</Link>
 					{!!customised && (
-						<Badge variant="secondary" className="font-normal">Edited</Badge>
+						<Badge variant="secondary" className="font-normal">{t("edited")}</Badge>
 					)}
 					{!template.canDisable && (
 						<Badge variant="outline" className="gap-1 font-normal">
-							<Lock className="size-3" />Always on</Badge>
+							<Lock className="size-3" />{t("alwaysOn")}</Badge>
 					)}
 				</div>
-				<p className="text-muted-foreground mt-1 text-sm">{template.description}</p>
+				<p className="text-muted-foreground mt-1 text-sm">{text.description(template.key, template.description)}</p>
 			</div>
 
 			<div className="flex shrink-0 items-center gap-3">
 				<Button asChild variant="ghost" size="sm">
 					<Link href={`/admin/dashboard/emails/${template.key}`}>
-						<Settings2 className="size-4" />Edit</Link>
+						<Settings2 className="size-4" />{t("edit")}</Link>
 				</Button>
 				<Switch
 					checked={template.override.enabled}
@@ -84,7 +86,7 @@ const EmailRow = ({ template }: { template: EmailTemplate }) => {
 					// cannot be switched off is worth showing.
 					disabled={!template.canDisable || isLoading}
 					onCheckedChange={toggle}
-					aria-label={`Send ${template.label}`}
+					aria-label={t("sendThing", { name: text.label(template.key, template.label) })}
 				/>
 			</div>
 		</div>
@@ -121,7 +123,7 @@ export default function EmailsPage() {
 				</Button>
 			</div>
 
-			{GROUPS.map((group) => {
+			{groups(t).map((group) => {
 				const rows = data.filter((t) => t.audience === group.audience)
 				if (!rows.length) return null
 

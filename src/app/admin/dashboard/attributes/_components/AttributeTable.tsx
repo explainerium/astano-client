@@ -68,7 +68,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 		} catch (error) {
 			toast.error(t("couldNotDuplicateThisAttribute"), {
 				description:
-					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+					(error as { data?: { message?: string } })?.data?.message ?? t("pleaseTryAgain"),
 			})
 		} finally {
 			setDuplicatingId(null)
@@ -117,7 +117,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 					name: nameOf(attribute),
 					message:
 						(error as { data?: { message?: string } })?.data?.message ??
-						"Could not be deleted.",
+						t("couldNotBeDeleted"),
 				})
 			}
 		}
@@ -136,7 +136,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 			<Toolbar
 				searchValue={query}
 				onSearchChange={setQuery}
-				searchPlaceholder="Search attributes…"
+				searchPlaceholder={t("searchAttributes")}
 				selectedCount={selected.size}
 				onClearSelection={() => setSelected(new Set())}
 				selectionActions={
@@ -183,8 +183,8 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 									<TableCell colSpan={5} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{query.trim()
-												? `Nothing matches “${query}”.`
-												: "No attributes yet. Add Size or Colour to start building variants."}
+												? t("nothingMatchesQuery", { query })
+												: t("noAttributesYet")}
 										</p>
 									</TableCell>
 								</TableRow>
@@ -204,7 +204,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 											<Checkbox
 												checked={isSelected}
 												onCheckedChange={() => toggle(attribute.id)}
-												aria-label={`Select ${nameOf(attribute)}`}
+												aria-label={t("selectThing", { thing: nameOf(attribute) })}
 											/>
 										</TableCell>
 
@@ -251,7 +251,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 												<Button asChild variant="ghost" size="icon">
 													<Link
 														href={editHref(attribute.id)}
-														aria-label={`Edit ${nameOf(attribute)}`}
+														aria-label={t("editThing", { thing: nameOf(attribute) })}
 													>
 														<Pencil />
 													</Link>
@@ -259,7 +259,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 												<Button
 													variant="ghost"
 													size="icon"
-													aria-label={`Duplicate ${nameOf(attribute)}`}
+													aria-label={t("duplicateThing", { thing: nameOf(attribute) })}
 													title={t("duplicate")}
 													disabled={duplicatingId !== null}
 													onClick={() => runDuplicate(attribute)}
@@ -310,7 +310,7 @@ export const AttributeTable = ({ attributes }: { attributes: AdminAttribute[] })
 							}}
 							disabled={isDeleting}
 						>
-							{isDeleting ? "Deleting…" : "Delete"}
+							{isDeleting ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

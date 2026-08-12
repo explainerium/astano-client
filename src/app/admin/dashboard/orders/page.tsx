@@ -180,7 +180,7 @@ export default function OrdersPage() {
 													<Button
 														variant="ghost"
 														size="icon"
-														aria-label={`Open ${order.orderNumber}`}
+														aria-label={t("openThing", { thing: order.orderNumber })}
 														onClick={(event) => {
 															event.stopPropagation()
 															router.push(`/admin/dashboard/orders/${order.id}`)

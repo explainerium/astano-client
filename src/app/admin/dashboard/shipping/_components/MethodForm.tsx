@@ -34,36 +34,43 @@ const EDITOR_LOCALES = [
 	{ code: "de", label: "Deutsch" },
 ] as const
 
-const TYPES = [
-	{ label: "Weight bands", value: "WEIGHT_BANDED" },
-	{ label: "Flat rate", value: "FLAT_RATE" },
-	{ label: "Free shipping", value: "FREE_SHIPPING" },
-	{ label: "Order-value bands", value: "PRICE_BANDED" },
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const types = (t: T) => [
+	{ label: t("methodWeightBands"), value: "WEIGHT_BANDED" },
+	{ label: t("methodFlatRate"), value: "FLAT_RATE" },
+	{ label: t("methodFreeShipping"), value: "FREE_SHIPPING" },
+	{ label: t("methodPriceBands"), value: "PRICE_BANDED" },
 ]
 
 const BANDED: ShippingMethodType[] = ["WEIGHT_BANDED", "PRICE_BANDED"]
 
-const money = z
-	.string()
-	.trim()
-	.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), { message: "Use a number like 8.50" })
+const money = (t: T) =>
+	z
+		.string()
+		.trim()
+		.refine((v) => v === "" || /^\d+(\.\d{1,4})?$/.test(v), {
+			message: t("useANumberLike850"),
+		})
 
-const schema = z
-	.object({
+const buildSchema = (t: T) =>
+	z
+		.object({
 		code: z
 			.string()
 			.trim()
-			.min(1, "Required")
+			.min(1, t("required"))
 			.max(60)
-			.regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, "Lowercase letters, digits, - or _"),
+			.regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, t("codePattern")),
 		type: z.enum(["WEIGHT_BANDED", "FLAT_RATE", "FREE_SHIPPING", "PRICE_BANDED"]),
-		flatCost: money,
-		freeAboveSubtotal: money,
+		flatCost: money(t),
+		freeAboveSubtotal: money(t),
 		taxable: z.boolean(),
 		isActive: z.boolean(),
-		sortOrder: z.number({ message: "Enter a number" }).int().min(0),
+		sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 		en: z.object({
-			name: z.string().trim().min(1, "An English name is required"),
+			name: z.string().trim().min(1, t("anEnglishNameIsRequired")),
 			description: z.string().trim().max(500),
 		}),
 		de: z.object({
@@ -72,16 +79,16 @@ const schema = z
 		}),
 		bands: z.array(
 			z.object({
-				minValue: money.refine((v) => v !== "", { message: "Required" }),
+				minValue: money(t).refine((v) => v !== "", { message: t("required") }),
 				/** Empty means open-ended — allowed on the last rung only. */
-				maxValue: money,
-				cost: money.refine((v) => v !== "", { message: "Required" }),
+				maxValue: money(t),
+				cost: money(t).refine((v) => v !== "", { message: t("required") }),
 			})
 		),
 	})
 	.superRefine((values, ctx) => {
 		if (values.type === "FLAT_RATE" && !values.flatCost.trim()) {
-			ctx.addIssue({ code: "custom", path: ["flatCost"], message: "A flat rate needs a cost." })
+			ctx.addIssue({ code: "custom", path: ["flatCost"], message: t("flatRateNeedsACost") })
 		}
 
 		if (!BANDED.includes(values.type)) return
@@ -90,7 +97,7 @@ const schema = z
 			ctx.addIssue({
 				code: "custom",
 				path: ["type"],
-				message: "A banded method needs at least one band, or nothing can be quoted.",
+				message: t("bandedNeedsABand"),
 			})
 			return
 		}
@@ -116,7 +123,7 @@ const schema = z
 				ctx.addIssue({
 					code: "custom",
 					path: ["bands", index, "maxValue"],
-					message: "Must be above the band's own minimum.",
+					message: t("mustBeAboveTheBandS"),
 				})
 			}
 
@@ -126,7 +133,7 @@ const schema = z
 				ctx.addIssue({
 					code: "custom",
 					path: ["bands", index, "maxValue"],
-					message: "Only the last band may be open-ended.",
+					message: t("onlyTheLastBandMayBe"),
 				})
 			}
 
@@ -141,14 +148,14 @@ const schema = z
 					path: ["bands", index, "minValue"],
 					message:
 						previousMax < min
-							? `Leaves a gap: nothing covers ${previousMax}–${min}.`
-							: `Overlaps the band ending at ${previousMax}.`,
+							? t("bandLeavesGap", { from: previousMax, to: min })
+							: t("bandOverlaps", { previous: previousMax }),
 				})
 			}
 		})
 	})
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const translationFor = (method: ShippingMethod | undefined, locale: string) =>
 	method?.translations.find((t) => t.locale === locale)
@@ -187,6 +194,7 @@ const toDefaults = (method?: ShippingMethod): FormValues => ({
  * children are stable elements that React would skip.
  */
 const TypeFields = () => {
+	const t = useTranslations("admin")
 	const { control, getValues } = useFormContext()
 	const type = useWatch({ control, name: "type" }) as ShippingMethodType
 	const { fields, append, remove } = useFieldArray({ control, name: "bands" })
@@ -204,8 +212,8 @@ const TypeFields = () => {
 		return (
 			<ProInput
 				name="flatCost"
-				label="Cost per order"
-				description="Charged once, whatever the cart weighs."
+				label={t("costPerOrder")}
+				description={t("chargedOnceWhateverTheCartWeighs")}
 				placeholder="0.00"
 				className="sm:max-w-xs"
 			/>
@@ -216,8 +224,8 @@ const TypeFields = () => {
 		return (
 			<ProInput
 				name="freeAboveSubtotal"
-				label="Free above order value"
-				description="Leave empty to make it always free."
+				label={t("freeAboveOrderValue")}
+				description={t("leaveEmptyToMakeItAlways")}
 				placeholder="—"
 				className="sm:max-w-xs"
 			/>
@@ -229,17 +237,14 @@ const TypeFields = () => {
 			<div className="flex flex-wrap items-end justify-between gap-2">
 				<div>
 					<h3 className="text-sm font-medium">
-						{type === "PRICE_BANDED" ? "Order-value bands" : "Weight bands"}
+						{type === "PRICE_BANDED" ? t("methodPriceBands") : t("methodWeightBands")}
 					</h3>
 					<p className="text-muted-foreground mt-1 max-w-prose text-xs">
-						Each band runs from its start up to — but not including — the next
-						one. Leave the last <em>To</em> empty for everything above it. Bands
-						must join up: a gap means an order in it is offered no shipping at
-						all.
+						{t.rich("bandsRunUpwards", { b: (chunks) => <em>{chunks}</em> })}
 					</p>
 				</div>
 				<Button type="button" variant="outline" size="sm" onClick={appendBand}>
-					<Plus />Add band</Button>
+					<Plus />{t("addBand")}</Button>
 			</div>
 
 			{!fields.length ? (
@@ -273,7 +278,7 @@ const TypeFields = () => {
 											variant="ghost"
 											size="icon"
 											className="text-muted-foreground hover:text-destructive"
-											aria-label={`Remove band ${index + 1}`}
+											aria-label={t("removeNumbered", { thing: t("bandWord"), index: index + 1 })}
 											onClick={() => remove(index)}
 										>
 											<Trash2 />
@@ -363,7 +368,7 @@ export const MethodForm = ({
 			router.push(zoneHref)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the method.")
+			toast.error(message ?? t("couldNotSaveTheMethod"))
 		}
 	}
 
@@ -372,21 +377,21 @@ export const MethodForm = ({
 			<EditorHeader
 				backHref={zoneHref}
 				backLabel={zoneName}
-				title={isEdit ? (translationFor(method, "en")?.name ?? method.code) : "New method"}
+				title={isEdit ? (translationFor(method, "en")?.name ?? method.code) : t("newMethod")}
 				description={t("whatTheCustomerIsOfferedAt")}
 			/>
 
 			<ProForm
 					key={method?.id ?? "new"}
 					onSubmit={onSubmit}
-					resolver={zodResolver(schema)}
+					resolver={zodResolver(buildSchema(t))}
 					defaultValues={toDefaults(method)}
 					className="space-y-6"
 				>
 					<div className="bg-card space-y-6 rounded-lg border p-5">
 						<div className="grid gap-4 sm:grid-cols-3">
 							<ProInput name="code" label={t("code")} required />
-							<ProSelect name="type" label={t("costIsBasedOn")} options={TYPES} />
+							<ProSelect name="type" label={t("costIsBasedOn")} options={types(t)} />
 							<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 						</div>
 
@@ -434,7 +439,7 @@ export const MethodForm = ({
 							<ProCheckbox
 								name="isActive"
 								label={t("active")}
-								description="An inactive method is never offered at checkout."
+								description={t("inactiveMethodNeverOfferedAtCheckout")}
 							/>
 						</div>
 					</div>
@@ -443,7 +448,7 @@ export const MethodForm = ({
 						<Button asChild type="button" variant="ghost">
 							<Link href={zoneHref}>{t("cancel")}</Link>
 						</Button>
-						<ProSubmit>{isEdit ? "Save changes" : "Add method"}</ProSubmit>
+						<ProSubmit>{isEdit ? t("saveChanges") : t("addMethod")}</ProSubmit>
 					</div>
 				</ProForm>
 		</div>

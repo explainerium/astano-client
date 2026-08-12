@@ -254,7 +254,7 @@ const buildSchema = (t: T) =>
 				ctx.addIssue({
 					code: "custom",
 					path: ["prices", role, "salePrice"],
-					message: `Must not be above the ${label} price of ${base}.`,
+					message: t("mustNotBeAbovePrice", { label, base }),
 				})
 			}
 		}
@@ -286,7 +286,7 @@ const buildSchema = (t: T) =>
 				ctx.addIssue({
 					code: "custom",
 					path: ["prices", "GUEST", "basePrice"],
-					message: `Set a regular price before adding ${label.toLowerCase()} quantity discounts.`,
+					message: t("setRegularPriceFirst", { label: label.toLowerCase() }),
 				})
 			}
 
@@ -302,7 +302,7 @@ const buildSchema = (t: T) =>
 				ctx.addIssue({
 					code: "custom",
 					path: ["tiers", role, index, "minQuantity"],
-					message: `Row ${first + 1} already covers ${row.minQuantity}.`,
+					message: t("rowAlreadyCovers", { row: first + 1, quantity: row.minQuantity }),
 				})
 			})
 
@@ -907,9 +907,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 							<div>
 								<h3 className="text-sm font-medium">{t("dimensionsCm")}</h3>
 								<p className="text-muted-foreground mt-1 max-w-prose text-xs">
-									Length, width and height of one packed item. Shipping is
-									priced by weight, not by size, so these are for packing and
-									your own records.
+									{t("dimensionsBlurb")}
 								</p>
 							</div>
 

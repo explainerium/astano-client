@@ -30,6 +30,7 @@ import {
 	useUpdateGatewaySettingsMutation,
 } from "@/redux/api/paymentGatewayApi"
 import { cn } from "@/lib/utils"
+import useCountryName from "@/lib/useCountryName"
 import { pickTranslation } from "@/lib/pickTranslation"
 import type { PaymentMethod } from "@/types/payment"
 import type { PaymentGatewayView } from "@/types/paymentGateway"
@@ -43,22 +44,13 @@ const METHOD_ICON: Record<string, typeof Landmark> = {
 	CASH_ON_DELIVERY: Banknote,
 }
 
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-
-const countryName = (code: string) => {
-	try {
-		return regionNames.of(code) ?? code
-	} catch {
-		return code
-	}
-}
-
+/** Keys, resolved where the sentence is built — this map has no locale. */
 const ROLE_LABEL: Record<string, string> = {
-	GUEST: "guests",
-	B2C: "retail customers",
-	RESELLER: "dealers",
-	SHOP_MANAGER: "shop managers",
-	ADMIN: "admins",
+	GUEST: "roleGuests",
+	B2C: "roleRetailCustomers",
+	RESELLER: "roleDealers",
+	SHOP_MANAGER: "roleShopManagers",
+	ADMIN: "roleAdmins",
 }
 
 /**
@@ -70,32 +62,41 @@ const ROLE_LABEL: Record<string, string> = {
  */
 const describeRules = (
 	method: PaymentMethod,
-	t: (key: string, values?: Record<string, string | number | Date>) => string
+	t: (key: string, values?: Record<string, string | number | Date>) => string,
+	/** Country names in the reader's language; see useCountryName. */
+	countryName: (code: string) => string | null
 ): string[] => {
 	const { rules } = method
 	const lines: string[] = []
 
 	if (rules.allowedCountries.length) {
-		lines.push(`Only ${rules.allowedCountries.map(countryName).join(", ")}`)
+		lines.push(t("onlyCountries", { countries: rules.allowedCountries.map((code) => countryName(code) ?? code).join(", ") }))
 	}
 	if (rules.allowedRoles.length) {
-		lines.push(`Only ${rules.allowedRoles.map((r) => ROLE_LABEL[r] ?? r).join(", ")}`)
+		lines.push(
+			t("onlyRoles", {
+				roles: rules.allowedRoles.map((r) => (ROLE_LABEL[r] ? t(ROLE_LABEL[r]) : r)).join(", "),
+			})
+		)
 	}
-	if (rules.requiresLogin) lines.push("Signed-in customers only")
+	if (rules.requiresLogin) lines.push(t("signedInCustomersOnly"))
 	if (rules.minCompletedOrders > 0) {
 		lines.push(
 			t("afterCompletedOrders", { count: rules.minCompletedOrders })
 		)
 	}
-	if (rules.minOrderTotal) lines.push(`Orders from €${Number(rules.minOrderTotal)}`)
-	if (rules.maxOrderTotal) lines.push(`Orders up to €${Number(rules.maxOrderTotal)}`)
-	if (rules.requiresValidatedVatId) lines.push("Validated VAT ID required")
+	if (rules.minOrderTotal) lines.push(t("ordersFrom", { amount: `€${Number(rules.minOrderTotal)}` }))
+	if (rules.maxOrderTotal) lines.push(t("ordersUpTo", { amount: `€${Number(rules.maxOrderTotal)}` }))
+	if (rules.requiresValidatedVatId) lines.push(t("validatedVatIdRequired"))
 
 	return lines
 }
 
 /** Which step a gateway is stuck on, in words that say what to do next. */
-const gatewayStatus = (gateway: PaymentGatewayView) => {
+const gatewayStatus = (
+	gateway: PaymentGatewayView,
+	t: (key: string, values?: Record<string, string | number | Date>) => string
+) => {
 	const stored = gateway.credentials[gateway.mode] ?? {}
 	const configured = gateway.fields
 		.filter((field) => field.required)
@@ -103,14 +104,14 @@ const gatewayStatus = (gateway: PaymentGatewayView) => {
 
 	if (gateway.isActive) {
 		return gateway.mode === "LIVE"
-			? { label: "Live", tone: "bg-positive-soft text-positive" }
-			: { label: "Test mode", tone: "bg-accent-soft-strong text-primary" }
+			? { label: t("gatewayLive"), tone: "bg-positive-soft text-positive" }
+			: { label: t("gatewayTestMode"), tone: "bg-accent-soft-strong text-primary" }
 	}
-	if (!configured) return { label: "Not set up", tone: "bg-muted text-muted-foreground" }
+	if (!configured) return { label: t("gatewayNotSetUp"), tone: "bg-muted text-muted-foreground" }
 	if (gateway.lastTest?.succeeded) {
-		return { label: "Ready, switched off", tone: "bg-accent-soft text-accent-foreground" }
+		return { label: t("gatewayReadyOff"), tone: "bg-accent-soft text-accent-foreground" }
 	}
-	return { label: "Needs testing", tone: "bg-accent-soft text-accent-foreground" }
+	return { label: t("gatewayNeedsTesting"), tone: "bg-accent-soft text-accent-foreground" }
 }
 
 /**
@@ -144,6 +145,7 @@ const errorMessage = (error: unknown, fallback: string) =>
  * inside the Bank transfer settings offering to turn it into an invoice.
  */
 export default function PaymentsPage() {
+	const countryName = useCountryName()
 	const t = useTranslations("admin")
 	const gateways = usePaymentGatewaysQuery()
 	const methods = usePaymentMethodsQuery()
@@ -204,7 +206,7 @@ export default function PaymentsPage() {
 
 					<ul className="divide-y">
 						{gateways.data.map((gateway) => {
-							const status = gatewayStatus(gateway)
+							const status = gatewayStatus(gateway, t)
 							const Icon = GATEWAY_ICON[gateway.provider]
 							const canEnable =
 								gateway.lastTest?.succeeded === true && gateway.lastTest.mode === gateway.mode
@@ -228,10 +230,10 @@ export default function PaymentsPage() {
 												? gateway.methods
 														.filter((m) => gateway.enabledMethods.includes(m.code))
 														.map((m) => m.label)
-														.join(" · ") || "No methods enabled"
+														.join(" · ") || t("noMethodsEnabled")
 												: gateway.provider === "STRIPE"
-													? "Cards, SEPA, Klarna and giropay."
-													: "Customers approve the payment on PayPal."}
+													? t("stripeBlurb")
+													: t("paypalBlurb")}
 										</p>
 
 										{gateway.lastTest && (
@@ -254,7 +256,7 @@ export default function PaymentsPage() {
 									<div className="flex shrink-0 items-center gap-3">
 										<Switch
 											checked={gateway.isActive}
-											aria-label={`Offer ${gateway.label} at checkout`}
+											aria-label={t("offerThingAtCheckout", { name: gateway.label })}
 											// The API refuses this too. Disabled here so the switch is
 											// never a button whose only outcome is an error.
 											disabled={busy === gateway.provider || (!gateway.isActive && !canEnable)}
@@ -266,7 +268,9 @@ export default function PaymentsPage() {
 															provider: gateway.provider,
 															isActive: checked,
 														}).unwrap(),
-													`${gateway.label} ${checked ? "switched on" : "switched off"}.`
+													checked
+										? t("switchedOnThing", { name: gateway.label })
+										: t("switchedOffThing", { name: gateway.label })
 												)
 											}
 										/>
@@ -274,7 +278,7 @@ export default function PaymentsPage() {
 										<Button asChild variant="outline" size="sm">
 											<Link href={`/admin/dashboard/payments/gateways/${gateway.provider}`}>
 												<Settings2 />
-												{gateway.lastTest?.succeeded ? "Manage" : "Set up"}
+												{gateway.lastTest?.succeeded ? t("manage") : t("setUp")}
 											</Link>
 										</Button>
 									</div>
@@ -292,7 +296,7 @@ export default function PaymentsPage() {
 
 					<ul className="divide-y">
 						{methods.data.map((method) => {
-							const rules = describeRules(method, t)
+							const rules = describeRules(method, t, countryName)
 							const Icon = METHOD_ICON[method.type] ?? Landmark
 							const incomplete = missingBankDetails(method)
 
@@ -315,7 +319,7 @@ export default function PaymentsPage() {
 													variant="outline"
 													className="border-transparent bg-accent-soft text-accent-foreground"
 												>
-													No bank details
+													{t("noBankDetails")}
 												</Badge>
 											)}
 										</div>
@@ -342,7 +346,7 @@ export default function PaymentsPage() {
 									<div className="flex shrink-0 items-center gap-3">
 										<Switch
 											checked={method.isActive}
-											aria-label={`Offer ${method.title} at checkout`}
+											aria-label={t("offerThingAtCheckout", { name: method.title })}
 											disabled={busy === method.id}
 											onCheckedChange={(checked) =>
 												run(
@@ -352,7 +356,9 @@ export default function PaymentsPage() {
 															id: method.id,
 															data: { isActive: checked },
 														}).unwrap(),
-													`${method.title} ${checked ? "switched on" : "switched off"}.`
+													checked
+										? t("switchedOnThing", { name: method.title })
+										: t("switchedOffThing", { name: method.title })
 												)
 											}
 										/>
@@ -369,7 +375,7 @@ export default function PaymentsPage() {
 											<Button
 												variant="ghost"
 												size="icon"
-												aria-label={`Delete ${method.title}`}
+												aria-label={t("deleteThing", { thing: method.title })}
 												disabled={busy === method.id}
 												onClick={() =>
 													run(

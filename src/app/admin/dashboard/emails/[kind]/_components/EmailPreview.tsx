@@ -54,7 +54,7 @@ export const EmailPreview = ({ kind }: { kind: string }) => {
 					aria-pressed={narrow}
 				>
 					{narrow ? <Smartphone className="size-4" /> : <Monitor className="size-4" />}
-					{narrow ? "Phone" : "Desktop"}
+					{narrow ? t("previewPhone") : t("previewDesktop")}
 				</Button>
 
 				<Button
@@ -64,7 +64,7 @@ export const EmailPreview = ({ kind }: { kind: string }) => {
 					onClick={() => setShowText((v) => !v)}
 					aria-pressed={showText}
 				>
-					{showText ? "HTML" : "Plain text"}
+					{showText ? "HTML" : t("previewPlainText")}
 				</Button>
 
 				{isFetching && <Loader2 className="text-muted-foreground size-4 animate-spin" />}

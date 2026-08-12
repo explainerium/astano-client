@@ -19,7 +19,7 @@ export default function AttributesPage() {
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load attributes."}
+						t("couldNotLoadAttributes")}
 				</div>
 			)}
 

@@ -81,8 +81,12 @@ export const ImportReportView = ({ report }: { report: ImportReport }) => {
 
 			{(report.imagesFetched > 0 || report.imagesFailed > 0) && (
 				<p className="text-muted-foreground text-sm">
-					Images: {report.imagesFetched} fetched
-					{report.imagesFailed > 0 && `, ${report.imagesFailed} could not be`}.
+					{report.imagesFailed > 0
+						? t("imagesFetchedWithFailures", {
+								fetched: report.imagesFetched,
+								failed: report.imagesFailed,
+							})
+						: t("imagesFetched", { fetched: report.imagesFetched })}
 				</p>
 			)}
 

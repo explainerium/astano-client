@@ -8,6 +8,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { openInvoice } from "@/lib/downloadInvoice"
+import useCountryName from "@/lib/useCountryName"
 import {
 	Table,
 	TableBody,
@@ -28,19 +29,10 @@ import {
 } from "../_components/orderStatus"
 import useMoney from "@/lib/useMoney"
 import type { MoneyFormatter } from "@/lib/money"
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-
-const countryName = (code: string | null) => {
-	if (!code) return null
-	try {
-		return regionNames.of(code) ?? code
-	} catch {
-		return code
-	}
-}
 
 const AddressBlock = ({ title, address }: { title: string; address?: OrderAddress }) => {
 	const t = useTranslations("admin")
+	const countryName = useCountryName()
 
 	return (
 	<section className="bg-card rounded-lg border">
@@ -206,7 +198,7 @@ export default function OrderDetailPage() {
 						}}
 					>
 						{downloading ? <Loader2 className="animate-spin" /> : <FileText />}
-						Invoice
+						{t("invoice")}
 					</Button>
 					<Button size="lg" onClick={() => setStatusOpen(true)}>
 						<Pencil />{t("updateStatus")}</Button>

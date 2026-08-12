@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { Check, Loader2, Mail } from "lucide-react"
 import { toast } from "sonner"
@@ -19,8 +19,19 @@ import { useContactMessagesQuery, useMarkContactHandledMutation } from "@/redux/
 const ANY = "__any__"
 const PER_PAGE = 20
 
-const formatDate = (value: string) =>
-	new Date(value).toLocaleDateString("en-GB", {
+/**
+ * The subject offered when a message arrived without one.
+ *
+ * In the customer's language, not the dashboard's — they are the one who reads
+ * it in their inbox.
+ */
+const ENQUIRY_SUBJECT: Record<string, string> = {
+	de: "Ihre Anfrage",
+	en: "Your enquiry",
+}
+
+const formatDate = (value: string, locale = "de") =>
+	new Date(value).toLocaleDateString(locale, {
 		day: "2-digit",
 		month: "short",
 		year: "numeric",
@@ -30,6 +41,7 @@ const formatDate = (value: string) =>
 
 export default function ContactPage() {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const [handled, setHandled] = useState<"true" | "false" | undefined>("false")
 	const [page, setPage] = useState(1)
 	const [busy, setBusy] = useState<string | null>(null)
@@ -52,7 +64,7 @@ export default function ContactPage() {
 			toast.success(t("markedAsHandled"))
 		} catch (err) {
 			const message = (err as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not update the message.")
+			toast.error(message ?? t("couldNotUpdateTheMessage"))
 		}
 		setBusy(null)
 	}
@@ -88,7 +100,7 @@ export default function ContactPage() {
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load messages."}
+						t("couldNotLoadMessages")}
 				</div>
 			)}
 
@@ -96,8 +108,8 @@ export default function ContactPage() {
 				<div className="bg-card rounded-lg border border-dashed p-16 text-center">
 					<p className="text-muted-foreground text-sm">
 						{handled === "false"
-							? "Nothing waiting for a reply."
-							: "No messages here."}
+							? t("nothingWaitingForAReply")
+							: t("noMessagesHere")}
 					</p>
 				</div>
 			)}
@@ -112,7 +124,7 @@ export default function ContactPage() {
 					<header className="flex flex-wrap items-center gap-3 border-b px-4 py-3">
 						<div className="min-w-0">
 							<h2 className="font-heading truncate text-sm font-semibold">
-								{message.subject || "(no subject)"}
+								{message.subject || t("noSubject")}
 							</h2>
 							<p className="text-muted-foreground text-xs">
 								{message.name}
@@ -127,7 +139,7 @@ export default function ContactPage() {
 						<div className="ml-auto flex items-center gap-2">
 							<span className="text-muted-foreground text-xs uppercase">{message.locale}</span>
 							<span className="text-muted-foreground text-xs">
-								{formatDate(message.createdAt)}
+								{formatDate(message.createdAt, locale)}
 							</span>
 							{message.handledAt ? (
 								<Badge
@@ -153,7 +165,9 @@ export default function ContactPage() {
 							<Button asChild variant="outline" size="sm">
 								<a
 									href={`mailto:${message.email}?subject=${encodeURIComponent(
-										message.subject ? `Re: ${message.subject}` : "Your enquiry"
+										message.subject
+											? `Re: ${message.subject}`
+											: (ENQUIRY_SUBJECT[message.locale] ?? ENQUIRY_SUBJECT.de)
 									)}`}
 								>
 									<Mail />{t("replyByEmail")}</a>

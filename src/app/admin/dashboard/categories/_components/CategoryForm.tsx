@@ -45,22 +45,27 @@ const EDITOR_LOCALES = [
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-const slugField = z
-	.string()
-	.trim()
-	.refine((value) => value === "" || SLUG_PATTERN.test(value), {
-		message: "Lowercase words separated by hyphens",
-	})
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const slugField = (t: T) =>
+	z
+		.string()
+		.trim()
+		.refine((value) => value === "" || SLUG_PATTERN.test(value), {
+			message: t("lowercaseWordsSeparatedByHyphens"),
+		})
 
 /** An id, cleared, or untouched. Nullable and optional mean different things here. */
 const assetField = z.string().nullable()
 
-const schema = z.object({
+const buildSchema = (t: T) =>
+	z.object({
 	parentId: z.string(),
 	// Not z.coerce: ProInput's number handling already yields a real number, and
 	// coerce would make zod's input and output types diverge so the resolver no
 	// longer matches the form's value type.
-	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
+	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 	isHidden: z.boolean(),
 	isOptionCategory: z.boolean(),
 	imageAssetId: assetField,
@@ -70,18 +75,18 @@ const schema = z.object({
 	imagePreview: z.string(),
 	iconPreview: z.string(),
 	en: z.object({
-		name: z.string().trim().min(1, "An English name is required"),
-		slug: slugField,
+		name: z.string().trim().min(1, t("anEnglishNameIsRequired")),
+		slug: slugField(t),
 		description: z.string().trim(),
 	}),
 	de: z.object({
 		name: z.string().trim(),
-		slug: slugField,
+		slug: slugField(t),
 		description: z.string().trim(),
 	}),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const NO_PARENT = "__none__"
 
@@ -133,11 +138,11 @@ export const CategoryForm = ({
 		: new Set<string>()
 
 	const parentOptions = [
-		{ label: "— No parent (top level) —", value: NO_PARENT },
+		{ label: t("noParentTopLevel"), value: NO_PARENT },
 		...allCategories
 			.filter((c) => !excluded.has(c.id))
 			.map((c) => ({
-				label: translationFor(c, "en")?.name ?? c.translations[0]?.name ?? "(untitled)",
+				label: translationFor(c, "en")?.name ?? c.translations[0]?.name ?? t("untitled"),
 				value: c.id,
 			}))
 			.sort((a, b) => a.label.localeCompare(b.label)),
@@ -187,7 +192,7 @@ export const CategoryForm = ({
 			// The API's message is already a readable sentence — it names the
 			// offending SKU or the blocking relation rather than leaking Prisma.
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the category.")
+			toast.error(message ?? t("couldNotSaveTheCategory"))
 		}
 	}
 
@@ -202,12 +207,11 @@ export const CategoryForm = ({
 
 				<h1 className="mt-2 text-xl font-semibold">
 					{isEdit
-						? (translationFor(category, "en")?.name ?? "Edit category")
-						: "New category"}
+						? (translationFor(category, "en")?.name ?? t("editCategory"))
+						: t("newCategory")}
 				</h1>
 				<p className="text-muted-foreground mt-1 text-sm">
-					The English name is required. German is optional, but a category without it falls back
-					to English on the German site.
+					{t("englishRequiredGermanOptional")}
 				</p>
 			</div>
 
@@ -216,7 +220,7 @@ export const CategoryForm = ({
 				// the form — useForm only reads defaultValues once.
 				key={category?.id ?? "new"}
 				onSubmit={onSubmit}
-				resolver={zodResolver(schema)}
+				resolver={zodResolver(buildSchema(t))}
 				defaultValues={toDefaults(category)}
 				className="space-y-6"
 			>
@@ -260,7 +264,7 @@ export const CategoryForm = ({
 						previewName="imagePreview"
 						label={t("categoryImage")}
 						description={t("optionalTheBannerOnTheCategory")}
-						pickerTitle="Category image"
+						pickerTitle={t("categoryImage")}
 					/>
 
 					<CategoryAssetField
@@ -268,7 +272,7 @@ export const CategoryForm = ({
 						previewName="iconPreview"
 						label={t("icon")}
 						description={t("optionalASmallMarkForMenus")}
-						pickerTitle="Category icon"
+						pickerTitle={t("categoryIcon")}
 						square
 					/>
 				</div>
@@ -299,7 +303,7 @@ export const CategoryForm = ({
 					<Button asChild type="button" variant="ghost">
 						<Link href="/admin/dashboard/categories">{t("cancel")}</Link>
 					</Button>
-					<ProSubmit>{isEdit ? "Save changes" : "Create category"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("createCategory")}</ProSubmit>
 				</div>
 			</ProForm>
 

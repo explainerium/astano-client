@@ -29,9 +29,12 @@ import {
 import { cn } from "@/lib/utils"
 import type { ConnectionTestResult, GatewayMode, GatewayProvider } from "@/types/paymentGateway"
 
-const MODES: { value: GatewayMode; label: string; hint: string }[] = [
-	{ value: "TEST", label: "Test", hint: "Nothing is charged. Use Stripe’s test cards." },
-	{ value: "LIVE", label: "Live", hint: "Real money. Only switch here once the test mode works." },
+/** Built per render — the labels are translated, and this has no locale. */
+const modes = (
+	t: (key: string) => string
+): { value: GatewayMode; label: string; hint: string }[] => [
+	{ value: "TEST", label: t("modeTest"), hint: t("testModeBlurb") },
+	{ value: "LIVE", label: t("modeLive"), hint: t("liveModeBlurb") },
 ]
 
 const errorMessage = (error: unknown, fallback: string) =>
@@ -162,7 +165,7 @@ export default function PaymentGatewayPage() {
 								: "bg-muted text-muted-foreground"
 						)}
 					>
-						{gateway.isActive ? (gateway.mode === "LIVE" ? "Live" : "Active · test") : "Off"}
+						{gateway.isActive ? (gateway.mode === "LIVE" ? "Live" : t("activeTest")) : t("off")}
 					</Badge>
 
 					<div className="flex items-center gap-2">
@@ -175,7 +178,7 @@ export default function PaymentGatewayPage() {
 							onCheckedChange={(checked) =>
 								patch(
 									{ provider: gatewayProvider, isActive: checked },
-									checked ? "Gateway switched on." : "Gateway switched off."
+									checked ? t("gatewaySwitchedOn") : t("gatewaySwitchedOff")
 								)
 							}
 						/>
@@ -194,7 +197,7 @@ export default function PaymentGatewayPage() {
 
 			<Panel title={t("mode")}>
 				<div className="grid gap-3 sm:grid-cols-2">
-					{MODES.map((option) => {
+					{modes(t).map((option) => {
 						const current = gateway.mode === option.value
 						const configured = gateway.fields
 							.filter((field) => field.required)
@@ -213,7 +216,7 @@ export default function PaymentGatewayPage() {
 										// neither has been proved yet.
 										void patch(
 											{ provider: gatewayProvider, mode: option.value, isActive: false },
-											`Now using ${option.label.toLowerCase()} keys.`
+											t("nowUsingKeys", { mode: option.label.toLowerCase() })
 										)
 									}
 								}}
@@ -228,7 +231,7 @@ export default function PaymentGatewayPage() {
 								</span>
 								<span className="text-muted-foreground mt-1 block text-xs">{option.hint}</span>
 								<span className="text-muted-foreground mt-2 block text-xs">
-									{configured ? "Keys stored" : "No keys yet"}
+									{configured ? t("keysStored") : t("noKeysYet")}
 								</span>
 							</button>
 						)
@@ -237,7 +240,7 @@ export default function PaymentGatewayPage() {
 			</Panel>
 
 			<Panel
-				title={`${mode === "LIVE" ? "Live" : "Test"} credentials`}
+				title={t("modeCredentials", { mode: mode === "LIVE" ? t("modeLive") : t("modeTest") })}
 				action={
 					editing && editing !== gateway.mode ? (
 						<button
@@ -281,7 +284,7 @@ export default function PaymentGatewayPage() {
 									type={field.secret ? "password" : "text"}
 									autoComplete="off"
 									spellCheck={false}
-									placeholder={state?.isSet ? "Stored — leave blank to keep it" : field.placeholder}
+									placeholder={state?.isSet ? t("storedLeaveBlank") : field.placeholder}
 									value={draft[field.key] ?? ""}
 									onChange={(event) =>
 										setDraft((current) => ({ ...current, [field.key]: event.target.value }))

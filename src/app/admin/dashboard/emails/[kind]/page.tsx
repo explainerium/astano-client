@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import useEmailText from "../_components/useEmailText"
 import { use } from "react"
 import Link from "next/link"
 import { ArrowLeft, Loader2 } from "lucide-react"
@@ -20,6 +21,7 @@ import TestSend from "./_components/TestSend"
  */
 export default function EmailDetailPage({ params }: { params: Promise<{ kind: string }> }) {
 	const t = useTranslations("admin")
+	const text = useEmailText()
 	const { kind } = use(params)
 	const { data, isLoading, isError } = useEmailTemplateQuery(kind)
 
@@ -44,16 +46,16 @@ export default function EmailDetailPage({ params }: { params: Promise<{ kind: st
 					<ArrowLeft className="size-4" />{t("allEmails")}</Link>
 
 				<div className="mt-2 flex flex-wrap items-center gap-2">
-					<h1 className="text-xl font-semibold">{data.label}</h1>
+					<h1 className="text-xl font-semibold">{text.label(kind, data.label)}</h1>
 					<Badge variant={data.override.enabled ? "secondary" : "outline"} className="font-normal">
-						{data.override.enabled ? "On" : "Off"}
+						{data.override.enabled ? t("on") : t("off")}
 					</Badge>
 					<Badge variant="outline" className="font-normal">
-						{data.audience === "staff" ? "To you" : "To customers"}
+						{data.audience === "staff" ? t("toYou") : t("toCustomers")}
 					</Badge>
 				</div>
 
-				<p className="text-muted-foreground mt-1 text-sm">{data.description}</p>
+				<p className="text-muted-foreground mt-1 text-sm">{text.description(kind, data.description)}</p>
 			</div>
 
 			<div className="grid gap-6 xl:grid-cols-2">

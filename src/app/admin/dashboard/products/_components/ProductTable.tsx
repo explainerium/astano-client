@@ -504,7 +504,7 @@ export const ProductTable = ({
 											<Checkbox
 												checked={isSelected}
 												onCheckedChange={() => toggle(product.id)}
-												aria-label={`Select ${product.name}`}
+												aria-label={t("selectThing", { thing: product.name })}
 											/>
 										</TableCell>
 
@@ -682,7 +682,7 @@ export const ProductTable = ({
 												<Button
 													variant="ghost"
 													size="icon"
-													aria-label={`Edit ${product.name}`}
+													aria-label={t("editThing", { thing: product.name })}
 													onClick={() => onEdit(product)}
 												>
 													<Pencil />
@@ -690,7 +690,7 @@ export const ProductTable = ({
 												<Button
 													variant="ghost"
 													size="icon"
-													aria-label={`Duplicate ${product.name}`}
+													aria-label={t("duplicateThing", { thing: product.name })}
 													title={t("duplicate")}
 													// Every copy button, not just this row's: two copies
 													// started at once would open two editors, and the
@@ -707,7 +707,7 @@ export const ProductTable = ({
 												<Button
 													variant="ghost"
 													size="icon"
-													aria-label={`Delete ${product.name}`}
+													aria-label={t("deleteThing", { thing: product.name })}
 													onClick={() => setPending([product])}
 													className="text-muted-foreground hover:text-destructive"
 												>

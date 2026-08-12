@@ -64,9 +64,9 @@ export const MediaToolbar = ({
 		setIsBusy(false)
 		onClearSelection()
 
-		const target = folderId ? (folders.find((f) => f.id === folderId)?.name ?? "folder") : "Unfiled"
-		if (moved) toast.success(`${moved} moved to ${target}.`)
-		if (failed) toast.error(`${failed} could not be moved.`)
+		const target = folderId ? (folders.find((f) => f.id === folderId)?.name ?? t("folderWord")) : t("unfiled")
+		if (moved) toast.success(t("movedToFolder", { count: moved, folder: target }))
+		if (failed) toast.error(t("couldNotBeMoved", { count: failed }))
 	}
 
 	const removeSelected = async () => {
@@ -83,7 +83,7 @@ export const MediaToolbar = ({
 					name: nameOf(id),
 					message:
 						(error as { data?: { message?: string } })?.data?.message ??
-						"Could not be deleted.",
+						t("couldNotBeDeleted"),
 				})
 			}
 		}
@@ -102,7 +102,7 @@ export const MediaToolbar = ({
 			<Toolbar
 				searchValue={search}
 				onSearchChange={onSearchChange}
-				searchPlaceholder="Search by file name…"
+				searchPlaceholder={t("searchByFileName")}
 				selectedCount={selected.size}
 				onClearSelection={onClearSelection}
 				selectionActions={
@@ -156,7 +156,7 @@ export const MediaToolbar = ({
 						aria-controls="media-upload-panel"
 					>
 						{uploadOpen ? <X /> : <Upload />}
-						{uploadOpen ? "Close" : "Upload"}
+						{uploadOpen ? t("close") : t("upload")}
 					</Button>
 				}
 			/>
@@ -181,7 +181,7 @@ export const MediaToolbar = ({
 							}}
 							disabled={isBusy}
 						>
-							{isBusy ? "Deleting…" : "Delete"}
+							{isBusy ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

@@ -157,13 +157,13 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 								key={id}
 								className="group bg-muted relative aspect-square overflow-hidden rounded-md border"
 							>
-								<Tile src={thumbs[id]} alt={`Gallery image ${index + 1}`} />
+								<Tile src={thumbs[id]} alt={t("galleryImageNumbered", { index: index + 1 })} />
 
 								<Button
 									type="button"
 									variant="secondary"
 									size="icon"
-									aria-label={`Remove gallery image ${index + 1}`}
+									aria-label={t("removeNumbered", { thing: t("galleryImageWord"), index: index + 1 })}
 									className="absolute top-1 right-1 size-6 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
 									onClick={() => removeFromGallery(id)}
 								>
@@ -175,7 +175,7 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 										type="button"
 										variant="secondary"
 										size="icon"
-										aria-label={`Move gallery image ${index + 1} earlier`}
+										aria-label={t("moveImageEarlier", { index: index + 1 })}
 										className="size-6"
 										disabled={index === 0}
 										onClick={() => move(index, -1)}
@@ -186,7 +186,7 @@ export const ProductImages = ({ product }: { product?: AdminProduct }) => {
 										type="button"
 										variant="secondary"
 										size="icon"
-										aria-label={`Move gallery image ${index + 1} later`}
+										aria-label={t("moveImageLater", { index: index + 1 })}
 										className="size-6"
 										disabled={index === assetIds.length - 1}
 										onClick={() => move(index, 1)}

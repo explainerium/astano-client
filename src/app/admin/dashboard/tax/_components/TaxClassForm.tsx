@@ -23,20 +23,24 @@ const EDITOR_LOCALES = [
 	{ code: "de", label: "Deutsch" },
 ] as const
 
-const schema = z.object({
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const buildSchema = (t: T) =>
+	z.object({
 	code: z
 		.string()
 		.trim()
-		.min(1, "Required")
+		.min(1, t("required"))
 		.max(60)
 		.regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, "Lowercase letters, digits, - or _"),
 	isDefault: z.boolean(),
-	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
-	en: z.object({ name: z.string().trim().min(1, "An English name is required") }),
+	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
+	en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
 	de: z.object({ name: z.string().trim() }),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const nameFor = (taxClass: TaxClass | undefined, locale: string) =>
 	taxClass?.translations.find((t) => t.locale === locale)?.name ?? ""
@@ -84,7 +88,7 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the tax class.")
+			toast.error(message ?? t("couldNotSaveTheTaxClass"))
 		}
 	}
 
@@ -92,15 +96,15 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 		<div className="space-y-6">
 			<EditorHeader
 				backHref="/admin/dashboard/tax"
-				backLabel="All tax classes"
-				title={isEdit ? taxClass.name : "New tax class"}
+				backLabel={t("allTaxClasses")}
+				title={isEdit ? taxClass.name : t("newTaxClass")}
 				description={t("aClassGroupsRatesProductsPick")}
 			/>
 
 			<ProForm
 				key={taxClass?.id ?? "new"}
 				onSubmit={onSubmit}
-				resolver={zodResolver(schema)}
+				resolver={zodResolver(buildSchema(t))}
 				defaultValues={toDefaults(taxClass)}
 				className="space-y-6"
 			>
@@ -148,7 +152,7 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 					<Button asChild type="button" variant="ghost">
 						<Link href="/admin/dashboard/tax">{t("cancel")}</Link>
 					</Button>
-					<ProSubmit>{isEdit ? "Save changes" : "Create class"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("createClass")}</ProSubmit>
 				</div>
 			</ProForm>
 		</div>

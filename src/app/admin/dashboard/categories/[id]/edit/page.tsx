@@ -30,7 +30,7 @@ export default function EditCategoryPage({ params }: { params: Promise<{ id: str
 	if (isError || !category) {
 		return (
 			<p className="text-destructive py-24 text-center text-sm">
-				{(error as { data?: { message?: string } })?.data?.message ?? "Could not load that category."}
+				{(error as { data?: { message?: string } })?.data?.message ?? t("couldNotLoadThatCategory")}
 			</p>
 		)
 	}

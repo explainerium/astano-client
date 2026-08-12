@@ -61,7 +61,7 @@ export const UploadDropzone = ({
 				} catch (error) {
 					failed++
 					const message = (error as { data?: { message?: string } })?.data?.message
-					toast.error(`${file.name} — ${message ?? "upload failed"}`)
+					toast.error(t("uploadFailedFor", { name: file.name, message: message ?? t("uploadFailed") }))
 				}
 				setProgress({ done: index + 1, total: accepted.length })
 			}
@@ -101,18 +101,19 @@ export const UploadDropzone = ({
 				<>
 					<Loader2 className="text-primary size-6 animate-spin" />
 					<p className="text-sm font-medium">
-						Uploading {progress.done} of {progress.total}…
+						{t("uploadingProgress", { done: progress.done, total: progress.total })}
 					</p>
 				</>
 			) : (
 				<>
 					<CloudUpload className="text-muted-foreground size-6" />
 					<p className="text-sm font-medium">
-						{isDragActive ? "Drop to upload" : "Drag images here, or click to choose"}
+						{isDragActive ? t("dropToUpload") : t("dragImagesHere")}
 					</p>
 					<p className="text-muted-foreground text-xs">
-						JPEG, PNG, WebP, AVIF or GIF · up to 10 MB · converted to WebP automatically
-						{targetFolder ? ` · filed under ${folderName}` : " · unfiled"}
+						{targetFolder
+							? t("dropzoneHintInFolder", { folder: folderName })
+							: t("dropzoneHint")}
 					</p>
 				</>
 			)}

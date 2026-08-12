@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -28,21 +28,25 @@ const EDITOR_LOCALES = [
 	{ code: "de", label: "Deutsch" },
 ] as const
 
-const schema = z.object({
+/** The dashboard translator, as a type these builders can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const buildSchema = (t: T) =>
+	z.object({
 	code: z
 		.string()
 		.trim()
-		.min(1, "Required")
+		.min(1, t("required"))
 		.max(60)
 		.regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, "Lowercase letters, digits, - or _"),
-	sortOrder: z.number({ message: "Enter a number" }).int().min(0),
+	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 	isActive: z.boolean(),
-	countries: z.array(z.string()).min(1, "Pick at least one country"),
-	en: z.object({ name: z.string().trim().min(1, "An English name is required") }),
+	countries: z.array(z.string()).min(1, t("pickAtLeastOneCountry")),
+	en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
 	de: z.object({ name: z.string().trim() }),
 })
 
-type FormValues = z.infer<typeof schema>
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 const nameFor = (zone: ShippingZone | undefined, locale: string) =>
 	zone?.translations.find((t) => t.locale === locale)?.name ?? ""
@@ -58,6 +62,7 @@ const toDefaults = (zone?: ShippingZone): FormValues => ({
 
 export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const router = useRouter()
 	const [createZone] = useCreateShippingZoneMutation()
 	const [updateZone] = useUpdateShippingZoneMutation()
@@ -92,7 +97,7 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 		} catch (error) {
 			// A country already claimed by another zone is refused by the API.
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save the zone.")
+			toast.error(message ?? t("couldNotSaveTheZone"))
 		}
 	}
 
@@ -100,15 +105,15 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 		<div className="space-y-6">
 			<EditorHeader
 				backHref="/admin/dashboard/shipping"
-				backLabel="All shipping zones"
-				title={isEdit ? zone.name : "New zone"}
+				backLabel={t("allShippingZones")}
+				title={isEdit ? zone.name : t("newZone")}
 				description={t("aZoneIsAGroupOf")}
 			/>
 
 			<ProForm
 				key={zone?.id ?? "new"}
 				onSubmit={onSubmit}
-				resolver={zodResolver(schema)}
+				resolver={zodResolver(buildSchema(t))}
 				defaultValues={toDefaults(zone)}
 				className="space-y-6"
 			>
@@ -148,15 +153,15 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 						name="countries"
 						label={t("countries")}
 						multiple
-						options={countryOptions("en")}
-						placeholder="No countries"
+						options={countryOptions(locale)}
+						placeholder={t("noCountries")}
 						description={t("aCountryCanOnlyBeIn")}
 					/>
 
 					<ProCheckbox
 						name="isActive"
 						label={t("active")}
-						description="An inactive zone offers no shipping at all to its countries."
+						description={t("inactiveZoneOffersNothing")}
 						className="border-t pt-4"
 					/>
 				</div>
@@ -165,7 +170,7 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 					<Button asChild type="button" variant="ghost">
 						<Link href="/admin/dashboard/shipping">{t("cancel")}</Link>
 					</Button>
-					<ProSubmit>{isEdit ? "Save changes" : "Create zone"}</ProSubmit>
+					<ProSubmit>{isEdit ? t("saveChanges") : t("createZone")}</ProSubmit>
 				</div>
 			</ProForm>
 		</div>

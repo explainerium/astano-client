@@ -23,11 +23,26 @@ export const translationFor = (category: AdminCategory | undefined, locale: stri
  * Matches the fallback the API itself uses, so the admin never shows a blank
  * row for a category that renders fine on the storefront.
  */
-export const displayName = (category: AdminCategory, locale = "en"): string =>
+/*
+ * Defaults to German, which is the primary language now — an English default
+ * meant a German-only category fell through to "whatever exists" instead of
+ * being found on the first try.
+ *
+ *  is a parameter rather than a constant so the two places that
+ * render this as a name can pass a translated one. The sort comparators and
+ * aria-labels take the default: it only appears on a category with no
+ * translation in any language, which is a broken row rather than copy.
+ */
+export const displayName = (
+	category: AdminCategory,
+	locale = "de",
+	untitled = "(untitled)"
+): string =>
 	translationFor(category, locale)?.name ??
+	translationFor(category, "de")?.name ??
 	translationFor(category, "en")?.name ??
 	category.translations[0]?.name ??
-	"(untitled)"
+	untitled
 
 /**
  * Flat list → nested tree, sorted by sortOrder then name.

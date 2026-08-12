@@ -64,13 +64,13 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 					.map((r) => ({ minQuantity: r.minQuantity, type: r.type, value: r.amount.trim() })),
 			}).unwrap()
 
-			toast.success(`${TIER_ROLES.find((r) => r.key === role)?.label} ladder saved`, {
-				description: "Every product in this category follows it from now on.",
+			toast.success(t("ladderSaved", { role: TIER_ROLES.find((r) => r.key === role)?.label ?? role }), {
+				description: t("ladderAppliesToCategory"),
 			})
 		} catch (error) {
 			toast.error(t("couldNotSaveThisLadder"), {
 				description:
-					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+					(error as { data?: { message?: string } })?.data?.message ?? t("pleaseTryAgain"),
 			})
 		}
 	}
@@ -87,9 +87,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 			<div>
 				<h3 className="text-sm font-medium">{t("categoryQuantityDiscounts")}</h3>
 				<p className="text-muted-foreground mt-1 max-w-prose text-xs">
-					Applies to every product filed under this category. The quantity counted is
-					everything the customer has from the category, not one line — ten each of five
-					products reaches a threshold of 50 that no single line reaches.
+					{t("categoryLadderBlurb")}
 				</p>
 			</div>
 
@@ -120,7 +118,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 				value={rows}
 				onChange={(next) => draft && setDraft({ ...draft, [role]: next })}
 				base={null}
-				baseHint="Depends on each product's own price"
+				baseHint={t("dependsOnOwnPrice")}
 				disabled={isSaving}
 			/>
 

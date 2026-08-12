@@ -62,7 +62,10 @@ const Item = ({
 	depth?: number
 	onClick: () => void
 	onDelete?: () => void
-}) => (
+}) => {
+	const t = useTranslations("admin")
+
+	return (
 	<div
 		className={cn(
 			// pr-2 rather than pr-1 so the count and delete icon are not pressed
@@ -83,7 +86,7 @@ const Item = ({
 		{onDelete && (
 			<button
 				type="button"
-				aria-label={`Delete folder ${label}`}
+				aria-label={t("deleteFolderThing", { name: label })}
 				onClick={onDelete}
 				className={cn(
 					"opacity-0 transition-opacity group-hover:opacity-100",
@@ -94,7 +97,8 @@ const Item = ({
 			</button>
 		)}
 	</div>
-)
+	)
+}
 
 export const FolderSidebar = ({
 	folders,
@@ -128,7 +132,7 @@ export const FolderSidebar = ({
 			setAdding(false)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not create the folder.")
+			toast.error(message ?? t("couldNotCreateTheFolder"))
 		}
 	}
 
@@ -140,7 +144,7 @@ export const FolderSidebar = ({
 		} catch (error) {
 			// The API refuses a folder that still holds files, and says so.
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not delete the folder.")
+			toast.error(message ?? t("couldNotDeleteTheFolder"))
 		}
 	}
 

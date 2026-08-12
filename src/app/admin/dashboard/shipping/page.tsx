@@ -87,7 +87,7 @@ export default function ShippingPage() {
 			} catch (err) {
 				// A country already claimed by another zone is the likely cause.
 				const message = (err as { data?: { message?: string } })?.data?.message
-				toast.error(`${zone.name.en} — ${message ?? "could not be created"}`)
+				toast.error(t("zoneCreateFailed", { zone: zone.name.en, message: message ?? t("couldNotBeCreated") }))
 				break
 			}
 		}
@@ -122,7 +122,7 @@ export default function ShippingPage() {
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load shipping zones."}
+						t("couldNotLoadShippingZones")}
 				</div>
 			)}
 
@@ -144,7 +144,7 @@ export default function ShippingPage() {
 						</Button>
 						<Button disabled={seeding} onClick={seedLiveMatrix}>
 							<Wand2 />
-							{seeding ? "Building…" : "Build the live matrix"}
+							{seeding ? t("building") : t("buildTheLiveMatrix")}
 						</Button>
 					</div>
 				</div>

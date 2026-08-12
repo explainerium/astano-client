@@ -37,7 +37,7 @@ export default function TaxPage() {
 			{isError && (
 				<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
 					{(error as { data?: { message?: string } })?.data?.message ??
-						"Could not load tax classes."}
+						t("couldNotLoadTaxClasses")}
 				</div>
 			)}
 
@@ -55,8 +55,7 @@ export default function TaxPage() {
 			{classes?.length === 0 && (
 				<div className="bg-card space-y-3 rounded-lg border border-dashed p-16 text-center">
 					<p className="text-muted-foreground text-sm">
-						No tax classes yet. Checkout cannot work out what to charge until one
-						class and one matching rate exist.
+						{t("noTaxClassesYet")}
 					</p>
 					<Button asChild>
 						<Link href="/admin/dashboard/tax/classes/new">

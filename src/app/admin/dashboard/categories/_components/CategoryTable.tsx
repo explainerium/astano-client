@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -46,6 +46,7 @@ const editHref = (id: string) => `/admin/dashboard/categories/${id}/edit`
 
 export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) => {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	const router = useRouter()
 	const [deleteCategory] = useDeleteCategoryMutation()
 	const [duplicateCategory] = useDuplicateCategoryMutation()
@@ -65,7 +66,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 		try {
 			const copy = await duplicateCategory(row.id).unwrap()
 			toast.success(`“${displayName(row)}” duplicated`, {
-				description: "Settings and text only — the copy has no products yet.",
+				description: t("categoryCopyHasNoProducts"),
 			})
 			// Straight into the copy, which is the point of duplicating one — it
 			// needs a new name before it is any use.
@@ -73,7 +74,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 		} catch (error) {
 			toast.error(t("couldNotDuplicateThisCategory"), {
 				description:
-					(error as { data?: { message?: string } })?.data?.message ?? "Please try again.",
+					(error as { data?: { message?: string } })?.data?.message ?? t("pleaseTryAgain"),
 			})
 		} finally {
 			setDuplicatingId(null)
@@ -153,7 +154,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 					name: displayName(row),
 					message:
 						(error as { data?: { message?: string } })?.data?.message ??
-						"Could not be deleted.",
+						t("couldNotBeDeleted"),
 				})
 			}
 		}
@@ -168,8 +169,12 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 		if (failures.length) {
 			toast.error(
 				failures.length === 1
-					? `“${failures[0].name}” — ${failures[0].message}`
-					: `${failures.length} could not be deleted. “${failures[0].name}” — ${failures[0].message}`
+					? t("deleteFailureOne", { name: failures[0].name, message: failures[0].message })
+					: t("deleteFailureMany", {
+							count: failures.length,
+							name: failures[0].name,
+							message: failures[0].message,
+						})
 			)
 		}
 	}
@@ -179,7 +184,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 			<Toolbar
 				searchValue={query}
 				onSearchChange={setQuery}
-				searchPlaceholder="Search categories…"
+				searchPlaceholder={t("searchCategories")}
 				selectedCount={selected.size}
 				onClearSelection={() => setSelected(new Set())}
 				selectionActions={
@@ -230,8 +235,8 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 									<TableCell colSpan={5} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{isSearching
-												? `Nothing matches “${query}”.`
-												: "No categories yet. Create the first one to start building the catalogue."}
+												? t("nothingMatchesQuery", { query })
+												: t("noCategoriesYet")}
 										</p>
 									</TableCell>
 								</TableRow>
@@ -251,7 +256,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 											<Checkbox
 												checked={isSelected}
 												onCheckedChange={() => toggle(row.id)}
-												aria-label={`Select ${displayName(row)}`}
+												aria-label={t("selectThing", { thing: displayName(row) })}
 											/>
 										</TableCell>
 
@@ -274,11 +279,11 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 														rel="noopener noreferrer"
 														className="group inline-flex items-center gap-1.5 font-medium hover:underline"
 													>
-														{displayName(row)}
+														{displayName(row, locale, t("untitled"))}
 														<ExternalLink className="text-muted-foreground size-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
 													</a>
 												) : (
-													<span className="font-medium">{displayName(row)}</span>
+													<span className="font-medium">{displayName(row, locale, t("untitled"))}</span>
 												)}
 
 												{row.isHidden && (
@@ -307,7 +312,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 												<Button asChild variant="ghost" size="icon">
 													<Link
 														href={editHref(row.id)}
-														aria-label={`Edit ${displayName(row)}`}
+														aria-label={t("editThing", { thing: displayName(row) })}
 													>
 														<Pencil />
 													</Link>
@@ -315,7 +320,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 												<Button
 													variant="ghost"
 													size="icon"
-													aria-label={`Duplicate ${displayName(row)}`}
+													aria-label={t("duplicateThing", { thing: displayName(row) })}
 													title={t("duplicate")}
 													disabled={duplicatingId !== null}
 													onClick={() => runDuplicate(row)}
@@ -330,7 +335,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 													variant="ghost"
 													size="icon"
 													className="text-muted-foreground hover:text-destructive"
-													aria-label={`Delete ${displayName(row)}`}
+													aria-label={t("deleteThing", { thing: displayName(row) })}
 													onClick={() => setPending([row])}
 												>
 													<Trash2 />
@@ -392,7 +397,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 							}}
 							disabled={isDeleting}
 						>
-							{isDeleting ? "Deleting…" : "Delete"}
+							{isDeleting ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

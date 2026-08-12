@@ -24,26 +24,32 @@ import type { EmailTemplate } from "@/types/email"
  * English email.
  */
 
-const schema = z.object({
-	enabled: z.boolean(),
-	subject: z.string().trim().max(200),
-	heading: z.string().trim().max(200),
-	additionalContent: z.string().trim().max(4000),
-	recipient: z.union([z.literal(""), z.email({ message: "Enter an email address" })]),
-})
+/** The dashboard translator, as a type this builder can take. */
+type T = (key: string, values?: Record<string, string | number | Date>) => string
+
+const buildSchema = (t: T) =>
+	z.object({
+		enabled: z.boolean(),
+		subject: z.string().trim().max(200),
+		heading: z.string().trim().max(200),
+		additionalContent: z.string().trim().max(4000),
+		recipient: z.union([z.literal(""), z.email({ message: t("enterAnEmailAddress") })]),
+	})
+
+type FormValues = z.infer<ReturnType<typeof buildSchema>>
 
 export const EmailForm = ({ template }: { template: EmailTemplate }) => {
 	const t = useTranslations("admin")
 	const [save] = useSaveEmailTemplateMutation()
 	const [reset, { isLoading: isResetting }] = useResetEmailTemplateMutation()
 
-	const onSubmit = async (values: z.infer<typeof schema>) => {
+	const onSubmit = async (values: FormValues) => {
 		try {
 			await save({ kind: template.key, data: values }).unwrap()
 			toast.success(t("saved"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not save that.")
+			toast.error(message ?? t("couldNotSaveThat"))
 		}
 	}
 
@@ -53,7 +59,7 @@ export const EmailForm = ({ template }: { template: EmailTemplate }) => {
 			toast.success(t("backToTheDefaultWording"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not reset that.")
+			toast.error(message ?? t("couldNotResetThat"))
 		}
 	}
 
@@ -63,7 +69,7 @@ export const EmailForm = ({ template }: { template: EmailTemplate }) => {
 			// actually stored rather than what was typed.
 			key={JSON.stringify(template.override)}
 			onSubmit={onSubmit}
-			resolver={zodResolver(schema)}
+			resolver={zodResolver(buildSchema(t))}
 			defaultValues={template.override}
 			className="space-y-4"
 		>

@@ -16,6 +16,7 @@ import {
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+import useCountryName from "@/lib/useCountryName"
 import { Button } from "@/components/ui/button"
 import {
 	Table,
@@ -32,16 +33,6 @@ import {
 } from "@/redux/api/taxApi"
 import type { TaxClass, TaxRate } from "@/types/tax"
 
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-
-const countryName = (code: string) => {
-	try {
-		return regionNames.of(code) ?? code
-	} catch {
-		return code
-	}
-}
-
 /** Trailing zeros from Decimal(9,4) read as noise in a table. */
 const formatRate = (rate: string) => `${Number(rate)}%`
 
@@ -55,12 +46,15 @@ const LIVE_EU_RATES = [
 	"IT", "LV", "LT", "LU", "NL", "PT", "RO", "SK", "SI", "ES", "SE",
 ]
 
-const Yes = ({ on }: { on: boolean }) =>
-	on ? (
-		<Check className="text-positive size-4" aria-label="Yes" />
+const Yes = ({ on }: { on: boolean }) => {
+	const t = useTranslations("admin")
+
+	return on ? (
+		<Check className="text-positive size-4" aria-label={t("yes")} />
 	) : (
-		<Minus className="text-muted-foreground size-4" aria-label="No" />
+		<Minus className="text-muted-foreground size-4" aria-label={t("no")} />
 	)
+}
 
 const classHref = (id: string) => `/admin/dashboard/tax/classes/${id}/edit`
 const rateHref = (classId: string, rateId: string) =>
@@ -68,6 +62,7 @@ const rateHref = (classId: string, rateId: string) =>
 const newRateHref = (classId: string) => `/admin/dashboard/tax/classes/${classId}/rates/new`
 
 export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
+	const countryName = useCountryName()
 	const t = useTranslations("admin")
 	const [createRate] = useCreateTaxRateMutation()
 	const [deleteClass] = useDeleteTaxClassMutation()
@@ -109,7 +104,10 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 				added++
 			} catch (error) {
 				const message = (error as { data?: { message?: string } })?.data?.message
-				toast.error(`${countryName(countryCode)} — ${message ?? "could not be added"}`)
+				toast.error(t("rateAddFailed", {
+					country: countryName(countryCode) ?? countryCode,
+					message: message ?? t("couldNotBeAdded"),
+				}))
 				break
 			}
 		}
@@ -129,13 +127,13 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 				toast.success(`“${taxClass.name}” deleted.`)
 			} else {
 				await deleteRate(pending.rate.id).unwrap()
-				toast.success(`${countryName(pending.rate.countryCode)} rate deleted.`)
+				toast.success(t("countryRateDeleted", { country: countryName(pending.rate.countryCode) ?? pending.rate.countryCode }))
 			}
 			setPending(null)
 		} catch (error) {
 			// The API refuses a class still attached to products.
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not delete.")
+			toast.error(message ?? t("couldNotDelete"))
 		}
 
 		setBusy(false)
@@ -152,7 +150,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 
 				<div className="ml-auto flex gap-1">
 					<Button asChild variant="ghost" size="icon">
-						<Link href={classHref(taxClass.id)} aria-label={`Edit ${taxClass.name}`}>
+						<Link href={classHref(taxClass.id)} aria-label={t("editThing", { thing: taxClass.name })}>
 							<Pencil />
 						</Link>
 					</Button>
@@ -160,7 +158,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 						variant="ghost"
 						size="icon"
 						className="text-muted-foreground hover:text-destructive"
-						aria-label={`Delete ${taxClass.name}`}
+						aria-label={t("deleteThing", { thing: taxClass.name })}
 						onClick={() => setPending({ kind: "class" })}
 					>
 						<Trash2 />
@@ -171,8 +169,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 			{!taxClass.rates.length ? (
 				<div className="space-y-3 p-8 text-center">
 					<p className="text-muted-foreground text-sm">
-						No rates yet. Until one matches the shipping country, this class
-						charges nothing.
+						{t("noRatesYet")}
 					</p>
 					<div className="flex flex-wrap justify-center gap-2">
 						<Button asChild variant="outline" size="sm">
@@ -189,7 +186,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 						<Table>
 							<TableHeader className="bg-muted/50">
 								<TableRow className="hover:bg-transparent">
-									{["Country", "Region", "Label", "Rate", "Shipping", "Reverse charge", "Priority", "Active"].map(
+									{[t("country"), "Region", "Label", "Rate", "Shipping", "Reverse charge", "Priority", "Active"].map(
 										(head) => (
 											<TableHead
 												key={head}
@@ -232,7 +229,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 												<Button asChild variant="ghost" size="icon">
 													<Link
 														href={rateHref(taxClass.id, rate.id)}
-														aria-label={`Edit the ${countryName(rate.countryCode)} rate`}
+														aria-label={t("editCountryRate", { country: countryName(rate.countryCode) ?? rate.countryCode })}
 													>
 														<Pencil />
 													</Link>
@@ -241,7 +238,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 													variant="ghost"
 													size="icon"
 													className="text-muted-foreground hover:text-destructive"
-													aria-label={`Delete the ${countryName(rate.countryCode)} rate`}
+													aria-label={t("deleteCountryRate", { country: countryName(rate.countryCode) ?? rate.countryCode })}
 													onClick={() => setPending({ kind: "rate", rate })}
 												>
 													<Trash2 />
@@ -276,12 +273,14 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 						<AlertDialogTitle>
 							{pending?.kind === "class"
 								? `Delete “${taxClass.name}”?`
-								: `Delete the ${pending ? countryName(pending.rate.countryCode) : ""} rate?`}
+								: t("deleteCountryRateTitle", {
+								country: pending ? (countryName(pending.rate.countryCode) ?? pending.rate.countryCode) : "",
+							})}
 						</AlertDialogTitle>
 						<AlertDialogDescription>
 							{pending?.kind === "class"
-								? "This removes the class and every rate in it. A class still attached to products cannot be deleted."
-								: "Orders in that country will fall through to whichever rate matches next, or to no tax at all."}
+								? t("deleteClassWarning")
+								: t("deleteRateWarning")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -293,7 +292,7 @@ export const TaxClassCard = ({ taxClass }: { taxClass: TaxClass }) => {
 							}}
 							disabled={busy}
 						>
-							{busy ? "Deleting…" : "Delete"}
+							{busy ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

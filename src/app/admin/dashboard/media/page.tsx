@@ -51,7 +51,7 @@ export default function MediaPage() {
 	const currentFolderName =
 		folderId && folderId !== UNFILED
 			? (folders.find((f) => f.id === folderId)?.name ?? "this folder")
-			: "Unfiled"
+			: t("unfiled")
 
 	return (
 		<div className="flex gap-5">

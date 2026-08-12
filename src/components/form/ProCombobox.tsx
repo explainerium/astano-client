@@ -149,7 +149,7 @@ export const ProCombobox = ({
 									.filter((o) => values.includes(o.value))
 									.map((o) => o.label)
 									.join(", ")
-							: `${values.length} selected`
+							: t("selectedCount", { count: values.length })
 					: (selected?.label ?? placeholder ?? t("select"))
 
 				const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

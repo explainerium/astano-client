@@ -28,19 +28,27 @@ import type { ShippingMethod, ShippingZone } from "@/types/shipping"
  * deleting stays a confirmation, which is a question rather than a form.
  */
 
+/** Keys, resolved at render — this map is built at import time. */
 const TYPE_LABEL: Record<string, string> = {
-	WEIGHT_BANDED: "Weight bands",
-	FLAT_RATE: "Flat rate",
-	FREE_SHIPPING: "Free shipping",
-	PRICE_BANDED: "Order-value bands",
+	WEIGHT_BANDED: "methodWeightBands",
+	FLAT_RATE: "methodFlatRate",
+	FREE_SHIPPING: "methodFreeShipping",
+	PRICE_BANDED: "methodPriceBands",
 }
 
 /** Trailing zeros from Decimal(12,4) read as false precision in a rate table. */
 const num = (value: string) => String(Number(value))
 
 /** "0 – 15 kg" · "320 kg and above". */
-const bandRange = (min: string, max: string | null, unit: string) =>
-	max === null ? `${num(min)} ${unit} and above` : `${num(min)} – ${num(max)} ${unit}`
+const bandRange = (
+	min: string,
+	max: string | null,
+	unit: string,
+	t: (key: string, values?: Record<string, string | number | Date>) => string
+) =>
+	max === null
+		? t("fromWeightUpwards", { amount: num(min), unit })
+		: `${num(min)} – ${num(max)} ${unit}`
 
 const MethodBlock = ({
 	method,
@@ -51,6 +59,7 @@ const MethodBlock = ({
 	editHref: string
 	onDelete: () => void
 }) => {
+	const t = useTranslations("admin")
 	const unit = method.type === "PRICE_BANDED" ? "€" : "kg"
 
 	return (
@@ -62,15 +71,15 @@ const MethodBlock = ({
 					{TYPE_LABEL[method.type] ?? method.type}
 				</Badge>
 				{!method.taxable && (
-					<Badge variant="outline" className="text-muted-foreground">Not taxed</Badge>
+					<Badge variant="outline" className="text-muted-foreground">{t("notTaxed")}</Badge>
 				)}
 				{!method.isActive && (
-					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">Inactive</Badge>
+					<Badge variant="outline" className="border-transparent bg-negative-soft text-negative">{t("inactive")}</Badge>
 				)}
 
 				<div className="ml-auto flex gap-1">
 					<Button asChild variant="ghost" size="icon">
-						<Link href={editHref} aria-label={`Edit ${method.name}`}>
+						<Link href={editHref} aria-label={t("editThing", { thing: method.name })}>
 							<Pencil />
 						</Link>
 					</Button>
@@ -78,7 +87,7 @@ const MethodBlock = ({
 						variant="ghost"
 						size="icon"
 						className="text-muted-foreground hover:text-destructive"
-						aria-label={`Delete ${method.name}`}
+						aria-label={t("deleteThing", { thing: method.name })}
 						onClick={onDelete}
 					>
 						<Trash2 />
@@ -98,8 +107,8 @@ const MethodBlock = ({
 				{method.type === "FREE_SHIPPING" && (
 					<p className="text-sm">
 						{method.freeAboveSubtotal
-							? `Free above €${num(method.freeAboveSubtotal)}`
-							: "Always free"}
+							? t("freeAboveAmount", { amount: `€${num(method.freeAboveSubtotal)}` })
+							: t("alwaysFree")}
 					</p>
 				)}
 
@@ -109,7 +118,7 @@ const MethodBlock = ({
 							{method.bands.map((band, index) => (
 								<span key={band.id ?? index} className="text-xs tabular-nums">
 									<span className="text-muted-foreground">
-										{bandRange(band.minValue, band.maxValue, unit)}
+										{bandRange(band.minValue, band.maxValue, unit, t)}
 									</span>
 									<span className="ml-2 font-medium">€{num(band.cost)}</span>
 								</span>
@@ -141,7 +150,7 @@ export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
 			setPending(null)
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not delete.")
+			toast.error(message ?? t("couldNotDelete"))
 		}
 
 		setBusy(false)
@@ -167,10 +176,9 @@ export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
 			<AlertDialog open={!!pending} onOpenChange={(open) => !open && setPending(null)}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
-						<AlertDialogTitle>Delete “{pending?.name}”?</AlertDialogTitle>
+						<AlertDialogTitle>{t("deleteThingTitle", { name: pending?.name ?? "" })}</AlertDialogTitle>
 						<AlertDialogDescription>
-							Its bands go with it. If this was the zone&rsquo;s only method, nobody there can
-							check out.
+							{t("deleteMethodWarning")}
 						</AlertDialogDescription>
 					</AlertDialogHeader>
 					<AlertDialogFooter>
@@ -182,7 +190,7 @@ export const ZoneMethods = ({ zone }: { zone: ShippingZone }) => {
 							}}
 							disabled={busy}
 						>
-							{busy ? "Deleting…" : "Delete"}
+							{busy ? t("deleting") : "Delete"}
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>

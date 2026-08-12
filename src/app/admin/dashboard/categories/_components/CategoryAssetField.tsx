@@ -77,7 +77,11 @@ export const CategoryAssetField = ({
 						"bg-muted/40 hover:border-primary/50 flex shrink-0 items-center justify-center overflow-hidden rounded-md border border-dashed transition-colors",
 						square ? "size-20" : "h-20 w-32"
 					)}
-					aria-label={url ? `Change ${label.toLowerCase()}` : `Choose ${label.toLowerCase()}`}
+					aria-label={
+						url
+							? t("changeThing", { thing: label.toLowerCase() })
+							: t("chooseThing", { thing: label.toLowerCase() })
+					}
 				>
 					{url ? (
 						// Plain img: already a sized derivative, so next/image would
@@ -94,7 +98,7 @@ export const CategoryAssetField = ({
 
 					<div className="flex flex-wrap gap-2">
 						<Button type="button" variant="outline" size="sm" onClick={() => setPicking(true)}>
-							{url ? "Change" : "Choose"}
+							{url ? t("change") : t("choose")}
 						</Button>
 						{!!url && (
 							<Button type="button" variant="ghost" size="sm" onClick={clear}>

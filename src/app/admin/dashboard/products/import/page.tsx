@@ -76,7 +76,11 @@ export default function ImportProductsPage() {
 			setMapping(data.mapping)
 
 			toast.success(
-				`${data.rowCount} rows, ${Object.keys(data.mapping).length} of ${data.headers.length} columns recognised.`
+				t("importAnalysed", {
+					rows: data.rowCount,
+					matched: Object.keys(data.mapping).length,
+					columns: data.headers.length,
+				})
 			)
 		} catch (error) {
 			setAnalysis(null)
@@ -103,7 +107,7 @@ export default function ImportProductsPage() {
 			} else {
 				setResult(report)
 				setPreview(null)
-				toast.success(`${report.created + report.updated} products imported.`)
+				toast.success(t("importedProducts", { count: report.created + report.updated }))
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
@@ -212,8 +216,7 @@ export default function ImportProductsPage() {
 					{running && (
 						<p className="text-muted-foreground flex items-start gap-2 text-sm">
 							<TriangleAlert className="mt-0.5 size-4 shrink-0" />
-							This can take a few minutes for a large file, and longer again with images
-							turned on. Leave the page open.
+							{t("importMayTakeMinutes")}
 						</p>
 					)}
 

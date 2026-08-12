@@ -69,8 +69,7 @@ export const AttributesTab = () => {
 
 			{attributes.length === 0 && (
 				<p className="text-muted-foreground rounded-lg border border-dashed p-8 text-center text-xs">
-					No attributes exist yet. Create Size or Material first, then attach them
-					here.
+					{t("noAttributesExistYet")}
 				</p>
 			)}
 
@@ -103,7 +102,7 @@ export const AttributesTab = () => {
 								variant="ghost"
 								size="icon"
 								className="text-muted-foreground hover:text-destructive mt-7"
-								aria-label={`Remove attribute ${index + 1}`}
+								aria-label={t("removeNumbered", { thing: t("attributeWord"), index: index + 1 })}
 								onClick={() => remove(index)}
 							>
 								<Trash2 />

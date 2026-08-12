@@ -1,6 +1,6 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { TriangleAlert } from "lucide-react"
 import { toast } from "sonner"
@@ -64,6 +64,7 @@ export const SettingsGroupForm = ({
 	groupKey: string
 }) => {
 	const c = useTranslations("adminCommon")
+	const locale = useLocale()
 	const a = useTranslations("admin")
 	const text = useSettingText()
 	const [saveSettings] = useSaveSettingsMutation()
@@ -142,7 +143,10 @@ export const SettingsGroupForm = ({
 					name={name}
 					label={text.label(key, definition.label)}
 					description={text.help(key, definition.help)}
-					options={definition.options ?? []}
+					options={(definition.options ?? []).map((choice) => ({
+						...choice,
+						label: text.option(key, choice.value, choice.label),
+					}))}
 				/>
 			)
 		}
@@ -160,7 +164,7 @@ export const SettingsGroupForm = ({
 					label={text.label(key, definition.label)}
 					description={text.help(key, definition.help)}
 					multiple={definition.type === "countries"}
-					options={countryOptions("en")}
+					options={countryOptions(locale)}
 					placeholder={definition.type === "countries" ? c("noCountries") : c("chooseCountry")}
 				/>
 			)

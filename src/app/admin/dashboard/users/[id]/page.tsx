@@ -39,6 +39,7 @@ import {
 } from "@/redux/api/userApi"
 import useUserInfo from "@/hooks/useUserInfo"
 import { cn } from "@/lib/utils"
+import useCountryName from "@/lib/useCountryName"
 import type { AssignableRole, AssignableStatus } from "@/types/user"
 import {
 	ASSIGNABLE_ROLES,
@@ -50,17 +51,6 @@ import {
 	STATUS_ACTIONS,
 	STATUS_CHIP,
 } from "../_components/userLabels"
-
-const regionNames = new Intl.DisplayNames(["en"], { type: "region" })
-
-const countryName = (code: string | null) => {
-	if (!code) return "—"
-	try {
-		return regionNames.of(code) ?? code
-	} catch {
-		return code
-	}
-}
 
 const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
 	<div className="flex justify-between gap-4 border-b py-2 last:border-0">
@@ -77,6 +67,7 @@ const Row = ({ label, value }: { label: string; value: React.ReactNode }) => (
  * spread over two screens that each showed half the picture.
  */
 export default function UserDetailPage() {
+	const countryName = useCountryName()
 	const t = useTranslations("admin")
 	const { id } = useParams<{ id: string }>()
 	const router = useRouter()
@@ -103,7 +94,7 @@ export default function UserDetailPage() {
 			toast.success(success)
 		} catch (err) {
 			const message = (err as { data?: { message?: string } })?.data?.message
-			toast.error(message ?? "Could not update the account.")
+			toast.error(message ?? t("couldNotUpdateTheAccount"))
 		}
 		setBusy(false)
 	}
@@ -118,7 +109,7 @@ export default function UserDetailPage() {
 	if (isError || !user) {
 		return (
 			<div className="text-destructive bg-card rounded-lg border border-dashed p-16 text-center text-sm">
-				{(error as { data?: { message?: string } })?.data?.message ?? "Could not load this account."}
+				{(error as { data?: { message?: string } })?.data?.message ?? t("couldNotLoadThisAccount")}
 			</div>
 		)
 	}
@@ -163,9 +154,9 @@ export default function UserDetailPage() {
 						</Badge>
 					)}
 					<Badge variant="outline" className={chip.className}>
-						{chip.label}
+						{t(chip.labelKey)}
 					</Badge>
-					<Badge variant="outline">{ROLE_LABEL[user.role]}</Badge>
+					<Badge variant="outline">{t(ROLE_LABEL[user.role])}</Badge>
 				</div>
 			</div>
 
@@ -173,15 +164,13 @@ export default function UserDetailPage() {
 			    its name, so it says what it means where the decision is visible. */}
 			{user.status === "SUSPENDED" && (
 				<div className="bg-accent-soft text-accent-foreground rounded-lg px-4 py-3 text-sm">
-					Suspended. They can still sign in, read their history and correct their details, but
-					cannot order or request a quote — and as a dealer they see guest prices.
+					{t("suspendedExplanation")}
 				</div>
 			)}
 
 			{isSelf && (
 				<div className="bg-muted text-muted-foreground rounded-lg px-4 py-3 text-sm">
-					This is your own account. Roles and account state can only be changed by another
-					administrator — nobody moderates themselves.
+					{t("ownAccountExplanation")}
 				</div>
 			)}
 
@@ -193,7 +182,7 @@ export default function UserDetailPage() {
 						<Row label={t("company")} value={user.company} />
 						<Row label={t("phone")} value={user.phone} />
 						<Row
-							label="VAT number"
+							label={t("vatNumber")}
 							value={
 								user.vatNumber ? (
 									<span className="flex items-center justify-end gap-2">
@@ -207,14 +196,14 @@ export default function UserDetailPage() {
 													: "bg-muted text-muted-foreground"
 											)}
 										>
-											{user.vatValidated ? "VIES validated" : "Unvalidated"}
+											{user.vatValidated ? t("viesValidated") : t("unvalidated")}
 										</Badge>
 									</span>
 								) : null
 							}
 						/>
 						<Row label={t("founded")} value={formatDate(user.foundingDate)} />
-						<Row label="PSI member" value={user.psiMember ? "Yes" : "No"} />
+						<Row label={t("psiMember")} value={user.psiMember ? t("yes") : "No"} />
 						<Row label={t("language")} value={user.locale === "de" ? "Deutsch" : "English"} />
 						<Row label={t("termsAccepted")} value={formatDateTime(user.termsAcceptedAt)} />
 						<Row label={t("registered")} value={formatDateTime(user.createdAt)} />
@@ -229,8 +218,7 @@ export default function UserDetailPage() {
 				<div className="space-y-5">
 					<Panel title={t("role")}>
 						<p className="text-muted-foreground mb-3 text-sm">
-							A role decides what this account pays. Only an administrator can change it, and
-							never their own.
+							{t("roleExplanation")}
 						</p>
 						<Select
 							value={user.role === "GUEST" ? "B2C" : user.role}
@@ -238,7 +226,7 @@ export default function UserDetailPage() {
 							onValueChange={(value) =>
 								run(
 									() => setRole({ id: user.id, role: value as AssignableRole }).unwrap(),
-									`${name} is now ${ROLE_LABEL[value as AssignableRole]}.`
+									t("userIsNow", { name, what: t(ROLE_LABEL[value as AssignableRole]) })
 								)
 							}
 						>
@@ -248,7 +236,7 @@ export default function UserDetailPage() {
 							<SelectContent>
 								{ASSIGNABLE_ROLES.map((value) => (
 									<SelectItem key={value} value={value}>
-										{ROLE_LABEL[value]}
+										{t(ROLE_LABEL[value])}
 									</SelectItem>
 								))}
 							</SelectContent>
@@ -256,10 +244,10 @@ export default function UserDetailPage() {
 						{!canSetRole && (
 							<p className="text-muted-foreground mt-2 text-xs">
 								{isSelf
-									? "You cannot change your own role."
+									? t("cannotChangeOwnRole")
 									: user.deletedAt
-										? "Restore the account first."
-										: "Administrators only."}
+										? t("restoreTheAccountFirst")
+										: t("administratorsOnly")}
 							</p>
 						)}
 					</Panel>
@@ -282,7 +270,7 @@ export default function UserDetailPage() {
 														id: user.id,
 														status: action.value as AssignableStatus,
 													}).unwrap(),
-												`${name} is now ${action.label.toLowerCase()}.`
+												t("userIsNow", { name, what: t(action.labelKey).toLowerCase() })
 											)
 										}
 										className={cn(
@@ -294,11 +282,11 @@ export default function UserDetailPage() {
 										)}
 									>
 										<span className="flex items-center justify-between gap-2 text-sm font-medium">
-											{action.label}
+											{t(action.labelKey)}
 											{current && <Check className="text-primary size-4" />}
 										</span>
 										<span className="text-muted-foreground mt-0.5 block text-xs">
-											{action.hint}
+											{t(action.hintKey)}
 										</span>
 									</button>
 								)
@@ -308,10 +296,10 @@ export default function UserDetailPage() {
 						{!canModerate && (
 							<p className="text-muted-foreground mt-3 text-xs">
 								{isSelf
-									? "You cannot change your own account state."
+									? t("cannotChangeOwnStatus")
 									: user.deletedAt
-										? "Restore the account first."
-										: "Only an administrator can act on a staff account."}
+										? t("restoreTheAccountFirst")
+										: t("onlyAdminCanActOnStaff")}
 							</p>
 						)}
 					</Panel>
@@ -336,7 +324,7 @@ export default function UserDetailPage() {
 					<div className="grid gap-6 md:grid-cols-2">
 						<dl>
 							<Row label={t("company")} value={application.companyName} />
-							<Row label="VAT number" value={application.vatNumber} />
+							<Row label={t("vatNumber")} value={application.vatNumber} />
 							<Row label={t("registerNumber")} value={application.registerNumber} />
 							<Row label={t("founded")} value={formatDate(application.foundingDate)} />
 							<Row
@@ -356,7 +344,7 @@ export default function UserDetailPage() {
 							/>
 							<Row label={t("businessType")} value={application.businessType} />
 							<Row label={t("expectedVolume")} value={application.expectedVolume} />
-							<Row label="PSI member" value={application.psiMember ? "Yes" : "No"} />
+							<Row label={t("psiMember")} value={application.psiMember ? t("yes") : "No"} />
 						</dl>
 
 						<dl>
@@ -400,7 +388,7 @@ export default function UserDetailPage() {
 								onClick={() =>
 									run(
 										() => decide({ id: application.id, approve: true }).unwrap(),
-										`${name} approved — they now see dealer prices.`
+										t("userApprovedDealerPrices", { name })
 									)
 								}
 							>
@@ -458,8 +446,7 @@ export default function UserDetailPage() {
 					<div className="space-y-3">
 						<div className="flex flex-wrap items-center gap-3">
 							<p className="text-muted-foreground flex-1 text-sm">
-								Deleting hides the account, ends its sessions and refuses sign-in. It keeps the
-								email address reserved and can be undone.
+								{t("deleteExplanation")}
 							</p>
 							<Button
 								variant="outline"
@@ -467,7 +454,7 @@ export default function UserDetailPage() {
 								onClick={() =>
 									run(
 										() => remove(user.id).unwrap(),
-										`${name} deleted. Restore them from the Deleted list.`
+										t("userDeletedRestoreFromList", { name })
 									)
 								}
 							>
@@ -479,8 +466,7 @@ export default function UserDetailPage() {
 						{isAdmin && !isSelf && (
 							<div className="border-negative/30 flex flex-wrap items-center gap-3 rounded-md border border-dashed p-3">
 								<p className="text-muted-foreground flex-1 text-sm">
-									Permanent deletion destroys the row. Past orders stay in the books but lose
-									their link to this customer, and nothing can be recovered.
+									{t("permanentDeleteExplanation")}
 								</p>
 								<Button
 									variant="destructive"
@@ -508,7 +494,7 @@ export default function UserDetailPage() {
 						<AlertDialogAction
 							onClick={async () => {
 								setConfirmPurge(false)
-								await run(() => purge(user.id).unwrap(), `${name} permanently deleted.`)
+								await run(() => purge(user.id).unwrap(), t("userPermanentlyDeleted", { name }))
 								router.push("/admin/dashboard/users")
 							}}
 						>{t("deletePermanently")}</AlertDialogAction>
