@@ -1,6 +1,6 @@
 "use client"
 
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 import { Provider as ReduxProvider } from "react-redux"
 import { Toaster } from "sonner"
 import { store } from "@/redux/store"
@@ -25,10 +25,30 @@ export const Providers = ({ children }: { children: ReactNode }) => (
 		    API; before the children so prices format correctly on first paint. */}
 		<MoneyFormatProvider />
 		{children}
-		{/* Pinned rather than left to the default: sonner is the one component
-		    that would still follow the OS, and its `system` setting would paint
-		    dark toasts over a shop that has no dark palette. */}
-		<Toaster theme="light" richColors closeButton position="top-right" />
+		{/*
+		 * Pinned rather than left to the default: sonner is the one component
+		 * that would still follow the OS, and its `system` setting would paint
+		 * dark toasts over a shop that has no dark palette.
+		 *
+		 * Centred at the top, a little larger, and held a second longer than the
+		 * defaults — because "I saved that, did it work?" was going unanswered.
+		 * A 356px card at 13px in the far corner, gone in four seconds, is easy
+		 * to miss while your eye is still on the button you pressed. The colours
+		 * are sonner's own; only the size, the dwell and the place changed.
+		 */}
+		<Toaster
+			theme="light"
+			richColors
+			closeButton
+			position="top-center"
+			duration={5000}
+			// Width is a custom property on the container; the rest is per toast.
+			// Inline rather than classes, so sonner's own rules — which match on
+			// [data-sonner-toast] and carry the same specificity as a class —
+			// cannot win depending on stylesheet order.
+			style={{ "--width": "420px" } as CSSProperties}
+			toastOptions={{ style: { fontSize: "14px", padding: "18px" } }}
+		/>
 	</ReduxProvider>
 )
 

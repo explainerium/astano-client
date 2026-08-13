@@ -1,13 +1,13 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useRouter } from "next/navigation"
 import { DropdownMenu } from "radix-ui"
 import { ChevronDown, LogOut } from "lucide-react"
 import type { UserRole } from "@/types"
 import { useMeQuery } from "@/redux/api/authApi"
 import useUserInfo from "@/hooks/useUserInfo"
 import logoutUser from "@/services/actions/logoutUser"
+import { hardNavigate } from "@/lib/hardNavigate"
 
 const ROLE_LABEL: Partial<Record<UserRole, string>> = {
 	ADMIN: "Admin",
@@ -16,7 +16,6 @@ const ROLE_LABEL: Partial<Record<UserRole, string>> = {
 
 export const UserMenu = () => {
 	const t = useTranslations("admin")
-	const router = useRouter()
 	const { role } = useUserInfo()
 	const { data: user } = useMeQuery()
 
@@ -29,7 +28,9 @@ export const UserMenu = () => {
 
 	const signOut = async () => {
 		await logoutUser()
-		router.replace("/login")
+		// The dashboard and the shop are separate root layouts, so the client
+		// router cannot carry us from one to the other — see hardNavigate.
+		hardNavigate("/login")
 	}
 
 	return (

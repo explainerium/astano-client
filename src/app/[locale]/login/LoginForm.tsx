@@ -10,6 +10,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import { isStaff } from "@/constants/role"
+import { hardNavigate, isAdminPath } from "@/lib/hardNavigate"
 import { Link } from "@/i18n/navigation"
 import { baseApi } from "@/redux/api/baseApi"
 import { useAppDispatch } from "@/redux/hooks"
@@ -74,10 +75,15 @@ export const LoginForm = () => {
 			// otherwise a stale 401 from /auth/me survives the sign-in.
 			dispatch(baseApi.util.resetApiState())
 
-			router.replace(
+			const target =
 				safeRedirect(searchParams.get("redirect")) ??
-					(isStaff(user.role) ? "/admin/dashboard" : "/account")
-			)
+				(isStaff(user.role) ? "/admin/dashboard" : "/account")
+
+			// Into the dashboard is a change of root layout, which the client
+			// router cannot make — see hardNavigate. Anywhere in the shop is the
+			// same tree this page is in, so it stays a soft navigation.
+			if (isAdminPath(target)) hardNavigate(target)
+			else router.replace(target)
 		} catch (error) {
 			// A dead or unreachable API throws NETWORK_ERROR. Anything else that
 			// reached the server already carries a localized message from it.

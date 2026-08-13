@@ -75,7 +75,7 @@ export const ProCombobox = ({
 
 	const [open, setOpen] = useState(false)
 	const [query, setQuery] = useState("")
-	const [activeIndex, setActiveIndex] = useState(0)
+	const [highlighted, setActiveIndex] = useState(0)
 
 	const listId = useId()
 	const optionId = (index: number) => `${listId}-option-${index}`
@@ -93,10 +93,16 @@ export const ProCombobox = ({
 		)
 	}, [options, query])
 
-	// Keep the highlight in range as the list shrinks, and scroll it into view.
-	useEffect(() => {
-		setActiveIndex((current) => Math.min(current, Math.max(filtered.length - 1, 0)))
-	}, [filtered.length])
+	/*
+	 * Clamped on read, not stored clamped.
+	 *
+	 * The list shrinks as the query narrows, so a stored index can end up past
+	 * the end. Correcting it in an effect meant a second render every time the
+	 * filter changed, and setting state from an effect is what the compiler
+	 * warns about — the clamp is a function of what is on screen, so it belongs
+	 * in the render that draws it.
+	 */
+	const activeIndex = Math.min(highlighted, Math.max(filtered.length - 1, 0))
 
 	useEffect(() => {
 		if (!open) return

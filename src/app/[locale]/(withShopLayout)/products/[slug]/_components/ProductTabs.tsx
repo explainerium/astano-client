@@ -58,7 +58,25 @@ export const ProductTabs = ({
 		})
 	}
 
+	/*
+	 * The product's own attributes, then the variant's.
+	 *
+	 * They answer different questions and both belong here. The product's are
+	 * what the shop published about the article — "Material: Edelstahl" — and
+	 * the variant's are which one of a choice this particular variant is. The
+	 * product's went unprinted entirely until now, which is what the client
+	 * meant by attributes not showing on the product page: the admin has a
+	 * "visible on the product page" tick, and nothing was reading it.
+	 */
+	for (const attribute of product.attributes ?? []) {
+		if (!attribute.values.length) continue
+		spec.push({ label: attribute.name, value: attribute.values.join(", ") })
+	}
+
 	for (const attribute of variant?.attributes ?? []) {
+		// Skip what the product already stated, or a variant of a product with
+		// one material prints "Material" twice with the same word after it.
+		if (spec.some((row) => row.label === attribute.name)) continue
 		spec.push({ label: attribute.name, value: attribute.label })
 	}
 
@@ -130,7 +148,7 @@ export const ProductTabs = ({
 					className="pt-8"
 				>
 					<div
-						className={cn("max-w-3xl", richTextClass)}
+						className={richTextClass}
 						// Product copy is written by staff in the admin editor, not by
 						// shoppers, and is stored as the TipTap HTML they authored.
 						dangerouslySetInnerHTML={{ __html: product.description }}
@@ -183,7 +201,7 @@ export const ProductTabs = ({
 					className="pt-8"
 				>
 					<div
-						className={cn("max-w-3xl", richTextClass)}
+						className={richTextClass}
 						// Written by staff in the admin editor and sanitised on the way
 						// into the database — see domain/html/sanitizeRichText.
 						dangerouslySetInnerHTML={{ __html: tab.content ?? "" }}

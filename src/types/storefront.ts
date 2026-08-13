@@ -102,11 +102,27 @@ export interface PublicProductTab {
 	content: string | null
 }
 
+export interface PublicProductAttribute {
+	id: string
+	/** The attribute — "Material". */
+	name: string
+	/** Its values — one for most, several where the product offers a choice. */
+	values: string[]
+}
+
 export interface PublicProductDetail extends PublicProduct {
 	/** After Description and Additional information, in the shop's own order. */
 	tabs: PublicProductTab[]
 	/** Whether this product is made to a customer drawing, and how many. */
 	artwork: ArtworkRules
+	/**
+	 * What the shop chose to publish about the product, for the specification.
+	 *
+	 * One entry per attribute with all of its values — "Material: Edelstahl,
+	 * Aluminium" — and only the ones ticked as visible in the admin. Distinct
+	 * from a variant's attributes, which say which *one* value that variant is.
+	 */
+	attributes: PublicProductAttribute[]
 	description: string | null
 	metaTitle: string | null
 	metaDescription: string | null
