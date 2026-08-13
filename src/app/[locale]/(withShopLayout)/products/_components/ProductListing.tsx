@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import ProductCard from "@/app/[locale]/_components/ProductCard"
 import QuickViewDialog from "@/app/[locale]/_components/QuickViewDialog"
+import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
 import CompareBar from "@/app/[locale]/_components/CompareBar"
 import Pagination from "@/app/[locale]/_components/Pagination"
 import { useShopProductsQuery } from "@/redux/api/storefrontApi"
@@ -82,6 +83,13 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 
 	/** The product the quick view is open on, or null. */
 	const [quickView, setQuickView] = useState<PublicProduct | null>(null)
+
+	/** What the quick view just added, while its confirmation is open. */
+	const [added, setAdded] = useState<{
+		name: string
+		image: string | null
+		quantity: number
+	} | null>(null)
 
 	/** Rewrites the query string, always resetting to page 1 unless paging. */
 	const setParams = useCallback(
@@ -240,7 +248,15 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 
 			{/* Both are portalled or fixed, so where they sit in the tree only
 			    decides who owns their state — not where they appear. */}
-			<QuickViewDialog product={quickView} onOpenChange={(open) => !open && setQuickView(null)} />
+			<QuickViewDialog
+				product={quickView}
+				onOpenChange={(open) => !open && setQuickView(null)}
+				onAdded={setAdded}
+			/>
+
+			{/* Owned here, not by the quick view, because it has to outlive it. */}
+			<AddedToCartDialog open={!!added} onClose={() => setAdded(null)} product={added} />
+
 			<CompareBar />
 		</div>
 	)

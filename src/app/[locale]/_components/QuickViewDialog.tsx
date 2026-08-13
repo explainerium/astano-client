@@ -2,13 +2,12 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { AlertCircle, Check, Loader2, Minus, Plus, X } from "lucide-react"
+import { AlertCircle, Loader2, Minus, Plus, X } from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useAddToCartMutation, useShopProductQuery } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import useMoney from "@/lib/useMoney"
-import { cn } from "@/lib/utils"
 import TierTable from "@/app/[locale]/(withShopLayout)/products/[slug]/_components/TierTable"
 import type { PublicProduct } from "@/types/storefront"
 
@@ -26,13 +25,29 @@ import type { PublicProduct } from "@/types/storefront"
  * at a chosen quantity. Fetching only when open keeps a grid of twenty-four
  * cards from making twenty-four requests nobody asked for.
  */
+
+/**
+ * How long the dialog takes to leave — `duration-100` on DialogContent, plus a
+ * little, so the confirmation that replaces it starts on an empty stage.
+ */
+const EXIT_MS = 150
+
 export const QuickViewDialog = ({
 	product,
 	onOpenChange,
+	onAdded,
 }: {
 	/** Null when closed. The card passes the product it was clicked on. */
 	product: PublicProduct | null
 	onOpenChange: (open: boolean) => void
+	/**
+	 * What went in the cart, for whoever owns the confirmation.
+	 *
+	 * Reported upwards rather than shown here because this is already a dialog,
+	 * and a dialog opening on top of a dialog is a stack the customer has to
+	 * dismiss twice. Quick view closes and the confirmation takes its place.
+	 */
+	onAdded: (added: { name: string; image: string | null; quantity: number }) => void
 }) => {
 	// The shop's own separators and symbol. A function rather than an import,
 	// so React Compiler can see that these prices depend on it.
@@ -41,7 +56,14 @@ export const QuickViewDialog = ({
 	const t = useTranslations("shop")
 
 	const [quantity, setQuantity] = useState(1)
-	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
+	/**
+	 * Only ever a failure now.
+	 *
+	 * Success used to be reported here too, as a line of text under the button.
+	 * It closes the dialog and opens the confirmation instead, so the one thing
+	 * left to say in place is why nothing happened.
+	 */
+	const [error, setError] = useState<string | null>(null)
 
 	const { data, isFetching } = useShopProductQuery(
 		product ? { slug: product.slug, quantity } : { slug: "" },
@@ -66,7 +88,7 @@ export const QuickViewDialog = ({
 	if (product && seededFor !== product.id) {
 		setSeededFor(product.id)
 		setQuantity(1)
-		setFeedback(null)
+		setError(null)
 	}
 	if (variant && quantity < min) setQuantity(min)
 
@@ -75,21 +97,36 @@ export const QuickViewDialog = ({
 
 	const add = async () => {
 		if (!variant || belowMoq) return
-		setFeedback(null)
+		setError(null)
 		try {
 			await addToCart({ variantId: variant.id, quantity }).unwrap()
-			setFeedback({ ok: true, message: t("addedToCart") })
 
 			// Same rule as the product page. A quick view that adds silently while
 			// the product page jumps to the cart is the sort of inconsistency the
 			// setting exists to prevent.
-			if (shopSettings?.["cart.redirectAfterAdd"] === true) router.push("/cart")
-		} catch (error) {
-			setFeedback({
-				ok: false,
-				message:
-					(error as { data?: { message?: string } })?.data?.message ?? t("addFailed"),
-			})
+			if (shopSettings?.["cart.redirectAfterAdd"] === true) {
+				router.push("/cart")
+				return
+			}
+
+			/*
+			 * The same confirmation the product page shows, rather than the line of
+			 * text that used to sit under this button.
+			 *
+			 * That line was the client's complaint: adding from a card told you it
+			 * had worked and then left you to find the cart yourself. What anybody
+			 * wants next is one of two things, so the confirmation offers both.
+			 *
+			 * This one leaves before that one arrives. Closing and opening in the
+			 * same commit puts two modals through their transitions at once, each
+			 * portalled into the body and each claiming focus and the scroll lock
+			 * on the way past the other. It also looked like a flicker.
+			 */
+			const added = { name: product?.name ?? "", image: hero, quantity }
+			onOpenChange(false)
+			setTimeout(() => onAdded(added), EXIT_MS)
+		} catch (cause) {
+			setError((cause as { data?: { message?: string } })?.data?.message ?? t("addFailed"))
 		}
 	}
 
@@ -220,20 +257,10 @@ export const QuickViewDialog = ({
 									{t("addToCart")}
 								</button>
 
-								{feedback && (
-									<p
-										role="status"
-										className={cn(
-											"flex items-center gap-2 text-sm",
-											feedback.ok ? "text-primary" : "text-destructive"
-										)}
-									>
-										{feedback.ok ? (
-											<Check className="size-4 shrink-0" />
-										) : (
-											<AlertCircle className="size-4 shrink-0" />
-										)}
-										{feedback.message}
+								{error && (
+									<p role="alert" className="text-destructive flex items-center gap-2 text-sm">
+										<AlertCircle className="size-4 shrink-0" />
+										{error}
 									</p>
 								)}
 							</>

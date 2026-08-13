@@ -15,7 +15,6 @@ import {
 import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/types/storefront"
-import CartLineArtwork from "./CartLineArtwork"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
 
@@ -110,7 +109,14 @@ export const CartView = () => {
 				</div>
 			</div>
 
-			{!!cart.issues.length && (
+			{/*
+			 * Only what stops the cart. A missing design file is now asked for on
+			 * the checkout page, so it is neither listed here nor allowed to hold
+			 * the customer back — `checkoutReady` leaves it out for the same
+			 * reason. Checking the same two flags the list draws keeps this box
+			 * from appearing empty when artwork is the only thing outstanding.
+			 */}
+			{(cart.issues.includes("BELOW_MOQ") || cart.issues.includes("OUT_OF_STOCK")) && (
 				<div className="border-destructive/40 bg-destructive/5 text-destructive mb-6 border p-4 text-sm">
 					<ul className="space-y-1">
 						{cart.issues.includes("BELOW_MOQ") && (
@@ -123,12 +129,6 @@ export const CartView = () => {
 							<li className="flex items-center gap-2">
 								<AlertCircle className="size-4 shrink-0" />
 								{t("issueOutOfStock")}
-							</li>
-						)}
-						{cart.issues.includes("ARTWORK_REQUIRED") && (
-							<li className="flex items-center gap-2">
-								<AlertCircle className="size-4 shrink-0" />
-								{t("issueArtworkRequired")}
 							</li>
 						)}
 					</ul>
@@ -220,13 +220,6 @@ export const CartView = () => {
 												{t("onlyLeft", { count: line.availableStock })}
 											</p>
 										)}
-
-									<CartLineArtwork
-										itemId={line.id}
-										files={line.files}
-										artwork={line.artwork}
-										missing={line.artworkMissing}
-									/>
 
 									{!!line.options?.length && (
 										<div className="mt-3 space-y-1">{line.options.map(renderOption)}</div>

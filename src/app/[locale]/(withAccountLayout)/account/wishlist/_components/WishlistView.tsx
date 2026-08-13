@@ -13,6 +13,7 @@ import {
 import { formatDate } from "@/lib/dates"
 import useMoney from "@/lib/useMoney"
 import { cn } from "@/lib/utils"
+import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
 
@@ -39,6 +40,13 @@ export const WishlistView = () => {
 	const [addToCart] = useAddToCartMutation()
 	const [busyId, setBusyId] = useState<string | null>(null)
 
+	/** What was just added, while its confirmation is open. */
+	const [added, setAdded] = useState<{
+		name: string
+		image: string | null
+		quantity: number
+	} | null>(null)
+
 	if (isLoading) {
 		return (
 			<p className="text-muted-foreground py-16 text-center text-sm">
@@ -61,11 +69,16 @@ export const WishlistView = () => {
 		)
 	}
 
-	const add = async (variantId: string, moq: number) => {
-		setBusyId(variantId)
+	const add = async (item: { variantId: string; moq: number; name: string; image: { url: string } | null }) => {
+		setBusyId(item.variantId)
+		const quantity = Math.max(item.moq, 1)
 		try {
-			await addToCart({ variantId, quantity: Math.max(moq, 1) }).unwrap()
-			toast.success(t("addedToCart"))
+			await addToCart({ variantId: item.variantId, quantity }).unwrap()
+
+			// The same confirmation every other add-to-cart shows. A toast said it
+			// had worked and then left the customer to find the cart themselves,
+			// which is what the client asked us to stop doing.
+			setAdded({ name: item.name, image: item.image?.url ?? null, quantity })
 		} catch (error) {
 			toast.error(apiMessage(error) ?? t("addFailed"))
 		} finally {
@@ -74,6 +87,7 @@ export const WishlistView = () => {
 	}
 
 	return (
+		<>
 		<ul className="divide-y border-y">
 			{wishlist.items.map((item) => (
 				<li key={item.id} className={cn("flex gap-5 py-5", !item.available && "opacity-60")}>
@@ -132,7 +146,7 @@ export const WishlistView = () => {
 							<button
 								type="button"
 								disabled={!item.available || !item.inStock || busyId === item.variantId}
-								onClick={() => add(item.variantId, item.moq)}
+								onClick={() => add(item)}
 								className="bg-primary text-primary-foreground inline-flex items-center gap-2 px-5 py-2.5 text-xs font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 							>
 								{busyId === item.variantId && <Loader2 className="size-3.5 animate-spin" />}
@@ -153,6 +167,9 @@ export const WishlistView = () => {
 				</li>
 			))}
 		</ul>
+
+		<AddedToCartDialog open={!!added} onClose={() => setAdded(null)} product={added} />
+		</>
 	)
 }
 

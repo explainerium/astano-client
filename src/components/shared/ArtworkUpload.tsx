@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useId, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import { FileText, Loader2, Paperclip, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -25,9 +25,12 @@ import { cn } from "@/lib/utils"
  */
 
 /** Mirrors ALLOWED_FILE_EXTENSIONS on the server. */
-const ACCEPT = ".pdf,.eps,.ai,.stl,.stp,.step,.svg,.dxf"
+export const ACCEPT = ".pdf,.eps,.ai,.stl,.stp,.step,.svg,.dxf"
 
-const MAX_BYTES = 50 * 1024 * 1024
+const MAX_BYTES = 10 * 1024 * 1024
+
+/** Derived, so the sentence under the button cannot outlive the number above it. */
+const MAX_LABEL = `${Math.round(MAX_BYTES / (1024 * 1024))} MB`
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
 
@@ -45,15 +48,31 @@ interface Props {
 	required: boolean
 	/** Set while the caller is saving, so the list cannot be edited mid-flight. */
 	busy?: boolean
+	/**
+	 * Whether to print the two standing explanations — why a file is needed and
+	 * which formats are allowed.
+	 *
+	 * Only the reason. The accepted formats are printed either way, because
+	 * that is the one thing a customer needs in front of them at the moment
+	 * they pick a file, and hunting for it elsewhere on the page is worse than
+	 * reading it twice.
+	 *
+	 * The reason is what gets repetitive: it says the same thing about every
+	 * made-to-order line, and six of them in a totals panel is a wall.
+	 */
+	explain?: boolean
 	className?: string
 }
 
-const ArtworkUpload = ({ files, onChange, maxFiles, required, busy, className }: Props) => {
+const ArtworkUpload = ({ files, onChange, maxFiles, required, busy, explain = true, className }: Props) => {
 	const t = useTranslations("artwork")
 	const { isLoggedIn, isResolved } = useUserInfo()
 	const [upload, { isLoading: uploading }] = useUploadArtworkMutation()
 	const [error, setError] = useState<string | null>(null)
 	const inputRef = useRef<HTMLInputElement>(null)
+	// Unique per instance. The order summary shows one of these under every line
+	// that needs a drawing, and a fixed id would repeat down the page.
+	const inputId = useId()
 
 	const remaining = maxFiles - files.length
 	const disabled = busy || uploading || remaining <= 0
@@ -117,7 +136,7 @@ const ArtworkUpload = ({ files, onChange, maxFiles, required, busy, className }:
 					className="sr-only"
 					onChange={(event) => void handleFiles(event.target.files)}
 					disabled={disabled}
-					id="artwork-input"
+					id={inputId}
 				/>
 
 				<Button
@@ -171,11 +190,13 @@ const ArtworkUpload = ({ files, onChange, maxFiles, required, busy, className }:
 			)}
 
 			{/* Said before the customer is refused at checkout, not after. */}
-			{required && files.length === 0 && (
+			{explain && required && files.length === 0 && (
 				<p className="text-muted-foreground text-xs">{t("requiredHint")}</p>
 			)}
 
-			<p className="text-muted-foreground text-xs">{t("accepted", { types: ACCEPT })}</p>
+			<p className="text-muted-foreground text-xs">
+				{t("accepted", { types: ACCEPT, size: MAX_LABEL })}
+			</p>
 
 			{error && <p className="text-destructive text-sm">{error}</p>}
 		</div>

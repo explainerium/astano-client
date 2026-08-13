@@ -228,8 +228,8 @@ export const QuantityPricing = () => {
 	 * fields as they are typed.
 	 *
 	 * The sale price wins where there is one, because that is what the resolver
-	 * discounts from. B2C has no field of its own on this form — it is seeded
-	 * from the regular price on save — so it previews against the same number.
+	 * discounts from. A dealer with no price of their own discounts from the
+	 * regular price, the same fallback the resolver applies.
 	 */
 	const prices = useWatch({ control, name: "prices" }) as
 		| { GUEST: { basePrice: string; salePrice: string }; RESELLER: { basePrice: string; salePrice: string } }
@@ -265,7 +265,7 @@ export const QuantityPricing = () => {
 						const count = counts?.[item.key]?.length ?? 0
 						return (
 							<TabsTrigger key={item.key} value={item.key}>
-								{item.label}
+								{t(item.labelKey)}
 								{/*
 								 * A count rather than a dot: which group has rungs, and how
 								 * many, is the thing you come to this tab strip to find out.
@@ -285,7 +285,7 @@ export const QuantityPricing = () => {
 				</TabsList>
 			</Tabs>
 
-			<p className="text-muted-foreground text-xs">{active.hint}</p>
+			<p className="text-muted-foreground text-xs">{t(active.hintKey)}</p>
 
 			{/*
 			 * Every ladder is mounted, only the active one is shown.

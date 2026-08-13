@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl"
 import { AlertCircle, Info, Loader2 } from "lucide-react"
 import useMoney from "@/lib/useMoney"
+import LineArtwork, { wantsArtwork } from "./LineArtwork"
 import type { CartView, CheckoutPreview } from "@/types/storefront"
 
 /**
@@ -45,22 +46,42 @@ export const OrderSummary = ({
 		<aside className="bg-muted/50 p-6">
 			<h2 className="font-heading mb-5 text-lg font-semibold">{t("summary")}</h2>
 
-			<ul className="mb-5 space-y-3 border-b pb-5">
+			<ul className="mb-5 space-y-4 border-b pb-5">
 				{cart.items.map((line) => (
-					<li key={line.id} className="flex justify-between gap-3 text-sm">
-						<span className="min-w-0">
-							<span className="block truncate font-medium">{line.name}</span>
-							<span className="text-muted-foreground text-xs">
-								{line.quantity} × {formatMoney(line.unitPrice)}
+					<li key={line.id}>
+						<div className="flex justify-between gap-3 text-sm">
+							<span className="min-w-0">
+								<span className="block truncate font-medium">{line.name}</span>
+								<span className="text-muted-foreground text-xs">
+									{line.quantity} × {formatMoney(line.unitPrice)}
+								</span>
+								{!!line.options?.length &&
+									line.options.map((option) => (
+										<span key={option.id} className="text-muted-foreground block text-xs">
+											+ {option.name} ({option.quantity})
+										</span>
+									))}
 							</span>
-							{!!line.options?.length &&
-								line.options.map((option) => (
-									<span key={option.id} className="text-muted-foreground block text-xs">
-										+ {option.name} ({option.quantity})
-									</span>
-								))}
-						</span>
-						<span className="shrink-0">{formatMoney(line.lineTotal)}</span>
+							<span className="shrink-0">{formatMoney(line.lineTotal)}</span>
+						</div>
+
+						{/*
+						 * The drawing goes under the line it is for.
+						 *
+						 * An option is its own line here — an engraving attached to a
+						 * cutter is the part made to a drawing, not the cutter — so its
+						 * field sits under the option's own name rather than under the
+						 * parent, where it would be one of two uploads with nothing to
+						 * tell them apart.
+						 */}
+						{wantsArtwork(line) && <LineArtwork line={line} />}
+
+						{(line.options ?? []).filter(wantsArtwork).map((option) => (
+							<div key={option.id}>
+								<p className="text-muted-foreground mt-3 text-xs">+ {option.name}</p>
+								<LineArtwork line={option} />
+							</div>
+						))}
 					</li>
 				))}
 			</ul>

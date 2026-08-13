@@ -830,14 +830,15 @@
 		"reasonAwaitingCountry": "Available once we know your delivery country",
 		"reasonCountryNotAllowed": "Not available for deliveries to this country",
 		"reasonRequiresLogin": "Sign in to use this",
-		"noticeTitle": "Before we can place your order:"
+		"noticeTitle": "Before we can place your order:",
+		"artworkMissing": "One of your items still needs a design file."
 	},
 	"artwork": {
 		"choose": "Choose files",
 		"remaining": "{count} more can be added",
 		"full": "{max} of {max} attached",
 		"remove": "Remove {name}",
-		"accepted": "Accepted: {types}. Up to 50 MB each.",
+		"accepted": "Accepted: {types}. Up to {size} each.",
 		"requiredHint": "This product is made to your design — a file is needed before it can be ordered.",
 		"signInRequired": "Sign in to attach your design files.",
 		"tooLarge": "{name} is larger than the {limit} limit.",
@@ -1561,7 +1562,7 @@
 		"imagesFetched": "Images: {fetched} fetched.",
 		"imagesFetchedWithFailures": "Images: {fetched} fetched, {failed} could not be.",
 		"mustNotBeAbovePrice": "Must not be above the {label} price of {base}.",
-		"setRegularPriceFirst": "Set a regular price before adding {label} quantity discounts.",
+		"setRegularPriceFirst": "Set a regular price before adding quantity discounts for {label}.",
 		"rowAlreadyCovers": "Row {row} already covers {quantity}.",
 		"galleryImageNumbered": "Gallery image {index}",
 		"gatewayLive": "Live",
@@ -1795,6 +1796,12 @@
 		"priceOnRequestHelp": "Hides the price, blocks add-to-cart, and offers \"Add to quote request\" instead.",
 		"permalink": "Permalink",
 		"editPermalink": "Edit permalink",
-		"generatedFromTheName": "generated from the name"
+		"generatedFromTheName": "generated from the name",
+		"tierRoleRetail": "Guests & retail customers",
+		"tierRoleRetailHint": "Everyone who is not an approved dealer, signed in or not. One ladder covers both.",
+		"tierRoleReseller": "Resellers",
+		"tierRoleResellerHint": "Approved dealers only. Leave it empty and they follow the ladder above. A pending application is priced as a guest (R5b).",
+		"saveLadderFor": "Save ladder for {role}",
+		"rungAboveSmallerOrder": "Works out at {unit} per unit — above the {previous} charged for a smaller order."
 	}
 }

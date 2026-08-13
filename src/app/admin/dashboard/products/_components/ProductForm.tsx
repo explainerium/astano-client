@@ -182,7 +182,6 @@ const buildSchema = (t: T) =>
 	 */
 	tiers: z.object({
 		GUEST: z.array(tierRow(t)),
-		B2C: z.array(tierRow(t)),
 		RESELLER: z.array(tierRow(t)),
 	}),
 
@@ -289,13 +288,13 @@ const buildSchema = (t: T) =>
 		 * `resolvePrice` discounts from.
 		 */
 		const baseFor = (role: TierRole): string => {
-			const own = values.prices[role === "B2C" ? "GUEST" : role]
+			const own = values.prices[role]
 			const sale = own.salePrice.trim()
 			const list = own.basePrice.trim()
 			return sale || list || regular
 		}
 
-		for (const { key: role, label } of TIER_ROLES) {
+		for (const { key: role, labelKey } of TIER_ROLES) {
 			const ladder = rows[role]
 			if (!ladder.length) continue
 
@@ -305,7 +304,7 @@ const buildSchema = (t: T) =>
 				ctx.addIssue({
 					code: "custom",
 					path: ["prices", "GUEST", "basePrice"],
-					message: t("setRegularPriceFirst", { label: label.toLowerCase() }),
+					message: t("setRegularPriceFirst", { label: t(labelKey) }),
 				})
 			}
 
@@ -365,9 +364,10 @@ const buildSchema = (t: T) =>
 					ctx.addIssue({
 						code: "custom",
 						path: ["tiers", role, index, "amount"],
-						message: `Works out at ${unit.toFixed(2)} per unit — above the ${previous.toFixed(
-							2
-						)} charged for a smaller order.`,
+						message: t("rungAboveSmallerOrder", {
+							unit: unit.toFixed(2),
+							previous: previous.toFixed(2),
+						}),
 					})
 				}
 				previous = unit
@@ -407,9 +407,12 @@ const toTierRows = (product?: AdminProduct) => {
 				amount: tier.value,
 			}))
 
+	/*
+	 * No B2C entry. The form offers one retail ladder and stores it as GUEST,
+	 * which is where a signed-in retail customer's lookup already terminates.
+	 */
 	return {
 		GUEST: ladderFor("GUEST"),
-		B2C: ladderFor("B2C"),
 		RESELLER: ladderFor("RESELLER"),
 	}
 }
@@ -657,19 +660,15 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 		 * A ladder needs a price row of its own role to hang from.
 		 *
 		 * The rungs attach to the price row of their own role, and a role with no
-		 * row is never resolved at all — so a B2C ladder without a B2C price is
-		 * data the shop would silently ignore. Where the admin gave no price for
-		 * that role, the regular price becomes the row's base, which is what
+		 * row is never resolved at all — so a Reseller ladder without a Reseller
+		 * price is data the shop would silently ignore. Where the admin gave no
+		 * dealer price, the regular price becomes the row's base, which is what
 		 * "leave empty and they pay the regular price" says on the field.
+		 *
+		 * Nothing is written for B2C, by either price or ladder. Both fall back to
+		 * GUEST, and writing a duplicate row would only give a future edit two
+		 * places to disagree.
 		 */
-		if (hasLadder("B2C") && regular) {
-			prices.push({
-				role: "B2C",
-				basePrice: regular,
-				...(regularSale ? { salePrice: regularSale } : {}),
-			})
-		}
-
 		if (dealer || (hasLadder("RESELLER") && regular)) {
 			prices.push({
 				role: "RESELLER",

@@ -193,6 +193,21 @@ const RichTextEditor = ({
 				// space under a short paragraph still puts the cursor in the
 				// document rather than landing on dead padding.
 				style: "min-height:100%",
+
+				/*
+				 * Ask the writing assistants to keep out.
+				 *
+				 * Grammarly and its kind attach to contenteditable elements and
+				 * insert their own nodes inside them. React did not put those nodes
+				 * there, so when it later takes this subtree down it asks the DOM to
+				 * remove a child that has since been moved — "The node to be removed
+				 * is not a child of this node", and the page dies until it is
+				 * reloaded. This is the documented way to be left alone; all three
+				 * spellings exist because different versions read different ones.
+				 */
+				"data-gramm": "false",
+				"data-gramm_editor": "false",
+				"data-enable-grammarly": "false",
 			},
 		},
 		onUpdate: ({ editor }) => {

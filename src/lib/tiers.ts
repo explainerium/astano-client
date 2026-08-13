@@ -10,29 +10,34 @@
  */
 
 /**
- * The three audiences a price can be set for, in the order they are shown.
+ * The two audiences a ladder is entered for, in the order they are shown.
  *
- * These are WholesaleX's own three (§4.2) — `wholesalex_guest`,
- * `wholesalex_b2c_users` and the single B2B role — and the same three the
- * pricing resolver falls back through. Each keeps its own ladder because the
- * real data has them genuinely differing: the Reseller ladder sits 25–35 %
- * below the retail one at every quantity.
+ * WholesaleX has three (§4.2) — `wholesalex_guest`, `wholesalex_b2c_users` and
+ * the single B2B role — and so did this form, which is what the client asked
+ * us to stop: "filling up 3 tables is very much work". Guests and signed-in
+ * retail customers were being given the same numbers every single time, so the
+ * second table was pure transcription with an opportunity to mistype.
+ *
+ * Now there are two, and the retail one is stored as GUEST. That is not a
+ * shortcut — it is where the resolver's fallback chain terminates, so a B2C
+ * customer with no ladder of their own already lands on it, exactly as they
+ * already land on the guest *price*. The Reseller ladder stays separate
+ * because the real data has it genuinely differing: 25–35 % below retail at
+ * every quantity.
+ *
+ * Keys, not text: these labels appear in the product form and the category
+ * dialog, both of which are translated.
  */
 export const TIER_ROLES = [
 	{
 		key: "GUEST" as const,
-		label: "Guests",
-		hint: "Not signed in. Also the fallback for any customer with no price of their own.",
-	},
-	{
-		key: "B2C" as const,
-		label: "Retail customers",
-		hint: "Signed in, standard account. Leave empty and they follow the guest ladder.",
+		labelKey: "tierRoleRetail",
+		hintKey: "tierRoleRetailHint",
 	},
 	{
 		key: "RESELLER" as const,
-		label: "Resellers",
-		hint: "Approved dealers only. A pending application is priced as a guest (R5b).",
+		labelKey: "tierRoleReseller",
+		hintKey: "tierRoleResellerHint",
 	},
 ]
 

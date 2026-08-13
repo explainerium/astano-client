@@ -338,6 +338,14 @@ export const CheckoutView = () => {
 		)
 	}
 
+	/*
+	 * Read from the cart the server just sent, not from anything counted here.
+	 * The upload saves straight away and the cart refetches, so this follows the
+	 * files as they are attached — and it is the same judgement `place` will
+	 * make when the order is submitted, rather than a second opinion about it.
+	 */
+	const artworkMissing = cart.issues.includes("ARTWORK_REQUIRED")
+
 	const shippingOptions: MethodOption[] = (preview?.shippingOptions ?? []).map((option) => ({
 		id: option.methodId,
 		title: option.name,
@@ -457,7 +465,18 @@ export const CheckoutView = () => {
 					)}
 				</div>
 
-				<div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start">
+				{/*
+				 * The summary is the wider of the two now that the design files are
+				 * asked for inside it — an upload field, its filenames and a remove
+				 * button do not fit in the 380px this used to be. The address form
+				 * gives up that width and is no worse for it: it is two columns of
+				 * short fields, and past a point extra width only lengthens the
+				 * distance the eye travels between a label and its box.
+				 *
+				 * minmax(0,1fr) rather than 1fr so a long product name in the summary
+				 * cannot push the form column wider than the grid.
+				 */}
+				<div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_460px] lg:items-start">
 					<div className="space-y-10">
 						<section>
 							<h2 className="font-heading mb-5 text-xl font-semibold">{t("billingAddress")}</h2>
@@ -522,7 +541,14 @@ export const CheckoutView = () => {
 						</section>
 					</div>
 
-					<div className="space-y-6 lg:sticky lg:top-6">
+					{/*
+					 * Capped, because a sticky column taller than the screen is a trap:
+					 * once it sticks, whatever hangs below the fold can never be
+					 * scrolled to — and what hangs below here is the button that places
+					 * the order. It only became tall enough to matter when the design
+					 * files moved in, so it scrolls within itself past that point.
+					 */}
+					<div className="space-y-6 lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto">
 						<OrderSummary cart={cart} preview={preview} calculating={previewState.isLoading} />
 
 						{error && (
@@ -542,7 +568,7 @@ export const CheckoutView = () => {
 						 */}
 						<button
 							type="submit"
-							disabled={placeState.isLoading}
+							disabled={placeState.isLoading || artworkMissing}
 							className="bg-primary text-primary-foreground inline-flex w-full items-center justify-center gap-2 px-6 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 						>
 							{placeState.isLoading && <Loader2 className="size-4 animate-spin" />}
@@ -552,6 +578,17 @@ export const CheckoutView = () => {
 										total: formatMoney(preview?.grandTotal) ?? "",
 									})}
 						</button>
+
+						{/*
+						 * Said under the button, unlike the delivery and payment hints
+						 * that were removed from here — those nagged about steps further
+						 * down the same page, while this one explains a button that is
+						 * actually disabled. A disabled control with no reason beside it
+						 * is the thing worth avoiding.
+						 */}
+						{artworkMissing && (
+							<p className="text-destructive text-center text-sm">{t("artworkMissing")}</p>
+						)}
 
 						<Link
 							href="/cart"

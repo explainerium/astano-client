@@ -42,14 +42,18 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 	 * compiler rejects setState inside an effect anyway.
 	 */
 	if (data && !draft) {
+		// The API still answers with a B2C bucket and is left alone — saving is
+		// per role, so a bucket this dialog no longer offers is simply never sent.
 		setDraft({
 			GUEST: toRungs(data.GUEST),
-			B2C: toRungs(data.B2C),
 			RESELLER: toRungs(data.RESELLER),
 		})
 	}
 
 	const rows = draft?.[role] ?? []
+
+	/** Named once — the toast and the Save button have to agree on what they call it. */
+	const roleLabel = t(TIER_ROLES.find((item) => item.key === role)?.labelKey ?? "tierRoleRetail")
 
 	const save = async () => {
 		if (!draft) return
@@ -64,7 +68,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 					.map((r) => ({ minQuantity: r.minQuantity, type: r.type, value: r.amount.trim() })),
 			}).unwrap()
 
-			toast.success(t("ladderSaved", { role: TIER_ROLES.find((r) => r.key === role)?.label ?? role }), {
+			toast.success(t("ladderSaved", { role: roleLabel }), {
 				description: t("ladderAppliesToCategory"),
 			})
 		} catch (error) {
@@ -97,7 +101,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 						const count = draft?.[item.key]?.length ?? 0
 						return (
 							<TabsTrigger key={item.key} value={item.key}>
-								{item.label}
+								{t(item.labelKey)}
 								{!!count && (
 									<span className="bg-primary/12 text-primary inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full px-1 text-[10px] font-semibold tabular-nums">
 										{count}
@@ -125,7 +129,7 @@ export const CategoryTiersPanel = ({ categoryId }: { categoryId: string }) => {
 			<div className="flex justify-end">
 				<Button type="button" onClick={save} disabled={isSaving || !draft}>
 					{isSaving && <Loader2 className="animate-spin" />}
-					Save {TIER_ROLES.find((r) => r.key === role)?.label.toLowerCase()} ladder
+					{t("saveLadderFor", { role: roleLabel })}
 				</Button>
 			</div>
 		</div>

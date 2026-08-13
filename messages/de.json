@@ -831,14 +831,15 @@
 		"reasonAwaitingCountry": "Verfügbar, sobald Ihr Lieferland bekannt ist",
 		"reasonCountryNotAllowed": "Für Lieferungen in dieses Land nicht verfügbar",
 		"reasonRequiresLogin": "Zum Nutzen bitte anmelden",
-		"noticeTitle": "Bevor wir Ihre Bestellung aufgeben können:"
+		"noticeTitle": "Bevor wir Ihre Bestellung aufgeben können:",
+		"artworkMissing": "Für einen Ihrer Artikel wird noch eine Druckdatei benötigt."
 	},
 	"artwork": {
 		"choose": "Dateien auswählen",
 		"remaining": "Noch {count} möglich",
 		"full": "{max} von {max} angehängt",
 		"remove": "{name} entfernen",
-		"accepted": "Zulässig: {types}. Je bis zu 50 MB.",
+		"accepted": "Zulässig: {types}. Je bis zu {size}.",
 		"requiredHint": "Dieses Produkt wird nach Ihrer Vorlage gefertigt — für die Bestellung wird eine Datei benötigt.",
 		"signInRequired": "Melden Sie sich an, um Ihre Druckdateien anzuhängen.",
 		"tooLarge": "{name} überschreitet das Limit von {limit}.",
@@ -2082,7 +2083,13 @@
 		"priceOnRequestHelp": "Blendet den Preis aus, deaktiviert „In den Warenkorb“ und bietet stattdessen „In den Anfragekorb“ an.",
 		"permalink": "Permalink",
 		"editPermalink": "Permalink bearbeiten",
-		"generatedFromTheName": "wird aus dem Namen erzeugt"
+		"generatedFromTheName": "wird aus dem Namen erzeugt",
+		"tierRoleRetail": "Gäste & Privatkunden",
+		"tierRoleRetailHint": "Alle, die keine freigeschalteten Händler sind — angemeldet oder nicht. Eine Staffel gilt für beide.",
+		"tierRoleReseller": "Händler",
+		"tierRoleResellerHint": "Nur freigeschaltete Händler. Leer lassen, dann gilt die obige Staffel. Ein offener Antrag wird wie ein Gast bepreist (R5b).",
+		"saveLadderFor": "Staffel für {role} speichern",
+		"rungAboveSmallerOrder": "Ergibt {unit} pro Stück — mehr als die {previous} für eine kleinere Bestellung."
 	},
 	"adminEmails": {
 		"order-placed": {
