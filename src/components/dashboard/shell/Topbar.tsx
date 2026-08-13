@@ -13,6 +13,9 @@ import UserMenu from "./UserMenu"
  */
 export const Topbar = () => {
 	const t = useTranslations("adminNav")
+	// adminNav holds only the route names; everything else in this bar is
+	// ordinary dashboard vocabulary.
+	const a = useTranslations("admin")
 	const pathname = usePathname()
 	// The heading is whichever nav item is active, so it has to be translated
 	// here too — otherwise a German sidebar sat under an English page title.
@@ -24,10 +27,10 @@ export const Topbar = () => {
 
 			<div className="ml-auto flex items-center gap-2 lg:gap-4">
 				<label className="bg-muted/70 border-input hidden items-center gap-2 rounded-lg border px-4 py-2.5 md:flex">
-					<span className="sr-only">{t("search")}</span>
+					<span className="sr-only">{a("search")}</span>
 					<input
 						type="search"
-						placeholder={t("searchStockOrderEtc")}
+						placeholder={a("searchStockOrderEtc")}
 						className="placeholder:text-muted-foreground w-48 bg-transparent text-sm outline-none lg:w-64"
 					/>
 					<Search className="text-muted-foreground size-4 shrink-0" />
@@ -35,7 +38,7 @@ export const Topbar = () => {
 
 				<button
 					type="button"
-					aria-label={t("messages")}
+					aria-label={a("messages")}
 					className="hover:bg-muted text-muted-foreground hidden size-10 items-center justify-center rounded-lg transition-colors sm:flex"
 				>
 					<MessageSquare className="size-5" strokeWidth={1.75} />
@@ -43,7 +46,7 @@ export const Topbar = () => {
 
 				<button
 					type="button"
-					aria-label={t("notifications")}
+					aria-label={a("notifications")}
 					className="hover:bg-muted text-muted-foreground relative hidden size-10 items-center justify-center rounded-lg transition-colors sm:flex"
 				>
 					<Bell className="size-5" strokeWidth={1.75} />

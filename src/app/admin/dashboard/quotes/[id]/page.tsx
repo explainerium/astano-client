@@ -211,7 +211,7 @@ const ReplyForm = ({ quote }: { quote: Quote }) => {
 				<ProCheckbox
 					name="isInternal"
 					label={t("internalNote")}
-					description={t("keptOnTheThreadForStaffThe")}
+					description={t("keptOnTheThreadForStaff")}
 				/>
 				<ProSubmit>
 					<Send />{t("send")}</ProSubmit>

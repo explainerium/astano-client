@@ -29,6 +29,11 @@ const BLOCKS = [
 	"[&_li>ul]:mt-1 [&_li>ul]:mb-0 [&_li>ul]:list-[circle] [&_li>ol]:mt-1 [&_li>ol]:mb-0 [&_li>ol]:list-[lower-alpha]",
 	"[&_blockquote]:border-border [&_blockquote]:text-muted-foreground [&_blockquote]:my-4 [&_blockquote]:border-l-2 [&_blockquote]:pl-4 [&_blockquote]:italic",
 	"[&_hr]:border-border [&_hr]:my-8",
+	// A table is the one block that can be wider than the column it sits in, so
+	// it scrolls inside its own box rather than pushing the page sideways.
+	"[&_table]:my-4 [&_table]:w-full [&_table]:border-collapse [&_table]:text-sm",
+	"[&_th]:border-border [&_th]:bg-muted/50 [&_th]:border [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:font-semibold",
+	"[&_td]:border-border [&_td]:border [&_td]:px-3 [&_td]:py-2 [&_td]:align-top",
 	"[&_pre]:bg-muted [&_pre]:my-4 [&_pre]:overflow-x-auto [&_pre]:rounded-md [&_pre]:p-3 [&_pre]:text-xs",
 ].join(" ")
 

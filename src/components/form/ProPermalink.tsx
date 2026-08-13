@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Controller, useFormContext, useWatch } from "react-hook-form"
 import { Check, ExternalLink, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -49,9 +50,10 @@ export const ProPermalink = ({
 	name,
 	sourceName,
 	baseUrl,
-	label = "Permalink",
+	label,
 	className,
 }: ProPermalinkProps) => {
+	const t = useTranslations("admin")
 	const { control, setValue } = useFormContext()
 	const [editing, setEditing] = useState(false)
 	const [draft, setDraft] = useState("")
@@ -77,7 +79,7 @@ export const ProPermalink = ({
 					return (
 						<div className={className}>
 							<div className="flex flex-wrap items-center gap-2 text-sm">
-								<span className="text-muted-foreground">{label}:</span>
+								<span className="text-muted-foreground">{label ?? t("permalink")}:</span>
 								<span className="text-muted-foreground font-mono text-xs">{baseUrl}</span>
 								<Input
 									autoFocus
@@ -91,7 +93,7 @@ export const ProPermalink = ({
 										if (event.key === "Escape") setEditing(false)
 									}}
 									className="h-8 w-56 font-mono text-xs"
-									aria-label="Edit permalink"
+									aria-label={t("editPermalink")}
 								/>
 								<Button type="button" size="sm" onClick={commit}>
 									<Check />
@@ -104,7 +106,7 @@ export const ProPermalink = ({
 									onClick={() => setEditing(false)}
 								>
 									<X />
-									Cancel
+									{t("cancel")}
 								</Button>
 							</div>
 							{error?.message && (
@@ -119,7 +121,7 @@ export const ProPermalink = ({
 				return (
 					<div className={className}>
 						<div className="flex flex-wrap items-center gap-2 text-sm">
-							<span className="text-muted-foreground">{label}:</span>
+							<span className="text-muted-foreground">{label ?? t("permalink")}:</span>
 
 							{shown ? (
 								<a
@@ -134,7 +136,7 @@ export const ProPermalink = ({
 								</a>
 							) : (
 								<span className="text-muted-foreground text-xs italic">
-									generated from the name
+									{t("generatedFromTheName")}
 								</span>
 							)}
 
@@ -147,7 +149,7 @@ export const ProPermalink = ({
 									setEditing(true)
 								}}
 							>
-								Edit
+								{t("edit")}
 							</Button>
 						</div>
 						{error?.message && (

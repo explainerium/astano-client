@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useRef, useState } from "react"
+import { useLayoutEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft } from "lucide-react"
@@ -32,8 +32,10 @@ import AttributesTab from "./AttributesTab"
 import MoqField from "./MoqField"
 import OptionsTab from "./OptionsTab"
 import ProductImages from "./ProductImages"
+import ProductTabsEditor from "./ProductTabsEditor"
 import QuantityPricing from "./QuantityPricing"
 import { SITE_URL } from "@/lib/siteUrl"
+import { cn } from "@/lib/utils"
 import { TIER_ROLES, tierUnitPrice, type TierRole } from "@/lib/tiers"
 import {
 	buildTree,
@@ -196,6 +198,23 @@ const buildSchema = (t: T) =>
 			attributeValueIds: z.array(z.string()),
 			isVisible: z.boolean(),
 			isVariation: z.boolean(),
+		})
+	),
+
+	/**
+	 * The shop's own tabs on the product page. Unbounded — the point of the
+	 * feature is that two fixed tabs were not enough.
+	 */
+	tabs: z.array(
+		z.object({
+			sortOrder: z.number().int().min(0),
+			translations: z.array(
+				z.object({
+					locale: z.string(),
+					title: z.string().trim().max(120),
+					content: z.string().trim().max(50000),
+				})
+			),
 		})
 	),
 
@@ -452,6 +471,23 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 			isVariation: attribute.isVariation,
 		})),
 
+		/*
+		 * Both languages are always present, in the order ProductTabsEditor
+		 * addresses them by position. A tab saved with only German still gets an
+		 * empty English row back, so the editor has somewhere to type.
+		 */
+		tabs: (product?.tabs ?? []).map((tab, index) => ({
+			sortOrder: tab.sortOrder ?? index,
+			translations: ["en", "de"].map((locale) => {
+				const existing = tab.translations.find((tt) => tt.locale === locale)
+				return {
+					locale,
+					title: existing?.title ?? "",
+					content: existing?.content ?? "",
+				}
+			}),
+		})),
+
 		options: (product?.options ?? []).map((option, index) => ({
 			optionProductId: option.optionProductId,
 			groupLabel: option.groupLabel ?? "",
@@ -459,6 +495,20 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 			preselected: option.preselected ?? false,
 		})),
 	}
+}
+
+/**
+ * The thing that actually scrolls behind a given element.
+ *
+ * Not the window: the dashboard hangs a fixed topbar above a `main` that owns
+ * the scrollbar, so window.scrollY is 0 no matter where the reader is.
+ */
+const scrollerOf = (el: HTMLElement): HTMLElement | Window => {
+	for (let node = el.parentElement; node; node = node.parentElement) {
+		const { overflowY } = getComputedStyle(node)
+		if (/auto|scroll/.test(overflowY) && node.scrollHeight > node.clientHeight) return node
+	}
+	return window
 }
 
 export const ProductForm = ({ product }: { product?: AdminProduct }) => {
@@ -470,39 +520,55 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 	const [tab, setTab] = useState("general")
 
 	/**
-	 * Switching tabs used to throw the page around.
+	 * Changing section must not move the page.
 	 *
 	 * The panels are wildly different heights — General carries prices, MOQ and
-	 * the whole quantity ladder; Shipping is four boxes. Clicking from a long one
-	 * to a short one shrinks the scroll container under the reader, the browser
-	 * clamps the scroll position, and the view lurches downwards for no reason
-	 * the reader can see.
+	 * the whole quantity ladder; Inventory is a handful of boxes. Swapping a tall
+	 * panel for a short one shortens the document under a scroll position that
+	 * was valid a moment ago, and the browser clamps that position to the new
+	 * maximum. Nothing asked for that scroll, so the reader experiences it as the
+	 * page throwing itself somewhere.
 	 *
-	 * Two things fix it together. The panels share a floor height, so the
-	 * difference is small enough not to move anything in most cases; and when
-	 * the strip has scrolled out of sight above, it is brought back — landing on
-	 * a new tab should show you its heading, not its middle.
+	 * So: put it back. Note where the rail sits on screen before the swap, and
+	 * afterwards scroll by however far it drifted. When nothing was clamped the
+	 * drift is zero and this does nothing at all, which is the common case and
+	 * the whole point — a reader who can already see the section they clicked
+	 * should not have the page tidied up around them.
+	 *
+	 * Scrolling the rail to the top instead was the first attempt, and it is
+	 * worse: it moves the page every single time, including all the times it did
+	 * not need to.
+	 *
+	 * The measurement has to straddle the swap. Taken entirely in the click
+	 * handler it reads a document whose panel has not been replaced yet; taken
+	 * entirely afterwards there is nothing left to compare against.
 	 */
 	const tabStripRef = useRef<HTMLDivElement>(null)
+	const anchorRef = useRef<number | null>(null)
 
 	const changeTab = (next: string) => {
+		if (next === tab) return
+		anchorRef.current = tabStripRef.current?.getBoundingClientRect().top ?? null
 		setTab(next)
+	}
+
+	// After layout, before paint: the new panel's height is settled and the clamp
+	// has already happened, but nothing has been drawn — so the displaced frame
+	// is never shown.
+	useLayoutEffect(() => {
+		const anchor = anchorRef.current
+		anchorRef.current = null
 
 		const strip = tabStripRef.current
-		if (!strip) return
+		if (anchor === null || !strip) return
 
-		// Only when it is actually above the fold. Scrolling a strip that is
-		// already in view is motion for its own sake.
-		const { top } = strip.getBoundingClientRect()
-		if (top >= 0) return
+		const drift = strip.getBoundingClientRect().top - anchor
+		if (!drift) return
 
-		strip.scrollIntoView({
-			behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-				? "auto"
-				: "smooth",
-			block: "start",
-		})
-	}
+		// Positive drift means the rail slid down the screen, so the scroller has
+		// to go down by the same amount to bring it back.
+		scrollerOf(strip).scrollBy(0, drift)
+	}, [tab])
 
 	const isEdit = !!product
 
@@ -639,6 +705,19 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					isVisible: a.isVisible,
 					isVariation: a.isVariation,
 				})),
+			/*
+			 * A tab with no heading in any language is nothing — the strip has no
+			 * label to draw. Within a tab, a language with no heading is dropped
+			 * too, so the API is never asked to store a heading-less translation
+			 * the storefront would then have to filter out again.
+			 */
+			tabs: form.tabs
+				.map((tab, index) => ({
+					sortOrder: index,
+					translations: tab.translations.filter((tt) => tt.title.trim() !== ""),
+				}))
+				.filter((tab) => tab.translations.length > 0),
+
 			options: form.options
 				.filter((o) => o.optionProductId)
 				.map((o, index) => ({
@@ -706,10 +785,9 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					size="lg"
 					onClick={() => router.push("/admin/dashboard/products")}
 				>
-					<ArrowLeft />{t("products")}</Button>
-				{isEdit && (
-					<span className="text-muted-foreground font-mono text-xs">{product.id}</span>
-				)}
+					<ArrowLeft />
+					{t("products")}
+				</Button>
 				<div className="ml-auto">
 					<ProSubmit>{isEdit ? t("saveChanges") : t("createProduct")}</ProSubmit>
 				</div>
@@ -764,13 +842,13 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								name={`${code}.shortDescription`}
 								label={t("shortDescription")}
 								description={t("theSummaryBesideTheGallery")}
-								minHeight="6rem"
+								height="6rem"
 							/>
 							<ProRichText
 								name={`${code}.description`}
 								label={t("description")}
 								description={t("theFullDescriptionTabOnThe")}
-								minHeight="14rem"
+								height="14rem"
 							/>
 						</TabsContent>
 					))}
@@ -782,149 +860,221 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					<h2 className="font-heading text-sm font-semibold">{t("productData")}</h2>
 				</div>
 
-				{/* Controlled, so a failed save can open the tab holding the error.
-				    Uncontrolled, a required field on a hidden tab made Save look
-				    broken — see ValidationSummary. */}
-				<Tabs value={tab} onValueChange={changeTab} className="gap-0">
-					<div ref={tabStripRef} className="scroll-mt-4 px-5 pt-4">
-						<TabsList>
-							<TabsTrigger value="general">{t("general")}</TabsTrigger>
-							<TabsTrigger value="inventory">{t("inventory")}</TabsTrigger>
-							<TabsTrigger value="shipping">{t("shipping")}</TabsTrigger>
-							<TabsTrigger value="attributes">{t("attributes")}</TabsTrigger>
-							<TabsTrigger value="options">{t("options")}</TabsTrigger>
-						</TabsList>
+				{/*
+				 * A rail down the side rather than a strip across the top, matching
+				 * the settings screens.
+				 *
+				 * Six sections is where a horizontal strip starts to read as a row of
+				 * words: they compete with the form's own headings for the same
+				 * horizontal band, and the one you are on is a small difference in a
+				 * small area. Down the side they are a list you scan once, and the
+				 * active one is obvious because nothing else sits beside it.
+				 *
+				 * Still radix Tabs, still controlled — a failed save has to be able to
+				 * open the section holding the error, and an uncontrolled tab set made
+				 * Save look broken when the offending field was hidden. See
+				 * ValidationSummary.
+				 *
+				 * Below `lg` the rail goes back to a strip: a 220px column on a phone
+				 * leaves nothing for the form.
+				 */}
+				<Tabs
+					value={tab}
+					onValueChange={changeTab}
+					orientation="vertical"
+					className="gap-0"
+				>
+					<div
+						ref={tabStripRef}
+						className="grid scroll-mt-4 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start"
+					>
+						{/* The column keeps its rule for the full height of the panel
+						    beside it; the list inside it is what sticks. */}
+						<div className="border-b p-3 lg:h-full lg:border-r lg:border-b-0">
+							<TabsList
+								variant="line"
+								className={cn(
+									"w-full gap-0.5 bg-transparent p-0",
+									// Reading General means scrolling past the rail, and a
+									// section list you have to scroll back up to reach is a
+									// list you stop using. Sticky, it is always one click away
+									// — and it is then the one thing on screen that provably
+									// does not move when the panel beside it is swapped.
+									//
+									// Below the action bar rather than under it: that bar is
+									// sticky at the top of the same scroller and 61px tall,
+									// so at top-3 the rail's first section hid behind it.
+									"lg:sticky lg:top-[4.5rem]",
+									// Matches SettingsNav: a filled block for the active item,
+									// left aligned, and no underline rule.
+									"[&>button]:justify-start [&>button]:rounded-md [&>button]:px-3 [&>button]:py-2 [&>button]:text-sm [&>button]:font-medium",
+									"[&>button]:text-muted-foreground [&>button:hover]:bg-muted [&>button:hover]:text-foreground",
+									"[&>button[data-state=active]]:bg-accent-soft [&>button[data-state=active]]:text-foreground",
+									"[&>button]:after:hidden"
+								)}
+							>
+								<TabsTrigger value="general">{t("general")}</TabsTrigger>
+								<TabsTrigger value="inventory">{t("inventory")}</TabsTrigger>
+								<TabsTrigger value="shipping">{t("shipping")}</TabsTrigger>
+								<TabsTrigger value="attributes">{t("attributes")}</TabsTrigger>
+								<TabsTrigger value="options">{t("options")}</TabsTrigger>
+								<TabsTrigger value="tabs">{t("tabs")}</TabsTrigger>
+							</TabsList>
+						</div>
+
+						{/*
+						 * min-w-0 so a wide table inside a panel scrolls in its own box
+						 * rather than stretching the grid column.
+						 *
+						 * The floor is a screenful, and that is the point of it rather
+						 * than a guess at a pleasant size. It is what keeps a thin
+						 * section from collapsing the document so far that the reader's
+						 * scroll position no longer exists — the clamp changeTab has to
+						 * undo can only be as large as the height that went missing, and
+						 * a screenful of floor keeps that at nothing in every case but
+						 * reading the longest panel to its very last field.
+						 *
+						 * A thin section therefore ends in some empty card. So does a
+						 * thin settings section, and the rail's rule runs the full
+						 * height either way.
+						 */}
+						<div className="min-w-0 lg:min-h-[calc(100dvh-5rem)]">
+
+						<TabsContent value="general" className="min-h-[26rem] space-y-6 p-5">
+							{/* The price everyone pays. Written to the GUEST row, which is
+							    where resolvePrice()'s fallback chain terminates — so it is
+							    what every role falls back to when no override exists. */}
+							<div className="grid gap-4 sm:grid-cols-2">
+								<ProInput
+									name="prices.GUEST.basePrice"
+									label={t("regularPrice")}
+									description={t("whatACustomerPaysForOne")}
+									placeholder="0.00"
+								/>
+								<ProInput
+									name="prices.GUEST.salePrice"
+									label={t("salePrice")}
+									description={t("leaveEmptyForNoSale")}
+									placeholder="—"
+								/>
+								<ProInput
+									name="prices.RESELLER.basePrice"
+									label={t("resellerPrice")}
+									description={t("forApprovedDealersLeaveEmptyAnd")}
+									placeholder="—"
+								/>
+								<ProInput
+									name="prices.RESELLER.salePrice"
+									label={t("resellerSalePrice")}
+									placeholder="—"
+								/>
+							</div>
+
+							<div className="border-t pt-5">
+								<MoqField />
+							</div>
+
+							<div className="border-t pt-5">
+								<QuantityPricing />
+							</div>
+
+							<div className="space-y-4 border-t pt-5">
+								<ProSelect
+									name="taxStatus"
+									label={t("taxStatus")}
+									description={t("whetherTaxAppliesAtAllWhich")}
+									options={[
+										{ label: t("taxTaxable"), value: "TAXABLE" },
+										{ label: t("taxShippingOnly"), value: "SHIPPING_ONLY" },
+										{ label: t("taxNone"), value: "NONE" },
+									]}
+									className="sm:max-w-xs"
+								/>
+
+								<ProCheckbox
+									name="quoteEnabled"
+									label={t("priceOnRequest")}
+									description={t("priceOnRequestHelp")}
+								/>
+
+								{/* Made-to-order products are cut to a drawing the customer
+								    sends. 0 hides the upload field entirely. */}
+								<ProInput
+									name="artworkMaxFiles"
+									type="number"
+									label={t("designFilesTheCustomerMayAttach")}
+									description={t("0MeansThisProductTakesNo")}
+									className="sm:max-w-xs"
+								/>
+
+								<ProCheckbox
+									name="artworkRequired"
+									label={t("aDesignFileIsRequired")}
+									description={t("refusesCheckoutForALineWith")}
+								/>
+							</div>
+						</TabsContent>
+
+						<TabsContent value="inventory" className="min-h-[26rem] space-y-4 p-5">
+							{/* Not `required`: the asterisk was the only thing on the form
+							    claiming a SKU is mandatory, and it never was — the API
+							    accepts a product without one. */}
+							<ProInput
+								name="sku"
+								label="SKU"
+								description={t("optionalLeaveItEmptyAndThe")}
+							/>
+
+							<ProCheckbox name="manageStock" label={t("trackStockForThisProduct")} />
+
+							<div className="grid gap-4 sm:grid-cols-2">
+								<ProInput name="stock" type="number" label={t("stockQuantity")} />
+							</div>
+
+							<ProCheckbox
+								name="allowBackorder"
+								label={t("allowBackorders")}
+								description={t("customersMayOrderWhileStockIs")}
+							/>
+						</TabsContent>
+
+						<TabsContent value="shipping" className="min-h-[26rem] space-y-6 p-5">
+							<ProInput
+								name="weightKg"
+								label={t("weightKg")}
+								description={t("perItemShippingIsPricedBy")}
+								placeholder="0.000"
+								className="sm:max-w-xs"
+							/>
+
+							<div className="space-y-3 border-t pt-5">
+								<div>
+									<h3 className="text-sm font-medium">{t("dimensionsCm")}</h3>
+									<p className="text-muted-foreground mt-1 max-w-prose text-xs">
+										{t("dimensionsBlurb")}
+									</p>
+								</div>
+
+								<div className="grid gap-4 sm:grid-cols-3">
+									<ProInput name="lengthCm" label={t("length")} placeholder="—" />
+									<ProInput name="widthCm" label={t("width")} placeholder="—" />
+									<ProInput name="heightCm" label={t("height")} placeholder="—" />
+								</div>
+							</div>
+						</TabsContent>
+
+						<TabsContent value="attributes" className="min-h-[26rem] p-5">
+							<AttributesTab />
+						</TabsContent>
+
+						<TabsContent value="tabs" className="min-h-[26rem] p-5">
+							<ProductTabsEditor />
+						</TabsContent>
+						<TabsContent value="options" className="min-h-[26rem] p-5">
+							<OptionsTab currentProductId={product?.id} />
+						</TabsContent>
 					</div>
-
-					<TabsContent value="general" className="min-h-[26rem] space-y-6 p-5">
-						{/* The price everyone pays. Written to the GUEST row, which is
-						    where resolvePrice()'s fallback chain terminates — so it is
-						    what every role falls back to when no override exists. */}
-						<div className="grid gap-4 sm:grid-cols-2">
-							<ProInput
-								name="prices.GUEST.basePrice"
-								label={t("regularPrice")}
-								description={t("whatACustomerPaysForOne")}
-								placeholder="0.00"
-							/>
-							<ProInput
-								name="prices.GUEST.salePrice"
-								label={t("salePrice")}
-								description={t("leaveEmptyForNoSale")}
-								placeholder="—"
-							/>
-							<ProInput
-								name="prices.RESELLER.basePrice"
-								label={t("resellerPrice")}
-								description={t("forApprovedDealersLeaveEmptyAnd")}
-								placeholder="—"
-							/>
-							<ProInput
-								name="prices.RESELLER.salePrice"
-								label={t("resellerSalePrice")}
-								placeholder="—"
-							/>
-						</div>
-
-						<div className="border-t pt-5">
-							<MoqField />
-						</div>
-
-						<div className="border-t pt-5">
-							<QuantityPricing />
-						</div>
-
-						<div className="space-y-4 border-t pt-5">
-							<ProSelect
-								name="taxStatus"
-								label={t("taxStatus")}
-								description={t("whetherTaxAppliesAtAllWhich")}
-								options={[
-									{ label: t("taxTaxable"), value: "TAXABLE" },
-									{ label: t("taxShippingOnly"), value: "SHIPPING_ONLY" },
-									{ label: t("taxNone"), value: "NONE" },
-								]}
-								className="sm:max-w-xs"
-							/>
-
-							<ProCheckbox
-								name="quoteEnabled"
-								label={t("priceOnRequest")}
-								description='Hides the price, blocks add-to-cart, and offers "Add to quote request" instead.'
-							/>
-
-							{/* Made-to-order products are cut to a drawing the customer
-							    sends. 0 hides the upload field entirely. */}
-							<ProInput
-								name="artworkMaxFiles"
-								type="number"
-								label={t("designFilesTheCustomerMayAttach")}
-								description={t("0MeansThisProductTakesNo")}
-								className="sm:max-w-xs"
-							/>
-
-							<ProCheckbox
-								name="artworkRequired"
-								label={t("aDesignFileIsRequired")}
-								description={t("refusesCheckoutForALineWith")}
-							/>
-						</div>
-					</TabsContent>
-
-					<TabsContent value="inventory" className="min-h-[26rem] space-y-4 p-5">
-						{/* Not `required`: the asterisk was the only thing on the form
-						    claiming a SKU is mandatory, and it never was — the API
-						    accepts a product without one. */}
-						<ProInput
-							name="sku"
-							label="SKU"
-							description={t("optionalLeaveItEmptyAndThe")}
-						/>
-
-						<ProCheckbox name="manageStock" label={t("trackStockForThisProduct")} />
-
-						<div className="grid gap-4 sm:grid-cols-2">
-							<ProInput name="stock" type="number" label={t("stockQuantity")} />
-						</div>
-
-						<ProCheckbox
-							name="allowBackorder"
-							label={t("allowBackorders")}
-							description={t("customersMayOrderWhileStockIs")}
-						/>
-					</TabsContent>
-
-					<TabsContent value="shipping" className="min-h-[26rem] space-y-6 p-5">
-						<ProInput
-							name="weightKg"
-							label={t("weightKg")}
-							description={t("perItemShippingIsPricedBy")}
-							placeholder="0.000"
-							className="sm:max-w-xs"
-						/>
-
-						<div className="space-y-3 border-t pt-5">
-							<div>
-								<h3 className="text-sm font-medium">{t("dimensionsCm")}</h3>
-								<p className="text-muted-foreground mt-1 max-w-prose text-xs">
-									{t("dimensionsBlurb")}
-								</p>
-							</div>
-
-							<div className="grid gap-4 sm:grid-cols-3">
-								<ProInput name="lengthCm" label={t("length")} placeholder="—" />
-								<ProInput name="widthCm" label={t("width")} placeholder="—" />
-								<ProInput name="heightCm" label={t("height")} placeholder="—" />
-							</div>
-						</div>
-					</TabsContent>
-
-					<TabsContent value="attributes" className="min-h-[26rem] p-5">
-						<AttributesTab />
-					</TabsContent>
-					<TabsContent value="options" className="min-h-[26rem] p-5">
-						<OptionsTab currentProductId={product?.id} />
-					</TabsContent>
+					</div>
 				</Tabs>
 			</section>
 				</div>

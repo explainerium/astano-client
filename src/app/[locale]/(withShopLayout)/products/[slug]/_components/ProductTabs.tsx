@@ -66,9 +66,16 @@ export const ProductTabs = ({
 		spec.push({ label: t("minimumOrderLabel"), value: String(product.moq) })
 	}
 
+	/*
+	 * The two built-in tabs, then whatever the shop added, in its own order.
+	 *
+	 * The API has already dropped any tab with no heading or no content in this
+	 * locale, so anything arriving here is meant to be shown.
+	 */
 	const tabs = [
 		product.description && { id: "description", label: t("description") },
 		spec.length && { id: "specification", label: t("additionalInformation") },
+		...(product.tabs ?? []).map((tab) => ({ id: `custom-${tab.id}`, label: tab.title })),
 	].filter(Boolean) as { id: string; label: string }[]
 
 	const [active, setActive] = useState(tabs[0]?.id ?? "description")
@@ -158,6 +165,31 @@ export const ProductTabs = ({
 					</table>
 				</div>
 			)}
+
+			{/*
+			 * The shop's own tabs.
+			 *
+			 * Same styling as the description, from the same shared class — a size
+			 * chart written as a table in the admin editor has to come out as a
+			 * table here, or the editor was lying about what it was producing.
+			 */}
+			{(product.tabs ?? []).map((tab) => (
+				<div
+					key={tab.id}
+					role="tabpanel"
+					id={`panel-custom-${tab.id}`}
+					aria-labelledby={`tab-custom-${tab.id}`}
+					hidden={active !== `custom-${tab.id}`}
+					className="pt-8"
+				>
+					<div
+						className={cn("max-w-3xl", richTextClass)}
+						// Written by staff in the admin editor and sanitised on the way
+						// into the database — see domain/html/sanitizeRichText.
+						dangerouslySetInnerHTML={{ __html: tab.content ?? "" }}
+					/>
+				</div>
+			))}
 		</section>
 	)
 }

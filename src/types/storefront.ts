@@ -95,7 +95,16 @@ export interface PublicOption {
  * The list endpoint happens to return these too, but nothing on a listing
  * should depend on that — the narrower type keeps card code honest.
  */
+/** A tab the shop wrote itself, already filtered to this locale by the API. */
+export interface PublicProductTab {
+	id: string
+	title: string
+	content: string | null
+}
+
 export interface PublicProductDetail extends PublicProduct {
+	/** After Description and Additional information, in the shop's own order. */
+	tabs: PublicProductTab[]
 	/** Whether this product is made to a customer drawing, and how many. */
 	artwork: ArtworkRules
 	description: string | null

@@ -113,6 +113,13 @@ export interface ProductOptionInput {
 }
 
 /** What the admin list and detail both return. */
+/** One tab the shop writes itself, shown on the product page. */
+export interface ProductTab {
+	id?: string
+	sortOrder: number
+	translations: { locale: string; title: string; content?: string | null }[]
+}
+
 export interface AdminProduct {
 	id: string
 	kind: ProductKind
@@ -122,6 +129,7 @@ export interface AdminProduct {
 	/** Files a customer may attach to a line. 0 means the product takes none. */
 	artworkMaxFiles: number
 	artworkRequired: boolean
+	tabs: ProductTab[]
 	taxStatus: TaxStatus
 	moq: number
 	sortOrder: number
@@ -159,6 +167,7 @@ export interface ProductPayload {
 	quoteEnabled?: boolean
 	artworkMaxFiles?: number
 	artworkRequired?: boolean
+	tabs?: ProductTab[]
 	taxStatus?: TaxStatus
 	moq?: number
 	sortOrder?: number

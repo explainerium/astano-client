@@ -1,9 +1,11 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { Controller, useFormContext } from "react-hook-form"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
+import { TableKit } from "@tiptap/extension-table"
 import {
 	Bold,
 	Code,
@@ -22,6 +24,7 @@ import {
 	Quote,
 	Redo2,
 	Strikethrough,
+	Table as TableIcon,
 	Underline as UnderlineIcon,
 	Undo2,
 } from "lucide-react"
@@ -49,8 +52,12 @@ export interface ProRichTextProps {
 	description?: string
 	required?: boolean
 	className?: string
-	/** Roughly how tall the writing area starts. */
-	minHeight?: string
+	/**
+	 * How tall the writing area starts. It is a starting height, not a limit —
+	 * the field carries a resize grip, so what it ends up at is the writer's
+	 * call.
+	 */
+	height?: string
 }
 
 const ToolbarButton = ({
@@ -98,7 +105,7 @@ export const ProRichText = ({
 	description,
 	required,
 	className,
-	minHeight = "10rem",
+	height = "10rem",
 }: ProRichTextProps) => {
 	const { control } = useFormContext()
 
@@ -113,7 +120,7 @@ export const ProRichText = ({
 					description={description}
 					required={required}
 					className={className}
-					minHeight={minHeight}
+					height={height}
 					value={typeof field.value === "string" ? field.value : ""}
 					onChange={field.onChange}
 					onBlur={field.onBlur}
@@ -130,18 +137,19 @@ const RichTextEditor = ({
 	description,
 	required,
 	className,
-	minHeight,
+	height,
 	value,
 	onChange,
 	onBlur,
 	error,
-}: Omit<ProRichTextProps, "minHeight"> & {
-	minHeight: string
+}: Omit<ProRichTextProps, "height"> & {
+	height: string
 	value: string
 	onChange: (html: string) => void
 	onBlur: () => void
 	error?: string
 }) => {
+	const t = useTranslations("admin")
 	const [linkOpen, setLinkOpen] = useState(false)
 	const [linkDraft, setLinkDraft] = useState("")
 
@@ -163,6 +171,15 @@ const RichTextEditor = ({
 					HTMLAttributes: { rel: "noopener noreferrer nofollow", target: "_blank" },
 				},
 			}),
+			/*
+			 * Tables are not in StarterKit and are the one thing this catalogue
+			 * genuinely needs: a size chart or a materials list is a grid, and
+			 * writing it as paragraphs loses the alignment that makes it readable.
+			 *
+			 * Resizing is off. A dragged column width is stored as inline HTML
+			 * and would fight the storefront's own layout on a phone.
+			 */
+			TableKit.configure({ table: { resizable: false } }),
 		],
 		content: value,
 		immediatelyRender: false,
@@ -172,7 +189,10 @@ const RichTextEditor = ({
 				// The same styling the storefront applies to the saved HTML, so the
 				// field is a preview rather than an approximation.
 				class: cn(richTextEditorClass, "focus:outline-none"),
-				style: `min-height:${minHeight}`,
+				// Fills whatever the box has been dragged to, so clicking the empty
+				// space under a short paragraph still puts the cursor in the
+				// document rather than landing on dead padding.
+				style: "min-height:100%",
 			},
 		},
 		onUpdate: ({ editor }) => {
@@ -216,15 +236,21 @@ const RichTextEditor = ({
 			required={required}
 			className={className}
 		>
+			{/*
+			 * No overflow-hidden. It was here to clip the children to the rounded
+			 * corner, and the only child that can overflow now scrolls inside
+			 * itself — while clipping to the corner would also have taken a bite
+			 * out of the resize grip the writing area draws in exactly that spot.
+			 */}
 			<div
 				className={cn(
-					"border-input bg-background overflow-hidden rounded-lg border",
+					"border-input bg-background rounded-lg border",
 					error && "border-destructive"
 				)}
 			>
 				<div className="border-border flex flex-wrap items-center gap-0.5 border-b px-1.5 py-1">
 					<ToolbarButton
-						label="Paragraph"
+						label={t("paragraph")}
 						active={editor?.isActive("paragraph")}
 						onClick={() => editor?.chain().focus().setParagraph().run()}
 					>
@@ -234,7 +260,7 @@ const RichTextEditor = ({
 					{HEADINGS.map(({ level, Icon }) => (
 						<ToolbarButton
 							key={level}
-							label={`Heading ${level}`}
+							label={t("headingLevel", { level })}
 							active={editor?.isActive("heading", { level })}
 							onClick={() => editor?.chain().focus().toggleHeading({ level }).run()}
 						>
@@ -245,35 +271,35 @@ const RichTextEditor = ({
 					<span className="bg-border mx-1 h-5 w-px" />
 
 					<ToolbarButton
-						label="Bold"
+						label={t("bold")}
 						active={editor?.isActive("bold")}
 						onClick={() => editor?.chain().focus().toggleBold().run()}
 					>
 						<Bold className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Italic"
+						label={t("italic")}
 						active={editor?.isActive("italic")}
 						onClick={() => editor?.chain().focus().toggleItalic().run()}
 					>
 						<Italic className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Underline"
+						label={t("underline")}
 						active={editor?.isActive("underline")}
 						onClick={() => editor?.chain().focus().toggleUnderline().run()}
 					>
 						<UnderlineIcon className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Strikethrough"
+						label={t("strikethrough")}
 						active={editor?.isActive("strike")}
 						onClick={() => editor?.chain().focus().toggleStrike().run()}
 					>
 						<Strikethrough className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Inline code"
+						label={t("inlineCode")}
 						active={editor?.isActive("code")}
 						onClick={() => editor?.chain().focus().toggleCode().run()}
 					>
@@ -283,28 +309,41 @@ const RichTextEditor = ({
 					<span className="bg-border mx-1 h-5 w-px" />
 
 					<ToolbarButton
-						label="Bullet list"
+						label={t("bulletList")}
 						active={editor?.isActive("bulletList")}
 						onClick={() => editor?.chain().focus().toggleBulletList().run()}
 					>
 						<List className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Numbered list"
+						label={t("numberedList")}
 						active={editor?.isActive("orderedList")}
 						onClick={() => editor?.chain().focus().toggleOrderedList().run()}
 					>
 						<ListOrdered className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Quote"
+						label={t("blockquote")}
 						active={editor?.isActive("blockquote")}
 						onClick={() => editor?.chain().focus().toggleBlockquote().run()}
 					>
 						<Quote className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Divider"
+						label={t("insertTable")}
+						active={editor?.isActive("table")}
+						onClick={() =>
+							editor
+								?.chain()
+								.focus()
+								.insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+								.run()
+						}
+					>
+						<TableIcon className="size-4" />
+					</ToolbarButton>
+					<ToolbarButton
+						label={t("divider")}
 						onClick={() => editor?.chain().focus().setHorizontalRule().run()}
 					>
 						<Minus className="size-4" />
@@ -313,7 +352,7 @@ const RichTextEditor = ({
 					<span className="bg-border mx-1 h-5 w-px" />
 
 					<ToolbarButton
-						label="Link"
+						label={t("insertLink")}
 						active={editor?.isActive("link")}
 						onClick={() => {
 							// Seeded with the existing href when the cursor is already in
@@ -325,14 +364,14 @@ const RichTextEditor = ({
 						<Link2 className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Remove link"
+						label={t("removeLink")}
 						disabled={!editor?.isActive("link")}
 						onClick={() => editor?.chain().focus().unsetLink().run()}
 					>
 						<Link2Off className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Clear formatting"
+						label={t("clearFormatting")}
 						onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}
 					>
 						<Eraser className="size-4" />
@@ -341,14 +380,14 @@ const RichTextEditor = ({
 					<span className="bg-border mx-1 h-5 w-px" />
 
 					<ToolbarButton
-						label="Undo"
+						label={t("undo")}
 						disabled={!editor?.can().undo()}
 						onClick={() => editor?.chain().focus().undo().run()}
 					>
 						<Undo2 className="size-4" />
 					</ToolbarButton>
 					<ToolbarButton
-						label="Redo"
+						label={t("redo")}
 						disabled={!editor?.can().redo()}
 						onClick={() => editor?.chain().focus().redo().run()}
 					>
@@ -380,19 +419,36 @@ const RichTextEditor = ({
 							onClick={applyLink}
 							className="text-primary px-2 py-1 text-sm font-medium"
 						>
-							Apply
+							{t("apply")}
 						</button>
 						<button
 							type="button"
 							onClick={() => setLinkOpen(false)}
 							className="text-muted-foreground px-2 py-1 text-sm"
 						>
-							Cancel
+							{t("cancel")}
 						</button>
 					</div>
 				)}
 
-				<EditorContent editor={editor} className="px-3 py-2 text-sm" />
+				{/*
+				 * A box the writer sizes, like the textarea this replaced.
+				 *
+				 * It used to grow with its content, which sounds helpful and is not:
+				 * a product with four paragraphs of description pushed everything
+				 * below it — the whole Product Data panel — off the screen, and
+				 * there was no way to get it back. Whoever is writing knows how much
+				 * room they want; the grip in the corner is how they say so.
+				 *
+				 * `height` rather than `min-height` so it can be dragged shorter as
+				 * well as taller, and `overflow-y-auto` both to scroll the overflow
+				 * and because `resize` does nothing without it.
+				 */}
+				<EditorContent
+					editor={editor}
+					style={{ height }}
+					className="resize-y overflow-y-auto px-3 py-2 text-sm"
+				/>
 			</div>
 		</FieldShell>
 	)

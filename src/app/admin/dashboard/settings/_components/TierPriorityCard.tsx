@@ -21,6 +21,8 @@ const DEFAULT_ORDER: Source[] = ["customer", "catalogue", "category"]
  */
 export const TierPriorityCard = () => {
 	const t = useTranslations("adminPricing")
+	// The shared dashboard vocabulary, for the words this card borrows.
+	const a = useTranslations("admin")
 	const { data, isLoading } = useTierPriorityQuery()
 	const [savePriority, { isLoading: isSaving }] = useSaveTierPriorityMutation()
 
@@ -151,7 +153,7 @@ export const TierPriorityCard = () => {
 							onClick={() => setOrder(DEFAULT_ORDER)}
 							disabled={isSaving}
 						>
-							<RotateCcw />{t("resetToDefault")}</Button>
+							<RotateCcw />{a("resetToDefault")}</Button>
 					)}
 					<Button type="button" onClick={save} disabled={isSaving || !isDirty}>
 						{isSaving && <Loader2 className="animate-spin" />}

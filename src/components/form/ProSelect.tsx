@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { Controller, useFormContext } from "react-hook-form"
 import {
 	Select,
@@ -31,12 +32,13 @@ export const ProSelect = ({
 	name,
 	options,
 	label,
-	placeholder = "Select…",
+	placeholder,
 	description,
 	required,
 	disabled,
 	className,
 }: ProSelectProps) => {
+	const t = useTranslations("common")
 	const { control } = useFormContext()
 
 	return (
@@ -68,7 +70,7 @@ export const ProSelect = ({
 								error ? `${name}-error` : description ? `${name}-description` : undefined
 							}
 						>
-							<SelectValue placeholder={placeholder} />
+							<SelectValue placeholder={placeholder ?? t("select")} />
 						</SelectTrigger>
 						<SelectContent>
 							{options.map((option) => (
