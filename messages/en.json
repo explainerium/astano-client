@@ -165,7 +165,10 @@
 		"compareEmpty": "Pick a few products with the compare button and they will line up here.",
 		"goToCheckout": "Checkout",
 		"keepShopping": "Keep shopping",
-		"viewQuoteBasket": "View inquiry basket"
+		"viewQuoteBasket": "View inquiry basket",
+		"optionsSubtotal": "{count, plural, one {# option} other {# options}}",
+		"addWithOptions": "Add to cart with options",
+		"optionBelowMoq": "An option is below its minimum order quantity."
 	},
 	"cart": {
 		"title": "Shopping cart",
@@ -195,7 +198,10 @@
 		"emptyHint": "Browse the catalogue and add something to get started.",
 		"viewCart": "View cart",
 		"close": "Close",
-		"issueArtworkRequired": "A line needs a design file before you can check out."
+		"issueArtworkRequired": "A line needs a design file before you can check out.",
+		"removeWithOptionsTitle": "Remove this item?",
+		"removeWithOptions": "“{name}” was configured with {count, plural, one {# option} other {# options}}. Removing it removes {count, plural, one {that option} other {those options}} too.",
+		"keep": "Keep it"
 	},
 	"quote": {
 		"title": "Quote request",
@@ -1802,6 +1808,8 @@
 		"tierRoleReseller": "Resellers",
 		"tierRoleResellerHint": "Approved dealers only. Leave it empty and they follow the ladder above. A pending application is priced as a guest (R5b).",
 		"saveLadderFor": "Save ladder for {role}",
-		"rungAboveSmallerOrder": "Works out at {unit} per unit — above the {previous} charged for a smaller order."
+		"rungAboveSmallerOrder": "Works out at {unit} per unit — above the {previous} charged for a smaller order.",
+		"perPage": "Show",
+		"reorderNumbered": "Reorder {index}"
 	}
 }

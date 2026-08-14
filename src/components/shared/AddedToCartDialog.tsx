@@ -1,7 +1,6 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import Image from "next/image"
 import { Check } from "lucide-react"
 import { Link } from "@/i18n/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -65,14 +64,26 @@ const AddedToCartDialog = ({ open, onClose, product, quote }: Props) => {
 						 * collapses to bare text when a product has no photo is the
 						 * ragged look this layout is meant to avoid.
 						 */}
-						<div className="bg-muted relative size-20 shrink-0 overflow-hidden">
+						<div className="bg-muted size-20 shrink-0 overflow-hidden">
 							{product.image && (
-								<Image
+								/*
+								 * Plain img, not next/image — the same choice every other
+								 * picture on this shop makes, and for the same reason: what
+								 * arrives here is already a sized WebP derivative, so the
+								 * optimiser has nothing to do.
+								 *
+								 * It also has something to break. next/image refuses any
+								 * origin not listed in next.config, so on a deployment where
+								 * NEXT_PUBLIC_MEDIA_URL does not match where the images
+								 * actually come from, this one image fails while every other
+								 * image on the site loads — which is exactly how it looked.
+								 */
+								// eslint-disable-next-line @next/next/no-img-element
+								<img
 									src={product.image}
 									alt=""
-									fill
-									sizes="80px"
-									className="object-cover"
+									loading="lazy"
+									className="size-full object-cover"
 								/>
 							)}
 						</div>

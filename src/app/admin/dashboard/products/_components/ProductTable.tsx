@@ -194,7 +194,11 @@ export const ProductTable = ({
 	meta,
 	isFetching,
 	onPageChange,
+	pageSize,
+	pageSizes,
+	onPageSizeChange,
 	categories,
+	editHref,
 	onEdit,
 	onCreate,
 }: {
@@ -206,7 +210,19 @@ export const ProductTable = ({
 	meta?: IMeta
 	isFetching?: boolean
 	onPageChange?: (page: number) => void
+	/** How many rows a page holds, and what the reader may change it to. */
+	pageSize?: number
+	pageSizes?: number[]
+	onPageSizeChange?: (size: number) => void
 	categories: { id: string; name: string; depth: number; productCount: number }[]
+	/**
+	 * Where a row's Edit goes.
+	 *
+	 * A real address, because Edit is a link now: middle-click, ctrl-click and
+	 * "open in new tab" all worked on everything else in this table and did
+	 * nothing on the one control people use most.
+	 */
+	editHref: (product: AdminProduct) => string
 	onEdit: (product: AdminProduct) => void
 	onCreate: () => void
 }) => {
@@ -680,12 +696,14 @@ export const ProductTable = ({
 										<TableCell className="pr-4">
 											<div className="flex justify-end">
 												<Button
+													asChild
 													variant="ghost"
 													size="icon"
 													aria-label={t("editThing", { thing: product.name })}
-													onClick={() => onEdit(product)}
 												>
-													<Pencil />
+													<Link href={editHref(product)}>
+														<Pencil />
+													</Link>
 												</Button>
 												<Button
 													variant="ghost"
@@ -737,8 +755,29 @@ export const ProductTable = ({
 
 						{isFetching && <Loader2 className="size-3 animate-spin" />}
 
+						{/* How many rows, so a short catalogue can be read in one screen and
+						    a long one paged sensibly. Changing it returns to the first page:
+						    page 5 of 50 is not page 5 of 200. */}
+						{pageSize && pageSizes && onPageSizeChange && (
+							<div className="ml-auto flex items-center gap-2">
+								<label htmlFor="products-per-page">{t("perPage")}</label>
+								<select
+									id="products-per-page"
+									value={pageSize}
+									onChange={(event) => onPageSizeChange(Number(event.target.value))}
+									className="border-input bg-background focus:border-ring rounded-md border px-2 py-1 text-xs outline-none"
+								>
+									{pageSizes.map((size) => (
+										<option key={size} value={size}>
+											{size}
+										</option>
+									))}
+								</select>
+							</div>
+						)}
+
 						{meta && meta.totalPages > 1 && onPageChange && (
-							<div className="ml-auto flex gap-2">
+							<div className="flex gap-2">
 								<Button
 									variant="outline"
 									size="sm"

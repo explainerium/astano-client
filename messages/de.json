@@ -165,7 +165,10 @@
 		"compareEmpty": "Wählen Sie einige Produkte über die Vergleichen-Schaltfläche aus.",
 		"goToCheckout": "Zur Kasse",
 		"keepShopping": "Weiter einkaufen",
-		"viewQuoteBasket": "Anfragekorb ansehen"
+		"viewQuoteBasket": "Anfragekorb ansehen",
+		"optionsSubtotal": "{count, plural, one {# Option} other {# Optionen}}",
+		"addWithOptions": "Mit Optionen in den Warenkorb",
+		"optionBelowMoq": "Eine Option liegt unter ihrer Mindestbestellmenge."
 	},
 	"cart": {
 		"title": "Warenkorb",
@@ -195,7 +198,10 @@
 		"emptyHint": "Stöbern Sie im Katalog und legen Sie etwas hinein.",
 		"viewCart": "Warenkorb ansehen",
 		"close": "Schließen",
-		"issueArtworkRequired": "Für eine Position wird eine Druckdatei benötigt."
+		"issueArtworkRequired": "Für eine Position wird eine Druckdatei benötigt.",
+		"removeWithOptionsTitle": "Diesen Artikel entfernen?",
+		"removeWithOptions": "„{name}\" wurde mit {count, plural, one {# Option} other {# Optionen}} konfiguriert. Beim Entfernen {count, plural, one {wird diese Option} other {werden diese Optionen}} ebenfalls entfernt.",
+		"keep": "Behalten"
 	},
 	"quote": {
 		"title": "Angebotsanfrage",
@@ -2089,7 +2095,9 @@
 		"tierRoleReseller": "Händler",
 		"tierRoleResellerHint": "Nur freigeschaltete Händler. Leer lassen, dann gilt die obige Staffel. Ein offener Antrag wird wie ein Gast bepreist (R5b).",
 		"saveLadderFor": "Staffel für {role} speichern",
-		"rungAboveSmallerOrder": "Ergibt {unit} pro Stück — mehr als die {previous} für eine kleinere Bestellung."
+		"rungAboveSmallerOrder": "Ergibt {unit} pro Stück — mehr als die {previous} für eine kleinere Bestellung.",
+		"perPage": "Anzeigen",
+		"reorderNumbered": "{index} verschieben"
 	},
 	"adminEmails": {
 		"order-placed": {

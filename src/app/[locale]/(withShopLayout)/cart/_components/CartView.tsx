@@ -13,6 +13,16 @@ import {
 	useUpdateCartItemMutation,
 } from "@/redux/api/storefrontApi"
 import useMoney from "@/lib/useMoney"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { cn } from "@/lib/utils"
 import type { CartLine } from "@/types/storefront"
 
@@ -39,6 +49,16 @@ export const CartView = () => {
 	const { data: cart, isLoading, isError } = useCartQuery()
 	const [updateItem, updateState] = useUpdateCartItemMutation()
 	const [removeItem, removeState] = useRemoveCartItemMutation()
+
+	/**
+	 * The line waiting on a confirmation, or null.
+	 *
+	 * Only lines that carry options ever get here. Removing one takes its
+	 * options with it — the database cascades them, because an engraving with
+	 * nothing to engrave is not an order line — and that is a surprise worth one
+	 * question. A line with nothing attached goes straight away, as before.
+	 */
+	const [confirming, setConfirming] = useState<CartLine | null>(null)
 	const [clearCart, clearState] = useClearCartMutation()
 	const [error, setError] = useState<string | null>(null)
 
@@ -198,7 +218,10 @@ export const CartView = () => {
 
 										<button
 											type="button"
-											onClick={() => void run(() => removeItem(line.id).unwrap())}
+											onClick={() => {
+												if (line.options?.length) setConfirming(line)
+												else void run(() => removeItem(line.id).unwrap())
+											}}
 											disabled={busy}
 											className="text-muted-foreground hover:text-destructive ml-auto inline-flex items-center gap-1.5 text-sm transition-colors"
 										>
@@ -269,6 +292,40 @@ export const CartView = () => {
 					</Link>
 				</aside>
 			</div>
+
+			{/*
+			 * Asked before, not explained after.
+			 *
+			 * The option lines go with the product they were configured onto — the
+			 * database cascades them — so removing one line can take four away.
+			 * That is the right behaviour and a bad surprise, which is what a
+			 * confirmation is for. Lines with nothing attached never reach this.
+			 */}
+			<AlertDialog open={!!confirming} onOpenChange={(open) => !open && setConfirming(null)}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{t("removeWithOptionsTitle")}</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("removeWithOptions", {
+								name: confirming?.name ?? "",
+								count: confirming?.options?.length ?? 0,
+							})}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("keep")}</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => {
+								const line = confirming
+								setConfirming(null)
+								if (line) void run(() => removeItem(line.id).unwrap())
+							}}
+						>
+							{t("remove")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</div>
 	)
 }

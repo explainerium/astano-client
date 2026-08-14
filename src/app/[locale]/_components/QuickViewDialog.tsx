@@ -122,7 +122,13 @@ export const QuickViewDialog = ({
 			 * portalled into the body and each claiming focus and the scroll lock
 			 * on the way past the other. It also looked like a flicker.
 			 */
-			const added = { name: product?.name ?? "", image: hero, quantity }
+			const added = {
+				name: product?.name ?? "",
+				// The confirmation shows an 80px box, so it gets the thumbnail
+				// rather than the detail image this dialog is displaying.
+				image: image?.srcset.thumb ?? hero,
+				quantity,
+			}
 			onOpenChange(false)
 			setTimeout(() => onAdded(added), EXIT_MS)
 		} catch (cause) {

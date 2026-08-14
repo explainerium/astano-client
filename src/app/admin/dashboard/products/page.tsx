@@ -1,8 +1,8 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useCallback, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useAdminCategoriesQuery } from "@/redux/api/categoryApi"
 import { useAdminProductsQuery } from "@/redux/api/productApi"
@@ -15,13 +15,48 @@ import type { AdminProduct } from "@/types/product"
 import ProductTable, { type ProductFilters } from "./_components/ProductTable"
 
 /** Fifty is the API's own default and about two screens of rows. */
-const PAGE_SIZE = 50
+const DEFAULT_PAGE_SIZE = 50
+
+/** What the per-page control offers. */
+export const PAGE_SIZES = [10, 25, 50, 75, 100, 150, 200]
+
+const LIST_PATH = "/admin/dashboard/products"
 
 export default function ProductsPage() {
 	const t = useTranslations("admin")
 	const router = useRouter()
+	const searchParams = useSearchParams()
 	const [filters, setFilters] = useState<ProductFilters>({ search: "" })
-	const [page, setPage] = useState(1)
+
+	/**
+	 * Which page and how many, kept in the URL rather than in state.
+	 *
+	 * State was lost the moment you opened a product: editing one from page 2
+	 * and coming back landed on page 1, every time. The URL survives the round
+	 * trip, so the Back button works, the address is worth sending to someone,
+	 * and the "Products" button on the editor can return you exactly where you
+	 * were by carrying this query with it.
+	 */
+	const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1)
+	const limit = PAGE_SIZES.includes(Number(searchParams.get("limit")))
+		? Number(searchParams.get("limit"))
+		: DEFAULT_PAGE_SIZE
+
+	const setParams = useCallback(
+		(changes: Record<string, string | null>) => {
+			const next = new URLSearchParams(searchParams.toString())
+			for (const [key, value] of Object.entries(changes)) {
+				if (value === null || value === "") next.delete(key)
+				else next.set(key, value)
+			}
+
+			const query = next.toString()
+			// replace, not push: paging is not a place you want the Back button to
+			// walk through one screen at a time.
+			router.replace(query ? `${LIST_PATH}?${query}` : LIST_PATH, { scroll: false })
+		},
+		[router, searchParams]
+	)
 
 	/**
 	 * A filter change resets to the first page.
@@ -32,7 +67,7 @@ export default function ProductsPage() {
 	 */
 	const changeFilters = (next: ProductFilters) => {
 		setFilters(next)
-		setPage(1)
+		setParams({ page: null })
 	}
 
 	const {
@@ -48,7 +83,7 @@ export default function ProductsPage() {
 		categoryId: filters.categoryId,
 		stockStatus: filters.stockStatus,
 		page,
-		limit: PAGE_SIZE,
+		limit,
 	})
 
 	// Flattened to a tree order so the filter reads like the catalogue does.
@@ -78,6 +113,19 @@ export default function ProductsPage() {
 
 	const products = result?.data ?? []
 
+	/**
+	 * Where the editor should send you when you press Products.
+	 *
+	 * Carried in the link rather than left to history, so it is still right in a
+	 * tab opened from the middle-click that the edit button now supports — that
+	 * tab has no history to go back through.
+	 */
+	const listQuery = searchParams.toString()
+	const editHref = (product: AdminProduct) => {
+		const href = `${LIST_PATH}/${product.id}/edit`
+		return listQuery ? `${href}?back=${encodeURIComponent(`${LIST_PATH}?${listQuery}`)}` : href
+	}
+
 	return (
 		<div className="space-y-4">
 			{isLoading && (
@@ -106,11 +154,19 @@ export default function ProductsPage() {
 					}}
 					meta={result.meta}
 					isFetching={isFetching}
-					onPageChange={setPage}
-					onCreate={() => router.push("/admin/dashboard/products/create")}
-					onEdit={(product: AdminProduct) =>
-						router.push(`/admin/dashboard/products/${product.id}/edit`)
+					onPageChange={(next) => setParams({ page: next === 1 ? null : String(next) })}
+					pageSize={limit}
+					pageSizes={PAGE_SIZES}
+					// Back to the first page: page 5 of 50 is not page 5 of 200.
+					onPageSizeChange={(next) =>
+						setParams({
+							limit: next === DEFAULT_PAGE_SIZE ? null : String(next),
+							page: null,
+						})
 					}
+					editHref={editHref}
+					onCreate={() => router.push(`${LIST_PATH}/create`)}
+					onEdit={(product: AdminProduct) => router.push(editHref(product))}
 				/>
 			)}
 		</div>

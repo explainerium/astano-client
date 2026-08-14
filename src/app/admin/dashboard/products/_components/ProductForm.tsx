@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { useLayoutEffect, useRef, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
@@ -517,6 +517,24 @@ const scrollerOf = (el: HTMLElement): HTMLElement | Window => {
 export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 	const t = useTranslations("admin")
 	const router = useRouter()
+	const searchParams = useSearchParams()
+
+	/**
+	 * Where Products goes back to.
+	 * 
+	 * The list keeps its page and page size in its own query string, and hands
+	 * that address over in ?back= when it links here. Without it this button
+	 * returned to a bare /products, which is always page one — edit something on
+	 * page 2 and you came back to the top of the catalogue.
+	 * 
+	 * Only a path on this site is followed. The value comes from the URL, and
+	 * anyone can put anything in a URL.
+	 */
+	const backParam = searchParams.get("back")
+	const backHref =
+		backParam && backParam.startsWith("/admin/") && !backParam.startsWith("//")
+			? backParam
+			: "/admin/dashboard/products"
 	const [createProduct] = useCreateProductMutation()
 	const [updateProduct] = useUpdateProductMutation()
 	const [activeLocale, setActiveLocale] = useState<string>(EDITOR_LOCALES[0].code)
@@ -717,11 +735,22 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				}))
 				.filter((tab) => tab.translations.length > 0),
 
+			/*
+			 * Numbered from the row order, not from whatever was stored.
+			 *
+			 * Order is expressed by dragging the rows now, so the position in this
+			 * array is the only statement of it — keeping an old sortOrder would
+			 * mean a row could be moved on screen and come back where it was.
+			 *
+			 * The group heading and the ticked-by-default flag no longer have
+			 * inputs, and are passed through so that what a product already has
+			 * survives an edit made for some other reason.
+			 */
 			options: form.options
 				.filter((o) => o.optionProductId)
 				.map((o, index) => ({
 					optionProductId: o.optionProductId,
-					sortOrder: o.sortOrder ?? index,
+					sortOrder: index,
 					groupLabel: o.groupLabel.trim() || null,
 					preselected: o.preselected,
 				})),
@@ -782,7 +811,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					type="button"
 					variant="ghost"
 					size="lg"
-					onClick={() => router.push("/admin/dashboard/products")}
+					onClick={() => router.push(backHref)}
 				>
 					<ArrowLeft />
 					{t("products")}

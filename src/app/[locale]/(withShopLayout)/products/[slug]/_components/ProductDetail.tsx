@@ -158,15 +158,41 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * already resolved for this visitor at this rung, so nothing about which
 	 * price applies is decided locally.
 	 */
-	const lineTotalFor = (option: PublicProductDetail["options"][number], units: number) => {
+	const lineAmountFor = (option: PublicProductDetail["options"][number], units: number) => {
 		const rung = option.tiers.reduce<{ unitPrice: string | null } | null>(
 			(best, tier) => (units >= tier.minQuantity ? tier : best),
 			null
 		)
 		const unit = Number(rung?.unitPrice ?? option.unitPrice ?? Number.NaN)
 		if (Number.isNaN(unit)) return null
-		return formatMoney((unit * units).toFixed(2))
+
+		// Floored at the option's own minimum, the same floor `handleAdd` applies
+		// when it writes the line — so the figure quoted here is the figure the
+		// cart will hold, not one the API silently raises.
+		return unit * Math.max(units, option.startQuantity)
 	}
+
+	const lineTotalFor = (option: PublicProductDetail["options"][number], units: number) => {
+		const amount = lineAmountFor(option, units)
+		return amount === null ? null : formatMoney(amount.toFixed(2))
+	}
+
+	/**
+	 * What the chosen options add up to, and what the whole configuration costs.
+	 *
+	 * The product's own line comes from the server — it is `variant.lineTotal`,
+	 * already resolved for this visitor at this quantity — and the options are
+	 * summed from unit prices the server resolved too. The only arithmetic here
+	 * is the addition.
+	 */
+	const optionsAmount = [...chosenOptions].reduce((sum, [id, units]) => {
+		const option = product?.options.find((o) => o.id === id)
+		const amount = option ? lineAmountFor(option, units) : null
+		return sum + (amount ?? 0)
+	}, 0)
+
+	const productAmount = Number(variant?.lineTotal ?? Number.NaN)
+	const configuredTotal = Number.isNaN(productAmount) ? null : productAmount + optionsAmount
 
 	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
 		const option = product?.options.find((o) => o.id === id)
@@ -183,8 +209,17 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		setFeedback(null)
 	}
 
-	const handleAdd = async () => {
-		if (!product || !variant || belowMoq || optionBelowMoq) return
+	/**
+	 * Add to the cart, with or without what has been configured.
+	 *
+	 * Two buttons call this. The one beside the price buys the article on its
+	 * own — plenty of people want the cutter and none of the packaging — and the
+	 * one under the configurator buys it with everything ticked. A single button
+	 * would have to guess which was meant.
+	 */
+	const handleAdd = async (withOptions: boolean) => {
+		if (!product || !variant || belowMoq) return
+		if (withOptions && optionBelowMoq) return
 		setFeedback(null)
 
 		try {
@@ -192,7 +227,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				await addToQuoteBasket({ variantId: variant.id, quantity }).unwrap()
 				setAdded({
 					name: product.name,
-					image: product.featuredImage?.url ?? null,
+					image: product.featuredImage?.srcset.thumb ?? product.featuredImage?.url ?? null,
 					quantity,
 					quote: true,
 				})
@@ -201,7 +236,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 			const cart = await addToCart({ variantId: variant.id, quantity }).unwrap()
 
-			if (chosenOptions.size) {
+			if (withOptions && chosenOptions.size) {
 				setAttaching(true)
 				const line = cart.items.find((item) => item.variantId === variant.id)
 				// Options hang off the line that was just created. If that line
@@ -228,7 +263,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 			setAdded({
 				name: product.name,
-				image: product.featuredImage?.url ?? null,
+				image: product.featuredImage?.srcset.thumb ?? product.featuredImage?.url ?? null,
 				quantity,
 				quote: false,
 			})
@@ -273,6 +308,209 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const unitPrice = formatMoney(variant?.unitPrice)
 	const listPrice = formatMoney(variant?.listPrice)
 	const lineTotal = formatMoney(variant?.lineTotal)
+
+	const hasOptions = product.options.length > 0
+
+	/**
+	 * Quantity, what it comes to, and the button.
+	 * 
+	 * Held as a value because it belongs in one of two places. A product with
+	 * nothing to configure keeps it beside the price, where it has always been;
+	 * a product with options gets it underneath them, because until the options
+	 * are picked the total is not yet a number worth showing.
+	 */
+	/**
+	 * The whole configuration: the article, everything ticked, and the sum.
+	 *
+	 * Itemised rather than totalled, and with the quantity on every line,
+	 * because that is what is about to be written to the cart — an option is
+	 * ordered in its own quantity, so a customer buying 500 cutters and 500
+	 * engravings should be able to read both numbers before committing to
+	 * either. The quantity of the article itself is set beside the price
+	 * above; this reports it rather than offering a second control for it.
+	 */
+	const configuredLines = [
+		{
+			id: variant?.id ?? product.id,
+			name: product.name,
+			quantity,
+			// The server's figure for this visitor at this quantity.
+			total: lineTotal,
+		},
+		...[...chosenOptions].flatMap(([id, units]) => {
+			const option = product.options.find((o) => o.id === id)
+			if (!option) return []
+			return [
+				{
+					id: option.id,
+					name: option.name,
+					// The floor `handleAdd` applies, so this is the quantity that
+					// will actually be ordered rather than the one that was typed.
+					quantity: Math.max(units, option.startQuantity),
+					total: lineTotalFor(option, units),
+				},
+			]
+		}),
+	]
+
+	const configuredBox = (
+		<>
+			<ul className="space-y-2 text-sm">
+				{configuredLines.map((line) => (
+					<li key={line.id} className="flex justify-between gap-4">
+						<span className="min-w-0">
+							<span className="block">{line.name}</span>
+							<span className="text-muted-foreground text-xs tabular-nums">
+								{t("optionQuantity")}: {line.quantity}
+							</span>
+						</span>
+						<span className="shrink-0 tabular-nums">{line.total ?? "—"}</span>
+					</li>
+				))}
+			</ul>
+
+			<div className="mt-4 flex justify-between gap-4 border-t pt-3">
+				<span className="font-heading text-base font-semibold">{t("total")}</span>
+				<span className="text-lg font-bold tabular-nums">
+					{formatMoney((configuredTotal ?? 0).toFixed(2))}
+				</span>
+			</div>
+			<p className="text-muted-foreground text-xs">{t("exclVat")}</p>
+
+			{optionBelowMoq && (
+				<p className="text-destructive mt-3 flex items-center gap-2 text-sm">
+					<AlertCircle className="size-4 shrink-0" />
+					{t("optionBelowMoq")}
+				</p>
+			)}
+
+			{/* Named for what it does, because there are two of these on the page
+			    and the other one buys the article on its own. */}
+			<button
+				type="button"
+				onClick={() => void handleAdd(true)}
+				disabled={busy || belowMoq || optionBelowMoq || !variant?.inStock}
+				className="bg-primary text-primary-foreground mt-5 inline-flex w-full items-center justify-center gap-2 px-6 py-3.5 text-xs font-semibold tracking-widest uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
+			>
+				{busy && <Loader2 className="size-4 animate-spin" />}
+				{t("addWithOptions")}
+			</button>
+
+			{feedback && !feedback.ok && (
+				<p role="alert" className="text-destructive mt-3 flex items-center gap-2 text-sm">
+					<AlertCircle className="size-4 shrink-0" />
+					{feedback.message}
+				</p>
+			)}
+		</>
+	)
+	const buyBox = (
+		<>
+	<div className="first:mt-0 mt-8">
+		<label htmlFor="quantity" className="font-heading mb-3 block text-base font-semibold">
+			{t("quantity")}
+		</label>
+		<div className="flex items-center gap-4">
+			<div className="inline-flex border">
+				<button
+					type="button"
+					onClick={() => changeQuantity(Math.max(minQuantity, quantity - 1))}
+					disabled={quantity <= minQuantity}
+					aria-label="-"
+					className="px-3.5 py-2.5 disabled:opacity-40"
+				>
+					<Minus className="size-4" />
+				</button>
+				<input
+					id="quantity"
+					type="number"
+					inputMode="numeric"
+					min={minQuantity}
+					value={quantity}
+					onChange={(event) => changeQuantity(Number(event.target.value) || 1)}
+					className="w-20 border-x px-2 py-2.5 text-center text-sm outline-none"
+				/>
+				<button
+					type="button"
+					onClick={() => changeQuantity(quantity + 1)}
+					aria-label="+"
+					className="px-3.5 py-2.5"
+				>
+					<Plus className="size-4" />
+				</button>
+			</div>
+
+			{minQuantity > 1 && (
+				<p className="text-muted-foreground text-sm">
+					{t("minimumOrder", { quantity: minQuantity })}
+				</p>
+			)}
+		</div>
+
+		{belowMoq && (
+			<p className="text-destructive mt-3 flex items-center gap-2 text-sm">
+				<AlertCircle className="size-4 shrink-0" />
+				{t("belowMoq", { quantity: minQuantity })}
+			</p>
+		)}
+
+		{/*
+		 * What it comes to.
+		 *
+		 * Broken out once options are in play: the product on its own, what the
+		 * chosen options add, and the sum. A single figure that silently included
+		 * eleven extras is a number nobody can check.
+		 *
+		 * The product line is the server's — already priced for this visitor at
+		 * this quantity — and each option's is its own resolved unit price times
+		 * the quantity, floored at that option's minimum.
+		 */}
+		{/* This one is the article alone, so it is the article's own total. */}
+		{!product.quoteOnly && lineTotal && !belowMoq && (
+			<p className="mt-3 text-sm">
+				<span className="text-muted-foreground">{t("total")}: </span>
+				<span className="font-semibold">{lineTotal}</span>
+				<span className="text-muted-foreground"> {t("exclVat")}</span>
+			</p>
+		)}
+	</div>
+
+	<button
+		type="button"
+		onClick={() => void handleAdd(false)}
+		disabled={busy || belowMoq || (!product.quoteOnly && !variant?.inStock)}
+		className="bg-primary text-primary-foreground mt-8 inline-flex w-full items-center justify-center gap-2 px-8 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
+	>
+		{busy && <Loader2 className="size-4 animate-spin" />}
+		{product.quoteOnly ? t("addToQuote") : t("addToCart")}
+	</button>
+
+	{feedback && (
+		<p
+			role="status"
+			className={cn(
+				"mt-4 flex items-center gap-2 text-sm",
+				feedback.ok ? "text-primary" : "text-destructive"
+			)}
+		>
+			{feedback.ok ? (
+				<Check className="size-4 shrink-0" />
+			) : (
+				<AlertCircle className="size-4 shrink-0" />
+			)}
+			{feedback.message}
+			{feedback.ok && (
+				<Link
+					href={product.quoteOnly ? "/quote-basket" : "/cart"}
+					className="underline underline-offset-2"
+				>
+					{product.quoteOnly ? t("viewQuote") : t("viewCart")}
+				</Link>
+			)}
+		</p>
+	)}
+		</>
+	)
 
 	return (
 		<div className="mx-auto w-full max-w-[1400px] px-6 py-12">
@@ -364,102 +602,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</div>
 					)}
 
-					<div className="mt-8">
-						<label htmlFor="quantity" className="font-heading mb-3 block text-base font-semibold">
-							{t("quantity")}
-						</label>
-						<div className="flex items-center gap-4">
-							<div className="inline-flex border">
-								<button
-									type="button"
-									onClick={() => changeQuantity(Math.max(minQuantity, quantity - 1))}
-									disabled={quantity <= minQuantity}
-									aria-label="-"
-									className="px-3.5 py-2.5 disabled:opacity-40"
-								>
-									<Minus className="size-4" />
-								</button>
-								<input
-									id="quantity"
-									type="number"
-									inputMode="numeric"
-									min={minQuantity}
-									value={quantity}
-									onChange={(event) => changeQuantity(Number(event.target.value) || 1)}
-									className="w-20 border-x px-2 py-2.5 text-center text-sm outline-none"
-								/>
-								<button
-									type="button"
-									onClick={() => changeQuantity(quantity + 1)}
-									aria-label="+"
-									className="px-3.5 py-2.5"
-								>
-									<Plus className="size-4" />
-								</button>
-							</div>
-
-							{minQuantity > 1 && (
-								<p className="text-muted-foreground text-sm">
-									{t("minimumOrder", { quantity: minQuantity })}
-								</p>
-							)}
-						</div>
-
-						{belowMoq && (
-							<p className="text-destructive mt-3 flex items-center gap-2 text-sm">
-								<AlertCircle className="size-4 shrink-0" />
-								{t("belowMoq", { quantity: minQuantity })}
-							</p>
-						)}
-
-						{!product.quoteOnly && lineTotal && !belowMoq && (
-							<p className="mt-3 text-sm">
-								<span className="text-muted-foreground">{t("total")}: </span>
-								<span className="font-semibold">{lineTotal}</span>
-								<span className="text-muted-foreground"> {t("exclVat")}</span>
-							</p>
-						)}
-					</div>
-
-					<button
-						type="button"
-						onClick={handleAdd}
-						disabled={
-							busy ||
-							belowMoq ||
-							optionBelowMoq ||
-							(!product.quoteOnly && !variant?.inStock)
-						}
-						className="bg-primary text-primary-foreground mt-8 inline-flex w-full items-center justify-center gap-2 px-8 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
-					>
-						{busy && <Loader2 className="size-4 animate-spin" />}
-						{product.quoteOnly ? t("addToQuote") : t("addToCart")}
-					</button>
-
-					{feedback && (
-						<p
-							role="status"
-							className={cn(
-								"mt-4 flex items-center gap-2 text-sm",
-								feedback.ok ? "text-primary" : "text-destructive"
-							)}
-						>
-							{feedback.ok ? (
-								<Check className="size-4 shrink-0" />
-							) : (
-								<AlertCircle className="size-4 shrink-0" />
-							)}
-							{feedback.message}
-							{feedback.ok && (
-								<Link
-									href={product.quoteOnly ? "/quote-basket" : "/cart"}
-									className="underline underline-offset-2"
-								>
-									{product.quoteOnly ? t("viewQuote") : t("viewCart")}
-								</Link>
-							)}
-						</p>
-					)}
+					{buyBox}
 
 					<dl className="text-muted-foreground mt-8 space-y-1.5 border-t pt-6 text-sm">
 						{variant?.sku && (
@@ -482,199 +625,232 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</div>
 					</dl>
 
-					{!!product.options.length && (
-						<fieldset className="mt-8">
-							<legend className="font-heading mb-3 text-base font-semibold">{t("options")}</legend>
-							<ul className="space-y-2">
-								{product.options.map((option) => {
-									const chosen = chosenOptions.has(option.id)
-									const optionQuantity = chosenOptions.get(option.id) ?? option.startQuantity
-									const optionBelowMoq = chosen && optionQuantity < option.startQuantity
-
-									/**
-									 * What this option costs at the quantity chosen.
-									 *
-									 * Read off its own ladder rather than refetched: the rungs
-									 * were priced by the server for this visitor, so picking the
-									 * highest one the quantity reaches gives the same answer the
-									 * cart will, with no request per keystroke.
-									 */
-									const rung = option.tiers.reduce<{ unitPrice: string | null } | null>(
-										(best, tier) => (optionQuantity >= tier.minQuantity ? tier : best),
-										null
-									)
-									const price = formatMoney(rung?.unitPrice ?? option.unitPrice)
-
-									const setQuantityFor = (next: number) =>
-										setChosenOptions((current) => {
-											const map = new Map(current)
-											map.set(option.id, Math.max(1, next))
-											return map
-										})
-
-									return (
-										<li
-											key={option.id}
-											className={cn(
-												"overflow-hidden border transition-colors",
-												chosen
-													? "border-primary bg-primary/[0.03]"
-													: "hover:border-neutral-400"
-											)}
-										>
-											<label className="flex cursor-pointer items-center gap-4 p-4">
-												<input
-													type="checkbox"
-													checked={chosen}
-													onChange={(event) =>
-														setChosenOptions((current) => {
-															const next = new Map(current)
-															// Seeded at the option's own minimum, not at 1.
-															if (event.target.checked) next.set(option.id, option.startQuantity)
-															else next.delete(option.id)
-															return next
-														})
-													}
-													className="accent-primary size-4 shrink-0"
-												/>
-
-												{/* A thumbnail where the option has one. An add-on is a
-												    product, and packaging or a coating is far easier to
-												    choose from a picture than from its name. */}
-												{option.image ? (
-													// eslint-disable-next-line @next/next/no-img-element
-													<img
-														src={option.image.srcset.thumb ?? option.image.url}
-														alt=""
-														loading="lazy"
-														className="size-12 shrink-0 border object-cover"
-													/>
-												) : (
-													<span className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center border">
-														<Package className="size-5" />
-													</span>
-												)}
-
-												<span className="min-w-0 flex-1">
-													{option.groupLabel && (
-														<span className="text-muted-foreground block text-[11px] tracking-wide uppercase">
-															{option.groupLabel}
-														</span>
-													)}
-													<span className="block text-sm font-medium">{option.name}</span>
-													{option.startQuantity > 1 && (
-														<span className="text-muted-foreground block text-xs">
-															{t("minimumOrder", { quantity: option.startQuantity })}
-														</span>
-													)}
-												</span>
-
-												<span className="shrink-0 text-right">
-													{price && <span className="block text-sm font-semibold">{price}</span>}
-													{/* The ladder is worth advertising before the option is
-													    taken — it is the reason to take more of it. */}
-													{!!option.tiers.length && (
-														<span className="text-muted-foreground block text-[11px]">
-															{t("fromQuantity", {
-																quantity: option.tiers[0].minQuantity,
-																price: formatMoney(option.tiers[0].unitPrice) ?? "",
-															})}
-														</span>
-													)}
-												</span>
-											</label>
-
-											{/*
-											 * The reveal.
-											 *
-											 * A grid whose single row animates from 0fr to 1fr, which
-											 * transitions to the content's real height without measuring
-											 * it in JavaScript — `height: auto` is not animatable and a
-											 * fixed max-height would either clip a long ladder or leave
-											 * a pause on a short one. The inner div carries the
-											 * overflow so the collapsed state hides cleanly.
-											 */}
-											<div
-												className={cn(
-													"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
-													chosen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-												)}
-											>
-												<div className="overflow-hidden">
-													<div className="space-y-3 border-t px-4 py-3.5">
-														<div className="flex flex-wrap items-center gap-3">
-															<span className="text-muted-foreground text-xs">
-																{t("optionQuantity")}
-															</span>
-															<div className="flex items-center border bg-white">
-																<button
-																	type="button"
-																	onClick={() => setQuantityFor(optionQuantity - 1)}
-																	disabled={!chosen || optionQuantity <= option.startQuantity}
-																	className="px-3 py-1.5 disabled:opacity-40"
-																	aria-label="-"
-																>
-																	<Minus className="size-3.5" />
-																</button>
-																<input
-																	type="number"
-																	min={option.startQuantity}
-																	value={optionQuantity}
-																	disabled={!chosen}
-																	onChange={(event) =>
-																		setQuantityFor(Number(event.target.value) || 1)
-																	}
-																	className="w-16 border-x py-1.5 text-center text-sm outline-none"
-																	aria-label={`${option.name} ${t("optionQuantity")}`}
-																/>
-																<button
-																	type="button"
-																	onClick={() => setQuantityFor(optionQuantity + 1)}
-																	disabled={!chosen}
-																	className="px-3 py-1.5"
-																	aria-label="+"
-																>
-																	<Plus className="size-3.5" />
-																</button>
-															</div>
-
-															{lineTotalFor(option, optionQuantity) && (
-																<span className="text-muted-foreground ml-auto text-xs">
-																	{t("total")}:{" "}
-																	<span className="text-foreground font-semibold">
-																		{lineTotalFor(option, optionQuantity)}
-																	</span>
-																</span>
-															)}
-														</div>
-
-														{optionBelowMoq && (
-															<p role="alert" className="text-destructive flex items-center gap-1.5 text-xs">
-																<AlertCircle className="size-3.5 shrink-0" />
-																{t("belowMoq", { quantity: option.startQuantity })}
-															</p>
-														)}
-
-														{!!option.tiers.length && (
-															<TierTable
-																tiers={option.tiers}
-																quantity={optionQuantity}
-																baseRow={null}
-																title={t("optionTiers")}
-																compact
-															/>
-														)}
-													</div>
-												</div>
-											</div>
-										</li>
-									)
-								})}
-							</ul>
-						</fieldset>
-					)}
 				</div>
 			</div>
+
+			{/*
+			 * The configurator, across the whole page rather than in the column
+			 * beside the gallery.
+			 *
+			 * Eleven options in a half-width column is a single file of cards
+			 * running far below the fold. Given the page it is two readable
+			 * columns, and what the configuration costs sits underneath it —
+			 * which is where the decision is actually made, so that is where
+			 * the quantity and the button belong too.
+			 */}
+			{hasOptions && (
+				<section className="mt-14 border-t pt-10">
+					<fieldset className="mt-8">
+						<legend className="font-heading mb-3 text-base font-semibold">{t("options")}</legend>
+						{/*
+						 * Two across once there is room for them.
+						 *
+						 * A product can carry eleven options, and one per row pushed the whole
+						 * configurator well below the fold — the customer scrolled past the
+						 * price to reach it and past it again to get back.
+						 *
+						 * items-start so a row whose option is open, and has grown a quantity
+						 * control, does not stretch the unopened one beside it.
+						 */}
+						<ul className="grid items-start gap-2 sm:grid-cols-2">
+							{product.options.map((option) => {
+								const chosen = chosenOptions.has(option.id)
+								const optionQuantity = chosenOptions.get(option.id) ?? option.startQuantity
+								const optionBelowMoq = chosen && optionQuantity < option.startQuantity
+
+								/**
+								 * What this option costs at the quantity chosen.
+								 *
+								 * Read off its own ladder rather than refetched: the rungs
+								 * were priced by the server for this visitor, so picking the
+								 * highest one the quantity reaches gives the same answer the
+								 * cart will, with no request per keystroke.
+								 */
+								const rung = option.tiers.reduce<{ unitPrice: string | null } | null>(
+									(best, tier) => (optionQuantity >= tier.minQuantity ? tier : best),
+									null
+								)
+								const price = formatMoney(rung?.unitPrice ?? option.unitPrice)
+
+								const setQuantityFor = (next: number) =>
+									setChosenOptions((current) => {
+										const map = new Map(current)
+										map.set(option.id, Math.max(1, next))
+										return map
+									})
+
+								return (
+									<li
+										key={option.id}
+										className={cn(
+											"overflow-hidden border transition-colors",
+											chosen
+												? "border-primary bg-primary/[0.03]"
+												: "hover:border-neutral-400"
+										)}
+									>
+										<label className="flex cursor-pointer items-center gap-4 p-4">
+											<input
+												type="checkbox"
+												checked={chosen}
+												onChange={(event) =>
+													setChosenOptions((current) => {
+														const next = new Map(current)
+														// Seeded at the option's own minimum, not at 1.
+														if (event.target.checked) next.set(option.id, option.startQuantity)
+														else next.delete(option.id)
+														return next
+													})
+												}
+												className="accent-primary size-4 shrink-0"
+											/>
+
+											{/* A thumbnail where the option has one. An add-on is a
+											    product, and packaging or a coating is far easier to
+											    choose from a picture than from its name. */}
+											{option.image ? (
+												// eslint-disable-next-line @next/next/no-img-element
+												<img
+													src={option.image.srcset.thumb ?? option.image.url}
+													alt=""
+													loading="lazy"
+													className="size-12 shrink-0 border object-cover"
+												/>
+											) : (
+												<span className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center border">
+													<Package className="size-5" />
+												</span>
+											)}
+
+											<span className="min-w-0 flex-1">
+												{option.groupLabel && (
+													<span className="text-muted-foreground block text-[11px] tracking-wide uppercase">
+														{option.groupLabel}
+													</span>
+												)}
+												<span className="block text-sm font-medium">{option.name}</span>
+												{option.startQuantity > 1 && (
+													<span className="text-muted-foreground block text-xs">
+														{t("minimumOrder", { quantity: option.startQuantity })}
+													</span>
+												)}
+											</span>
+
+											<span className="shrink-0 text-right">
+												{price && <span className="block text-sm font-semibold">{price}</span>}
+												{/* The ladder is worth advertising before the option is
+												    taken — it is the reason to take more of it. */}
+												{!!option.tiers.length && (
+													<span className="text-muted-foreground block text-[11px]">
+														{t("fromQuantity", {
+															quantity: option.tiers[0].minQuantity,
+															price: formatMoney(option.tiers[0].unitPrice) ?? "",
+														})}
+													</span>
+												)}
+											</span>
+										</label>
+
+										{/*
+										 * The reveal.
+										 *
+										 * A grid whose single row animates from 0fr to 1fr, which
+										 * transitions to the content's real height without measuring
+										 * it in JavaScript — `height: auto` is not animatable and a
+										 * fixed max-height would either clip a long ladder or leave
+										 * a pause on a short one. The inner div carries the
+										 * overflow so the collapsed state hides cleanly.
+										 */}
+										<div
+											className={cn(
+												"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+												chosen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+											)}
+										>
+											<div className="overflow-hidden">
+												<div className="space-y-3 border-t px-4 py-3.5">
+													<div className="flex flex-wrap items-center gap-3">
+														<span className="text-muted-foreground text-xs">
+															{t("optionQuantity")}
+														</span>
+														<div className="flex items-center border bg-white">
+															<button
+																type="button"
+																onClick={() => setQuantityFor(optionQuantity - 1)}
+																disabled={!chosen || optionQuantity <= option.startQuantity}
+																className="px-3 py-1.5 disabled:opacity-40"
+																aria-label="-"
+															>
+																<Minus className="size-3.5" />
+															</button>
+															<input
+																type="number"
+																min={option.startQuantity}
+																value={optionQuantity}
+																disabled={!chosen}
+																onChange={(event) =>
+																	setQuantityFor(Number(event.target.value) || 1)
+																}
+																className="w-16 border-x py-1.5 text-center text-sm outline-none"
+																aria-label={`${option.name} ${t("optionQuantity")}`}
+															/>
+															<button
+																type="button"
+																onClick={() => setQuantityFor(optionQuantity + 1)}
+																disabled={!chosen}
+																className="px-3 py-1.5"
+																aria-label="+"
+															>
+																<Plus className="size-3.5" />
+															</button>
+														</div>
+
+														{lineTotalFor(option, optionQuantity) && (
+															<span className="text-muted-foreground ml-auto text-xs">
+																{t("total")}:{" "}
+																<span className="text-foreground font-semibold">
+																	{lineTotalFor(option, optionQuantity)}
+																</span>
+															</span>
+														)}
+													</div>
+
+													{optionBelowMoq && (
+														<p role="alert" className="text-destructive flex items-center gap-1.5 text-xs">
+															<AlertCircle className="size-3.5 shrink-0" />
+															{t("belowMoq", { quantity: option.startQuantity })}
+														</p>
+													)}
+
+													{!!option.tiers.length && (
+														<TierTable
+															tiers={option.tiers}
+															quantity={optionQuantity}
+															baseRow={null}
+															title={t("optionTiers")}
+															compact
+														/>
+													)}
+												</div>
+											</div>
+										</div>
+									</li>
+								)
+							})}
+						</ul>
+					</fieldset>
+
+					{/*
+					 * The order box.
+					 *
+					 * Boxed and held to a readable width rather than left to span the page:
+					 * a total whose label sits at the far left and whose figure sits 1300px
+					 * away is two facts the eye has to carry between, and the sum is the one
+					 * number on this page that has to be easy to check.
+					 */}
+					<div className="bg-muted/40 mt-10 max-w-md border p-6">{configuredBox}</div>
+				</section>
+			)}
 
 			<ProductTabs product={product} variant={variant} />
 
