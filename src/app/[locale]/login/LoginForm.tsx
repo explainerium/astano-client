@@ -11,6 +11,7 @@ import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import { isStaff } from "@/constants/role"
 import { hardNavigate, isAdminPath } from "@/lib/hardNavigate"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { Link } from "@/i18n/navigation"
 import { baseApi } from "@/redux/api/baseApi"
 import { useAppDispatch } from "@/redux/hooks"
@@ -82,8 +83,12 @@ export const LoginForm = () => {
 			// Into the dashboard is a change of root layout, which the client
 			// router cannot make — see hardNavigate. Anywhere in the shop is the
 			// same tree this page is in, so it stays a soft navigation.
-			if (isAdminPath(target)) hardNavigate(target)
-			else router.replace(target)
+			// Held, not returned from: signing in ends in a page load, and the
+			// button has to keep spinning through it rather than stopping the
+			// moment the API answers.
+			return holdForNavigation(() =>
+				isAdminPath(target) ? hardNavigate(target) : router.replace(target)
+			)
 		} catch (error) {
 			// A dead or unreachable API throws NETWORK_ERROR. Anything else that
 			// reached the server already carries a localized message from it.

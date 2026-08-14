@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowLeft } from "lucide-react"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import ProCheckbox from "@/components/form/ProCheckbox"
@@ -185,7 +186,9 @@ export const CategoryForm = ({
 				toast.success(t("categoryCreated"))
 				// Straight into the editor for the thing just made, so the price
 				// ladders below become reachable without hunting for it in the list.
-				router.replace(`/admin/dashboard/categories/${created.id}/edit`)
+				return holdForNavigation(() =>
+					router.replace(`/admin/dashboard/categories/${created.id}/edit`)
+				)
 				return
 			}
 		} catch (error) {

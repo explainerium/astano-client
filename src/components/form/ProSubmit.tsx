@@ -1,7 +1,8 @@
 "use client"
 
-import type { ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { useFormContext } from "react-hook-form"
+import { useTranslations } from "next-intl"
 import { Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -14,6 +15,16 @@ export interface ProSubmitProps {
 	size?: React.ComponentProps<typeof Button>["size"]
 	variant?: React.ComponentProps<typeof Button>["variant"]
 }
+
+/**
+ * How long a submit may run before the button says so in words.
+ *
+ * A spinner answers "did my click register". It stops answering "is this
+ * broken" somewhere around four seconds — and this API can take a great deal
+ * longer than that when it has been idle and has to wake up, which is exactly
+ * when a customer decides nothing is happening and clicks away.
+ */
+const SLOW_AFTER_MS = 4000
 
 /**
  * Submit button that disables itself while the form is submitting.
@@ -29,9 +40,22 @@ export const ProSubmit = ({
 	size = "lg",
 	variant,
 }: ProSubmitProps) => {
+	const t = useTranslations("common")
 	const {
 		formState: { isSubmitting },
 	} = useFormContext()
+
+	const [slow, setSlow] = useState(false)
+
+	useEffect(() => {
+		if (!isSubmitting) return
+
+		const timer = setTimeout(() => setSlow(true), SLOW_AFTER_MS)
+		return () => {
+			clearTimeout(timer)
+			setSlow(false)
+		}
+	}, [isSubmitting])
 
 	return (
 		<Button
@@ -42,7 +66,7 @@ export const ProSubmit = ({
 			className={cn(className)}
 		>
 			{isSubmitting && <Loader2 className="animate-spin" />}
-			{isSubmitting ? (pendingLabel ?? children) : children}
+			{isSubmitting ? (slow ? t("stillWorking") : (pendingLabel ?? children)) : children}
 		</Button>
 	)
 }

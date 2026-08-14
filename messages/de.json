@@ -23,7 +23,8 @@
 		"no": "Nein",
 		"selectDate": "Datum wählen",
 		"somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
-		"selectedCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}"
+		"selectedCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}",
+		"stillWorking": "Wird noch bearbeitet …"
 	},
 	"nav": {
 		"home": "Startseite",
@@ -2097,7 +2098,8 @@
 		"saveLadderFor": "Staffel für {role} speichern",
 		"rungAboveSmallerOrder": "Ergibt {unit} pro Stück — mehr als die {previous} für eine kleinere Bestellung.",
 		"perPage": "Anzeigen",
-		"reorderNumbered": "{index} verschieben"
+		"reorderNumbered": "{index} verschieben",
+		"lastUpdate": "Zuletzt geändert"
 	},
 	"adminEmails": {
 		"order-placed": {

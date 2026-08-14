@@ -5,6 +5,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
@@ -92,7 +93,9 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 				// Into the new zone's own page, where its first method is added. A
 				// zone with no methods offers no shipping, so leaving the admin on
 				// the list would hide the half-finished state behind a scroll.
-				router.replace(`/admin/dashboard/shipping/zones/${created.id}/edit`)
+				return holdForNavigation(() =>
+					router.replace(`/admin/dashboard/shipping/zones/${created.id}/edit`)
+				)
 			}
 		} catch (error) {
 			// A country already claimed by another zone is refused by the API.

@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { Plus, Trash2 } from "lucide-react"
 import { toast } from "sonner"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
@@ -365,7 +366,7 @@ export const MethodForm = ({
 			}
 			// Back to the zone either way: a method is only meaningful beside the
 			// others in its zone, and the gap-free ladder is checked across them.
-			router.push(zoneHref)
+			return holdForNavigation(() => router.push(zoneHref))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? t("couldNotSaveTheMethod"))

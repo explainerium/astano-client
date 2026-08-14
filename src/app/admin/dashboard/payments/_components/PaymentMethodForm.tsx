@@ -5,6 +5,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useFormContext, useFormState } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import ProCheckbox from "@/components/form/ProCheckbox"
@@ -302,7 +303,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 		try {
 			await updateMethod({ id: method.id, data: payload }).unwrap()
 			toast.success(t("paymentMethodUpdated"))
-			router.push("/admin/dashboard/payments")
+			return holdForNavigation(() => router.push("/admin/dashboard/payments"))
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
 			toast.error(message ?? t("couldNotSaveThePaymentMethod"))

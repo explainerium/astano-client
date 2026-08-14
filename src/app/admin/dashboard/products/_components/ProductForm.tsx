@@ -35,6 +35,7 @@ import ProductImages from "./ProductImages"
 import ProductTabsEditor from "./ProductTabsEditor"
 import QuantityPricing from "./QuantityPricing"
 import { SITE_URL } from "@/lib/siteUrl"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { cn } from "@/lib/utils"
 import { TIER_ROLES, tierUnitPrice, type TierRole } from "@/lib/tiers"
 import {
@@ -784,7 +785,11 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			} else {
 				const created = await createProduct(payload).unwrap()
 				toast.success(t("productCreated"))
-				router.replace(`/admin/dashboard/products/${created.id}/edit`)
+				// The editor for the new product is what comes next, so the button
+				// stays busy until it is on screen.
+				return holdForNavigation(() =>
+					router.replace(`/admin/dashboard/products/${created.id}/edit`)
+				)
 			}
 		} catch (error) {
 			// The API names the offending SKU and the product that owns it.

@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import RegistrationFields from "@/components/auth/RegistrationFields"
 import {
 	registrationSchema,
@@ -56,7 +57,7 @@ export const RegisterForm = () => {
 			// data so a bot learns nothing. Send the visitor to sign in rather than
 			// leave them staring at a form that appeared to work.
 			if (!result.data?.accessToken) {
-				router.replace("/login")
+				return holdForNavigation(() => router.replace("/login"))
 				return
 			}
 

@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
@@ -99,7 +100,7 @@ export const TaxRateForm = ({
 				await createTaxRate({ ...payload, taxClassId }).unwrap()
 				toast.success(t("rateAdded"))
 			}
-			router.push(backHref)
+			return holdForNavigation(() => router.push(backHref))
 		} catch (error) {
 			// The API refuses a duplicate (class, country, state, priority).
 			const message = (error as { data?: { message?: string } })?.data?.message

@@ -11,7 +11,7 @@ import {
 	displayName,
 	flattenTree,
 } from "../categories/_components/categoryTree"
-import type { AdminProduct } from "@/types/product"
+import type { AdminProduct, ProductSort, SortDirection } from "@/types/product"
 import ProductTable, { type ProductFilters } from "./_components/ProductTable"
 
 /** Fifty is the API's own default and about two screens of rows. */
@@ -37,6 +37,20 @@ export default function ProductsPage() {
 	 * and the "Products" button on the editor can return you exactly where you
 	 * were by carrying this query with it.
 	 */
+	/**
+	 * The order, also in the URL.
+	 *
+	 * Newest created first by default. The list used to come back ordered by
+	 * when a product was last touched, so saving one sent it to the top — the
+	 * thing an admin does most rearranged the page under them every time.
+	 */
+	const sort = (["created", "updated", "name", "price"] as const).includes(
+		searchParams.get("sort") as ProductSort
+	)
+		? (searchParams.get("sort") as ProductSort)
+		: "created"
+	const dir: SortDirection = searchParams.get("dir") === "asc" ? "asc" : "desc"
+
 	const page = Math.max(1, Number(searchParams.get("page") ?? 1) || 1)
 	const limit = PAGE_SIZES.includes(Number(searchParams.get("limit")))
 		? Number(searchParams.get("limit"))
@@ -84,6 +98,8 @@ export default function ProductsPage() {
 		stockStatus: filters.stockStatus,
 		page,
 		limit,
+		sort,
+		dir,
 	})
 
 	// Flattened to a tree order so the filter reads like the catalogue does.
@@ -152,6 +168,17 @@ export default function ProductsPage() {
 						DRAFT: draftCount?.meta?.total,
 						ARCHIVED: archivedCount?.meta?.total,
 					}}
+					sort={sort}
+					dir={dir}
+					// A new column resets to the first page: page 4 of one order is
+					// not page 4 of another.
+					onSortChange={(nextSort, nextDir) =>
+						setParams({
+							sort: nextSort === "created" ? null : nextSort,
+							dir: nextDir === "desc" ? null : nextDir,
+							page: null,
+						})
+					}
 					meta={result.meta}
 					isFetching={isFetching}
 					onPageChange={(next) => setParams({ page: next === 1 ? null : String(next) })}

@@ -197,4 +197,10 @@ export interface AdminProductListParams {
 	search?: string
 	page?: number
 	limit?: number
+	/** What to order by, and which way. Defaults to newest created first. */
+	sort?: ProductSort
+	dir?: SortDirection
 }
+
+export type ProductSort = "created" | "updated" | "name" | "price"
+export type SortDirection = "asc" | "desc"

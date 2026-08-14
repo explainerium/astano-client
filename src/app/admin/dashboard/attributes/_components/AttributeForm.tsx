@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useFieldArray, useFormContext } from "react-hook-form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
@@ -176,7 +177,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 			} else {
 				await createAttribute(payload).unwrap()
 				toast.success(t("attributeCreated"))
-				router.push("/admin/dashboard/attributes")
+				return holdForNavigation(() => router.push("/admin/dashboard/attributes"))
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message

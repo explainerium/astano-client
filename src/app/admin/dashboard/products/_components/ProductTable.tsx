@@ -1,9 +1,12 @@
 "use client"
 
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import Link from "next/link"
 import {
+	ArrowDown,
+	ArrowUp,
+	ChevronsUpDown,
 	Copy,
 	Download,
 	ExternalLink,
@@ -48,11 +51,14 @@ import StatusLinks, { type StatusCounts } from "./StatusLinks"
 import { getPathname } from "@/i18n/navigation"
 import { useDeleteProductMutation, useDuplicateProductMutation } from "@/redux/api/productApi"
 import { downloadFile } from "@/lib/downloadFile"
+import { formatDate } from "@/lib/dates"
 import { pickTranslation } from "@/lib/pickTranslation"
 import { cn } from "@/lib/utils"
 import type { IMeta } from "@/types"
 import type {
 	AdminProduct,
+	ProductSort,
+	SortDirection,
 	ProductKind,
 	ProductPrice,
 	ProductStatus,
@@ -166,7 +172,15 @@ const STATUS_CHIP: Record<ProductStatus, { labelKey: string; className: string }
 	ARCHIVED: { labelKey: "statusArchived", className: "text-muted-foreground" },
 }
 
-/** Shoppers cannot find it. The one genuine warning in this column. */
+/**
+ * Hidden is not a state of its own — it is this state, gone wrong.
+ *
+ * A separate chip beside the status meant two chips to read and a column wide
+ * enough for both, and it said the quiet part twice: a product is only worth
+ * flagging as hidden *because* it is published and still cannot be found. So
+ * the status keeps its own word and turns red instead. "Published" in red is
+ * the sentence — published, and nobody can see it.
+ */
 const HIDDEN_CHIP = "border-transparent bg-negative-soft text-negative"
 
 /**
@@ -186,6 +200,74 @@ export interface ProductFilters {
 	stockStatus?: StockStatus
 }
 
+/**
+ * A column heading you can order by.
+ *
+ * Clicking the column already in use flips the direction; clicking another
+ * starts it descending — for a date and a price that is the interesting end,
+ * and for a name the first click being Z–A is a small surprise nobody minds
+ * once they see the arrow.
+ *
+ * The arrow is drawn only on the active column. An indicator on every heading
+ * makes a table look like a spreadsheet and says nothing about the order it is
+ * actually in.
+ */
+const SortableHead = ({
+	column,
+	label,
+	align = "left",
+	sort,
+	dir,
+	onSortChange,
+}: {
+	column: ProductSort
+	label: string
+	align?: "left" | "right"
+	sort?: ProductSort
+	dir?: SortDirection
+	onSortChange?: (sort: ProductSort, dir: SortDirection) => void
+}) => {
+	const active = sort === column
+
+	if (!onSortChange) {
+		return (
+			<TableHead className={cn(HEAD_CLASS, align === "right" && "text-right")}>{label}</TableHead>
+		)
+	}
+
+	return (
+		<TableHead className={cn(HEAD_CLASS, align === "right" && "text-right")}>
+			<button
+				type="button"
+				onClick={() => onSortChange(column, active && dir === "desc" ? "asc" : "desc")}
+				className={cn(
+					"hover:text-foreground inline-flex items-center gap-1 transition-colors",
+					align === "right" && "flex-row-reverse",
+					active && "text-foreground"
+				)}
+			>
+				{label}
+				{/*
+				 * The active column shows which way it points; the rest show a faint
+				 * pair, so a heading you can order by is distinguishable from one you
+				 * cannot before you click it.
+				 */}
+				{active ? (
+					dir === "asc" ? (
+						<ArrowUp className="size-3" />
+					) : (
+						<ArrowDown className="size-3" />
+					)
+				) : (
+					<ChevronsUpDown className="size-3 opacity-40" />
+				)}
+			</button>
+		</TableHead>
+	)
+}
+
+const HEAD_CLASS = "text-muted-foreground text-xs font-medium tracking-wide uppercase"
+
 export const ProductTable = ({
 	products,
 	filters,
@@ -197,6 +279,9 @@ export const ProductTable = ({
 	pageSize,
 	pageSizes,
 	onPageSizeChange,
+	sort,
+	dir,
+	onSortChange,
 	categories,
 	editHref,
 	onEdit,
@@ -214,6 +299,10 @@ export const ProductTable = ({
 	pageSize?: number
 	pageSizes?: number[]
 	onPageSizeChange?: (size: number) => void
+	/** Which column the list is ordered by, and which way. */
+	sort?: ProductSort
+	dir?: SortDirection
+	onSortChange?: (sort: ProductSort, dir: SortDirection) => void
 	categories: { id: string; name: string; depth: number; productCount: number }[]
 	/**
 	 * Where a row's Edit goes.
@@ -227,6 +316,7 @@ export const ProductTable = ({
 	onCreate: () => void
 }) => {
 	const t = useTranslations("admin")
+	const locale = useLocale()
 	// The shop's own separators and symbol. A function rather than an import,
 	// so React Compiler can see that these prices depend on it.
 	const formatMoney = useMoney()
@@ -472,14 +562,34 @@ export const ProductTable = ({
 								<TableHead className="w-16">
 									<span className="sr-only">{t("image")}</span>
 								</TableHead>
-								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("product")}</TableHead>
+								<SortableHead
+									column="name"
+									label={t("product")}
+									sort={sort}
+									dir={dir}
+									onSortChange={onSortChange}
+								/>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
 									SKU
 								</TableHead>
-								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">{t("price")}</TableHead>
+								<SortableHead
+									column="price"
+									label={t("price")}
+									align="right"
+									sort={sort}
+									dir={dir}
+									onSortChange={onSortChange}
+								/>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("categories")}</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("author")}</TableHead>
 								<TableHead className="text-muted-foreground text-xs font-medium tracking-wide uppercase">{t("status")}</TableHead>
+								<SortableHead
+									column="updated"
+									label={t("lastUpdate")}
+									sort={sort}
+									dir={dir}
+									onSortChange={onSortChange}
+								/>
 								<TableHead className="text-muted-foreground text-right text-xs font-medium tracking-wide uppercase">
 									MOQ
 								</TableHead>
@@ -491,7 +601,7 @@ export const ProductTable = ({
 						<TableBody>
 							{!products.length && (
 								<TableRow className="hover:bg-transparent">
-									<TableCell colSpan={11} className="h-40 text-center">
+									<TableCell colSpan={12} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
 											{filters.search || filters.status || filters.kind
 												? t("nothingMatchesTheseFilters")
@@ -655,22 +765,27 @@ export const ProductTable = ({
 										 * chip per row.
 										 */}
 										<TableCell>
-											<div className="flex flex-wrap items-center gap-1">
-												<Badge variant="outline" className={status.className}>
+											{/* Stacked, not in a row: the chips side by side held a column wider
+											    than the words in it, and this table has no width to spare. */}
+											<div className="flex flex-col items-start gap-1">
+												<Badge
+													variant="outline"
+													className={product.visibility === "HIDDEN" ? HIDDEN_CHIP : status.className}
+													title={product.visibility === "HIDDEN" ? t("hidden") : undefined}
+												>
 													{t(status.labelKey)}
 												</Badge>
-
-												{/* Orthogonal to status — a product can be published
-												    and still invisible to shoppers, which is exactly
-												    the combination worth catching. */}
-												{product.visibility === "HIDDEN" && (
-													<Badge variant="outline" className={HIDDEN_CHIP}>{t("hidden")}</Badge>
-												)}
 
 												{product.kind === "OPTION" && (
 													<Badge variant="outline" className={OPTION_CHIP}>{t("option")}</Badge>
 												)}
 											</div>
+										</TableCell>
+
+										{/* When it was last touched — the thing the old ordering used to
+										    announce by moving the row, now simply stated. */}
+										<TableCell className="text-muted-foreground text-xs whitespace-nowrap">
+											{formatDate(product.updatedAt, locale)}
 										</TableCell>
 
 										<TableCell className="text-right tabular-nums">

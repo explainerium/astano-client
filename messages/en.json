@@ -23,7 +23,8 @@
 		"no": "No",
 		"selectDate": "Select a date",
 		"somethingWentWrong": "Something went wrong. Please try again.",
-		"selectedCount": "{count, plural, one {# selected} other {# selected}}"
+		"selectedCount": "{count, plural, one {# selected} other {# selected}}",
+		"stillWorking": "Still working…"
 	},
 	"nav": {
 		"home": "Home",
@@ -1810,6 +1811,7 @@
 		"saveLadderFor": "Save ladder for {role}",
 		"rungAboveSmallerOrder": "Works out at {unit} per unit — above the {previous} charged for a smaller order.",
 		"perPage": "Show",
-		"reorderNumbered": "Reorder {index}"
+		"reorderNumbered": "Reorder {index}",
+		"lastUpdate": "Last update"
 	}
 }

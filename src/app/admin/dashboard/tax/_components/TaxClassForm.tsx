@@ -6,6 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
+import { holdForNavigation } from "@/lib/holdForNavigation"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProCheckbox from "@/components/form/ProCheckbox"
@@ -84,7 +85,9 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 				toast.success(t("taxClassCreated"))
 				// Into the class's own page, where its rates are added. A class with
 				// no rates charges nothing, which is the mistake this avoids.
-				router.replace(`/admin/dashboard/tax/classes/${created.id}/edit`)
+				return holdForNavigation(() =>
+					router.replace(`/admin/dashboard/tax/classes/${created.id}/edit`)
+				)
 			}
 		} catch (error) {
 			const message = (error as { data?: { message?: string } })?.data?.message
