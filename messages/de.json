@@ -839,7 +839,10 @@
 		"reasonCountryNotAllowed": "Für Lieferungen in dieses Land nicht verfügbar",
 		"reasonRequiresLogin": "Zum Nutzen bitte anmelden",
 		"noticeTitle": "Bevor wir Ihre Bestellung aufgeben können:",
-		"artworkMissing": "Für einen Ihrer Artikel wird noch eine Druckdatei benötigt."
+		"artworkPromptTitle": "Druckdateien hinzufügen?",
+		"artworkPrompt": "{count, plural, one {Für einen Artikel} other {Für # Artikel}} dieser Bestellung kann eine Druckdatei hinterlegt werden, bisher ist keine angehängt. Sie können sie jetzt hochladen oder uns später zusenden — die Bestellung geht so oder so durch.",
+		"artworkUploadNow": "Jetzt hochladen",
+		"artworkSendLater": "Später zusenden"
 	},
 	"artwork": {
 		"choose": "Dateien auswählen",
@@ -857,7 +860,9 @@
 		"missing": "Druckdatei erforderlich",
 		"none": "Keine Dateien angehängt",
 		"download": "Herunterladen",
-		"deleted": "Nicht mehr verfügbar"
+		"deleted": "Nicht mehr verfügbar",
+		"optionalOrLater": "Sie können Ihre Druckdatei hier hochladen oder uns nach der Bestellung zusenden.",
+		"expectedOrLater": "Dieser Artikel wird nach Ihrer Vorlage gefertigt. Laden Sie die Datei hier hoch oder senden Sie sie uns nach der Bestellung zu."
 	},
 	"adminNav": {
 		"dashboard": "Übersicht",
@@ -1188,7 +1193,7 @@
 		}
 	},
 	"admin": {
-		"0MeansThisProductTakesNo": "0 bedeutet, dass dieses Produkt keine Uploads annimmt. Der alte Shop erlaubte 6.",
+		"0MeansThisProductTakesNo": "0 bis 6. Null bedeutet, dieses Produkt nimmt keine Dateien an.",
 		"0OffersItToFirstTime": "0 bietet es auch Erstkäufern an. Die Live-Website setzt hier 1 für den Rechnungskauf, sodass ihn nur wiederkehrende Kunden sehen.",
 		"1TheFile": "1 · Die Datei",
 		"19ForTheStandardGermanRate": "19 für den deutschen Regelsatz, 0 für die Schweiz.",
@@ -1534,7 +1539,7 @@
 		"reading": "Wird gelesen …",
 		"recentOrders": "Letzte Bestellungen",
 		"recordedAgainstThisChangeInThe": "Wird zu dieser Änderung im Bestellverlauf festgehalten. Intern — der Kunde sieht sie nie.",
-		"refusesCheckoutForALineWith": "Verhindert die Bestellung, wenn einer Position nichts angehängt ist. Ohne Wirkung, solange das Limit oben 0 ist.",
+		"refusesCheckoutForALineWith": "Ändert nur den Hinweistext an der Kasse — die Bestellung geht auch ohne durch, denn Dateien können nachgereicht werden.",
 		"region": "Region",
 		"registerNumber": "Handelsregisternummer",
 		"registered": "Registriert",
@@ -1784,7 +1789,7 @@
 		"createProduct": "Produkt anlegen",
 		"couldNotSaveTheProduct": "Das Produkt konnte nicht gespeichert werden.",
 		"anEnglishNameIsRequired": "Ein englischer Name ist erforderlich",
-		"aDesignFileIsRequired": "Eine Druckdatei ist erforderlich",
+		"aDesignFileIsRequired": "Eine Druckdatei wird erwartet",
 		"discountOverHundred": "Ein Rabatt kann nicht mehr als 100 % betragen.",
 		"atLeastOne": "Mindestens 1",
 		"englishContent": "Englische Inhalte",

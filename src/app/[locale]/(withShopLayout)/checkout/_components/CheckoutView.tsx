@@ -23,6 +23,16 @@ import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { preselectedCountry } from "@/lib/sellingLocations"
 import useMoney from "@/lib/useMoney"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import AddressFields from "./AddressFields"
 import MethodChoice, { type MethodOption } from "./MethodChoice"
 import OrderPlaced from "./OrderPlaced"
@@ -195,6 +205,15 @@ export const CheckoutView = () => {
 
 	/** What the customer still has to choose. Filled on a submit that cannot proceed. */
 	const [notice, setNotice] = useState<string[]>([])
+
+	/**
+	 * The order held one step back while the customer is asked about files.
+	 *
+	 * Holds the submitted values, so answering "send them later" goes straight
+	 * on rather than making anybody fill the form in again. Null whenever the
+	 * question is not on screen.
+	 */
+	const [askingAboutArtwork, setAskingAboutArtwork] = useState<FormValues | null>(null)
 	const noticeRef = useRef<HTMLDivElement>(null)
 
 	const schema = useMemo(() => buildSchema(t), [t])
@@ -246,7 +265,15 @@ export const CheckoutView = () => {
 		[runPreview, t]
 	)
 
-	const onSubmit = async (values: FormValues) => {
+	/**
+	 * `artworkAnswered` is passed in rather than read from state.
+	 *
+	 * The dialog calls this again after the customer chooses, and a flag read
+	 * from state would still hold its old value at that moment — the question
+	 * would be asked a second time, or skipped a first. An argument cannot be
+	 * stale.
+	 */
+	const submitOrder = async (values: FormValues, artworkAnswered: boolean) => {
 		/*
 		 * What is still missing, said once, at the top, on submit.
 		 *
@@ -272,6 +299,20 @@ export const CheckoutView = () => {
 
 		setNotice([])
 		setError(null)
+
+		/*
+		 * Asked before the order goes, not explained after it.
+		 *
+		 * The client's rule is that print files may follow the order, so this
+		 * cannot refuse — and saying nothing would be worse: somebody who meant
+		 * to attach a drawing and forgot finds out when production asks. One
+		 * question, only while something could still be attached.
+		 */
+		if (awaitingArtwork.length && !artworkAnswered) {
+			setAskingAboutArtwork(values)
+			return
+		}
+
 		try {
 			const placed = await placeOrder({
 				billingAddress: toApiAddress(values.billing),
@@ -338,13 +379,19 @@ export const CheckoutView = () => {
 		)
 	}
 
-	/*
-	 * Read from the cart the server just sent, not from anything counted here.
-	 * The upload saves straight away and the cart refetches, so this follows the
-	 * files as they are attached — and it is the same judgement `place` will
-	 * make when the order is submitted, rather than a second opinion about it.
+	/**
+	 * Lines that could carry a design file and do not yet.
+	 *
+	 * Counted, not judged: the client's rule is that print files may follow the
+	 * order, so this decides whether to *ask* before placing it — never whether
+	 * the order may be placed. The API agrees; it stopped refusing them.
+	 *
+	 * Options count as lines of their own, because each is a product with its
+	 * own artwork rules.
 	 */
-	const artworkMissing = cart.issues.includes("ARTWORK_REQUIRED")
+	const awaitingArtwork = cart.items
+		.flatMap((line) => [line, ...(line.options ?? [])])
+		.filter((line) => line.artwork.maxFiles > 0 && line.files.length === 0)
 
 	const shippingOptions: MethodOption[] = (preview?.shippingOptions ?? []).map((option) => ({
 		id: option.methodId,
@@ -409,7 +456,7 @@ export const CheckoutView = () => {
 
 	return (
 		<ProForm
-			onSubmit={onSubmit}
+			onSubmit={(values: FormValues) => submitOrder(values, false)}
 			resolver={zodResolver(schema)}
 			defaultValues={{
 				billing: defaultBilling
@@ -568,7 +615,7 @@ export const CheckoutView = () => {
 						 */}
 						<button
 							type="submit"
-							disabled={placeState.isLoading || artworkMissing}
+							disabled={placeState.isLoading}
 							className="bg-primary text-primary-foreground inline-flex w-full items-center justify-center gap-2 px-6 py-4 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 						>
 							{placeState.isLoading && <Loader2 className="size-4 animate-spin" />}
@@ -579,16 +626,6 @@ export const CheckoutView = () => {
 									})}
 						</button>
 
-						{/*
-						 * Said under the button, unlike the delivery and payment hints
-						 * that were removed from here — those nagged about steps further
-						 * down the same page, while this one explains a button that is
-						 * actually disabled. A disabled control with no reason beside it
-						 * is the thing worth avoiding.
-						 */}
-						{artworkMissing && (
-							<p className="text-destructive text-center text-sm">{t("artworkMissing")}</p>
-						)}
 
 						<Link
 							href="/cart"
@@ -601,6 +638,34 @@ export const CheckoutView = () => {
 			</div>
 
 			<PreviewSyncBridge shippingMethodId={shippingMethodId} onRecalculate={recalculate} />
+			{/* Upload now, or send them on. Never "you cannot order yet". */}
+			<AlertDialog
+				open={!!askingAboutArtwork}
+				onOpenChange={(open) => !open && setAskingAboutArtwork(null)}
+			>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{t("artworkPromptTitle")}</AlertDialogTitle>
+						<AlertDialogDescription>
+							{t("artworkPrompt", { count: awaitingArtwork.length })}
+						</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						{/* Cancel simply closes: the upload boxes are already on this page,
+						    a few centimetres away, so there is nowhere to send anybody. */}
+						<AlertDialogCancel>{t("artworkUploadNow")}</AlertDialogCancel>
+						<AlertDialogAction
+							onClick={() => {
+								const values = askingAboutArtwork
+								setAskingAboutArtwork(null)
+								if (values) void submitOrder(values, true)
+							}}
+						>
+							{t("artworkSendLater")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</ProForm>
 	)
 }

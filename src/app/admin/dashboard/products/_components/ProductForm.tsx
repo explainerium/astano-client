@@ -125,7 +125,9 @@ const buildSchema = (t: T) =>
 	visibility: z.enum(["SHOP_AND_SEARCH", "SHOP_ONLY", "SEARCH_ONLY", "HIDDEN"]),
 	kind: z.enum(["MAIN", "OPTION"]),
 	quoteEnabled: z.boolean(),
-	artworkMaxFiles: z.number({ message: t("enterANumber") }).int().min(0).max(20),
+	// 0 means the product takes no files; six is the ceiling the client works
+	// to, and the most the old shop ever offered on a line.
+	artworkMaxFiles: z.number({ message: t("enterANumber") }).int().min(0).max(6),
 	artworkRequired: z.boolean(),
 	moq: z.number({ message: t("enterANumber") }).int().min(0),
 	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),

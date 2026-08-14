@@ -838,7 +838,10 @@
 		"reasonCountryNotAllowed": "Not available for deliveries to this country",
 		"reasonRequiresLogin": "Sign in to use this",
 		"noticeTitle": "Before we can place your order:",
-		"artworkMissing": "One of your items still needs a design file."
+		"artworkPromptTitle": "Add your print files?",
+		"artworkPrompt": "{count, plural, one {One item} other {# items}} in this order can carry a print file and none is attached yet. You can upload them now, or send them to us later — the order goes through either way.",
+		"artworkUploadNow": "Upload now",
+		"artworkSendLater": "Send them later"
 	},
 	"artwork": {
 		"choose": "Choose files",
@@ -856,7 +859,9 @@
 		"missing": "Needs a design file",
 		"none": "No files attached",
 		"download": "Download",
-		"deleted": "No longer available"
+		"deleted": "No longer available",
+		"optionalOrLater": "You can upload your print file here, or send it to us after ordering.",
+		"expectedOrLater": "This item is made to your design. Upload the file here, or send it to us after ordering."
 	},
 	"adminNav": {
 		"dashboard": "Dashboard",
@@ -901,7 +906,7 @@
 		"tryAgain": "Please try again."
 	},
 	"admin": {
-		"0MeansThisProductTakesNo": "0 means this product takes no uploads. The old shop allowed 6.",
+		"0MeansThisProductTakesNo": "0 to 6. Zero means this product takes no uploads.",
 		"0OffersItToFirstTime": "0 offers it to first-time buyers. The live site sets this to 1 for the invoice gateway, so only returning customers see it.",
 		"1TheFile": "1 · The file",
 		"19ForTheStandardGermanRate": "19 for the standard German rate, 0 for Switzerland.",
@@ -1247,7 +1252,7 @@
 		"reading": "Reading…",
 		"recentOrders": "Recent orders",
 		"recordedAgainstThisChangeInThe": "Recorded against this change in the order's history. Internal — the customer never sees it.",
-		"refusesCheckoutForALineWith": "Refuses checkout for a line with nothing attached. Ignored while the limit above is 0.",
+		"refusesCheckoutForALineWith": "Only changes the wording at checkout — the order still goes through without one, because files may be sent later.",
 		"region": "Region",
 		"registerNumber": "Register number",
 		"registered": "Registered",
@@ -1497,7 +1502,7 @@
 		"createProduct": "Create product",
 		"couldNotSaveTheProduct": "Could not save the product.",
 		"anEnglishNameIsRequired": "An English name is required",
-		"aDesignFileIsRequired": "A design file is required",
+		"aDesignFileIsRequired": "A design file is expected",
 		"discountOverHundred": "A discount cannot be more than 100 %.",
 		"atLeastOne": "At least 1",
 		"englishContent": "English content",

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { AlertCircle } from "lucide-react"
+import { Info } from "lucide-react"
 import ArtworkUpload from "@/components/shared/ArtworkUpload"
 import { useSetCartItemFilesMutation } from "@/redux/api/storefrontApi"
 import type { ArtworkFile, CartLine } from "@/types/storefront"
@@ -27,14 +27,14 @@ const apiMessage = (error: unknown) => (error as { data?: { message?: string } }
 export type ArtworkLine = Omit<CartLine, "options">
 
 /**
- * Whether this line is one the customer has to do something about.
+ * Whether this line can take a design file at all.
  *
- * A product that merely tolerates a file is left alone unless something is
- * already attached: an empty box on every line reads as a demand rather than an
- * offer, and in a totals panel it would bury the totals.
+ * Every product the shop marked as taking files gets the field, not only the
+ * ones marked as needing one. That is the client's rule: the box is an offer,
+ * so a product that accepts a drawing should say so rather than stay silent
+ * until somebody already guessed.
  */
-export const wantsArtwork = (line: ArtworkLine): boolean =>
-	line.artwork.maxFiles > 0 && (line.artwork.required || line.files.length > 0)
+export const wantsArtwork = (line: ArtworkLine): boolean => line.artwork.maxFiles > 0
 
 export const LineArtwork = ({ line }: { line: ArtworkLine }) => {
 	const t = useTranslations("artwork")
@@ -53,16 +53,23 @@ export const LineArtwork = ({ line }: { line: ArtworkLine }) => {
 	return (
 		<div className="bg-background mt-3 border p-3">
 			{/*
-			 * No heading. The product name is directly above it and the summary
-			 * says it once at the top — a box that announced "Your design files"
-			 * on every line would be the same three words repeated down the panel.
-			 *
-			 * The missing warning stays, because that one is about this line.
+			 * No heading: the product name is directly above it, and a box that
+			 * announced "Your design files" on every line would be the same three
+			 * words repeated down the panel.
 			 */}
-			{line.artworkMissing && (
-				<p className="text-destructive mb-2 flex items-start gap-2 text-xs">
-					<AlertCircle className="mt-px size-3.5 shrink-0" />
-					{t("missing")}
+
+			{/*
+			 * What this line is waiting for, said as a note rather than a refusal.
+			 *
+			 * A product marked as needing a drawing says so more firmly, but
+			 * neither wording stops the order: files may follow it. Nothing is
+			 * printed once something is attached — the list of files is the
+			 * answer at that point.
+			 */}
+			{line.files.length === 0 && (
+				<p className="text-muted-foreground mb-2 flex items-start gap-2 text-xs">
+					<Info className="mt-px size-3.5 shrink-0" />
+					{line.artwork.required ? t("expectedOrLater") : t("optionalOrLater")}
 				</p>
 			)}
 
