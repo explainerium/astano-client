@@ -5,6 +5,7 @@ import type {
 	CartView,
 	CheckoutAddress,
 	CheckoutPreview,
+	ConfiguredBundle,
 	CustomerOrder,
 	CustomerQuote,
 	PlacedOrder,
@@ -99,6 +100,42 @@ export const storefrontApi = baseApi.injectEndpoints({
 			}
 		>({
 			query: (data) => ({ url: "/cart/items", method: "POST", data }),
+			invalidatesTags: [tagTypes.cart],
+		}),
+
+		/**
+		 * Prices a whole configuration — the article plus every ticked option.
+		 *
+		 * A mutation rather than a query because the body carries the selection and
+		 * RTK Query keys a query on its argument: every tick of an option would
+		 * mint a new cache entry that is never read again.
+		 *
+		 * The page used to do this arithmetic itself. It cannot: a bundle discount
+		 * lives on the link between the two products, tier rungs are per line, and
+		 * money in `Number` is money that drifts. Every figure here comes back from
+		 * `resolvePrice`, which is what the cart and the invoice also call.
+		 */
+		priceConfiguration: build.mutation<
+			ConfiguredBundle,
+			{ variantId: string; quantity: number; options: { variantId: string; quantity: number }[] }
+		>({
+			query: (data) => ({ url: "/configure/price", method: "POST", data }),
+		}),
+
+		/**
+		 * Adds the article and every ticked option in ONE request.
+		 *
+		 * The page used to post the article, then loop over the options posting one
+		 * at a time — the exact pattern the server's transaction was written to
+		 * replace. A failure half way left a cutter in the cart without its
+		 * engraving, which is not a smaller order but the wrong one, and six
+		 * options meant thirteen round trips on an API that sleeps between them.
+		 */
+		addConfigurationToCart: build.mutation<
+			CartView,
+			{ variantId: string; quantity: number; options: { variantId: string; quantity: number }[] }
+		>({
+			query: (data) => ({ url: "/configure/add-to-cart", method: "POST", data }),
 			invalidatesTags: [tagTypes.cart],
 		}),
 
@@ -476,6 +513,8 @@ export const {
 
 	useCartQuery,
 	useAddToCartMutation,
+	usePriceConfigurationMutation,
+	useAddConfigurationToCartMutation,
 	useSetCartItemFilesMutation,
 	useSetQuoteItemFilesMutation,
 	useUpdateCartItemMutation,

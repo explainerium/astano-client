@@ -69,6 +69,13 @@ export interface PublicVariant {
 /** An add-on sold alongside a main product (§4.6). */
 export interface PublicOption {
 	id: string
+	/**
+	 * The variant this option is bought as — what the configurator posts back.
+	 *
+	 * Null when the option product has no active variant, in which case it
+	 * cannot be ordered and the page leaves it out.
+	 */
+	variantId: string | null
 	name: string
 	slug: string
 	groupLabel: string | null
@@ -128,6 +135,38 @@ export interface PublicProductDetail extends PublicProduct {
 	metaDescription: string | null
 	variants: PublicVariant[]
 	options: PublicOption[]
+}
+
+/**
+ * A configuration priced by the API — POST /configure/price.
+ *
+ * The product page used to add these figures up itself, in `Number`, from the
+ * rungs embedded in the product payload. That skipped the bundle discount, used
+ * binary floating point on money, and left the configurator quoting one price
+ * while the cart charged another. Every figure below is resolved by the same
+ * function the cart and the invoice use.
+ */
+export interface ConfiguredLine {
+	variantId: string
+	sku: string | null
+	name: string
+	quantity: number
+	moq: number
+	belowMoq: boolean
+	unitPrice: string | null
+	lineTotal: string | null
+	/** Set when a bundle discount moved the price; the figure before it. */
+	discountedFrom?: string | null
+	quoteOnly: boolean
+}
+
+export interface ConfiguredBundle {
+	main: ConfiguredLine
+	options: ConfiguredLine[]
+	subtotal: string
+	/** Everything wrong with this configuration, so the page can say which line. */
+	issues: { line: string; problem: "BELOW_MOQ" | "NO_PRICE" | "QUOTE_ONLY"; moq?: number }[]
+	addable: boolean
 }
 
 /** Why a basket cannot proceed. The API sends codes, not sentences. */

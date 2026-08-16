@@ -6,16 +6,17 @@ import { AlertCircle, Check, Loader2, Minus, Package, Plus } from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
 import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
 import {
+	useAddConfigurationToCartMutation,
 	useAddToCartMutation,
 	useAddToQuoteBasketMutation,
-	useLazyShopProductQuery,
+	usePriceConfigurationMutation,
 	useShopProductQuery,
 } from "@/redux/api/storefrontApi"
 import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
-import type { PublicProductDetail } from "@/types/storefront"
+import type { ConfiguredBundle, PublicProductDetail } from "@/types/storefront"
 import ProductGallery from "./ProductGallery"
 import ProductTabs from "./ProductTabs"
 import TierTable from "./TierTable"
@@ -137,63 +138,97 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	}
 
 	const [addToCart, cartState] = useAddToCartMutation()
+	const [addConfigurationToCart, configureState] = useAddConfigurationToCartMutation()
 	const [addToQuoteBasket, quoteState] = useAddToQuoteBasketMutation()
-	const [fetchOptionProduct] = useLazyShopProductQuery()
 
-	const busy = cartState.isLoading || quoteState.isLoading || attaching
+	const busy =
+		cartState.isLoading || configureState.isLoading || quoteState.isLoading || attaching
 	const belowMoq = quantity < minQuantity
 
 	/**
-	 * An option under its own minimum blocks the whole add, not just itself.
+	 * The unit price the API resolved for this option at this quantity.
 	 *
-	 * The alternative is adding the main product and failing on the option,
-	 * which leaves a half-built configuration in the cart — worse than refusing
-	 * and saying which line is short.
+	 * A lookup, not a calculation: every rung was priced by the server at its own
+	 * threshold, so this only picks the one the quantity has reached. Shown for
+	 * options nobody has ticked yet, where there is no configuration to price.
 	 */
-	/**
-	 * What a chosen option adds to the order.
-	 *
-	 * Multiplied here rather than fetched, and this is the one place the page
-	 * does arithmetic on money — the *unit* price still comes from the server,
-	 * already resolved for this visitor at this rung, so nothing about which
-	 * price applies is decided locally.
-	 */
-	const lineAmountFor = (option: PublicProductDetail["options"][number], units: number) => {
+	const unitPriceFor = (option: PublicProductDetail["options"][number], units: number) => {
 		const rung = option.tiers.reduce<{ unitPrice: string | null } | null>(
 			(best, tier) => (units >= tier.minQuantity ? tier : best),
 			null
 		)
-		const unit = Number(rung?.unitPrice ?? option.unitPrice ?? Number.NaN)
-		if (Number.isNaN(unit)) return null
-
-		// Floored at the option's own minimum, the same floor `handleAdd` applies
-		// when it writes the line — so the figure quoted here is the figure the
-		// cart will hold, not one the API silently raises.
-		return unit * Math.max(units, option.startQuantity)
-	}
-
-	const lineTotalFor = (option: PublicProductDetail["options"][number], units: number) => {
-		const amount = lineAmountFor(option, units)
-		return amount === null ? null : formatMoney(amount.toFixed(2))
+		return rung?.unitPrice ?? option.unitPrice
 	}
 
 	/**
-	 * What the chosen options add up to, and what the whole configuration costs.
+	 * The configuration as the API takes it — variant ids and quantities.
 	 *
-	 * The product's own line comes from the server — it is `variant.lineTotal`,
-	 * already resolved for this visitor at this quantity — and the options are
-	 * summed from unit prices the server resolved too. The only arithmetic here
-	 * is the addition.
+	 * Quantities are floored at each option's own minimum, which is the floor the
+	 * server applies too, so the figure quoted is the figure the cart will hold.
+	 * An option product with no active variant cannot be bought at all and never
+	 * reaches here.
 	 */
-	const optionsAmount = [...chosenOptions].reduce((sum, [id, units]) => {
-		const option = product?.options.find((o) => o.id === id)
-		const amount = option ? lineAmountFor(option, units) : null
-		return sum + (amount ?? 0)
-	}, 0)
+	const selection = useMemo(
+		() =>
+			[...chosenOptions].flatMap(([id, units]) => {
+				const option = product?.options.find((o) => o.id === id)
+				if (!option?.variantId) return []
+				return [{ variantId: option.variantId, quantity: Math.max(units, option.startQuantity) }]
+			}),
+		[chosenOptions, product]
+	)
 
-	const productAmount = Number(variant?.lineTotal ?? Number.NaN)
-	const configuredTotal = Number.isNaN(productAmount) ? null : productAmount + optionsAmount
+	/**
+	 * What the whole configuration costs, answered by the API.
+	 *
+	 * This page used to add it up itself, in `Number`, from the rungs embedded in
+	 * the product payload — which skipped the bundle discount a product may offer
+	 * on an option, ignored any ladder negotiated with this customer, and did
+	 * binary floating-point arithmetic on money. The configurator quoted one
+	 * figure and the cart then charged another. Now every number below comes back
+	 * from `resolvePrice`, the same function the cart and the invoice call.
+	 */
+	const [priceConfiguration] = usePriceConfigurationMutation()
+	const [configured, setConfigured] = useState<ConfiguredBundle | null>(null)
 
+	useEffect(() => {
+		if (!variant || !product?.options.length) return
+
+		let cancelled = false
+
+		// Debounced for the same reason the quantity refetch is: ticking through
+		// six options should not be six round trips.
+		const timer = setTimeout(() => {
+			void priceConfiguration({ variantId: variant.id, quantity, options: selection })
+				.unwrap()
+				.then((result) => {
+					if (!cancelled) setConfigured(result)
+				})
+				.catch(() => {
+					// A failed reprice leaves the last good figures on screen rather
+					// than blanking the box the customer is reading.
+				})
+		}, REPRICE_DELAY_MS)
+
+		return () => {
+			cancelled = true
+			clearTimeout(timer)
+		}
+	}, [variant, quantity, selection, product?.options.length, priceConfiguration])
+
+	/** What the API says one ticked option comes to. Null until it has answered. */
+	const configuredOptionTotal = (option: PublicProductDetail["options"][number]) =>
+		configured?.options.find((line) => line.variantId === option.variantId)?.lineTotal ?? null
+
+	/**
+	 * An option under its own minimum blocks the whole add, not just itself.
+	 *
+	 * The alternative is adding the main product and failing on the option, which
+	 * leaves a half-built configuration in the cart — worse than refusing and
+	 * saying which line is short. Checked here for an immediate answer; the API
+	 * refuses the same configuration regardless, which is what actually protects
+	 * the rule.
+	 */
 	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
 		const option = product?.options.find((o) => o.id === id)
 		return !!option && chosenQuantity < option.startQuantity
@@ -234,31 +269,26 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				return
 			}
 
-			const cart = await addToCart({ variantId: variant.id, quantity }).unwrap()
-
-			if (withOptions && chosenOptions.size) {
+			/*
+			 * One request for the whole configuration, or one for the article.
+			 *
+			 * This used to post the article and then loop over the options posting
+			 * one at a time, fetching each option's product first to learn its
+			 * variant. Six options meant thirteen round trips, and a failure part
+			 * way through left a cutter in the cart without its engraving — which
+			 * is not a smaller order but the wrong one. `/configure/add-to-cart`
+			 * writes every line in one transaction, or none of them, and checks
+			 * server-side that each option is genuinely offered with this product.
+			 */
+			if (withOptions && selection.length) {
 				setAttaching(true)
-				const line = cart.items.find((item) => item.variantId === variant.id)
-				// Options hang off the line that was just created. If that line
-				// cannot be found the main product is still in the cart — the
-				// message below reports the failure rather than pretending.
-				for (const [optionId, optionQuantity] of chosenOptions) {
-					const option = product.options.find((o) => o.id === optionId)
-					if (!option || !line) continue
-					const optionProduct = await fetchOptionProduct({ slug: option.slug }).unwrap()
-					const optionVariant =
-						optionProduct.variants.find((v) => v.isDefault) ?? optionProduct.variants[0]
-					if (!optionVariant) continue
-					await addToCart({
-						variantId: optionVariant.id,
-						// The quantity the customer set, floored at the option's own
-						// minimum — the API rejects a short line rather than quietly
-						// raising it, and losing the whole basket to a typo here would
-						// be a poor trade.
-						quantity: Math.max(optionQuantity, option.startQuantity),
-						parentItemId: line.id,
-					}).unwrap()
-				}
+				await addConfigurationToCart({
+					variantId: variant.id,
+					quantity,
+					options: selection,
+				}).unwrap()
+			} else {
+				await addToCart({ variantId: variant.id, quantity }).unwrap()
 			}
 
 			setAdded({
@@ -268,8 +298,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				quote: false,
 			})
 
-			// After the options are attached, not before: leaving mid-way would
-			// take the customer to a cart still missing half of what they picked.
+			// After the whole configuration has landed, not before: leaving mid-way
+			// would take the customer to a cart still missing half of what they
+			// picked.
 			if (shopSettings?.["cart.redirectAfterAdd"] === true) {
 				setAdded(null)
 				router.push("/cart")
@@ -334,8 +365,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			id: variant?.id ?? product.id,
 			name: product.name,
 			quantity,
-			// The server's figure for this visitor at this quantity.
-			total: lineTotal,
+			// The configuration's own figure for the article once options are
+			// priced, and the plain one until they are.
+			total: formatMoney(configured?.main.lineTotal) ?? lineTotal,
 		},
 		...[...chosenOptions].flatMap(([id, units]) => {
 			const option = product.options.find((o) => o.id === id)
@@ -344,14 +376,23 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				{
 					id: option.id,
 					name: option.name,
-					// The floor `handleAdd` applies, so this is the quantity that
-					// will actually be ordered rather than the one that was typed.
+					// The floor the server applies, so this is the quantity that will
+					// actually be ordered rather than the one that was typed.
 					quantity: Math.max(units, option.startQuantity),
-					total: lineTotalFor(option, units),
+					total: formatMoney(configuredOptionTotal(option)),
 				},
 			]
 		}),
 	]
+
+	/**
+	 * The subtotal, straight from the API.
+	 *
+	 * Not `main + options` added up here: a bundle discount and any ladder
+	 * negotiated with this customer are already inside these figures, and the
+	 * only way to be sure this total matches the cart is not to compute it.
+	 */
+	const configuredTotal = configured?.subtotal ?? null
 
 	const configuredBox = (
 		<>
@@ -372,7 +413,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			<div className="mt-4 flex justify-between gap-4 border-t pt-3">
 				<span className="font-heading text-base font-semibold">{t("total")}</span>
 				<span className="text-lg font-bold tabular-nums">
-					{formatMoney((configuredTotal ?? 0).toFixed(2))}
+					{formatMoney(configuredTotal) ?? "—"}
 				</span>
 			</div>
 			<p className="text-muted-foreground text-xs">{t("exclVat")}</p>
@@ -805,14 +846,26 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 															</button>
 														</div>
 
-														{lineTotalFor(option, optionQuantity) && (
-															<span className="text-muted-foreground ml-auto text-xs">
-																{t("total")}:{" "}
-																<span className="text-foreground font-semibold">
-																	{lineTotalFor(option, optionQuantity)}
-																</span>
-															</span>
-														)}
+														{/* A ticked option shows what the API says the line comes
+														    to; an untouched one shows the unit price it resolved,
+														    because there is no configuration to price yet. */}
+														{chosen
+															? formatMoney(configuredOptionTotal(option)) && (
+																	<span className="text-muted-foreground ml-auto text-xs">
+																		{t("total")}:{" "}
+																		<span className="text-foreground font-semibold">
+																			{formatMoney(configuredOptionTotal(option))}
+																		</span>
+																	</span>
+																)
+															: formatMoney(unitPriceFor(option, optionQuantity)) && (
+																	<span className="text-muted-foreground ml-auto text-xs">
+																		<span className="text-foreground font-semibold">
+																			{formatMoney(unitPriceFor(option, optionQuantity))}
+																		</span>{" "}
+																		{t("perUnit")}
+																	</span>
+																)}
 													</div>
 
 													{optionBelowMoq && (
