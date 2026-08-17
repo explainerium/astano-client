@@ -24,7 +24,9 @@
 		"selectDate": "Datum wählen",
 		"somethingWentWrong": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
 		"selectedCount": "{count, plural, one {# ausgewählt} other {# ausgewählt}}",
-		"stillWorking": "Wird noch bearbeitet …"
+		"stillWorking": "Wird noch bearbeitet …",
+		"working": "Wird bearbeitet …",
+		"wakingUp": "Ihre Anfrage wird gesendet. Wenn unser Server pausiert war, kann das bis zu einer Minute dauern — bitte schließen Sie die Seite nicht."
 	},
 	"nav": {
 		"home": "Startseite",
@@ -87,7 +89,11 @@
 		"rejectedTitle": "Ihr Antrag wurde nicht freigegeben",
 		"rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt.",
 		"vatRequiredEu": "Für Unternehmen aus der EU außerhalb Deutschlands ist die USt-IdNr. erforderlich.",
-		"vatRequiredEuHint": "Für EU-Unternehmen außerhalb Deutschlands erforderlich, damit wir im Reverse-Charge-Verfahren abrechnen können."
+		"vatRequiredEuHint": "Für EU-Unternehmen außerhalb Deutschlands erforderlich, damit wir im Reverse-Charge-Verfahren abrechnen können.",
+		"signingIn": "Sie werden angemeldet …",
+		"signingInSlow": "Sie werden angemeldet. Wenn unser Server pausiert war, kann das bis zu einer Minute dauern — bitte schließen Sie die Seite nicht.",
+		"submittingRegistration": "Ihr Konto wird erstellt …",
+		"submittingRegistrationSlow": "Ihr Konto wird erstellt. Wenn unser Server pausiert war, kann das bis zu einer Minute dauern — bitte schließen Sie die Seite nicht."
 	},
 	"shop": {
 		"addToCart": "In den Warenkorb",

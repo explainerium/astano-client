@@ -12,6 +12,7 @@ import {
 } from "@/components/auth/registrationSchema"
 import ProForm from "@/components/form/ProForm"
 import ProSubmit from "@/components/form/ProSubmit"
+import SubmitStatus from "@/components/form/SubmitStatus"
 import { DEFAULT_COUNTRY } from "@/constants/countries"
 import { Link } from "@/i18n/navigation"
 import { NETWORK_ERROR } from "@/services/actions/apiFetch"
@@ -95,7 +96,12 @@ export const DealerForm = () => {
 			className="space-y-8"
 		>
 			<RegistrationFields requireVatForEu />
-			<ProSubmit className="w-full">{t("dealerTitle")}</ProSubmit>
+			<ProSubmit className="w-full" pendingLabel={t("submittingRegistration")}>
+				{t("dealerTitle")}
+			</ProSubmit>
+
+			{/* Only if the request is actually slow — see SubmitStatus. */}
+			<SubmitStatus message={t("submittingRegistrationSlow")} />
 		</ProForm>
 	)
 }

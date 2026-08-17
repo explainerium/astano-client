@@ -24,7 +24,9 @@
 		"selectDate": "Select a date",
 		"somethingWentWrong": "Something went wrong. Please try again.",
 		"selectedCount": "{count, plural, one {# selected} other {# selected}}",
-		"stillWorking": "Still working…"
+		"stillWorking": "Still working…",
+		"working": "Working…",
+		"wakingUp": "Sending your request. This can take up to a minute if our server has been idle — please don’t close the page."
 	},
 	"nav": {
 		"home": "Home",
@@ -87,7 +89,11 @@
 		"rejectedTitle": "Your application was not approved",
 		"rejectedBody": "Please contact us if you believe this is a mistake.",
 		"vatRequiredEu": "A VAT ID is required for businesses in the EU outside Germany.",
-		"vatRequiredEuHint": "Required for EU businesses outside Germany, so we can invoice you under the reverse-charge procedure."
+		"vatRequiredEuHint": "Required for EU businesses outside Germany, so we can invoice you under the reverse-charge procedure.",
+		"signingIn": "Signing you in…",
+		"signingInSlow": "Signing you in. This can take up to a minute if our server has been idle — please don’t close the page.",
+		"submittingRegistration": "Creating your account…",
+		"submittingRegistrationSlow": "Creating your account. This can take up to a minute if our server has been idle — please don’t close the page."
 	},
 	"shop": {
 		"addToCart": "Add to cart",

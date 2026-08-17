@@ -1,22 +1,24 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useTranslations } from "next-intl"
+import { useSearchParams } from "next/navigation"
+import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { z } from "zod"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
+import SubmitStatus from "@/components/form/SubmitStatus"
 import { isStaff } from "@/constants/role"
-import { hardNavigate, isAdminPath } from "@/lib/hardNavigate"
+import { hardNavigate } from "@/lib/hardNavigate"
 import { holdForNavigation } from "@/lib/holdForNavigation"
-import { Link } from "@/i18n/navigation"
+import { Link, getPathname } from "@/i18n/navigation"
 import { baseApi } from "@/redux/api/baseApi"
 import { useAppDispatch } from "@/redux/hooks"
 import { NETWORK_ERROR } from "@/services/actions/apiFetch"
 import userLogin from "@/services/actions/userLogin"
+import type { Locale } from "@/i18n/routing"
 import type { IGenericErrorResponse, UserStatus } from "@/types"
 
 /**
@@ -41,7 +43,7 @@ export const LoginForm = () => {
 	const t = useTranslations("auth")
 	const tv = useTranslations("validation")
 	const te = useTranslations("error")
-	const router = useRouter()
+	const locale = useLocale()
 	const searchParams = useSearchParams()
 	const dispatch = useAppDispatch()
 
@@ -76,19 +78,44 @@ export const LoginForm = () => {
 			// otherwise a stale 401 from /auth/me survives the sign-in.
 			dispatch(baseApi.util.resetApiState())
 
+			/**
+			 * Where they land, as a real URL rather than an internal route name.
+			 *
+			 * Staff go to the dashboard, everyone else — dealer, reseller, ordinary
+			 * customer — to their account.
+			 *
+			 * `getPathname` matters more than it looks. German is the default locale
+			 * and is served unprefixed, so the account page is `/mein-konto`; the
+			 * literal `/account` is the *English* route name and is not a page at
+			 * all in German. This used to navigate to it with the plain Next router,
+			 * which resolves nothing — so a customer signing in went nowhere, the
+			 * held promise never settled, and the button span until they gave up.
+			 * It only appeared to work when the guard had supplied `?redirect=`,
+			 * because that value is already a real path.
+			 *
+			 * The dashboard is outside `[locale]` and takes no prefix, so it is used
+			 * as written.
+			 */
 			const target =
 				safeRedirect(searchParams.get("redirect")) ??
-				(isStaff(user.role) ? "/admin/dashboard" : "/account")
+				(isStaff(user.role)
+					? "/admin/dashboard"
+					: getPathname({ href: "/account", locale: locale as Locale }))
 
-			// Into the dashboard is a change of root layout, which the client
-			// router cannot make — see hardNavigate. Anywhere in the shop is the
-			// same tree this page is in, so it stays a soft navigation.
-			// Held, not returned from: signing in ends in a page load, and the
-			// button has to keep spinning through it rather than stopping the
-			// moment the API answers.
-			return holdForNavigation(() =>
-				isAdminPath(target) ? hardNavigate(target) : router.replace(target)
-			)
+			/*
+			 * A full page load, always.
+			 *
+			 * Signing in changes the session, and every guard in the app decides
+			 * from a cookie that has only just been written. Handing the navigation
+			 * to the browser is what guarantees the middleware runs again with it —
+			 * and it is the only thing that works into the dashboard anyway, which
+			 * is a different root layout (see hardNavigate). The cost is one page
+			 * load at the one moment a page load is expected.
+			 *
+			 * Held, not returned from: the button has to keep spinning through that
+			 * load rather than stopping the moment the API answers.
+			 */
+			return holdForNavigation(() => hardNavigate(target))
 		} catch (error) {
 			// A dead or unreachable API throws NETWORK_ERROR. Anything else that
 			// reached the server already carries a localized message from it.
@@ -130,7 +157,14 @@ export const LoginForm = () => {
 				required
 			/>
 
-			<ProSubmit className="w-full">{t("signIn")}</ProSubmit>
+			{/* Names the action rather than saying "Working…", so the button reads
+			    as a sentence about what was just pressed. */}
+			<ProSubmit className="w-full" pendingLabel={t("signingIn")}>
+				{t("signIn")}
+			</ProSubmit>
+
+			{/* Appears only if the request is actually slow — see SubmitStatus. */}
+			<SubmitStatus message={t("signingInSlow")} />
 
 			<p className="text-center">
 				<Link href="/login" className="text-muted-foreground text-sm underline underline-offset-4">
