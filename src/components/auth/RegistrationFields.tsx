@@ -2,6 +2,7 @@
 
 import { useMemo } from "react"
 import { useLocale, useTranslations } from "next-intl"
+import { useWatch } from "react-hook-form"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import ProCombobox from "@/components/form/ProCombobox"
 import ProDatePicker from "@/components/form/ProDatePicker"
@@ -9,6 +10,7 @@ import ProInput from "@/components/form/ProInput"
 import ProRadioGroup from "@/components/form/ProRadioGroup"
 import ProSelect from "@/components/form/ProSelect"
 import { countryOptions } from "@/constants/countries"
+import { requiresVatId } from "@/lib/euCountries"
 
 const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
 	<fieldset className="space-y-4">
@@ -26,10 +28,26 @@ const Section = ({ title, children }: { title: string; children: React.ReactNode
  * questions either way, and a customer who applies as a dealer after signing up
  * as B2C should not meet a different form.
  */
-export const RegistrationFields = () => {
+export const RegistrationFields = ({
+	/**
+	 * Mark the VAT ID required once the chosen country makes it so.
+	 *
+	 * Passed in rather than decided here, because it is the same decision the
+	 * schema makes and only the dealer form makes it. The asterisk has to follow
+	 * the country field as it changes — a customer who picks Austria and finds
+	 * out at submit that a field they read as optional was not is being told too
+	 * late.
+	 */
+	requireVatForEu = false,
+}: { requireVatForEu?: boolean } = {}) => {
 	const t = useTranslations("auth")
 	const tc = useTranslations("common")
 	const locale = useLocale()
+
+	const country = useWatch<{ countryCode?: string }>({ name: "countryCode" }) as
+		| string
+		| undefined
+	const vatRequired = requireVatForEu && requiresVatId(country)
 
 	// ~250 entries sorted by the active language's collation — worth memoising.
 	const countries = useMemo(() => countryOptions(locale), [locale])
@@ -94,7 +112,15 @@ export const RegistrationFields = () => {
 
 				<div className="grid gap-4 sm:grid-cols-2">
 					<ProDatePicker name="foundingDate" label={t("foundingDate")} />
-					<ProInput name="vatNumber" label={t("vatNumber")} />
+					<ProInput
+						name="vatNumber"
+						label={t("vatNumber")}
+						required={vatRequired}
+						// Said only when it applies. A standing note about reverse
+						// charge on a German dealer's form is a rule they are not
+						// subject to, taking up space next to one they are.
+						{...(vatRequired ? { description: t("vatRequiredEuHint") } : {})}
+					/>
 				</div>
 
 				<ProRadioGroup name="psiMember" label={t("psiMember")} options={yesNo} />

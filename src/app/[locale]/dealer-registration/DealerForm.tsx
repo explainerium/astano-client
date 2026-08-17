@@ -26,12 +26,19 @@ export const DealerForm = () => {
 
 	const [submitted, setSubmitted] = useState(false)
 
-	const schema = registrationSchema({
-		required: tv("required"),
-		email: tv("email"),
-		minPassword: tv("minLength", { count: 8 }),
-		acceptTerms: t("acceptTerms"),
-	})
+	const schema = registrationSchema(
+		{
+			required: tv("required"),
+			email: tv("email"),
+			minPassword: tv("minLength", { count: 8 }),
+			acceptTerms: t("acceptTerms"),
+			vatRequired: t("vatRequiredEu"),
+		},
+		// Only here, not on ordinary signup: reverse charge is a business-to-
+		// business matter, and requiring a VAT ID of a private customer in Austria
+		// would refuse them over a number they do not have.
+		{ requireVatForEu: true }
+	)
 
 	const onSubmit = async (values: RegistrationValues) => {
 		try {
@@ -87,7 +94,7 @@ export const DealerForm = () => {
 			defaultValues={{ countryCode: DEFAULT_COUNTRY, psiMember: "no" }}
 			className="space-y-8"
 		>
-			<RegistrationFields />
+			<RegistrationFields requireVatForEu />
 			<ProSubmit className="w-full">{t("dealerTitle")}</ProSubmit>
 		</ProForm>
 	)

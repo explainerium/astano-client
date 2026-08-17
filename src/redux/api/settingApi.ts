@@ -33,6 +33,24 @@ export const settingApi = baseApi.injectEndpoints({
 			providesTags: [tagTypes.setting],
 		}),
 
+		/**
+		 * The countries the shop actually delivers to, from the shipping zones.
+		 *
+		 * Public, and it exists so no country dropdown has to keep its own list.
+		 * The one that did drifted from the admin's configuration in both
+		 * directions — offering two countries with no delivery method and hiding
+		 * five that had one.
+		 *
+		 * Tagged `shipping`, so an admin editing a zone invalidates it rather than
+		 * leaving the storefront on a stale list until the next reload. Same short
+		 * timeout and retries as the settings above, for the same sleeping API.
+		 */
+		deliveryCountries: build.query<{ countries: string[] }, void>({
+			query: () => ({ url: "/shipping/countries", method: "GET", timeout: 15_000 }),
+			extraOptions: { maxRetries: 3 },
+			providesTags: [tagTypes.shipping],
+		}),
+
 		/** Upsert — only the keys sent are touched, the rest are left alone. */
 		saveSettings: build.mutation<unknown, SettingsPayload>({
 			query: (data) => ({ url: "/settings", method: "PUT", data }),
@@ -49,6 +67,7 @@ export const settingApi = baseApi.injectEndpoints({
 export const {
 	useSettingsQuery,
 	usePublicSettingsQuery,
+	useDeliveryCountriesQuery,
 	useSaveSettingsMutation,
 	useDeleteSettingMutation,
 } = settingApi

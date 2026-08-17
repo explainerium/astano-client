@@ -1,44 +1,77 @@
 /**
- * The countries offered in the checkout country select.
+ * Country names, and the countries the shop will actually deliver to.
  *
- * This list mirrors the delivery countries stated on Zahlung & Versand and
- * configured as shipping zones in the admin. It is duplicated here because the
- * shipping zones are an admin-only endpoint — there is no public "where do you
- * deliver" route — so the select has nothing else to read from.
+ * Both used to be answered by a list of seventeen hardcoded here, with a
+ * comment admitting the duplication and predicting the failure: the shipping
+ * zones were an admin-only endpoint, so the storefront had nothing else to read
+ * from and the two drifted apart. They did, in both directions — the list
+ * offered Latvia and Lithuania, which had no zone and therefore no delivery
+ * method, while Czechia, Estonia, Finland, Monaco and the Netherlands were
+ * configured and could not be chosen at all.
  *
- * The list is only an input hint. Whether an order can actually be delivered
- * is decided by the checkout preview, which returns no shipping options for a
- * destination that is not covered. If the zones change, this needs changing
- * too; a small public endpoint would remove the duplication for good.
+ * `GET /shipping/countries` is that missing endpoint. The zones are the single
+ * source of truth now, and this file only turns their codes into something a
+ * person can read.
  */
-export interface Country {
-	code: string
-	en: string
-	de: string
+
+/**
+ * The country's name in the reader's language.
+ *
+ * `Intl.DisplayNames` rather than a table: it covers every code for free and
+ * cannot fall out of step with the zones. The old table returned the raw code
+ * for anything outside its seventeen, so an address in the Netherlands printed
+ * as "NL" on the order page.
+ */
+export const countryName = (code: string, locale: string): string => {
+	if (!code) return ""
+
+	try {
+		return new Intl.DisplayNames([locale], { type: "region" }).of(code.toUpperCase()) ?? code
+	} catch {
+		// An invalid code reaches Intl as a throw rather than a miss. Showing the
+		// code is the honest fallback — it is what the record holds.
+		return code
+	}
 }
 
-export const SHIPPING_COUNTRIES: Country[] = [
-	{ code: "DE", en: "Germany", de: "Deutschland" },
-	{ code: "AT", en: "Austria", de: "Österreich" },
-	{ code: "BE", en: "Belgium", de: "Belgien" },
-	{ code: "HR", en: "Croatia", de: "Kroatien" },
-	{ code: "DK", en: "Denmark", de: "Dänemark" },
-	{ code: "FR", en: "France", de: "Frankreich" },
-	{ code: "HU", en: "Hungary", de: "Ungarn" },
-	{ code: "IT", en: "Italy", de: "Italien" },
-	{ code: "LV", en: "Latvia", de: "Lettland" },
-	{ code: "LT", en: "Lithuania", de: "Litauen" },
-	{ code: "LU", en: "Luxembourg", de: "Luxemburg" },
-	{ code: "PL", en: "Poland", de: "Polen" },
-	{ code: "SK", en: "Slovakia", de: "Slowakei" },
-	{ code: "SI", en: "Slovenia", de: "Slowenien" },
-	{ code: "ES", en: "Spain", de: "Spanien" },
-	{ code: "SE", en: "Sweden", de: "Schweden" },
-	{ code: "CH", en: "Switzerland", de: "Schweiz" },
-]
+export interface CountryOption {
+	label: string
+	value: string
+	/** Searchable but not displayed — see `sortedCountryOptions`. */
+	keywords?: string[]
+}
 
-export const countryName = (code: string, locale: string) => {
-	const country = SHIPPING_COUNTRIES.find((c) => c.code === code)
-	if (!country) return code
-	return locale === "de" ? country.de : country.en
+/** Offered first — this is a German shop and most customers are in DE or nearby. */
+const PRIORITY = ["DE", "AT", "CH"]
+
+/**
+ * Codes as options, named in `locale` and sorted by that language's collation —
+ * "Österreich" belongs next to "Oman" in German, not at the end of the list.
+ *
+ * On a non-English page each entry also carries its English name as a hidden
+ * search term, so a bilingual customer typing "Netherlands" still finds
+ * "Niederlande". Plenty of people shop in German but think in English.
+ */
+export const sortedCountryOptions = (codes: readonly string[], locale: string): CountryOption[] => {
+	const english = new Intl.DisplayNames(["en"], { type: "region" })
+
+	const build = (code: string): CountryOption => {
+		const label = countryName(code, locale)
+		const englishName = english.of(code) ?? code
+
+		return {
+			value: code,
+			label,
+			...(englishName !== label ? { keywords: [englishName] } : {}),
+		}
+	}
+
+	const priority = PRIORITY.filter((code) => codes.includes(code))
+
+	const rest = codes
+		.filter((code) => !priority.includes(code))
+		.map(build)
+		.sort((a, b) => a.label.localeCompare(b.label, locale))
+
+	return [...priority.map(build), ...rest]
 }

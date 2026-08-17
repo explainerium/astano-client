@@ -26,7 +26,8 @@ import {
 	useMyAddressesQuery,
 	useUpdateAddressMutation,
 } from "@/redux/api/storefrontApi"
-import { SHIPPING_COUNTRIES, countryName } from "@/lib/countries"
+import { countryName } from "@/lib/countries"
+import { useSellingCountries } from "@/lib/useDeliveryCountries"
 import type { SavedAddress } from "@/types/storefront"
 
 const apiMessage = (error: unknown) => (error as { data?: { message?: string } })?.data?.message
@@ -87,10 +88,15 @@ export const AddressBook = () => {
 
 	const schema = useMemo(() => buildSchema(t), [t])
 
-	const countries = SHIPPING_COUNTRIES.map((country) => ({
-		value: country.code,
-		label: locale === "de" ? country.de : country.en,
-	}))
+	/*
+	 * The wider of the two lists, deliberately.
+	 *
+	 * An entry here can end up being used as a billing address, and a shop can
+	 * invoice a country it will not deliver to — so restricting this to the
+	 * delivery countries would leave a customer unable to save their own
+	 * address. Checkout narrows the *delivery* field on its own.
+	 */
+	const { options: countries } = useSellingCountries()
 
 	const onSubmit = async (form: FormValues) => {
 		const optional = (value: string) => (value.trim() ? value.trim() : null)

@@ -149,6 +149,30 @@ export const storefrontApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.cart],
 		}),
 
+		/**
+		 * A drawing sent after the order was placed.
+		 *
+		 * The client's rule is that print files may follow the order, and this is
+		 * the channel — the customer opens the order in their account and attaches
+		 * the file to the line it belongs to. Staff are emailed a link to the
+		 * order, never to the file.
+		 *
+		 * Replaces the whole set, like the cart: somebody who attached the wrong
+		 * drawing needs a way to correct it. Invalidates `order` so the page
+		 * repaints from the server rather than from what it hoped happened.
+		 */
+		setOrderItemFiles: build.mutation<
+			ArtworkFile[],
+			{ orderId: string; itemId: string; assetIds: string[] }
+		>({
+			query: ({ orderId, itemId, assetIds }) => ({
+				url: `/orders/${orderId}/items/${itemId}/files`,
+				method: "PUT",
+				data: { assetIds },
+			}),
+			invalidatesTags: [tagTypes.order],
+		}),
+
 		/** Quantity 0 removes the line — the usual meaning of typing 0 into a cart. */
 		updateCartItem: build.mutation<CartView, { id: string; quantity: number }>({
 			query: ({ id, quantity }) => ({
@@ -516,6 +540,7 @@ export const {
 	usePriceConfigurationMutation,
 	useAddConfigurationToCartMutation,
 	useSetCartItemFilesMutation,
+	useSetOrderItemFilesMutation,
 	useSetQuoteItemFilesMutation,
 	useUpdateCartItemMutation,
 	useRemoveCartItemMutation,

@@ -1,10 +1,26 @@
 import { z } from "zod"
+import { requiresVatId } from "@/lib/euCountries"
 
 export interface RegistrationMessages {
 	required: string
 	email: string
 	minPassword: string
 	acceptTerms: string
+	/** Only read when `requireVatForEu` is set — see below. */
+	vatRequired?: string
+}
+
+export interface RegistrationOptions {
+	/**
+	 * Require a VAT ID from an EU business outside Germany.
+	 *
+	 * Off by default and on only for the dealer application, because that is
+	 * where it means something. Reverse charge applies between businesses, and
+	 * requiring it on ordinary signup would refuse a private customer in Austria
+	 * over a number they do not have. The server draws the same line: the B2B
+	 * schema enforces it, the account schema does not.
+	 */
+	requireVatForEu?: boolean
 }
 
 /**
@@ -22,7 +38,7 @@ export interface RegistrationMessages {
  *
  * Mirrors the server schema, which validates all of this again.
  */
-export const registrationSchema = (m: RegistrationMessages) =>
+export const registrationSchema = (m: RegistrationMessages, opts: RegistrationOptions = {}) =>
 	z.object({
 		// Contact
 		salutation: z.string().optional(),
@@ -56,6 +72,24 @@ export const registrationSchema = (m: RegistrationMessages) =>
 		// Honeypot. Never shown, never filled by a person.
 		email2: z.string().optional(),
 	})
+		/**
+		 * The VAT ID, required of an EU business outside Germany and nobody else.
+		 *
+		 * A `superRefine` because whether it is required depends on another answer
+		 * on the same form, which a field-level rule cannot see. Attached to the
+		 * path so the message lands on the box the customer has to fill.
+		 */
+		.superRefine((values, ctx) => {
+			if (!opts.requireVatForEu) return
+			if (!requiresVatId(values.countryCode)) return
+			if (values.vatNumber?.trim()) return
+
+			ctx.addIssue({
+				code: "custom",
+				path: ["vatNumber"],
+				message: m.vatRequired ?? m.required,
+			})
+		})
 
 export type RegistrationValues = z.infer<ReturnType<typeof registrationSchema>>
 

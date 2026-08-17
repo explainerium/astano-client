@@ -85,7 +85,9 @@
 		"pendingTitle": "Your application is being reviewed",
 		"pendingBody": "A member of our team checks every dealer application by hand. Until it is approved you can sign in, but trade pricing and your account pages stay locked.",
 		"rejectedTitle": "Your application was not approved",
-		"rejectedBody": "Please contact us if you believe this is a mistake."
+		"rejectedBody": "Please contact us if you believe this is a mistake.",
+		"vatRequiredEu": "A VAT ID is required for businesses in the EU outside Germany.",
+		"vatRequiredEuHint": "Required for EU businesses outside Germany, so we can invoice you under the reverse-charge procedure."
 	},
 	"shop": {
 		"addToCart": "Add to cart",
@@ -861,7 +863,8 @@
 		"download": "Download",
 		"deleted": "No longer available",
 		"optionalOrLater": "You can upload your print file here, or send it to us after ordering.",
-		"expectedOrLater": "This item is made to your design. Upload the file here, or send it to us after ordering."
+		"expectedOrLater": "This item is made to your design. Upload the file here, or send it to us after ordering.",
+		"sendLaterHere": "Send us the print file for this item. We will be notified as soon as you upload it."
 	},
 	"adminNav": {
 		"dashboard": "Dashboard",

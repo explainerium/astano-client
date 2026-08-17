@@ -258,7 +258,27 @@ export default function OrderDetailPage() {
 											    into the parent's price (§4.6). */}
 											{item.options.map((option) => (
 												<TableRow key={option.id} className="text-muted-foreground">
-													<TableCell className="pl-8 text-xs">↳ {option.name}</TableCell>
+													<TableCell className="pl-8 text-xs">
+														↳ {option.name}
+														{/*
+														 * An option's own drawings, which were not shown at
+														 * all. The engraving is usually the line the file
+														 * belongs to — the cutter is the blank — so leaving
+														 * them off the option row hid exactly the ones
+														 * production needs most.
+														 */}
+														{!!option.files.length && (
+															<div className="mt-1.5">
+																<ArtworkLinks
+																	files={option.files}
+																	labels={{
+																		download: t("download"),
+																		deleted: t("noLongerAvailable"),
+																	}}
+																/>
+															</div>
+														)}
+													</TableCell>
 													<TableCell className="font-mono text-xs">{option.sku}</TableCell>
 													<TableCell className="tabular-nums text-xs">
 														{option.quantity}

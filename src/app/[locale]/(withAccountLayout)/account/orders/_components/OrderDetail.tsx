@@ -13,6 +13,7 @@ import { openInvoice } from "@/lib/downloadInvoice"
 import BankAccountDetails from "@/app/[locale]/_components/BankAccountDetails"
 import type { CheckoutAddress } from "@/types/storefront"
 import StatusChip from "../../../_components/StatusChip"
+import OrderLineArtwork from "./OrderLineArtwork"
 
 const AddressBlock = ({ address, locale }: { address: CheckoutAddress; locale: string }) => (
 	<address className="text-muted-foreground text-sm not-italic">
@@ -116,20 +117,36 @@ export const OrderDetail = ({ id }: { id: string }) => {
 				<h3 className="font-heading mb-4 text-lg font-semibold">{t("orderItems")}</h3>
 				<ul className="divide-y border-y">
 					{order.items.map((item) => (
-						<li key={item.id} className="flex gap-4 py-4">
-							<div className="min-w-0 flex-1">
-								<p className="font-medium">{item.name}</p>
-								{item.sku && <p className="text-muted-foreground text-xs">{item.sku}</p>}
-								<p className="text-muted-foreground mt-1 text-sm">
-									{item.quantity} × {formatMoney(item.unitPrice)}
-								</p>
-								{item.options?.map((option) => (
-									<p key={option.id} className="text-muted-foreground mt-1 text-xs">
-										+ {option.name} ({option.quantity} × {formatMoney(option.unitPrice)})
+						<li key={item.id} className="py-4">
+							<div className="flex gap-4">
+								<div className="min-w-0 flex-1">
+									<p className="font-medium">{item.name}</p>
+									{item.sku && <p className="text-muted-foreground text-xs">{item.sku}</p>}
+									<p className="text-muted-foreground mt-1 text-sm">
+										{item.quantity} × {formatMoney(item.unitPrice)}
 									</p>
-								))}
+									{item.options?.map((option) => (
+										<p key={option.id} className="text-muted-foreground mt-1 text-xs">
+											+ {option.name} ({option.quantity} × {formatMoney(option.unitPrice)})
+										</p>
+									))}
+								</div>
+								<span className="shrink-0 font-semibold">{formatMoney(item.lineTotal)}</span>
 							</div>
-							<span className="shrink-0 font-semibold">{formatMoney(item.lineTotal)}</span>
+
+							{/*
+							 * The print files, still sendable after the order was placed.
+							 *
+							 * Outside the flex row above rather than inside it: an upload
+							 * control squeezed into a column beside a price has nowhere to
+							 * list a filename. Each option gets its own, because an option
+							 * is a product with its own artwork rules — the engraving takes
+							 * the drawing, not the cutter it goes on.
+							 */}
+							<OrderLineArtwork orderId={order.id} line={item} />
+							{item.options?.map((option) => (
+								<OrderLineArtwork key={option.id} orderId={order.id} line={option} />
+							))}
 						</li>
 					))}
 				</ul>

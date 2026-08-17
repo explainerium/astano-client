@@ -85,7 +85,9 @@
 		"pendingTitle": "Ihr Antrag wird geprüft",
 		"pendingBody": "Jeder Händlerantrag wird von uns persönlich geprüft. Bis zur Freigabe können Sie sich anmelden, Händlerpreise und Ihr Kundenkonto bleiben jedoch gesperrt.",
 		"rejectedTitle": "Ihr Antrag wurde nicht freigegeben",
-		"rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt."
+		"rejectedBody": "Bitte kontaktieren Sie uns, falls Sie der Meinung sind, dass es sich um einen Irrtum handelt.",
+		"vatRequiredEu": "Für Unternehmen aus der EU außerhalb Deutschlands ist die USt-IdNr. erforderlich.",
+		"vatRequiredEuHint": "Für EU-Unternehmen außerhalb Deutschlands erforderlich, damit wir im Reverse-Charge-Verfahren abrechnen können."
 	},
 	"shop": {
 		"addToCart": "In den Warenkorb",
@@ -862,7 +864,8 @@
 		"download": "Herunterladen",
 		"deleted": "Nicht mehr verfügbar",
 		"optionalOrLater": "Sie können Ihre Druckdatei hier hochladen oder uns nach der Bestellung zusenden.",
-		"expectedOrLater": "Dieser Artikel wird nach Ihrer Vorlage gefertigt. Laden Sie die Datei hier hoch oder senden Sie sie uns nach der Bestellung zu."
+		"expectedOrLater": "Dieser Artikel wird nach Ihrer Vorlage gefertigt. Laden Sie die Datei hier hoch oder senden Sie sie uns nach der Bestellung zu.",
+		"sendLaterHere": "Senden Sie uns die Druckdatei für diesen Artikel. Wir werden benachrichtigt, sobald Sie sie hochladen."
 	},
 	"adminNav": {
 		"dashboard": "Übersicht",

@@ -28,6 +28,19 @@ export interface OrderAddress {
 	email: string | null
 }
 
+/**
+ * A design file frozen onto an order line.
+ *
+ * `assetId` is null once the upload is deleted; the name still records what was
+ * sent, because a blank where a drawing used to be is the one thing production
+ * must never see.
+ */
+export interface OrderLineFile {
+	id: string
+	assetId: string | null
+	name: string
+}
+
 export interface OrderOptionLine {
 	id: string
 	sku: string
@@ -35,6 +48,14 @@ export interface OrderOptionLine {
 	quantity: number
 	unitPrice: string
 	lineTotal: string
+	/**
+	 * An option's own drawings.
+	 *
+	 * Options carry them as much as the lines above them do — an engraving is
+	 * the line the file belongs to, the cutter is the blank — and this type not
+	 * having the field is why the dashboard showed none of them.
+	 */
+	files: OrderLineFile[]
 }
 
 export interface OrderItem {
@@ -45,11 +66,8 @@ export interface OrderItem {
 	quantity: number
 	unitPrice: string
 	lineTotal: string
-	/**
-	 * The design files this line is made from, frozen at placement. `assetId`
-	 * is null once the upload is deleted; the name still records what was sent.
-	 */
-	files: { id: string; assetId: string | null; name: string }[]
+	/** The design files this line is made from, frozen at placement. */
+	files: OrderLineFile[]
 	/** Configurator lines, priced and counted separately (§4.6). */
 	options: OrderOptionLine[]
 }

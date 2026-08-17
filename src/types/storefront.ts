@@ -409,8 +409,25 @@ export interface OrderItem {
 	/**
 	 * The design files this line is made from, frozen at placement. `assetId`
 	 * is null once the upload is deleted; the name still records what was sent.
+	 * `sizeBytes` and `uploadedAt` come from the asset and go null with it.
 	 */
-	files: { id: string; assetId: string | null; name: string }[]
+	files: {
+		id: string
+		assetId: string | null
+		name: string
+		sizeBytes: number | null
+		uploadedAt: string | null
+	}[]
+	/** What the product allows. `maxFiles: 0` means it takes no artwork at all. */
+	artwork: ArtworkRules
+	/**
+	 * Whether the customer may still send a drawing for this line.
+	 *
+	 * Two questions folded into one by the API: the product has to accept
+	 * artwork, and the order has to still be open to it — a completed or
+	 * cancelled order is not. The upload box is shown on exactly this.
+	 */
+	canAttachArtwork: boolean
 	options?: Omit<OrderItem, "options">[]
 }
 

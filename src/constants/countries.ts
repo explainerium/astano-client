@@ -7,7 +7,7 @@
  * `test_land` field, which stored display names where ISO codes were expected
  * and quietly broke the tax and shipping matrices (§10.4 risk #5).
  */
-const ISO_COUNTRY_CODES = [
+export const ISO_COUNTRY_CODES = [
 	"AD","AE","AF","AG","AI","AL","AM","AO","AQ","AR","AS","AT","AU","AW","AX","AZ",
 	"BA","BB","BD","BE","BF","BG","BH","BI","BJ","BL","BM","BN","BO","BQ","BR","BS",
 	"BT","BV","BW","BY","BZ","CA","CC","CD","CF","CG","CH","CI","CK","CL","CM","CN",
