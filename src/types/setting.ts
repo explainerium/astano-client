@@ -6,6 +6,13 @@ export interface Setting {
 	/** Public settings are served to the storefront by `GET /settings/public`. */
 	isPublic: boolean
 	updatedAt: string
+	/**
+	 * Credentials only (`type: "password"`). `value` is always empty for these —
+	 * the API does not return a stored secret — so these two are all the screen
+	 * gets: whether one is saved, and a mask to recognise it by.
+	 */
+	isSet?: boolean
+	preview?: string | null
 }
 
 /**
@@ -23,6 +30,8 @@ export type SettingType =
 	| "country"
 	| "countries"
 	| "color"
+	/** Stored encrypted, never sent back. An empty box means "leave it alone". */
+	| "password"
 
 export interface SettingDefinition {
 	label: string
@@ -61,4 +70,20 @@ export type PublicSettings = Record<string, string | number | boolean>
 
 export interface SettingsPayload {
 	settings: { key: string; value: unknown; isPublic?: boolean }[]
+}
+
+/**
+ * What the mail server test reports.
+ *
+ * `ok: false` arrives on a 200 — the request succeeded in asking, and the
+ * answer is the interesting part. `message` is the mail server's own words
+ * ("535 Authentication failed"), which is the only thing that tells an admin
+ * whether they pasted the wrong key or the wrong port.
+ */
+export interface MailTestResult {
+	ok: boolean
+	message: string
+	/** Whether the settings or the deployment's environment supplied the server. */
+	source?: "settings" | "environment"
+	host?: string
 }

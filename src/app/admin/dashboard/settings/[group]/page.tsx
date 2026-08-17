@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useSettingsQuery } from "@/redux/api/settingApi"
+import MailServerTestCard from "../_components/MailServerTestCard"
 import SettingsGroupForm from "../_components/SettingsGroupForm"
 import useSettingText from "../_components/useSettingText"
 import TierPriorityCard from "../_components/TierPriorityCard"
@@ -61,6 +62,9 @@ export default function SettingsGroupPage() {
 			{/* The ladder priority has a control of its own — three named sources with
 			    an explanation each, rather than a comma-separated string to type. */}
 			{group === "pricing" && <TierPriorityCard />}
+
+			{/* Saving SMTP proves nothing. This is where you find out. */}
+			{group === "smtp" && <MailServerTestCard />}
 		</div>
 	)
 }

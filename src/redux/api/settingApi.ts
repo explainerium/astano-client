@@ -1,4 +1,9 @@
-import type { PublicSettings, SettingsPayload, SettingsResponse } from "@/types/setting"
+import type {
+	MailTestResult,
+	PublicSettings,
+	SettingsPayload,
+	SettingsResponse,
+} from "@/types/setting"
 import { tagTypes } from "../tag-types"
 import { baseApi } from "./baseApi"
 
@@ -61,6 +66,21 @@ export const settingApi = baseApi.injectEndpoints({
 			query: (key) => ({ url: `/settings/${key}`, method: "DELETE" }),
 			invalidatesTags: [tagTypes.setting],
 		}),
+
+		/**
+		 * Sends one real message through the configured mail server.
+		 *
+		 * Long timeout on purpose: an SMTP handshake to a wrong host does not
+		 * fail fast, it waits — and "we gave up before the server did" is a
+		 * different answer from "the server refused you", which is the whole
+		 * question being asked. Not retried, for the same reason nothing that
+		 * sends mail should be.
+		 *
+		 * Invalidates nothing. It changes no setting; it only reports.
+		 */
+		testMailServer: build.mutation<MailTestResult, { to: string }>({
+			query: (data) => ({ url: "/settings/mail/test", method: "POST", data, timeout: 45_000 }),
+		}),
 	}),
 })
 
@@ -70,4 +90,5 @@ export const {
 	useDeliveryCountriesQuery,
 	useSaveSettingsMutation,
 	useDeleteSettingMutation,
+	useTestMailServerMutation,
 } = settingApi

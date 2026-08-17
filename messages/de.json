@@ -893,6 +893,15 @@
 		"site": "Website"
 	},
 	"adminSettings": {
+		"mailTest": {
+			"title": "Test-E-Mail senden",
+			"blurb": "Sendet eine echte Nachricht über den oben eingetragenen Server. Speichern legt die Daten nur ab — hier zeigt sich, ob sie funktionieren.",
+			"placeholder": "name@beispiel.de",
+			"send": "Test senden",
+			"sending": "Wird gesendet…",
+			"viaSettings": "Gesendet über {host}, mit den Einstellungen oben.",
+			"viaEnvironment": "Gesendet über {host}, aus der Serverkonfiguration — die Felder oben sind leer."
+		},
 		"sections": {
 			"shop": "Shop",
 			"business": "Unternehmen",
@@ -938,6 +947,10 @@
 			"invoice": {
 				"title": "Rechnungen",
 				"blurb": "Wie Rechnungen nummeriert und abgeschlossen werden."
+			},
+			"smtp": {
+				"title": "Mailserver",
+				"blurb": "Das Konto, über das der Shop versendet. Ohne diese Angaben wird keine E-Mail verschickt."
 			},
 			"mail": {
 				"title": "Versand",
@@ -1007,11 +1020,28 @@
 			"invoice__numberPrefix": {
 				"label": "Präfix der Rechnungsnummer"
 			},
+			"smtp__host": {
+				"label": "SMTP-Server",
+				"help": "Von Ihrem E-Mail-Anbieter. Bei Brevo ist es smtp-relay.brevo.com; Ihr Webhoster hat einen eigenen. Leer lassen, um die Serverkonfiguration zu verwenden."
+			},
+			"smtp__port": {
+				"label": "Port",
+				"help": "587 für fast alles. 465 nur, wenn Ihr Anbieter es ausdrücklich verlangt."
+			},
+			"smtp__user": {
+				"label": "Benutzername",
+				"help": "Meist die vollständige E-Mail-Adresse oder der Login, den Ihr Anbieter auf seiner SMTP-Seite anzeigt."
+			},
+			"smtp__password": {
+				"label": "Passwort",
+				"help": "Der SMTP-Schlüssel — bei den meisten Anbietern nicht Ihr Kontopasswort. Wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um das bisherige zu behalten."
+			},
 			"mail__fromName": {
 				"label": "Absendername ausgehender E-Mails"
 			},
 			"mail__fromAddress": {
-				"label": "Absenderadresse ausgehender E-Mails"
+				"label": "Absenderadresse ausgehender E-Mails",
+				"help": "Muss eine Adresse einer Domain sein, für die Ihr Anbieter senden darf — sonst landet die Post im Spam."
 			},
 			"mail__adminNotifyAddress": {
 				"label": "Wohin neue Bestellungen und Anfragen gemeldet werden"
@@ -1172,7 +1202,9 @@
 		"enterNumber": "Bitte eine Zahl eingeben",
 		"noCountries": "Keine Länder ausgewählt",
 		"chooseCountry": "Land auswählen",
-		"invoiceFieldsWarning": "Rechnungen werden hieraus erzeugt — ein leeres Feld druckt sich als leere Zeile auf ein Dokument, das der Kunde behält."
+		"invoiceFieldsWarning": "Rechnungen werden hieraus erzeugt — ein leeres Feld druckt sich als leere Zeile auf ein Dokument, das der Kunde behält.",
+		"secretSaved": "Gespeichert — leer lassen, um es zu behalten",
+		"secretEmpty": "Nicht gesetzt"
 	},
 	"adminPricing": {
 		"title": "Priorität der Mengenrabatte",

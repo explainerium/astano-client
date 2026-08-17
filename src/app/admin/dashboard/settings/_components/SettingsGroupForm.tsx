@@ -70,6 +70,8 @@ export const SettingsGroupForm = ({
 	const [saveSettings] = useSaveSettingsMutation()
 
 	const stored = new Map(data.settings.map((s) => [s.key, s.value]))
+	/** Credentials never arrive with a value — only whether there is one. */
+	const secrets = new Map(data.settings.map((s) => [s.key, s]))
 
 	const entries = Object.entries(data.definitions).filter(
 		([key, definition]) => definition.group === groupKey && !HAS_OWN_CONTROL.has(key)
@@ -166,6 +168,33 @@ export const SettingsGroupForm = ({
 					multiple={definition.type === "countries"}
 					options={countryOptions(locale)}
 					placeholder={definition.type === "countries" ? c("noCountries") : c("chooseCountry")}
+				/>
+			)
+		}
+
+		if (definition.type === "password") {
+			const saved = secrets.get(key)
+
+			return (
+				<ProInput
+					name={name}
+					type="password"
+					label={text.label(key, definition.label)}
+					description={text.help(key, definition.help)}
+					/*
+					 * The mask goes in the placeholder, not the value.
+					 *
+					 * As a value it would be submitted back and stored as the
+					 * literal string of dots the next time somebody saved the group
+					 * — and the shop would then authenticate with "••••4242".
+					 * As a placeholder it says "there is one" and disappears the
+					 * moment anybody types, which is exactly the affordance wanted.
+					 */
+					placeholder={saved?.isSet ? (saved.preview ?? c("secretSaved")) : c("secretEmpty")}
+					// Off, deliberately. A browser offering the admin's own saved
+					// login here would put a personal password into the shop's
+					// outgoing mail configuration.
+					autoComplete="off"
 				/>
 			)
 		}

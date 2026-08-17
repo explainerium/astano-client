@@ -899,7 +899,20 @@
 		"enterNumber": "Enter a number",
 		"noCountries": "No countries selected",
 		"chooseCountry": "Choose a country",
-		"invoiceFieldsWarning": "Invoices are generated from these, so a blank one prints as a blank line on a document the customer keeps."
+		"invoiceFieldsWarning": "Invoices are generated from these, so a blank one prints as a blank line on a document the customer keeps.",
+		"secretSaved": "Saved — leave empty to keep it",
+		"secretEmpty": "Not set"
+	},
+	"adminSettings": {
+		"mailTest": {
+			"title": "Send a test email",
+			"blurb": "Sends one real message through the server above. Saving the settings only stores them — this is what proves they work.",
+			"placeholder": "you@example.com",
+			"send": "Send test",
+			"sending": "Sending…",
+			"viaSettings": "Sent through {host}, from the settings above.",
+			"viaEnvironment": "Sent through {host}, from the server's own configuration — the settings above are empty."
+		}
 	},
 	"adminPricing": {
 		"title": "Quantity discount priority",
