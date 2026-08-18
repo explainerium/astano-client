@@ -68,6 +68,17 @@ export const pathnames = {
 		de: "/haendler-registrierung",
 	},
 
+	/**
+	 * Password recovery, both halves outside /account.
+	 *
+	 * Whoever needs these cannot sign in — that is the entire premise — so they
+	 * must be reachable with no session. The reset link is composed by the
+	 * backend and therefore repeats these slugs; keep the two in step. See
+	 * shopLinks.ts in the API.
+	 */
+	"/forgot-password": { en: "/forgot-password", de: "/passwort-vergessen" },
+	"/reset-password": { en: "/reset-password", de: "/passwort-zuruecksetzen" },
+
 	// ─── Account ───────────────────────────────────────────────────────────
 	"/account": { en: "/account", de: "/mein-konto" },
 	"/account/profile": { en: "/account/profile", de: "/mein-konto/profil" },

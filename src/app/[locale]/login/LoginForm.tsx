@@ -167,7 +167,7 @@ export const LoginForm = () => {
 			<SubmitStatus message={t("signingInSlow")} />
 
 			<p className="text-center">
-				<Link href="/login" className="text-muted-foreground text-sm underline underline-offset-4">
+				<Link href="/forgot-password" className="text-muted-foreground text-sm underline underline-offset-4">
 					{t("forgotPassword")}
 				</Link>
 			</p>
