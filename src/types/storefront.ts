@@ -118,6 +118,15 @@ export interface PublicProductAttribute {
 }
 
 export interface PublicProductDetail extends PublicProduct {
+	/**
+	 * False for an option product — engraving, a coating, a gift box.
+	 *
+	 * It has a page, a price and a tier ladder, because the configurator links
+	 * to it and a customer choosing between two packagings has to be able to
+	 * read about them. It has no way to be ordered on its own: it is bought by
+	 * being ticked on the page of the product it belongs to.
+	 */
+	purchasableAlone: boolean
 	/** After Description and Additional information, in the shop's own order. */
 	tabs: PublicProductTab[]
 	/** Whether this product is made to a customer drawing, and how many. */

@@ -194,7 +194,16 @@
 		"viewQuoteBasket": "Anfragekorb ansehen",
 		"optionsSubtotal": "{count, plural, one {# Option} other {# Optionen}}",
 		"addWithOptions": "Mit Optionen in den Warenkorb",
-		"optionBelowMoq": "Eine Option liegt unter ihrer Mindestbestellmenge."
+		"optionBelowMoq": "Eine Option liegt unter ihrer Mindestbestellmenge.",
+		"optionsIntro": "Optionen sind Erweiterungen zu diesem Produkt — Verpackung, Gravur, Beschichtung. Wählen Sie die gewünschten aus und geben Sie je eine Menge an; alles wird gemeinsam in den Warenkorb gelegt.",
+		"optionsTierHint": "Stückpreise der Optionen ändern sich nach Eingabe der jeweiligen Menge auf die niedrigeren Staffelpreise!",
+		"optionsSelectedCount": "{count, plural, =0 {keine ausgewählt} one {# ausgewählt} other {# ausgewählt}}",
+		"optionsHide": "Optionen ausblenden",
+		"optionsShow": "Optionen einblenden",
+		"optionMoreInfo": "Details",
+		"optionMoreInfoLabel": "Mehr zu {name} (öffnet in neuem Tab)",
+		"optionProductTitle": "Dies ist eine Option, kein eigenständiger Artikel.",
+		"optionProductBody": "Sie wird bestellt, indem Sie sie im Bereich Optionen auf der Seite des zugehörigen Produkts auswählen — Preis, Mindestmenge und Staffelpreise finden Sie hier, damit Sie vorher entscheiden können."
 	},
 	"cart": {
 		"title": "Warenkorb",

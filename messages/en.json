@@ -194,7 +194,16 @@
 		"viewQuoteBasket": "View inquiry basket",
 		"optionsSubtotal": "{count, plural, one {# option} other {# options}}",
 		"addWithOptions": "Add to cart with options",
-		"optionBelowMoq": "An option is below its minimum order quantity."
+		"optionBelowMoq": "An option is below its minimum order quantity.",
+		"optionsIntro": "Options are extras for this product — packaging, engraving, coating. Tick the ones you want and set a quantity for each; everything is added to your basket in one go.",
+		"optionsTierHint": "The unit price of an option drops to its lower tier price as soon as you enter the corresponding quantity.",
+		"optionsSelectedCount": "{count, plural, =0 {none selected} one {# selected} other {# selected}}",
+		"optionsHide": "Hide options",
+		"optionsShow": "Show options",
+		"optionMoreInfo": "Details",
+		"optionMoreInfoLabel": "More about {name} (opens in a new tab)",
+		"optionProductTitle": "This is an option, not a separate article.",
+		"optionProductBody": "It is ordered by ticking it in the Options section on the page of the product it belongs to — its price, minimum quantity and quantity discounts are shown here so you can decide before you do."
 	},
 	"cart": {
 		"title": "Shopping cart",

@@ -10,7 +10,7 @@ import {
 	useShopCategoriesQuery,
 } from "@/redux/api/storefrontApi"
 import CartDrawer from "./CartDrawer"
-import ProductsMenu, { ProductsMenuMobile } from "./ProductsMenu"
+import ProductsMenu, { CategoryTree, ProductsMenuMobile } from "./ProductsMenu"
 import LanguageSwitcher from "./LanguageSwitcher"
 import { cn } from "@/lib/utils"
 
@@ -278,40 +278,57 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 			{/* Black categories bar, aligned under the wordmark as on the live site. */}
 			<div className="border-b bg-white">
 				<div className="mx-auto w-full max-w-[1400px] px-6">
-					<div className="relative w-full max-w-[260px]">
+					{/*
+					 * A click-opened menu, so it also has to close on a click elsewhere.
+					 *
+					 * The nav dropdown above closes when the pointer leaves it, which is
+					 * the whole of the interaction for a hover menu. This one stays open
+					 * until told otherwise, and a panel that can only be dismissed by
+					 * pressing the same button again is a panel people leave open and
+					 * scroll the page behind.
+					 */}
+					<div
+						className="relative w-full max-w-[260px]"
+						onBlur={(event) => {
+							if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+								setOpenCategories(false)
+							}
+						}}
+						onKeyDown={(event) => {
+							if (event.key === "Escape") setOpenCategories(false)
+						}}
+					>
 						<button
 							type="button"
 							onClick={() => setOpenCategories((open) => !open)}
 							aria-expanded={openCategories}
+							aria-haspopup="true"
 							className="bg-ink text-ink-foreground flex w-full items-center gap-3 px-4 py-3 text-sm font-semibold tracking-wide uppercase"
 						>
 							<Menu className="size-4" />
 							{lang === "de" ? "Kategorien" : "Categories"}
 							<ChevronDown
-								className={cn("ml-auto size-4 transition-transform", openCategories && "rotate-180")}
+								className={cn(
+									"ml-auto size-4 transition-transform duration-200 ease-out motion-reduce:transition-none",
+									openCategories && "rotate-180"
+								)}
 							/>
 						</button>
 
-						{openCategories && (
-							<ul className="absolute inset-x-0 top-full z-50 max-h-96 overflow-y-auto border border-t-0 bg-white shadow-lg">
-								{!categories.length && (
-									<li className="text-muted-foreground px-4 py-3 text-sm">
-										{emptyCategories}
-									</li>
-								)}
-								{categories.map((category) => (
-									<li key={category.id}>
-										<Link
-											href={{ pathname: "/categories/[slug]", params: { slug: category.slug } }}
-											className="hover:text-primary block px-4 py-2.5 text-sm hover:bg-neutral-50"
-											onClick={() => setOpenCategories(false)}
-										>
-											{category.name}
-										</Link>
-									</li>
-								))}
-							</ul>
-						)}
+						{/* The same tree the Products menu shows — subcategories included,
+						    which this one used to drop, and animated rather than simply
+						    appearing. Flush under the bar it belongs to, so it reads as
+						    the bar opening rather than as a panel landing on the page. */}
+						<CategoryTree
+							categories={categories}
+							open={openCategories}
+							onNavigate={() => setOpenCategories(false)}
+							emptyLabel={emptyCategories}
+							className={cn(
+								"inset-x-0 top-full border-t-0",
+								openCategories ? "translate-y-0" : "-translate-y-1.5"
+							)}
+						/>
 					</div>
 				</div>
 			</div>

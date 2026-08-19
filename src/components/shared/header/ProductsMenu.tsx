@@ -164,6 +164,56 @@ const Row = ({
 	)
 }
 
+/**
+ * The category tree as a panel — rows, flyouts, and the open/close animation.
+ *
+ * Shared by the two menus that show it: the Products dropdown in the nav row
+ * and the Categories bar beneath it. They open differently — one on hover, one
+ * on a click — but what they open is the same tree, and the second copy of it
+ * was already flat, unanimated and a level shallower than the first. One
+ * component, so they cannot drift again.
+ *
+ * `className` places it. Everything else is the same wherever it appears.
+ */
+export const CategoryTree = ({
+	categories,
+	open,
+	onNavigate,
+	emptyLabel,
+	className,
+}: {
+	categories: PublicCategory[]
+	open: boolean
+	onNavigate: () => void
+	emptyLabel: string
+	className?: string
+}) => {
+	const [openId, setOpenId] = useState<string | null>(null)
+
+	return (
+		<ul
+			className={cn(
+				panelBase,
+				className,
+				open ? "visible opacity-100" : "invisible opacity-0"
+			)}
+		>
+			{!categories.length && (
+				<li className="text-muted-foreground px-4 py-2 text-sm">{emptyLabel}</li>
+			)}
+			{categories.map((category) => (
+				<Row
+					key={category.id}
+					category={category}
+					onNavigate={onNavigate}
+					openId={open ? openId : null}
+					setOpenId={setOpenId}
+				/>
+			))}
+		</ul>
+	)
+}
+
 export const ProductsMenu = ({
 	label,
 	href,
@@ -178,13 +228,11 @@ export const ProductsMenu = ({
 	emptyLabel: string
 }) => {
 	const [open, setOpen] = useState(false)
-	const [openId, setOpenId] = useState<string | null>(null)
 	const timer = useDelayed()
 
-	const shut = () => {
-		setOpen(false)
-		setOpenId(null)
-	}
+	// Closing the panel is enough — CategoryTree drops its own open flyout when
+	// the panel goes, so there is no second piece of state to keep in step.
+	const shut = () => setOpen(false)
 
 	return (
 		<div
@@ -223,9 +271,12 @@ export const ProductsMenu = ({
 				/>
 			</Link>
 
-			<ul
+			<CategoryTree
+				categories={categories}
+				open={open}
+				onNavigate={() => timer.now(shut)}
+				emptyLabel={emptyLabel}
 				className={cn(
-					panelBase,
 					// No max-height here, unlike the flyout: a submenu has to be able to
 					// escape this box, and a scroll container is precisely what stops it.
 					// Five top-level categories do not need one.
@@ -233,22 +284,9 @@ export const ProductsMenu = ({
 					// A hair below the trigger rather than flush against it — the gap is
 					// where the pointer travels, and CLOSE_DELAY_MS is what forgives it.
 					"top-full left-1/2 mt-2 -translate-x-1/2",
-					open ? "visible translate-y-0 opacity-100" : "invisible -translate-y-1.5 opacity-0"
+					open ? "translate-y-0" : "-translate-y-1.5"
 				)}
-			>
-				{!categories.length && (
-					<li className="text-muted-foreground px-4 py-2 text-sm">{emptyLabel}</li>
-				)}
-				{categories.map((category) => (
-					<Row
-						key={category.id}
-						category={category}
-						onNavigate={() => timer.now(shut)}
-						openId={openId}
-						setOpenId={setOpenId}
-					/>
-				))}
-			</ul>
+			/>
 		</div>
 	)
 }

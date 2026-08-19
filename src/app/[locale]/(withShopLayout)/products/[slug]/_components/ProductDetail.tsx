@@ -2,7 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { AlertCircle, Check, Loader2, Minus, Package, Plus } from "lucide-react"
+import {
+	AlertCircle,
+	ChevronDown,
+	Check,
+	Info,
+	Loader2,
+	Minus,
+	Package,
+	Plus,
+	SquareArrowOutUpRight,
+} from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
 import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
 import {
@@ -70,6 +80,19 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * Ticking one seeds it at that option's own minimum (§4.6, R3).
 	 */
 	const [chosenOptions, setChosenOptions] = useState<Map<string, number>>(new Map())
+	/**
+	 * The configurator, folded away once the customer is done with it.
+	 *
+	 * Open to begin with. The largest bundle in the catalogue carries
+	 * twenty-four options and folding it away is a real relief — but it is still
+	 * how this product is bought, and a shop that opens with its configurator
+	 * closed has hidden the wrong section.
+	 *
+	 * Declared with the other hooks rather than beside the markup that uses it:
+	 * the render path returns early while the product is loading, and a hook
+	 * after that returns on some renders and not others.
+	 */
+	const [optionsOpen, setOptionsOpen] = useState(true)
 	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 	const [attaching, setAttaching] = useState(false)
 
@@ -342,6 +365,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 	const hasOptions = product.options.length > 0
 
+
 	/**
 	 * Quantity, what it comes to, and the button.
 	 * 
@@ -445,6 +469,29 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			)}
 		</>
 	)
+	/**
+	 * What an option product offers instead of a purchase.
+	 *
+	 * It cannot be ordered on its own — it is bought by being ticked on the page
+	 * of the product it belongs to. So the quantity field, the line total and the
+	 * add-to-cart button are all absent rather than disabled: a greyed-out Buy
+	 * button says "not right now", and the truthful answer is "not here, and not
+	 * ever, and here is where instead".
+	 *
+	 * Everything else on the page stays. The photographs, the description, the
+	 * specification and the tier ladder are the entire reason this page is worth
+	 * opening, and are what the configurator's Details link came for.
+	 */
+	const optionOnlyNote = (
+		<div className="mt-8 flex gap-3 rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-sm text-amber-900">
+			<Info className="mt-0.5 size-4 shrink-0" />
+			<div className="space-y-1">
+				<p className="font-medium">{t("optionProductTitle")}</p>
+				<p>{t("optionProductBody")}</p>
+			</div>
+		</div>
+	)
+
 	const buyBox = (
 		<>
 	<div className="first:mt-0 mt-8">
@@ -643,7 +690,17 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						</div>
 					)}
 
-					{buyBox}
+					{/*
+					 * Absent counts as purchasable.
+					 *
+					 * The two repositories deploy separately, so there is a window
+					 * where this page is running against an API that predates the
+					 * field. Read as falsy it would hide the buy button on every
+					 * product in the shop; read this way the worst case is a buy
+					 * button on the handful of option pages, where the request is
+					 * refused anyway.
+					 */}
+					{product.purchasableAlone === false ? optionOnlyNote : buyBox}
 
 					<dl className="text-muted-foreground mt-8 space-y-1.5 border-t pt-6 text-sm">
 						{variant?.sku && (
@@ -681,8 +738,79 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			 */}
 			{hasOptions && (
 				<section className="mt-14 border-t pt-10">
-					<fieldset className="mt-8">
-						<legend className="font-heading mb-3 text-base font-semibold">{t("options")}</legend>
+					{/*
+					 * A heading that collapses the configurator.
+					 *
+					 * Twenty-four options is the largest bundle in the catalogue, and a
+					 * customer who has finished configuring — or who came for the
+					 * description and the tier table below — should be able to fold it
+					 * away rather than scroll past it twice. Open by default: this is
+					 * the configurator, not an aside, and a shop that hides how to buy
+					 * the thing has hidden the wrong section.
+					 */}
+					<div className="flex flex-wrap items-center gap-3">
+						<h2 className="font-heading text-base font-semibold">{t("options")}</h2>
+
+						{/* The count is the reason to fold it away, so it stays visible
+						    when it is folded. Amber rather than the page accent: this is
+						    a running tally of choices made, not a call to action. */}
+						<span
+							className={cn(
+								"rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-200",
+								chosenOptions.size
+									? "bg-amber-100 text-amber-900"
+									: "text-muted-foreground bg-neutral-100"
+							)}
+						>
+							{t("optionsSelectedCount", { count: chosenOptions.size })}
+						</span>
+
+						<button
+							type="button"
+							onClick={() => setOptionsOpen((open) => !open)}
+							aria-expanded={optionsOpen}
+							aria-controls="product-options"
+							className="hover:text-primary text-muted-foreground ml-auto inline-flex items-center gap-1.5 text-sm transition-colors duration-200 motion-reduce:transition-none"
+						>
+							{optionsOpen ? t("optionsHide") : t("optionsShow")}
+							<ChevronDown
+								className={cn(
+									"size-4 transition-transform duration-300 ease-out motion-reduce:transition-none",
+									optionsOpen && "rotate-180"
+								)}
+							/>
+						</button>
+					</div>
+
+					<div
+						id="product-options"
+						className={cn(
+							"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+							optionsOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+						)}
+					>
+					<div className="overflow-hidden">
+					<fieldset className="mt-6">
+						<legend className="sr-only">{t("options")}</legend>
+
+						{/*
+						 * What this section is, and the one thing about it that is not
+						 * obvious.
+						 *
+						 * The tier sentence is carried over from the WordPress
+						 * configurator, which said it in exactly these terms — an option's
+						 * unit price falls once the quantity reaches its next rung, and a
+						 * customer who does not know that reads the first figure as the
+						 * only figure. Amber because it is guidance rather than a warning;
+						 * the red one below is for a quantity that is actually wrong.
+						 */}
+						<div className="mb-5 flex gap-3 rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-sm text-amber-900">
+							<Info className="mt-0.5 size-4 shrink-0" />
+							<div className="space-y-1.5">
+								<p>{t("optionsIntro")}</p>
+								<p className="font-medium">{t("optionsTierHint")}</p>
+							</div>
+						</div>
 						{/*
 						 * Two across once there is room for them.
 						 *
@@ -724,10 +852,17 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 									<li
 										key={option.id}
 										className={cn(
-											"overflow-hidden border transition-colors",
+											// Amber for the chosen state, matching the notice above and
+											// the tally in the heading — the whole configurator speaks
+											// one colour, and it is not the page's buy-button accent.
+											"overflow-hidden border transition-[border-color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none",
 											chosen
-												? "border-primary bg-primary/[0.03]"
-												: "hover:border-neutral-400"
+												// A left edge rather than an inset shadow: `theme()` inside
+												// an arbitrary value is Tailwind 3 syntax and silently
+												// produces nothing under 4, so the marker was invisible while
+												// the class sat in the markup looking correct.
+												? "border-amber-400 border-l-4 bg-amber-50/60"
+												: "hover:border-neutral-400 hover:shadow-sm"
 										)}
 									>
 										<label className="flex cursor-pointer items-center gap-4 p-4">
@@ -755,11 +890,11 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 													src={option.image.srcset.thumb ?? option.image.url}
 													alt=""
 													loading="lazy"
-													className="size-12 shrink-0 border object-cover"
+													className="size-16 shrink-0 border bg-white object-cover"
 												/>
 											) : (
-												<span className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center border">
-													<Package className="size-5" />
+												<span className="bg-muted text-muted-foreground flex size-16 shrink-0 items-center justify-center border">
+													<Package className="size-6" />
 												</span>
 											)}
 
@@ -770,6 +905,33 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 													</span>
 												)}
 												<span className="block text-sm font-medium">{option.name}</span>
+
+												{/*
+												 * Through to the option's own page.
+												 *
+												 * Every option is a real product with its own
+												 * photographs, description and tier table — the
+												 * configurator can only show a line of it, and
+												 * "Lasergravur auf Metallbox" is not a description of
+												 * anything to somebody deciding whether they want it.
+												 *
+												 * A new tab, and a click that does not reach the label:
+												 * this sits inside the row that ticks the checkbox, so
+												 * without stopPropagation reading about an option would
+												 * also select it — and navigating away in this tab
+												 * would throw away everything configured so far.
+												 */}
+												<Link
+													href={{ pathname: "/products/[slug]", params: { slug: option.slug } }}
+													target="_blank"
+													rel="noreferrer"
+													onClick={(event) => event.stopPropagation()}
+													aria-label={t("optionMoreInfoLabel", { name: option.name })}
+													className="text-muted-foreground hover:text-primary mt-0.5 inline-flex items-center gap-1 text-xs underline underline-offset-2 transition-colors duration-200 motion-reduce:transition-none"
+												>
+													{t("optionMoreInfo")}
+													<SquareArrowOutUpRight className="size-3" />
+												</Link>
 												{option.startQuantity > 1 && (
 													<span className="text-muted-foreground block text-xs">
 														{t("minimumOrder", { quantity: option.startQuantity })}
@@ -892,9 +1054,15 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							})}
 						</ul>
 					</fieldset>
+					</div>
+					</div>
 
 					{/*
 					 * The order box.
+					 *
+					 * Outside the collapse on purpose: folding the options away is about
+					 * getting the list off the screen, and taking the total and the buy
+					 * button with it would fold away the reason the list was there.
 					 *
 					 * Boxed and held to a readable width rather than left to span the page:
 					 * a total whose label sits at the far left and whose figure sits 1300px
