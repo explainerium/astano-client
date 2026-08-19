@@ -10,6 +10,7 @@ import {
 	useShopCategoriesQuery,
 } from "@/redux/api/storefrontApi"
 import CartDrawer from "./CartDrawer"
+import ProductsMenu, { ProductsMenuMobile } from "./ProductsMenu"
 import LanguageSwitcher from "./LanguageSwitcher"
 import { cn } from "@/lib/utils"
 
@@ -111,6 +112,11 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 	/** The basket panel. Opened from the icon, closed by any link inside it. */
 	const [openCart, setOpenCart] = useState(false)
 
+	/** The category list inside the collapsed menu. Desktop keeps its own. */
+	const [openProducts, setOpenProducts] = useState(false)
+
+	const emptyCategories = lang === "de" ? "Keine Kategorien" : "No categories"
+
 	// Navigating with the panel open would leave it covering the new page.
 	const closeMenu = () => setOpenMenu(false)
 
@@ -140,20 +146,30 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 					<Wordmark />
 
 					<nav className="hidden flex-1 items-center justify-center gap-7 lg:flex">
-						{NAV.map((item) => (
-							<Link
-								key={item.key}
-								href={item.href}
-								aria-current={pathname === item.href ? "page" : undefined}
-								className={cn(
-									"hover:text-primary inline-flex items-center gap-1 text-[13px] font-medium tracking-wide uppercase transition-colors",
-									pathname === item.href && "border-b-2 border-current pb-0.5"
-								)}
-							>
-								{NAV_LABEL[item.key][lang]}
-								{item.hasChildren && <ChevronDown className="size-3" />}
-							</Link>
-						))}
+						{NAV.map((item) =>
+							item.hasChildren ? (
+								<ProductsMenu
+									key={item.key}
+									label={NAV_LABEL[item.key][lang]}
+									href={item.href as "/products"}
+									categories={categories}
+									isActive={pathname === item.href}
+									emptyLabel={emptyCategories}
+								/>
+							) : (
+								<Link
+									key={item.key}
+									href={item.href}
+									aria-current={pathname === item.href ? "page" : undefined}
+									className={cn(
+										"hover:text-primary inline-flex items-center gap-1 text-[13px] font-medium tracking-wide uppercase transition-colors",
+										pathname === item.href && "border-b-2 border-current pb-0.5"
+									)}
+								>
+									{NAV_LABEL[item.key][lang]}
+								</Link>
+							)
+						)}
 					</nav>
 
 					<div className="ml-auto flex items-center gap-4 sm:gap-5 lg:ml-0">
@@ -199,17 +215,53 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 						<ul className="mx-auto w-full max-w-[1400px] divide-y px-6">
 							{NAV.map((item) => (
 								<li key={item.key}>
-									<Link
-										href={item.href}
-										onClick={closeMenu}
-										aria-current={pathname === item.href ? "page" : undefined}
-										className={cn(
-											"hover:text-primary block py-3.5 text-sm font-medium tracking-wide uppercase transition-colors",
-											pathname === item.href && "text-primary"
+									<div className="flex items-center">
+										<Link
+											href={item.href}
+											onClick={closeMenu}
+											aria-current={pathname === item.href ? "page" : undefined}
+											className={cn(
+												"hover:text-primary flex-1 py-3.5 text-sm font-medium tracking-wide uppercase transition-colors",
+												pathname === item.href && "text-primary"
+											)}
+										>
+											{NAV_LABEL[item.key][lang]}
+										</Link>
+
+										{item.hasChildren && (
+											<button
+												type="button"
+												onClick={() => setOpenProducts((open) => !open)}
+												aria-expanded={openProducts}
+												aria-label={NAV_LABEL[item.key][lang]}
+												className="hover:text-primary p-2"
+											>
+												<ChevronDown
+													className={cn(
+														"size-4 transition-transform duration-200 motion-reduce:transition-none",
+														openProducts && "rotate-180"
+													)}
+												/>
+											</button>
 										)}
-									>
-										{NAV_LABEL[item.key][lang]}
-									</Link>
+									</div>
+
+									{item.hasChildren && (
+										<div
+											className={cn(
+												"grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none",
+												openProducts ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+											)}
+										>
+											<div className="overflow-hidden">
+												<ProductsMenuMobile
+													categories={categories}
+													onNavigate={closeMenu}
+													emptyLabel={emptyCategories}
+												/>
+											</div>
+										</div>
+									)}
 								</li>
 							))}
 
@@ -244,7 +296,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 							<ul className="absolute inset-x-0 top-full z-50 max-h-96 overflow-y-auto border border-t-0 bg-white shadow-lg">
 								{!categories.length && (
 									<li className="text-muted-foreground px-4 py-3 text-sm">
-										{lang === "de" ? "Keine Kategorien" : "No categories"}
+										{emptyCategories}
 									</li>
 								)}
 								{categories.map((category) => (
