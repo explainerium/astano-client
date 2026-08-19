@@ -52,7 +52,7 @@ export const MethodChoice = ({
 						checked={value === option.id}
 						disabled={option.disabled}
 						onChange={() => onChange(option.id)}
-						className="mt-0.5 size-4 shrink-0"
+						className="mt-0.5 shrink-0"
 					/>
 					<span className="flex-1 text-sm">
 						<span className="font-medium">{option.title}</span>

@@ -31,6 +31,30 @@ import ProductGallery from "./ProductGallery"
 import ProductTabs from "./ProductTabs"
 import TierTable from "./TierTable"
 
+/**
+ * The configurator's accent, and only the configurator's.
+ *
+ * #FF4D00 is what the WordPress site used for this section — the notice above
+ * the grid, the section title, and the ribbon on the main product. Customers
+ * told us they could no longer find the options area; this is the colour they
+ * were looking for.
+ *
+ * Deliberately not `--primary`: the cyan is the shop's identity and marks what
+ * to press. This marks one section of one page.
+ *
+ * Written out as whole class names rather than through a CSS variable. The
+ * `text-(--var)` shorthand generated a rule for some of these utilities and
+ * silently none for others, so the heading turned orange and the selected row
+ * did not — a failure that looks like a styling opinion rather than a bug.
+ */
+const ACCENT = {
+	text: "text-[#ff4d00]",
+	border: "border-[#ff4d00]",
+	bg: "bg-[#ff4d00]",
+	soft: "bg-[#fff4ef]",
+	softBorder: "border-[#ffd0bd]",
+} as const
+
 /** Long enough that typing a quantity does not fire a request per keystroke. */
 const REPRICE_DELAY_MS = 400
 
@@ -483,8 +507,8 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * opening, and are what the configurator's Details link came for.
 	 */
 	const optionOnlyNote = (
-		<div className="mt-8 flex gap-3 rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-sm text-amber-900">
-			<Info className="mt-0.5 size-4 shrink-0" />
+		<div className={cn("mt-8 flex gap-3 rounded-lg border p-4 text-sm", ACCENT.softBorder, ACCENT.soft, ACCENT.text)}>
+			<Info className="mt-0.5 shrink-0" />
 			<div className="space-y-1">
 				<p className="font-medium">{t("optionProductTitle")}</p>
 				<p>{t("optionProductBody")}</p>
@@ -748,18 +772,45 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 					 * the configurator, not an aside, and a shop that hides how to buy
 					 * the thing has hidden the wrong section.
 					 */}
-					<div className="flex flex-wrap items-center gap-3">
-						<h2 className="font-heading text-base font-semibold">{t("options")}</h2>
+					{/*
+					 * A solid bar, not a coloured heading.
+					 *
+					 * Orange type on white read as a styled title and nothing more —
+					 * the section still did not announce itself, which was the whole
+					 * complaint. A filled bar is a piece of furniture: it separates
+					 * this section from the description above it and is findable at a
+					 * glance from anywhere on the page.
+					 */}
+					<div
+						className={cn(
+							// Rounded all round, not joined to what follows: the section
+							// below it folds away, and a bar with square bottom corners
+							// sitting over nothing looks like something failed to load.
+							"flex flex-wrap items-center gap-3 rounded-lg px-5 py-3.5 text-white",
+							ACCENT.bg
+						)}
+					>
+						<h2 className="font-heading text-base font-semibold">{t("optionsTitle")}</h2>
 
-						{/* The count is the reason to fold it away, so it stays visible
-						    when it is folded. Amber rather than the page accent: this is
-						    a running tally of choices made, not a call to action. */}
+						{/*
+						 * The count, and how loudly it is said.
+						 *
+						 * A tally of choices already made deserves to be legible at a
+						 * glance — it is the reason the section can be folded away at
+						 * all. Translucent white was the first attempt and it dissolved
+						 * into the orange behind it; a solid white pill with the bar's
+						 * own colour inside it is the one combination on this bar that
+						 * cannot be missed.
+						 *
+						 * Only once there is something to count. Empty, it stays
+						 * translucent: "none selected" is a state, not news.
+						 */}
 						<span
 							className={cn(
 								"rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-200",
 								chosenOptions.size
-									? "bg-amber-100 text-amber-900"
-									: "text-muted-foreground bg-neutral-100"
+									? cn("bg-white font-semibold", ACCENT.text)
+									: "bg-white/20 text-white/85"
 							)}
 						>
 							{t("optionsSelectedCount", { count: chosenOptions.size })}
@@ -770,7 +821,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							onClick={() => setOptionsOpen((open) => !open)}
 							aria-expanded={optionsOpen}
 							aria-controls="product-options"
-							className="hover:text-primary text-muted-foreground ml-auto inline-flex items-center gap-1.5 text-sm transition-colors duration-200 motion-reduce:transition-none"
+							className="ml-auto inline-flex items-center gap-1.5 text-sm text-white/90 transition-colors duration-200 hover:text-white motion-reduce:transition-none"
 						>
 							{optionsOpen ? t("optionsHide") : t("optionsShow")}
 							<ChevronDown
@@ -804,8 +855,8 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						 * only figure. Amber because it is guidance rather than a warning;
 						 * the red one below is for a quantity that is actually wrong.
 						 */}
-						<div className="mb-5 flex gap-3 rounded-lg border border-amber-300/70 bg-amber-50 p-4 text-sm text-amber-900">
-							<Info className="mt-0.5 size-4 shrink-0" />
+						<div className={cn("mb-5 flex gap-3 rounded-lg border p-4 text-sm", ACCENT.softBorder, ACCENT.soft, ACCENT.text)}>
+							<Info className="mt-0.5 shrink-0" />
 							<div className="space-y-1.5">
 								<p>{t("optionsIntro")}</p>
 								<p className="font-medium">{t("optionsTierHint")}</p>
@@ -861,7 +912,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 												// an arbitrary value is Tailwind 3 syntax and silently
 												// produces nothing under 4, so the marker was invisible while
 												// the class sat in the markup looking correct.
-												? "border-amber-400 border-l-4 bg-amber-50/60"
+												? cn("border-l-4", ACCENT.border, ACCENT.soft)
 												: "hover:border-neutral-400 hover:shadow-sm"
 										)}
 									>
@@ -878,7 +929,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 														return next
 													})
 												}
-												className="accent-primary size-4 shrink-0"
+												className="shrink-0"
 											/>
 
 											{/* A thumbnail where the option has one. An add-on is a

@@ -262,3 +262,140 @@
     overflow-wrap: break-word;
   }
 }
+
+@layer base {
+  /*
+   * Native checkboxes and radios, styled to match the Radix ones.
+   *
+   * Most of the shop uses the components in components/ui, but three screens
+   * do not — the product configurator, the checkout's delivery and payment
+   * choice, and the quote acceptance form. Those are plain inputs on purpose:
+   * they are grouped by `name` and read straight off the DOM, which is simpler
+   * than wiring a controlled component for a list of radio rows.
+   *
+   * The cost was that they looked like a different website: the browser's own
+   * grey 13px box beside an 18px accented one. Styling the element itself fixes
+   * every one of them at once, including any added later, and needs no import.
+   *
+   * `:not([aria-hidden])` leaves Radix alone. Its components render a hidden
+   * native input so a form still submits a value; that input is positioned off
+   * to the side with inline styles, and giving it a border and a tick would put
+   * a second, ghostly checkbox next to every real one.
+   */
+  input[type="checkbox"]:not([aria-hidden]),
+  input[type="radio"]:not([aria-hidden]) {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 2px solid var(--color-neutral-300, #d4d4d4);
+    background-color: #fff;
+    cursor: pointer;
+    transition:
+      background-color 150ms ease-out,
+      border-color 150ms ease-out,
+      box-shadow 150ms ease-out;
+  }
+
+  input[type="checkbox"]:not([aria-hidden]) {
+    border-radius: 5px;
+  }
+
+  input[type="radio"]:not([aria-hidden]) {
+    border-radius: 9999px;
+  }
+
+  input[type="checkbox"]:not([aria-hidden]):hover:not(:disabled),
+  input[type="radio"]:not([aria-hidden]):hover:not(:disabled) {
+    border-color: var(--color-neutral-400, #a3a3a3);
+  }
+
+  input[type="checkbox"]:not([aria-hidden]):focus-visible,
+  input[type="radio"]:not([aria-hidden]):focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+
+  input[type="checkbox"]:not([aria-hidden]):checked,
+  input[type="radio"]:not([aria-hidden]):checked {
+    border-color: var(--primary);
+  }
+
+  input[type="checkbox"]:not([aria-hidden]):checked {
+    background-color: var(--primary);
+  }
+
+  /*
+   * The tick, drawn rather than fetched.
+   *
+   * Two borders of a rotated box: no SVG to load, no background-image to encode,
+   * and it takes the foreground colour so a checkbox on a dark row would still
+   * work if one ever appears.
+   */
+  input[type="checkbox"]:not([aria-hidden]):checked::after {
+    content: "";
+    position: absolute;
+    inset-inline-start: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--primary-foreground, #fff);
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
+    animation: astano-tick 150ms ease-out;
+  }
+
+  /* The radio keeps its white ring and fills the middle — a choice of one
+     reads differently from a set of independent ticks. */
+  input[type="radio"]:not([aria-hidden]):checked::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background-color: var(--primary);
+    transform: translate(-50%, -50%);
+    animation: astano-tick 150ms ease-out;
+  }
+
+  input[type="checkbox"]:not([aria-hidden]):disabled,
+  input[type="radio"]:not([aria-hidden]):disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  @keyframes astano-tick {
+    from {
+      opacity: 0;
+      transform: rotate(45deg) scale(0.4);
+    }
+  }
+
+  /* The radio's mark is centred by a transform, so it needs its own keyframes
+     rather than sharing the tick's rotation. */
+  input[type="radio"]:not([aria-hidden]):checked::after {
+    animation-name: astano-dot;
+  }
+
+  @keyframes astano-dot {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.4);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    input[type="checkbox"]:not([aria-hidden]),
+    input[type="radio"]:not([aria-hidden]),
+    input[type="checkbox"]:not([aria-hidden]):checked::after,
+    input[type="radio"]:not([aria-hidden]):checked::after {
+      transition: none;
+      animation: none;
+    }
+  }
+}

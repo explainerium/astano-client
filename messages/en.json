@@ -203,7 +203,8 @@
 		"optionMoreInfo": "Details",
 		"optionMoreInfoLabel": "More about {name} (opens in a new tab)",
 		"optionProductTitle": "This is an option, not a separate article.",
-		"optionProductBody": "It is ordered by ticking it in the Options section on the page of the product it belongs to — its price, minimum quantity and quantity discounts are shown here so you can decide before you do."
+		"optionProductBody": "It is ordered by ticking it in the Options section on the page of the product it belongs to — its price, minimum quantity and quantity discounts are shown here so you can decide before you do.",
+		"optionsTitle": "Option products"
 	},
 	"cart": {
 		"title": "Shopping cart",

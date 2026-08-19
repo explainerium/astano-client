@@ -203,7 +203,8 @@
 		"optionMoreInfo": "Details",
 		"optionMoreInfoLabel": "Mehr zu {name} (öffnet in neuem Tab)",
 		"optionProductTitle": "Dies ist eine Option, kein eigenständiger Artikel.",
-		"optionProductBody": "Sie wird bestellt, indem Sie sie im Bereich Optionen auf der Seite des zugehörigen Produkts auswählen — Preis, Mindestmenge und Staffelpreise finden Sie hier, damit Sie vorher entscheiden können."
+		"optionProductBody": "Sie wird bestellt, indem Sie sie im Bereich Optionen auf der Seite des zugehörigen Produkts auswählen — Preis, Mindestmenge und Staffelpreise finden Sie hier, damit Sie vorher entscheiden können.",
+		"optionsTitle": "Optionsprodukte"
 	},
 	"cart": {
 		"title": "Warenkorb",

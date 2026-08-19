@@ -118,7 +118,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 									name="accept-address"
 									checked={chosen?.id === address.id}
 									onChange={() => setAddressId(address.id)}
-									className="mt-0.5 size-4 shrink-0"
+									className="mt-0.5 shrink-0"
 								/>
 								<span>
 									{address.label && (
@@ -157,7 +157,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 									disabled={!method.eligible}
 									checked={selectedPayment === method.id}
 									onChange={() => setPaymentMethodId(method.id)}
-									className="mt-0.5 size-4 shrink-0"
+									className="mt-0.5 shrink-0"
 								/>
 								<span>{method.title ?? method.code}</span>
 							</label>
@@ -168,7 +168,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 
 			{error && (
 				<p className="text-destructive flex items-start gap-2 text-sm" role="alert">
-					<AlertCircle className="mt-0.5 size-4 shrink-0" />
+					<AlertCircle className="mt-0.5 shrink-0" />
 					{error}
 				</p>
 			)}
