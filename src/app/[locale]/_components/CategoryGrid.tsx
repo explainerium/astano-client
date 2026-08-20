@@ -13,7 +13,10 @@ import { useShopCategoriesQuery } from "@/redux/api/storefrontApi"
 export const CategoryGrid = () => {
 	const t = useTranslations("home.categories")
 	const tShop = useTranslations("shop")
-	const { data: categories = [], isLoading } = useShopCategoriesQuery({ tree: true })
+	const { data: categories = [], isLoading } = useShopCategoriesQuery(
+		{ tree: true },
+		{ refetchOnFocus: true }
+	)
 
 	return (
 		<section className="mx-auto w-full max-w-[1400px] px-6 py-16">

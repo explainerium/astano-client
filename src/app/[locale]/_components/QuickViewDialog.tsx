@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { useAddToCartMutation, useShopProductQuery } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import useMoney from "@/lib/useMoney"
+import { richTextClass } from "@/lib/richText"
+import { cn } from "@/lib/utils"
 import TierTable from "@/app/[locale]/(withShopLayout)/products/[slug]/_components/TierTable"
 import type { PublicProduct } from "@/types/storefront"
 
@@ -37,8 +39,17 @@ export const QuickViewDialog = ({
 	onOpenChange,
 	onAdded,
 }: {
-	/** Null when closed. The card passes the product it was clicked on. */
-	product: PublicProduct | null
+	/**
+	 * Null when closed. Whatever was clicked passes what it knows.
+	 *
+	 * Deliberately not `PublicProduct`: the product configurator opens this for
+	 * its option rows, and an option row carries a name, a slug and a thumbnail
+	 * rather than a whole listing entry. The slug is all that is really needed —
+	 * everything else is fetched — and the rest only dresses the loading state.
+	 */
+	product: Pick<PublicProduct, "id" | "slug" | "name"> & {
+		featuredImage?: PublicProduct["featuredImage"]
+	} | null
 	onOpenChange: (open: boolean) => void
 	/**
 	 * What went in the cart, for whoever owns the confirmation.
@@ -47,7 +58,7 @@ export const QuickViewDialog = ({
 	 * and a dialog opening on top of a dialog is a stack the customer has to
 	 * dismiss twice. Quick view closes and the confirmation takes its place.
 	 */
-	onAdded: (added: { name: string; image: string | null; quantity: number }) => void
+	onAdded?: (added: { name: string; image: string | null; quantity: number }) => void
 }) => {
 	// The shop's own separators and symbol. A function rather than an import,
 	// so React Compiler can see that these prices depend on it.
@@ -92,6 +103,26 @@ export const QuickViewDialog = ({
 	}
 	if (variant && quantity < min) setQuantity(min)
 
+	/**
+	 * The ladder's opening price — what one unit costs before any rung applies.
+	 *
+	 * The tier rows themselves are safe at any quantity: the API prices each one
+	 * at its own threshold. This first row is not, because it is the price of
+	 * whatever quantity was last asked for. So it is captured from a response
+	 * taken while the quantity was genuinely below the first threshold, and held
+	 * until the dialog opens on something else.
+	 *
+	 * Without it the table started at the first rung and, worse, computed every
+	 * discount against that rung instead of the base price: an option at €0.50
+	 * falling to €0.45 and €0.38 was shown as "—" and "−16%" here while the
+	 * product page said "−10%" and "−24%". Same ladder, two different answers.
+	 */
+	const firstTierAt = variant?.tiers[0]?.minQuantity ?? Number.POSITIVE_INFINITY
+	const [openingPrice, setOpeningPrice] = useState<{ variantId: string; unitPrice: string | null }>()
+	if (variant && quantity < firstTierAt && openingPrice?.variantId !== variant.id) {
+		setOpeningPrice({ variantId: variant.id, unitPrice: variant.unitPrice })
+	}
+
 	const image = detail?.featuredImage ?? product?.featuredImage ?? null
 	const hero = image ? (image.srcset.detail ?? image.srcset.grid ?? image.url) : null
 
@@ -130,7 +161,7 @@ export const QuickViewDialog = ({
 				quantity,
 			}
 			onOpenChange(false)
-			setTimeout(() => onAdded(added), EXIT_MS)
+			setTimeout(() => onAdded?.(added), EXIT_MS)
 		} catch (cause) {
 			setError((cause as { data?: { message?: string } })?.data?.message ?? t("addFailed"))
 		}
@@ -194,22 +225,66 @@ export const QuickViewDialog = ({
 									<span className="text-muted-foreground text-xs">{t("exclVat")}</span>
 								</div>
 
-								{detail?.shortDescription && (
+								{/*
+								 * The short description if there is one, the full one if not.
+								 *
+								 * Most products carry both; the option products carry only the
+								 * long one, which left this dialog showing a name, a price and
+								 * a large empty rectangle — on the very screen the client asked
+								 * for "pictures and description". Clamped either way, with the
+								 * link below for the rest: this is a glance, not the page.
+								 *
+								 * The HTML is written by staff in the admin editor and
+								 * sanitised on the way into the database — see
+								 * domain/html/sanitizeRichText, and the product page renders
+								 * the same field the same way.
+								 */}
+								{detail?.shortDescription ? (
 									<p className="text-muted-foreground line-clamp-4 text-sm leading-relaxed">
 										{detail.shortDescription}
 									</p>
+								) : (
+									detail?.description && (
+										<div
+											className={cn(richTextClass, "line-clamp-6 text-sm leading-relaxed")}
+											dangerouslySetInnerHTML={{ __html: detail.description }}
+										/>
+									)
 								)}
 
 								{!!variant?.tiers.length && (
 									<TierTable
 										tiers={variant.tiers}
 										quantity={quantity}
-										baseRow={null}
+										baseRow={
+											min < firstTierAt && openingPrice?.variantId === variant.id
+												? { minQuantity: min, unitPrice: openingPrice.unitPrice }
+												: null
+										}
 										title={t("buyMoreSaveMore")}
 										compact
 									/>
 								)}
 
+								{/*
+								 * Only for a product that can be bought on its own.
+								 *
+								 * The configurator opens this dialog for its options, and an
+								 * option is ordered by being ticked on the page of the product
+								 * it belongs to — never here. Read off the fetched product
+								 * rather than passed in as a prop, so the rule is the same one
+								 * the product page applies and cannot disagree with it.
+								 *
+								 * `=== false` and not `!`: an API that predates the field
+								 * would otherwise hide the buy button on every product in the
+								 * shop. See the same guard on the product page.
+								 */}
+								{detail?.purchasableAlone === false ? (
+									<p className="rounded-lg border border-[#ffd0bd] bg-[#fff4ef] p-3 text-sm text-[#ff4d00]">
+										{t("optionProductTitle")}
+									</p>
+								) : (
+								<>
 								<div className="flex flex-wrap items-center gap-3">
 									<div className="flex items-center border">
 										<button
@@ -268,6 +343,8 @@ export const QuickViewDialog = ({
 										<AlertCircle className="size-4 shrink-0" />
 										{error}
 									</p>
+								)}
+								</>
 								)}
 							</>
 						)}

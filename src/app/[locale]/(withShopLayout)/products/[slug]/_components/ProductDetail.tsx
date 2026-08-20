@@ -11,10 +11,11 @@ import {
 	Minus,
 	Package,
 	Plus,
-	SquareArrowOutUpRight,
+	Eye,
 } from "lucide-react"
 import { Link, useRouter } from "@/i18n/navigation"
 import AddedToCartDialog from "@/components/shared/AddedToCartDialog"
+import QuickViewDialog from "@/app/[locale]/_components/QuickViewDialog"
 import {
 	useAddConfigurationToCartMutation,
 	useAddToCartMutation,
@@ -117,6 +118,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * after that returns on some renders and not others.
 	 */
 	const [optionsOpen, setOptionsOpen] = useState(true)
+
+	/** The option whose quick view is open. Null when closed. */
+	const [quickView, setQuickView] = useState<PublicProductDetail["options"][number] | null>(null)
 	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 	const [attaching, setAttaching] = useState(false)
 
@@ -958,31 +962,41 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 												<span className="block text-sm font-medium">{option.name}</span>
 
 												{/*
-												 * Through to the option's own page.
+												 * The option's photographs and description, without
+												 * leaving the page.
 												 *
-												 * Every option is a real product with its own
-												 * photographs, description and tier table — the
-												 * configurator can only show a line of it, and
-												 * "Lasergravur auf Metallbox" is not a description of
-												 * anything to somebody deciding whether they want it.
+												 * Every option is a real product with its own gallery,
+												 * description and ladder — the configurator can only
+												 * show a line of it, and "Lasergravur auf Metallbox" is
+												 * not a description of anything to somebody deciding
+												 * whether they want it.
 												 *
-												 * A new tab, and a click that does not reach the label:
-												 * this sits inside the row that ticks the checkbox, so
-												 * without stopPropagation reading about an option would
-												 * also select it — and navigating away in this tab
-												 * would throw away everything configured so far.
+												 * A dialog rather than a new tab, which is what this
+												 * was and what the client asked to change: a second tab
+												 * loses the half-finished configuration from view and
+												 * makes comparing two packagings a matter of switching
+												 * windows. The dialog reads the same product and hides
+												 * its own buy controls, because an option is not bought
+												 * on its own.
+												 *
+												 * `stopPropagation` because this sits inside the label
+												 * that ticks the checkbox — without it, reading about an
+												 * option would also select it.
 												 */}
-												<Link
-													href={{ pathname: "/products/[slug]", params: { slug: option.slug } }}
-													target="_blank"
-													rel="noreferrer"
-													onClick={(event) => event.stopPropagation()}
+												<button
+													type="button"
+													onClick={(event) => {
+														event.preventDefault()
+														event.stopPropagation()
+														setQuickView(option)
+													}}
+													aria-haspopup="dialog"
 													aria-label={t("optionMoreInfoLabel", { name: option.name })}
 													className="text-muted-foreground hover:text-primary mt-0.5 inline-flex items-center gap-1 text-xs underline underline-offset-2 transition-colors duration-200 motion-reduce:transition-none"
 												>
 													{t("optionMoreInfo")}
-													<SquareArrowOutUpRight className="size-3" />
-												</Link>
+													<Eye className="size-3.5" />
+												</button>
 												{option.startQuantity > 1 && (
 													<span className="text-muted-foreground block text-xs">
 														{t("minimumOrder", { quantity: option.startQuantity })}
@@ -1125,6 +1139,20 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			)}
 
 			<ProductTabs product={product} variant={variant} />
+
+			{/* One dialog for every option row — the open one is whichever is in
+			    state. Mounting one per row would build eleven of these. */}
+			<QuickViewDialog
+				product={
+					quickView && {
+						id: quickView.id,
+						slug: quickView.slug,
+						name: quickView.name,
+						featuredImage: quickView.image,
+					}
+				}
+				onOpenChange={(open) => !open && setQuickView(null)}
+			/>
 
 			<AddedToCartDialog
 				open={!!added}

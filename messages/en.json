@@ -110,7 +110,8 @@
 		"resetDoneBody": "You have been signed out everywhere. Taking you to sign in…",
 		"resetTokenMissingTitle": "This link is incomplete",
 		"resetTokenMissingBody": "The address is missing its token, which usually means the link was cut in half by the mail app. Open it again from the email, or ask for a new one.",
-		"requestNewResetLink": "Request a new link"
+		"requestNewResetLink": "Request a new link",
+		"backToShop": "Back to the shop"
 	},
 	"shop": {
 		"addToCart": "Add to cart",

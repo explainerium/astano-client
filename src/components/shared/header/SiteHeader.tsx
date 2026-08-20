@@ -89,7 +89,21 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 	 */
 	const pathname = usePathname()
 
-	const { data: categories = [] } = useShopCategoriesQuery({ tree: true })
+	const { data: categories = [] } = useShopCategoriesQuery({ tree: true }, {
+		/*
+		 * Refetched when the tab is looked at again.
+		 *
+		 * The header mounts once and never unmounts — client-side navigation
+		 * keeps it — so this list was fetched on the first page load of a tab and
+		 * then held for as long as that tab lived. Hiding a category in the
+		 * dashboard left it sitting in the storefront menu, which is what the
+		 * client reported as "hidden is checked and it still shows".
+		 *
+		 * Coming back to the tab is exactly the moment the shop may have changed
+		 * underneath it, and this list is a few hundred bytes.
+		 */
+		refetchOnFocus: true,
+	})
 
 	/**
 	 * Both baskets are shared with the storefront pages through the same cache

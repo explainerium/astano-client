@@ -110,7 +110,8 @@
 		"resetDoneBody": "Sie wurden überall abgemeldet. Sie werden zur Anmeldung weitergeleitet…",
 		"resetTokenMissingTitle": "Dieser Link ist unvollständig",
 		"resetTokenMissingBody": "Der Adresse fehlt ihr Token — meist hat das E-Mail-Programm den Link umgebrochen. Öffnen Sie ihn erneut aus der E-Mail oder fordern Sie einen neuen an.",
-		"requestNewResetLink": "Neuen Link anfordern"
+		"requestNewResetLink": "Neuen Link anfordern",
+		"backToShop": "Zurück zum Shop"
 	},
 	"shop": {
 		"addToCart": "In den Warenkorb",

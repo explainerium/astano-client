@@ -75,15 +75,35 @@ export const DealerForm = () => {
 
 	if (submitted) {
 		return (
-			<div className="bg-muted/50 space-y-3 rounded-lg border p-6">
+			<div className="bg-muted/50 space-y-4 rounded-lg border p-6">
 				<p className="font-heading text-lg font-semibold">{t("dealerSubmittedTitle")}</p>
 				<p className="text-muted-foreground text-sm">{t("dealerSubmittedBody")}</p>
-				<Link
-					href="/login"
-					className="inline-block text-sm underline underline-offset-4"
-				>
-					{t("signIn")}
-				</Link>
+
+				{/*
+				 * Somewhere to go next.
+				 *
+				 * The screen used to end on a sentence and a text link to sign in,
+				 * which is the wrong offer: the application is not approved yet, so
+				 * signing in shows the same waiting message again. What somebody
+				 * actually wants after filling in sixteen fields is to get back to
+				 * the products — so that is the button, and signing in stays as the
+				 * quieter second option for anyone who does want to watch the status.
+				 *
+				 * /products, not /: "shop" throughout this site means the product
+				 * listing — it is where the 404 page's own Zum Shop goes.
+				 */}
+				<div className="flex flex-wrap items-center gap-4 pt-1">
+					<Link
+						href="/products"
+						className="bg-primary text-primary-foreground inline-flex px-7 py-3 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90"
+					>
+						{t("backToShop")}
+					</Link>
+
+					<Link href="/login" className="text-sm underline underline-offset-4">
+						{t("signIn")}
+					</Link>
+				</div>
 			</div>
 		)
 	}

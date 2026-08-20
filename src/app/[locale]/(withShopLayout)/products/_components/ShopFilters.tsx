@@ -72,7 +72,7 @@ export const ShopFilters = ({
 }) => {
 	const t = useTranslations("shop")
 
-	const { data: categories = [] } = useShopCategoriesQuery({ tree: true })
+	const { data: categories = [] } = useShopCategoriesQuery({ tree: true }, { refetchOnFocus: true })
 
 	return (
 		<aside className="space-y-8">
