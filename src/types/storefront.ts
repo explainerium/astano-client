@@ -314,14 +314,44 @@ export interface ShippingOption {
 	unavailableReason?: "NO_MATCHING_BAND" | "BELOW_FREE_THRESHOLD" | "NOT_CONFIGURED"
 }
 
-export interface CheckoutPaymentMethod {
+/**
+ * Why a payment method is closed to this customer.
+ *
+ * A union rather than `string`, because these arrive from the API and are
+ * matched one by one to render an explanation. As free text they were matched
+ * against names that had never existed — the checkout looked for
+ * `ABOVE_MAXIMUM` while the server has always sent `ORDER_TOTAL_TOO_HIGH` —
+ * and the mismatch degraded silently to "not available for this order", which
+ * is exactly the message the branch existed to avoid. Typed, the same mistake
+ * does not compile.
+ *
+ * Kept in step with IneligibleReason in domain/payment/gatewayEligibility.ts.
+ */
+export type PaymentIneligibleReason =
+	| "INACTIVE"
+	| "REQUIRES_LOGIN"
+	| "COUNTRY_NOT_ALLOWED"
+	| "AWAITING_COUNTRY"
+	| "ROLE_NOT_ALLOWED"
+	| "NOT_ENOUGH_ORDER_HISTORY"
+	| "ORDER_TOTAL_TOO_LOW"
+	| "ORDER_TOTAL_TOO_HIGH"
+	| "REQUIRES_VALIDATED_VAT_ID"
+
+/** The order-value window a method is offered within. Null either side means no bound. */
+export interface PaymentValueLimits {
+	minOrderTotal: string | null
+	maxOrderTotal: string | null
+}
+
+export interface CheckoutPaymentMethod extends PaymentValueLimits {
 	id: string
 	code: string
 	title: string
 	description: string | null
 	eligible: boolean
 	/** e.g. NOT_ENOUGH_ORDER_HISTORY — why this method is closed to this customer. */
-	reason?: string
+	reason?: PaymentIneligibleReason
 }
 
 /**
@@ -517,7 +547,7 @@ export interface WishlistView {
  * carry — which left the checkout unable to name a method it was meant to show
  * greyed out.
  */
-export interface AvailablePaymentMethod {
+export interface AvailablePaymentMethod extends PaymentValueLimits {
 	id: string
 	code: string
 	type: string
@@ -528,7 +558,7 @@ export interface AvailablePaymentMethod {
 	bankAccounts: BankAccount[]
 	eligible: boolean
 	/** Why not, when not — e.g. AWAITING_COUNTRY, NOT_ENOUGH_ORDER_HISTORY. */
-	reason?: string
+	reason?: PaymentIneligibleReason
 }
 
 export interface PublicCategory {

@@ -22,6 +22,7 @@ import {
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { preselectedCountry } from "@/lib/sellingLocations"
 import useMoney from "@/lib/useMoney"
+import usePaymentReason from "@/lib/usePaymentReason"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
 import {
 	AlertDialog,
@@ -177,6 +178,7 @@ export const CheckoutView = () => {
 	const formatMoney = useMoney()
 
 	const t = useTranslations("checkout")
+	const paymentReason = usePaymentReason()
 	const { isLoggedIn, isResolved } = useUserInfo()
 
 	const { data: cart, isLoading: cartLoading } = useCartQuery()
@@ -408,28 +410,6 @@ export const CheckoutView = () => {
 						: undefined,
 	}))
 
-	const reasonLabel = (reason?: string) => {
-		const key =
-			reason === "NOT_ENOUGH_ORDER_HISTORY"
-				? "reasonNotEnoughOrderHistory"
-				: reason === "REQUIRES_VALIDATED_VAT_ID"
-					? "reasonRequiresValidatedVatId"
-					: reason === "BELOW_MINIMUM"
-						? "reasonBelowMinimum"
-						: reason === "ABOVE_MAXIMUM"
-							? "reasonAboveMaximum"
-							: // Not "unavailable in your country" — nobody has said which
-								// country it is yet. See AWAITING_COUNTRY on the API side.
-								reason === "AWAITING_COUNTRY"
-								? "reasonAwaitingCountry"
-								: reason === "COUNTRY_NOT_ALLOWED"
-									? "reasonCountryNotAllowed"
-									: reason === "REQUIRES_LOGIN"
-										? "reasonRequiresLogin"
-										: null
-		return key ? t(key) : t("notEligible")
-	}
-
 	/**
 	 * Payment options, listed from the moment the page opens.
 	 *
@@ -451,7 +431,7 @@ export const CheckoutView = () => {
 		title: method.title,
 		description: method.description,
 		disabled: !method.eligible,
-		disabledReason: method.eligible ? undefined : reasonLabel(method.reason),
+		disabledReason: paymentReason(method),
 	}))
 
 	return (

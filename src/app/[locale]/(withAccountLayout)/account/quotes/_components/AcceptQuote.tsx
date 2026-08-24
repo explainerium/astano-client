@@ -12,6 +12,7 @@ import {
 } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
 import useMoney from "@/lib/useMoney"
+import usePaymentReason from "@/lib/usePaymentReason"
 import { cn } from "@/lib/utils"
 import type { CheckoutAddress, SavedAddress } from "@/types/storefront"
 
@@ -59,6 +60,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 	const [error, setError] = useState<string | null>(null)
 
 	const [acceptQuote, { isLoading }] = useAcceptQuoteMutation()
+	const paymentReason = usePaymentReason()
 
 	const chosen = addresses.find((a) => a.id === addressId) ?? addresses.find((a) => a.isDefaultShipping) ?? addresses[0]
 
@@ -159,7 +161,20 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 									onChange={() => setPaymentMethodId(method.id)}
 									className="mt-0.5 shrink-0"
 								/>
-								<span>{method.title ?? method.code}</span>
+								<span>
+									{method.title ?? method.code}
+									{/*
+									 * Why it is greyed out, not just that it is. A quoted
+									 * order is the most likely place to exceed the invoice
+									 * limit, and a disabled radio with no explanation is
+									 * where a customer stops and emails instead.
+									 */}
+									{!method.eligible && (
+										<span className="text-muted-foreground mt-0.5 block text-xs">
+											{paymentReason(method)}
+										</span>
+									)}
+								</span>
 							</label>
 						</li>
 					))}

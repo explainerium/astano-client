@@ -21,6 +21,8 @@ export interface PaymentRules {
 	allowedRoles: PaymentRole[]
 	requiresLogin: boolean
 	minCompletedOrders: number
+	/** Roles the order-history requirement is waived for. */
+	historyExemptRoles: PaymentRole[]
 	minOrderTotal: string | null
 	maxOrderTotal: string | null
 	requiresValidatedVatId: boolean
@@ -58,6 +60,7 @@ export interface PaymentMethodPayload {
 	allowedRoles?: PaymentRole[]
 	requiresLogin?: boolean
 	minCompletedOrders?: number
+	historyExemptRoles?: PaymentRole[]
 	minOrderTotal?: string | null
 	maxOrderTotal?: string | null
 	requiresValidatedVatId?: boolean

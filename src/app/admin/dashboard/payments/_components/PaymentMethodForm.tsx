@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useFormContext, useFormState } from "react-hook-form"
+import { useFormContext, useFormState, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
@@ -114,6 +114,7 @@ const buildSchema = (type: PaymentMethodType, t: T) =>
 		}),
 		allowedCountries: z.array(z.string()),
 		allowedRoles: z.array(z.string()),
+		historyExemptRoles: z.array(z.string()),
 		requiresLogin: z.boolean(),
 		minCompletedOrders: z.number({ message: t("enterANumber") }).int().min(0),
 		minOrderTotal: money(t),
@@ -187,6 +188,7 @@ const toDefaults = (method: PaymentMethod): FormValues => ({
 	allowedRoles: method?.rules.allowedRoles ?? [],
 	requiresLogin: method?.rules.requiresLogin ?? false,
 	minCompletedOrders: method?.rules.minCompletedOrders ?? 0,
+	historyExemptRoles: method?.rules.historyExemptRoles ?? [],
 	minOrderTotal: method?.rules.minOrderTotal ? String(Number(method.rules.minOrderTotal)) : "",
 	maxOrderTotal: method?.rules.maxOrderTotal ? String(Number(method.rules.maxOrderTotal)) : "",
 	requiresValidatedVatId: method?.rules.requiresValidatedVatId ?? false,
@@ -216,6 +218,36 @@ const readAccounts = (config: unknown): z.infer<ReturnType<typeof bankAccount>>[
 			countryCode: text("countryCode"),
 		}
 	})
+}
+
+/**
+ * Which customer types skip the order-history requirement.
+ *
+ * Shown only once a history is actually required. At zero there is nothing to
+ * be exempt from, and a control that changes nothing is worse than no control:
+ * somebody fills it in, saves, and is left to work out why it made no
+ * difference.
+ *
+ * Its own component so it can watch that field — `useWatch` against the context
+ * control, for the reason spelled out on BankAccountsPanel below.
+ */
+const HistoryExemptRoles = () => {
+	const t = useTranslations("admin")
+	const { control } = useFormContext()
+	const required = Number(useWatch({ control, name: "minCompletedOrders" }) ?? 0)
+
+	if (!(required > 0)) return null
+
+	return (
+		<ProCombobox
+			name="historyExemptRoles"
+			label={t("exemptFromOrderHistory")}
+			multiple
+			options={roleOptions(t)}
+			placeholder={t("noOneIsExempt")}
+			description={t("theseCustomerTypesSkipTheHistory")}
+		/>
+	)
 }
 
 /**
@@ -294,6 +326,10 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			allowedRoles: form.allowedRoles as PaymentRole[],
 			requiresLogin: form.requiresLogin,
 			minCompletedOrders: form.minCompletedOrders,
+			// Cleared along with the requirement it excuses, so a method dropped
+			// back to 0 does not keep an exemption nobody can see any more.
+			historyExemptRoles:
+				form.minCompletedOrders > 0 ? (form.historyExemptRoles as PaymentRole[]) : [],
 			minOrderTotal: form.minOrderTotal.trim() || null,
 			maxOrderTotal: form.maxOrderTotal.trim() || null,
 			requiresValidatedVatId: form.requiresValidatedVatId,
@@ -392,6 +428,8 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 						description={t("0OffersItToFirstTime")}
 						className="sm:max-w-xs"
 					/>
+
+					<HistoryExemptRoles />
 
 					<ProCheckbox name="requiresLogin" label={t("signedInCustomersOnly")} />
 					<ProCheckbox
