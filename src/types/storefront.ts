@@ -342,6 +342,16 @@ export type PaymentIneligibleReason =
 export interface PaymentValueLimits {
 	minOrderTotal: string | null
 	maxOrderTotal: string | null
+	/**
+	 * Above this the method is still offered, but with conditions attached.
+	 *
+	 * Nothing to do with `maxOrderTotal`, which refuses. A large invoice order
+	 * is accepted and then reviewed — the shop wants it, and wants to agree
+	 * terms first.
+	 */
+	conditionalAboveTotal: string | null
+	/** The shop's own wording for those conditions. `{amount}` is the threshold. */
+	conditionalNotice: string | null
 }
 
 export interface CheckoutPaymentMethod extends PaymentValueLimits {
@@ -352,6 +362,8 @@ export interface CheckoutPaymentMethod extends PaymentValueLimits {
 	eligible: boolean
 	/** e.g. NOT_ENOUGH_ORDER_HISTORY — why this method is closed to this customer. */
 	reason?: PaymentIneligibleReason
+	/** Available, but this order is over the review threshold. */
+	conditional?: boolean
 }
 
 /**
@@ -559,6 +571,8 @@ export interface AvailablePaymentMethod extends PaymentValueLimits {
 	eligible: boolean
 	/** Why not, when not — e.g. AWAITING_COUNTRY, NOT_ENOUGH_ORDER_HISTORY. */
 	reason?: PaymentIneligibleReason
+	/** Available, but this order is over the review threshold. */
+	conditional?: boolean
 }
 
 export interface PublicCategory {

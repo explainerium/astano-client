@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Link } from "@/i18n/navigation"
-import { HERO_IMAGES } from "@/lib/wpMedia"
+import { HERO_IMAGES } from "@/lib/pageMedia"
 import { cn } from "@/lib/utils"
 
 const SLIDE_MS = 7000

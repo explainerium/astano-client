@@ -10,6 +10,8 @@ export interface PaymentTranslation {
 	description?: string | null
 	/** Shown after ordering and in the confirmation email — bank details go here. */
 	instructions?: string | null
+	/** Shown when an order passes `conditionalAboveTotal`. */
+	conditionalNotice?: string | null
 }
 
 /**
@@ -21,6 +23,7 @@ export interface PaymentRules {
 	allowedRoles: PaymentRole[]
 	requiresLogin: boolean
 	minCompletedOrders: number
+	conditionalAboveTotal: string | null
 	/** Roles the order-history requirement is waived for. */
 	historyExemptRoles: PaymentRole[]
 	minOrderTotal: string | null
@@ -60,6 +63,7 @@ export interface PaymentMethodPayload {
 	allowedRoles?: PaymentRole[]
 	requiresLogin?: boolean
 	minCompletedOrders?: number
+	conditionalAboveTotal?: string | null
 	historyExemptRoles?: PaymentRole[]
 	minOrderTotal?: string | null
 	maxOrderTotal?: string | null

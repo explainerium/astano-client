@@ -3,7 +3,7 @@ import { Check } from "lucide-react"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { CUSTOM_IMAGES, CUSTOM_WHY_ICONS } from "@/lib/wpMedia"
+import { CUSTOM_IMAGES, CUSTOM_WHY_ICONS } from "@/lib/pageMedia"
 
 interface Step {
 	title: string

@@ -12,7 +12,7 @@ import {
 } from "@/redux/api/storefrontApi"
 import { countryName } from "@/lib/countries"
 import useMoney from "@/lib/useMoney"
-import usePaymentReason from "@/lib/usePaymentReason"
+import usePaymentReason, { usePaymentNotice } from "@/lib/usePaymentReason"
 import { cn } from "@/lib/utils"
 import type { CheckoutAddress, SavedAddress } from "@/types/storefront"
 
@@ -61,6 +61,7 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 
 	const [acceptQuote, { isLoading }] = useAcceptQuoteMutation()
 	const paymentReason = usePaymentReason()
+	const paymentNotice = usePaymentNotice()
 
 	const chosen = addresses.find((a) => a.id === addressId) ?? addresses.find((a) => a.isDefaultShipping) ?? addresses[0]
 
@@ -172,6 +173,16 @@ export const AcceptQuote = ({ quoteId, total }: { quoteId: string; total: string
 									{!method.eligible && (
 										<span className="text-muted-foreground mt-0.5 block text-xs">
 											{paymentReason(method)}
+										</span>
+									)}
+									{/*
+									 * Still available, but on terms. A quoted order is the
+									 * likeliest of all to be large enough for the shop to want
+									 * to agree those terms first.
+									 */}
+									{paymentNotice(method) && (
+										<span className="mt-2 block border-l-2 border-amber-400 bg-amber-50 px-3 py-2 text-xs leading-relaxed whitespace-pre-line text-amber-900">
+											{paymentNotice(method)}
 										</span>
 									)}
 								</span>

@@ -22,7 +22,7 @@ import {
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { preselectedCountry } from "@/lib/sellingLocations"
 import useMoney from "@/lib/useMoney"
-import usePaymentReason from "@/lib/usePaymentReason"
+import usePaymentReason, { usePaymentNotice } from "@/lib/usePaymentReason"
 import type { CheckoutAddress, CheckoutPreview, PlacedOrder } from "@/types/storefront"
 import {
 	AlertDialog,
@@ -179,6 +179,7 @@ export const CheckoutView = () => {
 
 	const t = useTranslations("checkout")
 	const paymentReason = usePaymentReason()
+	const paymentNotice = usePaymentNotice()
 	const { isLoggedIn, isResolved } = useUserInfo()
 
 	const { data: cart, isLoading: cartLoading } = useCartQuery()
@@ -432,6 +433,7 @@ export const CheckoutView = () => {
 		description: method.description,
 		disabled: !method.eligible,
 		disabledReason: paymentReason(method),
+		notice: paymentNotice(method),
 	}))
 
 	return (

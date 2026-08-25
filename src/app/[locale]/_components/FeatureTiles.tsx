@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { TILE_IMAGES } from "@/lib/wpMedia"
+import { TILE_IMAGES } from "@/lib/pageMedia"
 
 /**
  * The four photographic tiles directly under the hero, edge to edge with no

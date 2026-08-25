@@ -1,7 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { CUSTOM_ICONS } from "@/lib/wpMedia"
+import { CUSTOM_ICONS } from "@/lib/pageMedia"
 
 /**
  * "Sonderanfertigungen" — heading on the left, intro paragraph on the right,

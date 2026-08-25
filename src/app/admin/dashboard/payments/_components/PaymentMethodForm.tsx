@@ -106,11 +106,13 @@ const buildSchema = (type: PaymentMethodType, t: T) =>
 			title: z.string().trim().min(1, t("anEnglishTitleIsRequired")),
 			description: z.string().trim().max(2000),
 			instructions: z.string().trim().max(4000),
+			conditionalNotice: z.string().trim().max(2000),
 		}),
 		de: z.object({
 			title: z.string().trim(),
 			description: z.string().trim().max(2000),
 			instructions: z.string().trim().max(4000),
+			conditionalNotice: z.string().trim().max(2000),
 		}),
 		allowedCountries: z.array(z.string()),
 		allowedRoles: z.array(z.string()),
@@ -119,6 +121,7 @@ const buildSchema = (type: PaymentMethodType, t: T) =>
 		minCompletedOrders: z.number({ message: t("enterANumber") }).int().min(0),
 		minOrderTotal: money(t),
 		maxOrderTotal: money(t),
+		conditionalAboveTotal: money(t),
 		requiresValidatedVatId: z.boolean(),
 		bankAccounts: z.array(bankAccount(t)),
 	})
@@ -178,11 +181,13 @@ const toDefaults = (method: PaymentMethod): FormValues => ({
 		title: translationFor(method, "en")?.title ?? "",
 		description: translationFor(method, "en")?.description ?? "",
 		instructions: translationFor(method, "en")?.instructions ?? "",
+		conditionalNotice: translationFor(method, "en")?.conditionalNotice ?? "",
 	},
 	de: {
 		title: translationFor(method, "de")?.title ?? "",
 		description: translationFor(method, "de")?.description ?? "",
 		instructions: translationFor(method, "de")?.instructions ?? "",
+		conditionalNotice: translationFor(method, "de")?.conditionalNotice ?? "",
 	},
 	allowedCountries: method?.rules.allowedCountries ?? [],
 	allowedRoles: method?.rules.allowedRoles ?? [],
@@ -191,6 +196,9 @@ const toDefaults = (method: PaymentMethod): FormValues => ({
 	historyExemptRoles: method?.rules.historyExemptRoles ?? [],
 	minOrderTotal: method?.rules.minOrderTotal ? String(Number(method.rules.minOrderTotal)) : "",
 	maxOrderTotal: method?.rules.maxOrderTotal ? String(Number(method.rules.maxOrderTotal)) : "",
+	conditionalAboveTotal: method?.rules.conditionalAboveTotal
+		? String(Number(method.rules.conditionalAboveTotal))
+		: "",
 	requiresValidatedVatId: method?.rules.requiresValidatedVatId ?? false,
 	bankAccounts: readAccounts(method?.config),
 })
@@ -294,6 +302,9 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			title: form[code].title.trim(),
 			...(form[code].description.trim() ? { description: form[code].description.trim() } : {}),
 			...(form[code].instructions.trim() ? { instructions: form[code].instructions.trim() } : {}),
+			...(form[code].conditionalNotice.trim()
+				? { conditionalNotice: form[code].conditionalNotice.trim() }
+				: {}),
 		})
 
 		/*
@@ -332,6 +343,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 				form.minCompletedOrders > 0 ? (form.historyExemptRoles as PaymentRole[]) : [],
 			minOrderTotal: form.minOrderTotal.trim() || null,
 			maxOrderTotal: form.maxOrderTotal.trim() || null,
+			conditionalAboveTotal: form.conditionalAboveTotal.trim() || null,
 			requiresValidatedVatId: form.requiresValidatedVatId,
 			translations: [block("en"), ...(form.de.title.trim() ? [block("de")] : [])],
 		}
@@ -387,6 +399,11 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 								label={t("instructionsAfterOrdering")}
 								description={t("shownOnTheThankYouPage")}
 							/>
+							<ProTextarea
+								name={`${code}.conditionalNotice`}
+								label={t("noticeForLargeOrders")}
+								description={t("shownWhenTheOrderPassesTheThreshold")}
+							/>
 						</TabsContent>
 					))}
 				</Tabs>
@@ -420,6 +437,20 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 						<ProInput name="minOrderTotal" label={t("minimumOrderTotal")} placeholder={t("noMinimum")} />
 						<ProInput name="maxOrderTotal" label={t("maximumOrderTotal")} placeholder={t("noMaximum")} />
 					</div>
+
+					{/*
+					 * Beneath the pair above, and worded to keep it apart from them.
+					 * The maximum refuses; this one accepts and warns, and reading
+					 * the first as the second is what left a €17,000 order with no
+					 * way to pay.
+					 */}
+					<ProInput
+						name="conditionalAboveTotal"
+						label={t("reviewOrdersAbove")}
+						description={t("aboveThisTheMethodStaysAvailable")}
+						placeholder={t("noThreshold")}
+						className="sm:max-w-xs"
+					/>
 
 					<ProInput
 						name="minCompletedOrders"

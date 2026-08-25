@@ -11,6 +11,14 @@ export interface MethodOption {
 	disabled?: boolean
 	/** Shown when disabled: why this option is closed to this customer. */
 	disabledReason?: string
+	/**
+	 * Selectable, but on terms the customer should read first — a large order
+	 * the shop will review before agreeing to invoice it.
+	 *
+	 * Deliberately not `disabledReason`. The option works; the note is part of
+	 * choosing it, not an explanation of why they cannot.
+	 */
+	notice?: string
 }
 
 /**
@@ -64,6 +72,17 @@ export const MethodChoice = ({
 						{option.disabled && option.disabledReason && (
 							<span className="text-muted-foreground mt-0.5 block text-xs">
 								{option.disabledReason}
+							</span>
+						)}
+						{/*
+						 * Given weight, unlike the greyed-out reasons above. This one
+						 * is a condition of the order the customer is about to place —
+						 * a deposit may be asked for — so it has to read as something
+						 * to notice rather than as fine print under a dead option.
+						 */}
+						{!option.disabled && option.notice && (
+							<span className="mt-2 block border-l-2 border-amber-400 bg-amber-50 px-3 py-2 text-xs leading-relaxed whitespace-pre-line text-amber-900">
+								{option.notice}
 							</span>
 						)}
 					</span>

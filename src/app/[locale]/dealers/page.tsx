@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { DEALER_IMAGES } from "@/lib/wpMedia"
+import { DEALER_IMAGES } from "@/lib/pageMedia"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params

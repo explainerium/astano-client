@@ -75,4 +75,33 @@ export const usePaymentReason = () => {
 	}
 }
 
+/**
+ * The conditions attached to an otherwise available method.
+ *
+ * Separate hook from the one above because the two say opposite things: that
+ * one explains a closed door, this one explains what walking through it means.
+ * Conflating them once already produced the worst version of this feature — a
+ * €17,000 order with payment by invoice greyed out and a message that read like
+ * a refusal, when the shop wanted the order and only wanted to agree terms.
+ *
+ * `{amount}` in the shop's wording is filled with the threshold, formatted the
+ * way the shop formats money, so the sentence follows the setting instead of
+ * having to be edited alongside it.
+ */
+export const usePaymentNotice = () => {
+	const money = useMoney()
+
+	return (
+		method: Partial<PaymentValueLimits> & { eligible: boolean; conditional?: boolean }
+	): string | undefined => {
+		if (!method.eligible || !method.conditional) return undefined
+
+		const notice = method.conditionalNotice?.trim()
+		if (!notice) return undefined
+
+		const amount = money(method.conditionalAboveTotal)
+		return amount ? notice.replaceAll("{amount}", amount) : notice
+	}
+}
+
 export default usePaymentReason

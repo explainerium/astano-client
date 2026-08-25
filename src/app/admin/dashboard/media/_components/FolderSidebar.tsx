@@ -75,10 +75,29 @@ const Item = ({
 		)}
 		style={{ paddingLeft: `${8 + depth * 14}px` }}
 	>
-		<button type="button" onClick={onClick} className="flex flex-1 items-center gap-2 py-2 text-left">
+		{/*
+		 * min-w-0 is what makes `truncate` work at all.
+		 *
+		 * A flex item defaults to min-width:auto — it refuses to shrink below its
+		 * content — so without this the label simply pushed the count out past the
+		 * panel edge instead of being clipped. It showed up as soon as the client's
+		 * own folders arrived: "Motive Haushalt & Diverses" is a good deal longer
+		 * than anything the sidebar was built with.
+		 */}
+		<button
+			type="button"
+			onClick={onClick}
+			title={label}
+			className="flex min-w-0 flex-1 items-center gap-2 py-2 text-left"
+		>
 			<Icon className={cn("size-4 shrink-0", !active && "text-muted-foreground")} />
 			<span className="truncate">{label}</span>
-			<span className={cn("ml-auto text-xs tabular-nums", !active && "text-muted-foreground")}>
+			<span
+				className={cn(
+					"ml-auto shrink-0 text-xs tabular-nums",
+					!active && "text-muted-foreground"
+				)}
+			>
 				{count}
 			</span>
 		</button>
@@ -148,8 +167,13 @@ export const FolderSidebar = ({
 		}
 	}
 
+	/*
+	 * w-72 rather than w-56. The shop's folder names are the client's own — a
+	 * category and a qualifier, "Motive Hochzeit & Feiern" — and at 224px every
+	 * one of them was cut in half.
+	 */
 	return (
-		<aside className="bg-card w-56 shrink-0 space-y-1 rounded-lg border p-2">
+		<aside className="bg-card w-72 shrink-0 space-y-1 rounded-lg border p-2">
 			<Item
 				active={selected === undefined}
 				icon={Images}

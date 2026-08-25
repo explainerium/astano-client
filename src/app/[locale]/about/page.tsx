@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { ABOUT_ICONS, ABOUT_IMAGES } from "@/lib/wpMedia"
+import { ABOUT_ICONS, ABOUT_IMAGES } from "@/lib/pageMedia"
 
 interface Card {
 	title: string
