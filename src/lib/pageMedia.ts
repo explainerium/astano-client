@@ -60,8 +60,15 @@ const IMPORTED: Record<string, string> = {
 	"2025/12/zoom_561178.png": "2026/08/8a39b77ebba3bc42670b340eb22c5143.webp",
 	"2026/03/Edelstahl-Bearbeitung-Laser.jpg": "2026/08/d4b5d558c3534ecee4578b0e5092ab9b.webp",
 	"2026/03/Individuelle-Trinkhalme.jpg": "2026/08/8db67061aca188113dfc73390c271bf5.webp",
+	/*
+	 * Shares its file with a product image rather than having its own copy.
+	 *
+	 * The import brought this picture in a second time — the Sonderanfertigung
+	 * page and a product were both using it, so the library held it twice at the
+	 * same size. One file, two callers.
+	 */
 	"2026/03/Kreative-individuelle-Ausstechformen.jpg":
-		"2026/08/ecd2fd5bb60d42813dadee639ff48fbe.webp",
+		"2026/08/984c97fbe22df7fb6fc34855affffdb1.webp",
 	"2026/03/Qualitaet-Materialien-astano.jpg": "2026/08/d82f5a16864ffe5285ef38af31a874f5.webp",
 	"2026/03/Qualitaetskontrolle-astano-Edelstahl-Eiswuerfel.jpg":
 		"2026/08/dbe208fcf15cb62a4f0fdfceed9e8095.webp",
