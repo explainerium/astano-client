@@ -268,12 +268,29 @@ export interface QuoteBasketView {
 }
 
 export interface QuoteSubmission {
-	title: string
+	/**
+	 * Optional. The form no longer asks for one — the server writes a subject
+	 * line from the basket contents instead, because a customer who has just
+	 * filled a basket has already said what the enquiry is about.
+	 */
+	title?: string
 	message?: string
+	/** Composed by the server from the first and last name. */
 	contactName?: string
 	contactEmail?: string
 	contactPhone?: string
 	contactCompany?: string
+
+	contactSalutation?: string
+	contactFirstName?: string
+	contactLastName?: string
+
+	/** Where the enquiry comes from — a quote is priced against a destination. */
+	contactStreet?: string
+	contactHouseNumber?: string
+	contactPostcode?: string
+	contactCity?: string
+	contactCountryCode?: string
 }
 
 export interface CheckoutAddress {

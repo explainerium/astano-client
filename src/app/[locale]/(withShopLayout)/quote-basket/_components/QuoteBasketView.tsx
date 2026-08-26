@@ -131,7 +131,20 @@ export const QuoteBasketView = () => {
 				</p>
 			)}
 
-			<div className="grid gap-12 lg:grid-cols-[1fr_420px] lg:items-start">
+			{/*
+			 * 540 rather than 420, and the list takes what is left.
+			 *
+			 * The form was sized when it asked four questions. It now asks an
+			 * address as well, and at 420px — 372 inside the panel's padding —
+			 * every paired row was squeezing two fields into less than half a
+			 * field each. The list is the side that can spare it: a line is an
+			 * image, a name and a stepper, and it reads no better wide.
+			 *
+			 * minmax(0,…) on the list so a long product name wraps instead of
+			 * pushing the form off the grid — 1fr alone refuses to shrink below
+			 * its content.
+			 */}
+			<div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_540px] lg:items-start">
 				<ul className={cn("divide-y border-y", busy && "opacity-60 transition-opacity")}>
 					{basket.items.map((line) => (
 						<li key={line.id} className="py-6">

@@ -30,7 +30,16 @@ const QuoteLineArtwork = ({ itemId, files, artwork, missing }: Props) => {
 	const [setFiles, { isLoading }] = useSetQuoteItemFilesMutation()
 	const [error, setError] = useState<string | null>(null)
 
-	if (artwork.maxFiles <= 0 || (!artwork.required && files.length === 0)) return null
+	/*
+	 * Shown whenever the line will take a file — not only when one is demanded.
+	 *
+	 * This used to hide itself unless the drawing was required or one had
+	 * already been attached, which meant the upload appeared for nobody: an
+	 * enquiry about a catalogue product had nowhere to put a sketch, and the box
+	 * only turned up once a file existed, which is a circle. The client reported
+	 * it as "we need the upload function" and they were describing exactly this.
+	 */
+	if (artwork.maxFiles <= 0) return null
 
 	const handleChange = async (next: ArtworkFile[]) => {
 		setError(null)

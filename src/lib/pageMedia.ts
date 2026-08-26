@@ -16,7 +16,22 @@
  * Storage keys rather than whole URLs, so the bucket can move without editing
  * thirty strings.
  */
-const BASE = process.env.NEXT_PUBLIC_MEDIA_URL ?? ""
+/**
+ * Where these particular files live. Not an environment setting, on purpose.
+ *
+ * Product images never need this: the API resolves them and hands the
+ * storefront a finished URL, so the frontend has no reason to know the storage
+ * origin. Building these from `NEXT_PUBLIC_MEDIA_URL` looked consistent and was
+ * wrong twice over — the deployment does not set it, so all thirty resolved
+ * against the shop's own domain and every marketing image broke; and local
+ * development *does* set it, to the API, which has never held these files
+ * either. The one variable available was wrong in both places.
+ *
+ * These are pinned to specific objects in the shop's public bucket, the same
+ * way their keys are. If the bucket moves, this line and
+ * `backend/scripts/wp-media-map.json` move together.
+ */
+const BASE = "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media"
 
 /** WordPress upload path → our storage key. */
 const IMPORTED: Record<string, string> = {
