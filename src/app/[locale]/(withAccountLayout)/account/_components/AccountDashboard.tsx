@@ -72,7 +72,7 @@ export const AccountDashboard = () => {
 								<span className="text-muted-foreground">
 									{formatDate(order.placedAt, locale)}
 								</span>
-								<StatusChip status={order.status} kind="orderStatus" />
+								<StatusChip status={order.status} kind="orderStatuses" />
 								<span className="ml-auto font-semibold">
 									{formatMoney(order.grandTotal)}
 								</span>
@@ -108,7 +108,7 @@ export const AccountDashboard = () => {
 									{quote.quoteNumber}
 								</Link>
 								<span className="min-w-0 truncate">{quote.title}</span>
-								<StatusChip status={quote.status} kind="quoteStatus" />
+								<StatusChip status={quote.status} kind="quoteStatuses" />
 								<span className="text-muted-foreground ml-auto">
 									{quote.quotedSubtotal
 										? formatMoney(quote.quotedSubtotal)

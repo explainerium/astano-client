@@ -78,8 +78,8 @@ export const OrderDetail = ({ id }: { id: string }) => {
 				<h2 className="font-heading text-2xl font-extrabold tracking-tight">
 					{order.orderNumber}
 				</h2>
-				<StatusChip status={order.status} kind="orderStatus" />
-				<StatusChip status={order.paymentStatus} kind="paymentStatus" />
+				<StatusChip status={order.status} kind="orderStatuses" />
+				<StatusChip status={order.paymentStatus} kind="paymentStatuses" />
 				<span className="text-muted-foreground text-sm">
 					{formatDate(order.placedAt, locale)}
 				</span>

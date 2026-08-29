@@ -192,6 +192,18 @@ const HIDDEN_CHIP = "border-transparent bg-negative-soft text-negative"
  */
 const OPTION_CHIP = "border-transparent bg-accent-soft-strong text-primary"
 
+/**
+ * On the home page's strip.
+ *
+ * In the same stack as the other two rather than a column of its own: a dozen
+ * products out of fifty-five carry it, so a column would be empty on four rows
+ * in five and would cost the width every time. Green because it is neither a
+ * fault nor a kind of product — it is the one placement in the shop the
+ * catalogue cannot show you any other way, and this list is the only screen
+ * where "which twelve are up there" can be answered at a glance.
+ */
+const TOP_CHIP = "border-transparent bg-positive-soft text-positive"
+
 export interface ProductFilters {
 	search: string
 	status?: ProductStatus
@@ -778,6 +790,10 @@ export const ProductTable = ({
 
 												{product.kind === "OPTION" && (
 													<Badge variant="outline" className={OPTION_CHIP}>{t("option")}</Badge>
+												)}
+
+												{product.isTopProduct && (
+													<Badge variant="outline" className={TOP_CHIP}>{t("topProduct")}</Badge>
 												)}
 											</div>
 										</TableCell>

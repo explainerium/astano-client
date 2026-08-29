@@ -624,4 +624,14 @@ export interface PublicProductListParams {
 	minPrice?: number
 	maxPrice?: number
 	sort?: "default" | "newest" | "name" | "price_asc" | "price_desc"
+	/**
+	 * Narrows the list to the products the shop marked as top products.
+	 *
+	 * The string, not a boolean, because a query string carries no types and
+	 * the API refuses anything but the two words — a boolean `false` would
+	 * serialise to "false", and coercing that back is how it becomes true
+	 * again. Omitted is the only way to say "do not filter", so that is the
+	 * only other value.
+	 */
+	top?: "true"
 }

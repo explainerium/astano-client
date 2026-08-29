@@ -133,6 +133,8 @@ export interface AdminProduct {
 	taxStatus: TaxStatus
 	moq: number
 	sortOrder: number
+	/** Leads the home page. `sortOrder` above decides where in the strip. */
+	isTopProduct: boolean
 	/** Resolved for the requesting locale; `translations` carries all of them. */
 	name: string
 	slug: string
@@ -171,6 +173,7 @@ export interface ProductPayload {
 	taxStatus?: TaxStatus
 	moq?: number
 	sortOrder?: number
+	isTopProduct?: boolean
 	featuredAssetId?: string | null
 	categoryIds?: string[]
 	assetIds?: string[]

@@ -70,7 +70,7 @@ export const QuoteDetail = ({ id }: { id: string }) => {
 				<h2 className="font-heading text-2xl font-extrabold tracking-tight">
 					{quote.quoteNumber}
 				</h2>
-				<StatusChip status={quote.status} kind="quoteStatus" />
+				<StatusChip status={quote.status} kind="quoteStatuses" />
 				<span className="text-muted-foreground text-sm">
 					{formatDate(quote.submittedAt, locale)}
 				</span>

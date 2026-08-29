@@ -9,9 +9,22 @@ import ProductCard from "./ProductCard"
 /** The live grid runs 4 across, 3 deep. */
 const LIMIT = 12
 
+/**
+ * The products the shop chose to lead with.
+ *
+ * This used to be the first twelve of the whole catalogue: no filter, and an
+ * ORDER BY over a column every product carried 0 in. Which twelve appeared,
+ * and in what order, was therefore Postgres's decision rather than anybody's
+ * — on the page a customer sees first.
+ *
+ * `top` names the set and `sort: "default"` arranges it by the sort order
+ * beside the tick in the editor, so both halves of the choice are the shop's.
+ * Twelve is still the ceiling and not a quota: ticking fewer shows fewer, and
+ * the grid reflows.
+ */
 export const PopularProducts = () => {
 	const t = useTranslations("home.popular")
-	const { data, isLoading } = useShopProductsQuery({ limit: LIMIT, sort: "default" })
+	const { data, isLoading } = useShopProductsQuery({ limit: LIMIT, sort: "default", top: "true" })
 
 	const products = data?.data ?? []
 

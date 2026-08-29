@@ -73,7 +73,7 @@ export const QuotesList = () => {
 								{formatDate(quote.submittedAt, locale)}
 							</td>
 							<td className="py-4">
-								<StatusChip status={quote.status} kind="quoteStatus" />
+								<StatusChip status={quote.status} kind="quoteStatuses" />
 							</td>
 							<td className="py-4 text-right">
 								{quote.quotedSubtotal ? (

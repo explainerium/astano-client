@@ -37,7 +37,14 @@ export const StatusChip = ({
 	kind,
 }: {
 	status: string
-	kind: "orderStatus" | "paymentStatus" | "quoteStatus"
+	/**
+	 * Which dictionary of status labels to read — plural, because that is what
+	 * it is. The singular names beside them in the catalogue are the column
+	 * headings for these chips, and naming one thing both was how a heading
+	 * came to be rendered as `account.orderStatus` on the customer's own
+	 * orders page.
+	 */
+	kind: "orderStatuses" | "paymentStatuses" | "quoteStatuses"
 }) => {
 	const t = useTranslations("account")
 

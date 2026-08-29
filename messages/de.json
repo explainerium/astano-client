@@ -190,6 +190,7 @@
 		"pagination": "Seitennummerierung",
 		"goToPage": "Seite {page}",
 		"compareEmpty": "Wählen Sie einige Produkte über die Vergleichen-Schaltfläche aus.",
+		"remove": "Entfernen",
 		"goToCheckout": "Zur Kasse",
 		"keepShopping": "Weiter einkaufen",
 		"viewQuoteBasket": "Anfragekorb ansehen",
@@ -301,7 +302,8 @@
 		"ordersTitle": "Bestellungen",
 		"orderNumber": "Bestellung",
 		"orderDate": "Datum",
-		"orderStatus": {
+		"orderStatus": "Bestellstatus",
+		"orderStatuses": {
 			"PENDING": "Offen",
 			"PROCESSING": "In Bearbeitung",
 			"ON_HOLD": "Zurückgestellt",
@@ -311,7 +313,8 @@
 			"FAILED": "Fehlgeschlagen"
 		},
 		"orderTotal": "Gesamt",
-		"paymentStatus": {
+		"paymentStatus": "Zahlungsstatus",
+		"paymentStatuses": {
 			"UNPAID": "Offen",
 			"PAID": "Bezahlt",
 			"PARTIALLY_REFUNDED": "Teilweise erstattet",
@@ -337,7 +340,8 @@
 		"quoteNumber": "Anfrage",
 		"quoteSubject": "Betreff",
 		"quoteSubmitted": "Gesendet",
-		"quoteStatus": {
+		"quoteStatus": "Angebotsstatus",
+		"quoteStatuses": {
 			"OPEN": "Offen",
 			"ANSWERED": "Beantwortet",
 			"ACCEPTED": "Angenommen",
@@ -1726,6 +1730,8 @@
 		"tickedByDefault": "Standardmäßig angehakt",
 		"title": "Titel",
 		"topCategories": "Top-Kategorien",
+		"topProduct": "Top-Produkt",
+		"showThisProductOnTheHome": "Dieses Produkt auf der Startseite zeigen, unter 'Unsere beliebtesten Produkte'.",
 		"topProducts": "Top-Produkte",
 		"total": "Gesamt",
 		"trackStockForThisProduct": "Bestand für dieses Produkt führen",

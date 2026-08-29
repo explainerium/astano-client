@@ -68,7 +68,7 @@ export const CompareTable = () => {
 					href="/products"
 					className="bg-ink text-ink-foreground mt-6 inline-block px-6 py-3 text-sm font-semibold tracking-wide uppercase transition-opacity hover:opacity-90"
 				>
-					{t("continueShopping")}
+					{t("keepShopping")}
 				</Link>
 			</div>
 		)

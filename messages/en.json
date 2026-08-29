@@ -190,6 +190,7 @@
 		"pagination": "Pagination",
 		"goToPage": "Page {page}",
 		"compareEmpty": "Pick a few products with the compare button and they will line up here.",
+		"remove": "Remove",
 		"goToCheckout": "Checkout",
 		"keepShopping": "Keep shopping",
 		"viewQuoteBasket": "View inquiry basket",
@@ -301,7 +302,8 @@
 		"ordersTitle": "Orders",
 		"orderNumber": "Order",
 		"orderDate": "Date",
-		"orderStatus": {
+		"orderStatus": "Order status",
+		"orderStatuses": {
 			"PENDING": "Pending",
 			"PROCESSING": "Processing",
 			"ON_HOLD": "On hold",
@@ -311,7 +313,8 @@
 			"FAILED": "Failed"
 		},
 		"orderTotal": "Total",
-		"paymentStatus": {
+		"paymentStatus": "Payment status",
+		"paymentStatuses": {
 			"UNPAID": "Unpaid",
 			"PAID": "Paid",
 			"PARTIALLY_REFUNDED": "Partially refunded",
@@ -337,7 +340,8 @@
 		"quoteNumber": "Request",
 		"quoteSubject": "Subject",
 		"quoteSubmitted": "Submitted",
-		"quoteStatus": {
+		"quoteStatus": "Quote status",
+		"quoteStatuses": {
 			"OPEN": "Open",
 			"ANSWERED": "Answered",
 			"ACCEPTED": "Accepted",
@@ -1420,6 +1424,8 @@
 		"tickedByDefault": "Ticked by default",
 		"title": "Title",
 		"topCategories": "Top categories",
+		"topProduct": "Top product",
+		"showThisProductOnTheHome": "Show this product on the home page, under 'Our most popular products'.",
 		"topProducts": "Top products",
 		"total": "Total",
 		"trackStockForThisProduct": "Track stock for this product",

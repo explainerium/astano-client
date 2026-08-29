@@ -72,10 +72,10 @@ export const OrdersList = () => {
 								{formatDate(order.placedAt, locale)}
 							</td>
 							<td className="py-4">
-								<StatusChip status={order.status} kind="orderStatus" />
+								<StatusChip status={order.status} kind="orderStatuses" />
 							</td>
 							<td className="py-4">
-								<StatusChip status={order.paymentStatus} kind="paymentStatus" />
+								<StatusChip status={order.paymentStatus} kind="paymentStatuses" />
 							</td>
 							<td className="py-4 text-right font-semibold">
 								{formatMoney(order.grandTotal)}

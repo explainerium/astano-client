@@ -131,6 +131,7 @@ const buildSchema = (t: T) =>
 	artworkRequired: z.boolean(),
 	moq: z.number({ message: t("enterANumber") }).int().min(0),
 	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
+	isTopProduct: z.boolean(),
 	categoryIds: z.array(z.string()),
 
 	// Media. Ids only — the thumbnails to draw them with live in the panel's
@@ -450,6 +451,7 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 		artworkRequired: product?.artworkRequired ?? false,
 		moq: product?.moq ?? 0,
 		sortOrder: product?.sortOrder ?? 0,
+		isTopProduct: product?.isTopProduct ?? false,
 		categoryIds: product?.categoryIds ?? [],
 		featuredAssetId: product?.featuredAssetId ?? null,
 		assetIds: product?.assetIds ?? [],
@@ -708,6 +710,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 			taxStatus: form.taxStatus,
 			moq: form.moq,
 			sortOrder: form.sortOrder,
+			isTopProduct: form.isTopProduct,
 			categoryIds: form.categoryIds,
 			featuredAssetId: form.featuredAssetId,
 			assetIds: form.assetIds,
@@ -1137,6 +1140,20 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 									{ label: t("visibilitySearchOnly"), value: "SEARCH_ONLY" },
 									{ label: t("hidden"), value: "HIDDEN" },
 								]}
+							/>
+							{/*
+							 * The two halves of "top products", one above the other.
+							 *
+							 * The tick chooses whether this product is in the home page's
+							 * strip; the number below decides where in it. In that order
+							 * because the number means nothing on a product that is not in
+							 * the strip, and the other way round invites setting a position
+							 * for something that will never appear.
+							 */}
+							<ProCheckbox
+								name="isTopProduct"
+								label={t("topProduct")}
+								description={t("showThisProductOnTheHome")}
 							/>
 							<ProInput
 								name="sortOrder"
