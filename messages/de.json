@@ -591,7 +591,7 @@
 		]
 	},
 	"about": {
-		"title": "Über uns – astano®",
+		"title": "Über uns",
 		"intro": "Seit über 20 Jahren steht astano® für hochwertige, individualisierbare Produkte rund um Küche, Kochen, Backen, Essen & Trinken. Was mit einer individuellen Ausstechform aus Kunststoff begann, hat sich zu einem vielseitigen Sortiment aus Edelstahl- und Silikonartikeln entwickelt – von Ausstechformen, Backformen und Keksstempeln bis hin zu Eiswürfelformen, Edelstahl-Eiswürfeln, Trinkhalmen und Lunchboxen. Unser Anspruch geht dabei weit über das Produkt hinaus: Wir individualisieren nahezu jeden Artikel – von der dezenten Logogravur bis zur kompletten kundenspezifischen Entwicklung inklusive passender, hochwertiger Verpackung. So entstehen Produkte, die nicht nur funktional überzeugen, sondern Marken sichtbar machen und Botschaften wirkungsvoll transportieren.",
 		"heroCta": "Jetzt entdecken",
 		"craft": {
@@ -637,7 +637,7 @@
 		]
 	},
 	"quality": {
-		"title": "Qualität bei astano®",
+		"title": "Qualität",
 		"intro": "Bei astano® ist Qualität für uns mehr als nur ein Merkmal – sie ist ein Versprechen. Jedes unserer Produkte – von Edelstahl-Ausstechformen über wiederverwendbare Strohhalme bis hin zu individuell gestaltbaren Eiswürfelformen und Backutensilien – erfüllt höchste Ansprüche an Langlebigkeit, Design und Benutzerfreundlichkeit. Wir setzen alles daran, in jedem einzelnen Produkt gleichbleibend exzellente Qualität zu liefern.",
 		"heroCta": "Jetzt entdecken",
 		"meaning": {
@@ -974,7 +974,8 @@
 		"emails": "E-Mails",
 		"settings": "Einstellungen",
 		"shop": "Shop",
-		"site": "Website"
+		"site": "Website",
+		"content": "Inhalte"
 	},
 	"adminSettings": {
 		"mailTest": {
@@ -2238,7 +2239,29 @@
 		"rungAboveSmallerOrder": "Ergibt {unit} pro Stück — mehr als die {previous} für eine kleinere Bestellung.",
 		"perPage": "Anzeigen",
 		"reorderNumbered": "{index} verschieben",
-		"lastUpdate": "Zuletzt geändert"
+		"lastUpdate": "Zuletzt geändert",
+		"content": "Inhalte",
+		"contentSections": "Inhaltsbereiche",
+		"theWordsAndPicturesOnTheSite": "Die Texte und Bilder auf der Website",
+		"loadingContent": "Inhalte werden geladen …",
+		"thatContentSectionDoesNotExist": "Diesen Inhaltsbereich gibt es nicht.",
+		"viewPage": "Seite ansehen",
+		"nothingToSave": "Nichts geändert",
+		"savedButCacheNotCleared": "Gespeichert. Die Website übernimmt die Änderung in Kürze.",
+		"sharedByBothLanguages": "Gilt für beide Sprachen",
+		"editThisPage": "Diese Seite bearbeiten",
+		"legalDocuments": "Rechtliche Dokumente",
+		"legalDocumentsNav": "Impressum, Datenschutz, AGB",
+		"legalDocumentsBlurb": "Impressum, Datenschutzerklärung und AGB. Änderungen hier ersetzen die ausgelieferte Fassung auf der Website.",
+		"pageTitle": "Seitentitel",
+		"pageBody": "Inhalt",
+		"editedHereReplacesTheShippedDocument": "Was hier steht, ersetzt die ausgelieferte Fassung auf der Website.",
+		"addItem": "Eintrag hinzufügen",
+		"removeItem": "Eintrag entfernen",
+		"moveUp": "Nach oben",
+		"moveDown": "Nach unten",
+		"noItemsYet": "Noch keine Einträge. Auf der Website erscheint dieser Abschnitt dann leer.",
+		"itemCount": "{count, plural, =0 {keine Einträge} one {# Eintrag} other {# Einträge}}"
 	},
 	"adminEmails": {
 		"order-placed": {
@@ -2320,6 +2343,89 @@
 		"staff-low-stock": {
 			"label": "Geringer Bestand",
 			"description": "Wird gesendet, wenn eine Bestellung eine Variante auf ihre Meldeschwelle bringt."
+		}
+	},
+	"adminContent": {
+		"groups": {
+			"home": {
+				"title": "Startseite",
+				"blurb": "Der Hero, die Banner-Kacheln und die Abschnitte darunter."
+			},
+			"about": {
+				"title": "Über uns",
+				"blurb": "Die Geschichte, die Fotos und die Wertekarten."
+			},
+			"custom": {
+				"title": "Sonderanfertigung",
+				"blurb": "Wie es abläuft und warum."
+			},
+			"quality": {
+				"title": "Qualität",
+				"blurb": "Was Qualität hier bedeutet und wie geprüft wird."
+			},
+			"dealers": {
+				"title": "Händler",
+				"blurb": "Was ein Händlerkonto wert ist."
+			},
+			"faq": {
+				"title": "FAQs",
+				"blurb": "Die Fragen und ihre Antworten."
+			},
+			"contact": {
+				"title": "Kontakt",
+				"blurb": "Die Seite und die Beschriftungen im Formular."
+			},
+			"payment": {
+				"title": "Zahlung & Versand",
+				"blurb": "Zahlungsarten, Fristen und Lieferländer."
+			},
+			"shell": {
+				"title": "Kopf- & Fußzeile",
+				"blurb": "Menü und Fußzeile, auf jeder Seite."
+			},
+			"auth": {
+				"title": "Anmeldung & Registrierung",
+				"blurb": "Was der Shop auf den Konto-Seiten sagt."
+			},
+			"product": {
+				"title": "Produktseite",
+				"blurb": "Die feste Erklärung, wie Optionen funktionieren."
+			}
+		},
+		"sections": {
+			"Banner tiles": "Banner-Kacheln",
+			"Categories strip": "Kategorien",
+			"Custom manufacture strip": "Sonderanfertigungen",
+			"Footer": "Fußzeile",
+			"Hero carousel": "Hero-Slider",
+			"Newsletter": "Newsletter",
+			"Popular products": "Beliebte Produkte",
+			"Top bar": "Obere Leiste",
+			"Craft": "Handwerk",
+			"Page": "Seite",
+			"Practical": "Praxis",
+			"Quality": "Qualität",
+			"Value cards": "Wertekarten",
+			"Call to action": "Handlungsaufruf",
+			"Capabilities": "Fertigungsmöglichkeiten",
+			"How it works": "So läuft es ab",
+			"Lead": "Einleitung",
+			"Why it works": "Warum es funktioniert",
+			"Process": "Ablauf",
+			"Promise": "Versprechen",
+			"What quality means": "Was Qualität bedeutet",
+			"Cards": "Karten",
+			"Questions": "Fragen",
+			"Form fields": "Formularfelder",
+			"Shipping": "Versand",
+			"Terms": "Konditionen",
+			"Menu": "Menü",
+			"Site": "Website",
+			"Sign in": "Anmelden",
+			"Register": "Registrieren",
+			"Dealer application": "Händlerantrag",
+			"Password": "Passwort",
+			"Options": "Optionen"
 		}
 	}
 }

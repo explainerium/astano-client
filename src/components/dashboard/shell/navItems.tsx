@@ -6,6 +6,7 @@ import {
 	Mail,
 	MailOpen,
 	Package,
+	PenLine,
 	Percent,
 	Send,
 	Settings,
@@ -30,6 +31,14 @@ export interface NavItem {
 	icon: LucideIcon
 	/** Match nested routes too — /products/new should still light up Products. */
 	nested?: boolean
+	/**
+	 * Hidden from a SHOP_MANAGER.
+	 * 
+	 * Only where the API refuses them too — this hides what cannot be used, it
+	 * does not decide anything. The guard that holds is auth("ADMIN") on the
+	 * route, with proxy.ts turning away a URL typed by hand.
+	 */
+	adminOnly?: boolean
 }
 
 /**
@@ -96,6 +105,18 @@ export const navGroups: NavGroup[] = [
 			 * more often than what colour it is, and burying twenty templates behind
 			 * a settings tab makes the common job the harder one to find.
 			 */
+			/*
+			 * The shop's own words and pictures. ADMIN only, at the client's
+			 * request: the owner writes the site, and a shop manager who could
+			 * rewrite the home page is not what was asked for.
+			 */
+			{
+				label: "content",
+				href: "/admin/dashboard/content",
+				icon: PenLine,
+				nested: true,
+				adminOnly: true,
+			},
 			{ label: "emails", href: "/admin/dashboard/emails", icon: MailOpen, nested: true },
 			{ label: "settings", href: "/admin/dashboard/settings", icon: Settings, nested: true },
 		],

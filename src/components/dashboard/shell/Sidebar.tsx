@@ -5,6 +5,8 @@ import Link from "next/link"
 // and has no translated pathnames to resolve.
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { ROLE } from "@/constants/role"
+import { useMeQuery } from "@/redux/api/authApi"
 import { cn } from "@/lib/utils"
 import { findNavItem, navGroups } from "./navItems"
 
@@ -13,6 +15,18 @@ export const Sidebar = () => {
 
 	const pathname = usePathname()
 	const active = findNavItem(pathname)
+
+	/**
+	 * Some entries are an ADMIN's only.
+	 *
+	 * Hiding them is a courtesy to a shop manager, not a control: what stops one
+	 * is `auth("ADMIN")` on the API route, with proxy.ts turning away a URL typed
+	 * by hand. While `me` is still loading nothing admin-only is drawn, which is
+	 * the right way round — an entry that appears and then vanishes reads as a
+	 * bug, and one that appears a moment late does not.
+	 */
+	const { data: me } = useMeQuery()
+	const isAdmin = me?.role === ROLE.ADMIN
 
 	return (
 		<aside className="bg-card border-border hidden w-60 shrink-0 flex-col border-r lg:flex">
@@ -46,6 +60,8 @@ export const Sidebar = () => {
 						)}
 
 						{group.items.map((item) => {
+							if (item.adminOnly && !isAdmin) return null
+
 							const isActive = active?.href === item.href
 							const Icon = item.icon
 

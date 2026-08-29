@@ -591,7 +591,7 @@
 		]
 	},
 	"about": {
-		"title": "About Us – astano®",
+		"title": "About us",
 		"intro": "As a family business with over 20 years of experience, we at astano® manufacture high-quality stainless steel and silicone products for the kitchen, table, and bar. With a passion for precision and individual design, we turn your ideas into reality – whether for everyday use, as a gift, or for your brand marketing.",
 		"heroCta": "Discover now",
 		"craft": {
@@ -637,7 +637,7 @@
 		]
 	},
 	"quality": {
-		"title": "Quality at astano®",
+		"title": "Quality",
 		"intro": "At astano®, quality is more than just a feature for us – it's a promise. Each of our products – from stainless steel cookie cutters to reusable straws, custom ice cube molds and baking utensils – meets the highest standards of durability, design and user-friendliness. We make every effort to deliver consistently excellent quality in every single product.",
 		"heroCta": "Discover now",
 		"meaning": {
@@ -974,7 +974,8 @@
 		"emails": "Emails",
 		"settings": "Settings",
 		"shop": "Shop",
-		"site": "Site"
+		"site": "Site",
+		"content": "Content"
 	},
 	"adminCommon": {
 		"save": "Save",
@@ -1933,6 +1934,28 @@
 		"rungAboveSmallerOrder": "Works out at {unit} per unit — above the {previous} charged for a smaller order.",
 		"perPage": "Show",
 		"reorderNumbered": "Reorder {index}",
-		"lastUpdate": "Last update"
+		"lastUpdate": "Last update",
+		"content": "Content",
+		"contentSections": "Content sections",
+		"theWordsAndPicturesOnTheSite": "The words and pictures on the site",
+		"loadingContent": "Loading content …",
+		"thatContentSectionDoesNotExist": "That content section does not exist.",
+		"viewPage": "View page",
+		"nothingToSave": "Nothing changed",
+		"savedButCacheNotCleared": "Saved. The site will pick the change up shortly.",
+		"sharedByBothLanguages": "Shared by both languages",
+		"editThisPage": "Edit this page",
+		"legalDocuments": "Legal documents",
+		"legalDocumentsNav": "Imprint, privacy, terms",
+		"legalDocumentsBlurb": "Imprint, privacy policy and terms. Changes here replace the shipped version on the site.",
+		"pageTitle": "Page title",
+		"pageBody": "Body",
+		"editedHereReplacesTheShippedDocument": "What is written here replaces the shipped version on the site.",
+		"addItem": "Add item",
+		"removeItem": "Remove item",
+		"moveUp": "Move up",
+		"moveDown": "Move down",
+		"noItemsYet": "No items yet. This section will appear empty on the site.",
+		"itemCount": "{count, plural, =0 {no items} one {# item} other {# items}}"
 	}
 }

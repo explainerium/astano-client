@@ -117,6 +117,30 @@ const applyOverride = (root: Record<string, unknown>, key: string, value: string
 	const parent = node as Record<string, unknown>
 	if (!(leaf in parent)) return
 
+	/**
+	 * A list arrives as one JSON value, replacing the whole array.
+	 *
+	 * That is what lets the shop add a tenth FAQ question: per-item keys can
+	 * only overwrite items the catalogue already has, so a new one would land on
+	 * a key nothing reads and change nothing. The whole array grows and shrinks
+	 * together.
+	 *
+	 * Recognised from what shipped rather than from a registry the storefront
+	 * would have to carry — the catalogue already knows `faq.groups.0.items` is
+	 * an array. Anything that does not parse into one is left alone, so a
+	 * malformed row cannot replace a list with a string and break the `.map`
+	 * that renders it.
+	 */
+	if (Array.isArray(parent[leaf])) {
+		try {
+			const parsed: unknown = JSON.parse(value)
+			if (Array.isArray(parsed)) parent[leaf] = parsed
+		} catch {
+			// Leave the shipped list in place.
+		}
+		return
+	}
+
 	parent[leaf] = value
 }
 

@@ -31,6 +31,7 @@ export enum tagTypes {
 	payment = "payment",
 	setting = "setting",
 	email = "email",
+	content = "content",
 
 	contact = "contact",
 	newsletter = "newsletter",

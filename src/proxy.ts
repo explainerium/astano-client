@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware"
 import { NextResponse, type NextRequest } from "next/server"
 import { AUTH_COOKIE } from "@/constants/authKey"
-import { isStaff } from "@/constants/role"
+import { isStaff, ROLE } from "@/constants/role"
 import { locales, pathnames, routing, type Locale } from "@/i18n/routing"
 import { readAccessToken } from "@/utils/jwt"
 import { readLanguagePolicy } from "@/lib/languagePolicy"
@@ -81,6 +81,20 @@ export async function proxy(request: NextRequest) {
 		if (user.status !== "ACTIVE" || !isStaff(user.role)) {
 			return NextResponse.redirect(new URL("/", request.url))
 		}
+
+		/*
+		 * The content screen is narrower than the dashboard around it.
+		 *
+		 * Both staff roles reach /admin, but only the owner writes the site — a
+		 * shop manager who could rewrite the home page is not what was asked for.
+		 * The sidebar hides the entry from them; this is what happens when the
+		 * URL is typed anyway, and the API refuses the same request underneath
+		 * with auth("ADMIN") regardless of either.
+		 */
+		if (pathname.startsWith("/admin/dashboard/content") && user.role !== ROLE.ADMIN) {
+			return NextResponse.redirect(new URL("/admin/dashboard", request.url))
+		}
+
 		return NextResponse.next()
 	}
 

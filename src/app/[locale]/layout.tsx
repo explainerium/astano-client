@@ -6,6 +6,7 @@ import { NextIntlClientProvider } from "next-intl"
 import { getMessages, getTranslations } from "next-intl/server"
 import { locales, routing, type Locale } from "@/i18n/routing"
 import Providers from "@/lib/providers/Providers"
+import EditThisPage from "@/components/shared/EditThisPage"
 import { SITE_URL } from "@/lib/siteUrl"
 import "../globals.css"
 
@@ -85,7 +86,11 @@ export default async function LocaleLayout({
 		>
 			<body className="flex min-h-full flex-col">
 				<NextIntlClientProvider messages={messages}>
-					<Providers>{children}</Providers>
+					<Providers>
+						{children}
+						{/* Draws nothing for anyone but a signed-in ADMIN. */}
+						<EditThisPage />
+					</Providers>
 				</NextIntlClientProvider>
 			</body>
 		</html>
