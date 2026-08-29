@@ -1,4 +1,19 @@
 /**
+ * NOT READ AT RUNTIME ANY MORE — kept as the record of where these came from.
+ *
+ * The pages now take their pictures from the message catalogue, beside the
+ * words they belong to (`home.hero.slides.0.image` next to `…0.title`), so that
+ * the shop can change a picture and its caption from one row of the content
+ * screen. The URLs below were copied into messages/{de,en}.json unchanged, and
+ * nothing imports this file.
+ *
+ * It stays because of the map underneath: the WordPress path each picture came
+ * from is the only record of provenance once the old site is switched off, and
+ * it is what would make a re-import line up with what is already here. Deleting
+ * it would save nothing and lose that.
+ *
+ * ── Original note ───────────────────────────────────────────────────────────
+ *
  * Photographs and icons on the marketing pages, in our own media library.
  *
  * These used to be loaded straight from `www.astano.de/wp-content/uploads/…`,

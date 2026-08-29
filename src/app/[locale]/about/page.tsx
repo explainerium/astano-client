@@ -2,11 +2,12 @@ import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { ABOUT_ICONS, ABOUT_IMAGES } from "@/lib/pageMedia"
 
 interface Card {
 	title: string
 	body: string
+	/** Beside the words in the catalogue, so the shop changes both together. */
+	icon: string
 }
 
 /** The page's three call-to-action buttons, all styled alike. */
@@ -49,6 +50,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 	const { locale } = await params
 	const t = await getTranslations({ locale, namespace: "about" })
 	const cards = t.raw("cards") as Card[]
+	const craftImages = t.raw("craft.images") as string[]
 
 	return (
 		<>
@@ -86,14 +88,14 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 						<div className="grid grid-cols-2 gap-4">
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img
-								src={ABOUT_IMAGES[0]}
+								src={craftImages[0]}
 								alt=""
 								loading="lazy"
 								className="aspect-[3/4] w-full object-cover"
 							/>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
 							<img
-								src={ABOUT_IMAGES[1]}
+								src={craftImages[1]}
 								alt=""
 								loading="lazy"
 								className="mt-10 aspect-[3/4] w-full object-cover"
@@ -116,7 +118,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 					<div className="lg:order-2">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
-							src={ABOUT_IMAGES[2]}
+							src={t("quality.image")}
 							alt=""
 							loading="lazy"
 							className="aspect-[4/3] w-full object-cover"
@@ -140,7 +142,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 							<article key={index} className="bg-muted p-6">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
-									src={ABOUT_ICONS[index]}
+									src={card.icon}
 									alt=""
 									loading="lazy"
 									className="size-8 object-contain"

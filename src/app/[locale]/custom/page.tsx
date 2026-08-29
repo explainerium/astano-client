@@ -3,7 +3,6 @@ import { Check } from "lucide-react"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { CUSTOM_IMAGES, CUSTOM_WHY_ICONS } from "@/lib/pageMedia"
 
 interface Step {
 	title: string
@@ -14,6 +13,8 @@ interface Step {
 interface Card {
 	title: string
 	body: string
+	/** Beside the words in the catalogue, so the shop changes both together. */
+	icon: string
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -47,6 +48,7 @@ export default async function CustomPage({ params }: { params: Promise<{ locale:
 	const steps = t.raw("how.steps") as Step[]
 	const cards = t.raw("why.cards") as Card[]
 	const items = t.raw("capabilities.items") as string[]
+	const leadImages = t.raw("lead.images") as string[]
 
 	return (
 		<>
@@ -75,7 +77,7 @@ export default async function CustomPage({ params }: { params: Promise<{ locale:
 					</div>
 
 					<div className="grid grid-cols-2 gap-4">
-						{CUSTOM_IMAGES.map((src, index) => (
+						{leadImages.map((src, index) => (
 							// eslint-disable-next-line @next/next/no-img-element
 							<img
 								key={src}
@@ -127,7 +129,7 @@ export default async function CustomPage({ params }: { params: Promise<{ locale:
 							<article key={index} className="bg-muted p-6">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
-									src={CUSTOM_WHY_ICONS[index]}
+									src={card.icon}
 									alt=""
 									loading="lazy"
 									className="size-8 object-contain"

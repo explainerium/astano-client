@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Link } from "@/i18n/navigation"
-import { HERO_IMAGES } from "@/lib/pageMedia"
 import { cn } from "@/lib/utils"
 
 const SLIDE_MS = 7000
@@ -18,7 +17,9 @@ const SLIDE_MS = 7000
  */
 export const Hero = () => {
 	const t = useTranslations("home.hero")
-	const slides = t.raw("slides") as { title: string; body: string }[]
+	// Picture included: it lives beside the words in the catalogue now, so the
+	// shop changes both from one row of the content screen.
+	const slides = t.raw("slides") as { title: string; body: string; image: string }[]
 
 	const [index, setIndex] = useState(0)
 	const [paused, setPaused] = useState(false)
@@ -56,11 +57,12 @@ export const Hero = () => {
 						i === index ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0"
 					)}
 				>
-					{/* Plain img: these are WordPress uploads on another origin, and
-					    next/image would need that host allow-listed for no gain here. */}
+					{/* Plain img: the shop may point this at any object in its own
+					    storage from the content screen, and next/image would need that
+					    host allow-listed for no gain here. */}
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src={HERO_IMAGES[i]}
+						src={slide.image}
 						alt=""
 						className="absolute inset-0 size-full object-cover"
 						loading={i === 0 ? "eager" : "lazy"}

@@ -425,34 +425,41 @@
 			"slides": [
 				{
 					"title": "Edelstahl-Strohhalme",
-					"body": "Edelstahl-Strohhalme sind eine langlebige, umweltfreundliche Alternative zu Plastikstrohhalmen. Sie sind für den jahrelangen Wiedergebrauch konzipiert, ohne an Qualität zu verlieren. Zudem sind sie leicht zu reinigen, stilvoll und ideal, um täglichen Abfall zu reduzieren und dabei Ihre Lieblingsgetränke zu genießen. Auch beim Thema Sicherheit und Branding punkten sie gegenüber anderen Materialien."
+					"body": "Edelstahl-Strohhalme sind eine langlebige, umweltfreundliche Alternative zu Plastikstrohhalmen. Sie sind für den jahrelangen Wiedergebrauch konzipiert, ohne an Qualität zu verlieren. Zudem sind sie leicht zu reinigen, stilvoll und ideal, um täglichen Abfall zu reduzieren und dabei Ihre Lieblingsgetränke zu genießen. Auch beim Thema Sicherheit und Branding punkten sie gegenüber anderen Materialien.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/a00c70b639ad7febe7788a9f5c6d1d2b.webp"
 				},
 				{
 					"title": "Die ganze Welt der Ausstechformen",
-					"body": "Sie benötigen keine individuelle Form? Wählen Sie aus unseren mehr als 400 verschiedenen Standardmotiven für nahezu jedes Thema und viele Branchen. Mit Ihrem Logo veredelt und individuell verpackt – einzeln oder als Set. Alles ist möglich."
+					"body": "Sie benötigen keine individuelle Form? Wählen Sie aus unseren mehr als 400 verschiedenen Standardmotiven für nahezu jedes Thema und viele Branchen. Mit Ihrem Logo veredelt und individuell verpackt – einzeln oder als Set. Alles ist möglich.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d6c15f12077b8057af19ebfe92a94bc5.webp"
 				},
 				{
 					"title": "Edelstahl-Eiswürfel",
-					"body": "Edelstahl-Eiswürfel halten Ihre Getränke perfekt gekühlt, ohne sie zu verwässern, und bewahren den vollen Geschmack vom ersten bis zum letzten Schluck. Wiederverwendbar und elegant sind sie ein hochwertiges Upgrade für Cocktails, Säfte und Getränke im Alltag. Mit Ihrem Logo als edler Werbeträger."
+					"body": "Edelstahl-Eiswürfel halten Ihre Getränke perfekt gekühlt, ohne sie zu verwässern, und bewahren den vollen Geschmack vom ersten bis zum letzten Schluck. Wiederverwendbar und elegant sind sie ein hochwertiges Upgrade für Cocktails, Säfte und Getränke im Alltag. Mit Ihrem Logo als edler Werbeträger.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/2fda4441a9015e493f175f049699c74b.webp"
 				}
 			]
 		},
 		"tiles": [
 			{
 				"title": "Individuelle Fertigung",
-				"body": "Jedes unserer Produkte ist so einzigartig wie die Ideen unserer Kunden."
+				"body": "Jedes unserer Produkte ist so einzigartig wie die Ideen unserer Kunden.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d4b5d558c3534ecee4578b0e5092ab9b.webp"
 			},
 			{
 				"title": "Qualität als Grundsatz",
-				"body": "Materialien und Verarbeitung liegen bei uns auf höchstem Niveau – für uns Standard."
+				"body": "Materialien und Verarbeitung liegen bei uns auf höchstem Niveau – für uns Standard.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d82f5a16864ffe5285ef38af31a874f5.webp"
 			},
 			{
 				"title": "Verpackungslösungen",
-				"body": "Wir liefern nicht nur ein Produkt – wir liefern Komplettpakete mit ansprechenden Verpackungslösungen."
+				"body": "Wir liefern nicht nur ein Produkt – wir liefern Komplettpakete mit ansprechenden Verpackungslösungen.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/370e0736b6d458a7a8d6069056d2ca52.webp"
 			},
 			{
 				"title": "Umfangreiche Beratung",
-				"body": "Die ausführliche und detailreiche Beratung ist uns wichtig auf dem Weg zu Ihrem perfekten Produkt von astano."
+				"body": "Die ausführliche und detailreiche Beratung ist uns wichtig auf dem Weg zu Ihrem perfekten Produkt von astano.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7071e024b3db8286c2ca636ace22e25e.webp"
 			}
 		],
 		"categories": {
@@ -469,19 +476,23 @@
 			"cards": [
 				{
 					"title": "Jedes Detail zählt",
-					"body": "Mit Blick auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und dabei ein hochwertiges Aussehen und Gefühl zu bewahren."
+					"body": "Mit Blick auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und dabei ein hochwertiges Aussehen und Gefühl zu bewahren.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8a39b77ebba3bc42670b340eb22c5143.webp"
 				},
 				{
 					"title": "Hochwertiges Material",
-					"body": "Wir verwenden ausschließlich Materialien höchster Qualität, um erstklassige Leistung und eine Verarbeitung zu gewährleisten, die sich von anderen abhebt."
+					"body": "Wir verwenden ausschließlich Materialien höchster Qualität, um erstklassige Leistung und eine Verarbeitung zu gewährleisten, die sich von anderen abhebt.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/85a6385b0c37693efaf74756d6b19917.webp"
 				},
 				{
 					"title": "Wo Handwerkskunst auf Perfektion trifft",
-					"body": "Mit Fokus auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und gleichzeitig ein hochwertiges Aussehen und Gefühl zu bewahren."
+					"body": "Mit Fokus auf Langlebigkeit gefertigt, sind unsere Produkte darauf ausgelegt, dem täglichen Gebrauch standzuhalten und gleichzeitig ein hochwertiges Aussehen und Gefühl zu bewahren.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/99ac80fea5d57168b023da0fe7c4d8d2.webp"
 				},
 				{
 					"title": "Maßgeschneidert nach Ihren Anforderungen",
-					"body": "Jedes Detail wird sorgfältig von erfahrenen Händen gefertigt und vereint Kunstfertigkeit und Präzision in jedem Stück, um Ihre genauen Anforderungen zu erfüllen."
+					"body": "Jedes Detail wird sorgfältig von erfahrenen Händen gefertigt und vereint Kunstfertigkeit und Präzision in jedem Stück, um Ihre genauen Anforderungen zu erfüllen.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/20dac5dc13e12cf7455671c773bebfde.webp"
 				}
 			]
 		},
@@ -585,12 +596,17 @@
 		"heroCta": "Jetzt entdecken",
 		"craft": {
 			"title": "Mit Sorgfalt gefertigt – individuell für Marke und Markt",
-			"body": "astano® entwickelt und fertigt Produkte nicht „von der Stange“, sondern mit Blick auf die Anforderungen unserer Kunden. Ob Werbeartikel, Merchandising, On-Pack-Aktion, OEM-Produktion oder Handelsware für den Einzelhandel – wir verbinden langjährige Erfahrung mit durchdachter Individualisierung und zuverlässiger Fertigungsqualität. Unsere Produkte entstehen überwiegend aus Edelstahl und Silikon – Materialien, die für Langlebigkeit, Funktionalität und eine hochwertige Anmutung stehen. So schaffen wir individuelle Lösungen, die im Alltag bestehen, die Marke unserer Kunden stärken und gleichzeitig preislich attraktiv bleiben."
+			"body": "astano® entwickelt und fertigt Produkte nicht „von der Stange“, sondern mit Blick auf die Anforderungen unserer Kunden. Ob Werbeartikel, Merchandising, On-Pack-Aktion, OEM-Produktion oder Handelsware für den Einzelhandel – wir verbinden langjährige Erfahrung mit durchdachter Individualisierung und zuverlässiger Fertigungsqualität. Unsere Produkte entstehen überwiegend aus Edelstahl und Silikon – Materialien, die für Langlebigkeit, Funktionalität und eine hochwertige Anmutung stehen. So schaffen wir individuelle Lösungen, die im Alltag bestehen, die Marke unserer Kunden stärken und gleichzeitig preislich attraktiv bleiben.",
+			"images": [
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/f13c1f8a3e61b6ec74e75336348e97c1.webp",
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/4790447c8a07ca6d26277a041b5ff754.webp"
+			]
 		},
 		"quality": {
 			"title": "Qualität, Erfahrung und Individualisierung aus einer Hand",
 			"body": "Bei astano® treffen Produktkompetenz, Fertigungserfahrung und Markenverständnis aufeinander. Wir wissen, worauf es bei individualisierten Produkten ankommt: eine saubere Umsetzung, überzeugende Materialqualität, ein stimmiges Design und ein Preis, der wirtschaftlich bleibt. Als Mitglied im Warenzeichenverband Edelstahl Rostfrei stehen wir zudem für einen besonders hohen Qualitätsanspruch bei der Verarbeitung unserer Edelstahlprodukte. Für unsere Kunden bedeutet das: verlässliche Materialien, hochwertige Ausführung und Produkte, die langfristig überzeugen – optisch wie funktional.",
-			"cta": "Qualität entdecken"
+			"cta": "Qualität entdecken",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/70976941d9f736ae910eebba891bf8fc.webp"
 		},
 		"practical": {
 			"title": "Wo Handwerkskunst auf Funktion und Markenwirkung trifft",
@@ -600,19 +616,23 @@
 		"cards": [
 			{
 				"title": "Gebaut für langfristige Qualität. Entwickelt für starke Marken.",
-				"body": "Unsere Produkte sind für einen langlebigen Einsatz konzipiert. Hochwertige Materialien, sorgfältige Verarbeitung und ein durchdachtes Design sorgen dafür, dass sie auch bei häufiger Nutzung zuverlässig funktionieren und dabei einen hochwertigen Eindruck vermitteln."
+				"body": "Unsere Produkte sind für einen langlebigen Einsatz konzipiert. Hochwertige Materialien, sorgfältige Verarbeitung und ein durchdachtes Design sorgen dafür, dass sie auch bei häufiger Nutzung zuverlässig funktionieren und dabei einen hochwertigen Eindruck vermitteln.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7f3fbd7c9ad0d2d5644db2b73c8f15f5.webp"
 			},
 			{
 				"title": "Hochwertige Materialien",
-				"body": "Wir setzen überwiegend auf Edelstahl und Silikon, weil diese Materialien langlebig, funktional und für viele Anwendungen im Küchen- und Haushaltsbereich ideal geeignet sind. Das Ergebnis sind Produkte mit hoher Wertigkeit, angenehmer Haptik und überzeugender Alltagstauglichkeit."
+				"body": "Wir setzen überwiegend auf Edelstahl und Silikon, weil diese Materialien langlebig, funktional und für viele Anwendungen im Küchen- und Haushaltsbereich ideal geeignet sind. Das Ergebnis sind Produkte mit hoher Wertigkeit, angenehmer Haptik und überzeugender Alltagstauglichkeit.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/99ac80fea5d57168b023da0fe7c4d8d2.webp"
 			},
 			{
 				"title": "Jedes Detail zählt",
-				"body": "Bei astano® fertigen wir hochwertige, individualisierbare Produkte für Küche, Kochen, Backen, Essen & Trinken. Unsere Artikel eignen sich als Werbegeschenke, Merchandising-Produkte, On-Pack-Lösungen, Handelsartikel oder OEM-Produkte für starke Marken. Über 20 Jahre Erfahrung, hochwertige Materialien, flexible Individualisierung und ein überzeugendes Preis-Leistungs-Verhältnis machen uns zu einem verlässlichen Partner."
+				"body": "Bei astano® fertigen wir hochwertige, individualisierbare Produkte für Küche, Kochen, Backen, Essen & Trinken. Unsere Artikel eignen sich als Werbegeschenke, Merchandising-Produkte, On-Pack-Lösungen, Handelsartikel oder OEM-Produkte für starke Marken. Über 20 Jahre Erfahrung, hochwertige Materialien, flexible Individualisierung und ein überzeugendes Preis-Leistungs-Verhältnis machen uns zu einem verlässlichen Partner.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/c871464cf8c2371e98cb5a652762cbf8.webp"
 			},
 			{
 				"title": "Maßgeschneiderte Lösungen für Ihre Anforderungen",
-				"body": "Sie benötigen kein Standardprodukt, sondern eine individuelle Lösung? Wir realisieren Artikel nach Ihren Vorstellungen – von der einfachen Logoanbringung bis zur kompletten OEM- oder Sonderanfertigung inklusive individueller Verpackung für Handel, Promotion oder Markenkommunikation."
+				"body": "Sie benötigen kein Standardprodukt, sondern eine individuelle Lösung? Wir realisieren Artikel nach Ihren Vorstellungen – von der einfachen Logoanbringung bis zur kompletten OEM- oder Sonderanfertigung inklusive individueller Verpackung für Handel, Promotion oder Markenkommunikation.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/ecede0c78afd2906e399c9944578d614.webp"
 			}
 		]
 	},
@@ -625,15 +645,18 @@
 			"cards": [
 				{
 					"title": "Premium-Materialien",
-					"body": "Wir verwenden hochwertigen Edelstahl, langlebige Kunststoffe und Premium Silikon – ausgewählt aufgrund ihrer Langlebigkeit, Sicherheit und Leistungsfähigkeit. Alle Produkte durchlaufen strenge Qualitätskontrollen, um sicherzustellen, dass sie unsere internen Standards erfüllen oder übertreffen."
+					"body": "Wir verwenden hochwertigen Edelstahl, langlebige Kunststoffe und Premium Silikon – ausgewählt aufgrund ihrer Langlebigkeit, Sicherheit und Leistungsfähigkeit. Alle Produkte durchlaufen strenge Qualitätskontrollen, um sicherzustellen, dass sie unsere internen Standards erfüllen oder übertreffen.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/85a6385b0c37693efaf74756d6b19917.webp"
 				},
 				{
 					"title": "Präzision und Konsistenz",
-					"body": "Egal, ob Sie sich für eine unserer über 400 Standard-Ausstechformen entscheiden oder eine individuell gestaltete Ausstechform mit Logogravur in Auftrag geben – unser Herstellungsprozess gewährleistet, dass jedes Produkt mit höchster Präzision und Liebe zum Detail gefertigt wird."
+					"body": "Egal, ob Sie sich für eine unserer über 400 Standard-Ausstechformen entscheiden oder eine individuell gestaltete Ausstechform mit Logogravur in Auftrag geben – unser Herstellungsprozess gewährleistet, dass jedes Produkt mit höchster Präzision und Liebe zum Detail gefertigt wird.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/55ec2e2bb9f650aa5c21419f5a7e66d7.webp"
 				},
 				{
 					"title": "Funktionalität und Benutzerfreundlichkeit",
-					"body": "Qualität beschränkt sich nicht nur auf Aussehen und technische Daten – sie zeigt sich in der Alltagstauglichkeit. Bei der Entwicklung stehen die Bedürfnisse der Nutzer im Vordergrund: Unsere Produkte sollen häufigem Gebrauch standhalten, unsere Küchenaccessoires sollen einfach und sicher in der Anwendung sein."
+					"body": "Qualität beschränkt sich nicht nur auf Aussehen und technische Daten – sie zeigt sich in der Alltagstauglichkeit. Bei der Entwicklung stehen die Bedürfnisse der Nutzer im Vordergrund: Unsere Produkte sollen häufigem Gebrauch standhalten, unsere Küchenaccessoires sollen einfach und sicher in der Anwendung sein.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/20dac5dc13e12cf7455671c773bebfde.webp"
 				}
 			]
 		},
@@ -657,12 +680,14 @@
 					"body": "Wir schätzen Ihre Erfahrung. Ihr Feedback nach dem Kauf hilft uns, Verbesserungspotenzial zu erkennen, damit wir uns anpassen und weiterentwickeln können."
 				}
 			],
-			"cta": "Jetzt entdecken"
+			"cta": "Jetzt entdecken",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/dbe208fcf15cb62a4f0fdfceed9e8095.webp"
 		},
 		"promise": {
 			"title": "Unser Versprechen an Sie",
 			"body": "Wenn Sie sich für astano® entscheiden, kaufen Sie nicht nur ein Produkt – Sie investieren in Zuverlässigkeit, handwerkliche Perfektion und langfristige Zufriedenheit. Wir verpflichten uns, diese Standards jeden Tag, bei jedem Werkzeug, jeder Form und jeder Verpackung, die wir herstellen, zu gewährleisten.",
-			"cta": "Jetzt einkaufen"
+			"cta": "Jetzt einkaufen",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8eb62c5a01088bf69b786c23d08cb563.webp"
 		}
 	},
 	"custom": {
@@ -670,7 +695,11 @@
 		"intro": "Verwandeln Sie Ihre Ideen in einzigartige, hochwertige Kreationen. Von individuellen Ausstechformen bis hin zu personalisierten Backutensilien – astano® erweckt Ihre Designs mit Präzision, erstklassigen Materialien und schneller Fertigung zum Leben.",
 		"lead": {
 			"title": "Erwecken Sie Ihre Ideen zum Leben mit astano®",
-			"body": "Bei astano® beginnt jedes großartige Produkt mit einer großartigen Idee – Ihrer. Wir setzen Ihre individuellen Wünsche in Edelstahl, Silikon oder Kunststoff um. Eine durchgängige Begleitung von der ersten Beratung und Machbarkeitsprüfung über die Entwicklung des Produkts und der Verpackung bis hin zur Auslieferung. Bei uns erhalten Sie alles aus einer Hand. Sie müssen uns nur ansprechen."
+			"body": "Bei astano® beginnt jedes großartige Produkt mit einer großartigen Idee – Ihrer. Wir setzen Ihre individuellen Wünsche in Edelstahl, Silikon oder Kunststoff um. Eine durchgängige Begleitung von der ersten Beratung und Machbarkeitsprüfung über die Entwicklung des Produkts und der Verpackung bis hin zur Auslieferung. Bei uns erhalten Sie alles aus einer Hand. Sie müssen uns nur ansprechen.",
+			"images": [
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8db67061aca188113dfc73390c271bf5.webp",
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/984c97fbe22df7fb6fc34855affffdb1.webp"
+			]
 		},
 		"how": {
 			"title": "Wie es funktioniert",
@@ -698,19 +727,23 @@
 			"cards": [
 				{
 					"title": "Präzisionsgefertigte Designs",
-					"body": "Wir setzen Ihre Ideen und Vorstellung so präzise wie möglich um. Dabei nutzen wir alle zur Verfügung stehenden, technischen Möglichkeiten um das Produkt trotz hohem Qualitätsanspruch so effizient und kostengünstig wie möglich zur realisieren."
+					"body": "Wir setzen Ihre Ideen und Vorstellung so präzise wie möglich um. Dabei nutzen wir alle zur Verfügung stehenden, technischen Möglichkeiten um das Produkt trotz hohem Qualitätsanspruch so effizient und kostengünstig wie möglich zur realisieren.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/059cb550ba41716e02f82d5778f22c9d.webp"
 				},
 				{
 					"title": "Hochwertige, lebensmittelechte Materialien",
-					"body": "Alle Sonderanfertigungen werden aus hochwertigem, rostfreiem Edelstahl oder zertifizierten lebensmittelechten Materialien hergestellt – langlebig, sicher und für den Langzeitgebrauch konzipiert. Nicht umnsonst sind wir Mitglied im Warenzeichenverband Edelstahl Rostfrei."
+					"body": "Alle Sonderanfertigungen werden aus hochwertigem, rostfreiem Edelstahl oder zertifizierten lebensmittelechten Materialien hergestellt – langlebig, sicher und für den Langzeitgebrauch konzipiert. Nicht umnsonst sind wir Mitglied im Warenzeichenverband Edelstahl Rostfrei.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7bb2a9b165e11e85aaa7eada02e0be6d.webp"
 				},
 				{
 					"title": "Erfahrung die Begeistert",
-					"body": "Mit mehr als 20 Jahren Erfahrung im Bereich individuell produzierter Produkte haben Sie mit uns einen starken Partner. Wir sind ehrlich und beraten Sie auch in Puncto Nutzen und Funktion Ihrer Idee. Wenn etwas nicht funktioniert oder es Verbesserungsmöglichkeiten gibt, sagen wir das ganz offen. Denn wir möchten, dass Sie ein rundum zufriedenstellendes Produkt erhalten."
+					"body": "Mit mehr als 20 Jahren Erfahrung im Bereich individuell produzierter Produkte haben Sie mit uns einen starken Partner. Wir sind ehrlich und beraten Sie auch in Puncto Nutzen und Funktion Ihrer Idee. Wenn etwas nicht funktioniert oder es Verbesserungsmöglichkeiten gibt, sagen wir das ganz offen. Denn wir möchten, dass Sie ein rundum zufriedenstellendes Produkt erhalten.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/54161696b5cfc4c7c874f740f3d68fd4.webp"
 				},
 				{
 					"title": "Perfekt für Ihr Unternehmen und Ihre Marke",
-					"body": "Individuelle Produkte zeugen nicht nur von Kreativität, sie begeistern auch den Endverbraucher. Ein durchdachtes Produkt in hoher Qualität steigert das Ansehen Ihres Unternehmens und Ihrer Marke. Mit astano haben Sie den richtigen Partner für erfolgreiche Produkte an Ihrer Seite."
+					"body": "Individuelle Produkte zeugen nicht nur von Kreativität, sie begeistern auch den Endverbraucher. Ein durchdachtes Produkt in hoher Qualität steigert das Ansehen Ihres Unternehmens und Ihrer Marke. Mit astano haben Sie den richtigen Partner für erfolgreiche Produkte an Ihrer Seite.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/83d5f68442f1c1873a7d2fe03ddf4a9f.webp"
 				}
 			]
 		},
@@ -771,7 +804,13 @@
 			"Individuelle Fertigung",
 			"Manuelle Freigabe zur Qualitätskontrolle"
 		],
-		"cta": "Wiederverkäufer werden"
+		"cta": "Wiederverkäufer werden",
+		"cardImages": [
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/4023507731be631c0a66aee2d37f82b2.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/a0a32c70b47093e778b7a6bfc12e1a50.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/1438c50f50a049d5892f40196a394b8e.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/c88b9399293736aae249c938469428fc.webp"
+		]
 	},
 	"quoteBasket": {
 		"title": "Angebotsanfrage",

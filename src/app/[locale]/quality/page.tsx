@@ -2,11 +2,15 @@ import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { QUALITY_ICONS, QUALITY_IMAGES } from "@/lib/pageMedia"
 
 interface Card {
 	title: string
 	body: string
+}
+
+/** A card that carries a picture. The process steps are numbered, not drawn. */
+interface IconCard extends Card {
+	icon: string
 }
 
 /** All four call-to-action buttons on the page point at the product listing. */
@@ -46,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function QualityPage({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
 	const t = await getTranslations({ locale, namespace: "quality" })
-	const cards = t.raw("meaning.cards") as Card[]
+	const cards = t.raw("meaning.cards") as IconCard[]
 	const steps = t.raw("process.steps") as Card[]
 
 	return (
@@ -78,7 +82,7 @@ export default async function QualityPage({ params }: { params: Promise<{ locale
 							<article key={index} className="bg-muted p-8">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
-									src={QUALITY_ICONS[index]}
+									src={card.icon}
 									alt=""
 									loading="lazy"
 									className="size-9 object-contain"
@@ -125,7 +129,7 @@ export default async function QualityPage({ params }: { params: Promise<{ locale
 
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
-							src={QUALITY_IMAGES[0]}
+							src={t("process.image")}
 							alt=""
 							loading="lazy"
 							className="aspect-[4/5] w-full object-cover"
@@ -136,7 +140,7 @@ export default async function QualityPage({ params }: { params: Promise<{ locale
 				<section className="relative isolate">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src={QUALITY_IMAGES[1]}
+						src={t("promise.image")}
 						alt=""
 						loading="lazy"
 						className="absolute inset-0 -z-10 size-full object-cover"

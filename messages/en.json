@@ -425,34 +425,41 @@
 			"slides": [
 				{
 					"title": "Stainless Steel Straws",
-					"body": "Stainless steel straws are a durable, eco-friendly alternative to plastic straws. They are designed for years of reuse without losing quality. Plus, they are easy to clean, stylish, and ideal for reducing daily waste while enjoying your favorite beverages."
+					"body": "Stainless steel straws are a durable, eco-friendly alternative to plastic straws. They are designed for years of reuse without losing quality. Plus, they are easy to clean, stylish, and ideal for reducing daily waste while enjoying your favorite beverages.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/a00c70b639ad7febe7788a9f5c6d1d2b.webp"
 				},
 				{
 					"title": "The whole world of cookie cutters",
-					"body": "Custom design or choose one of our 400 standard designs."
+					"body": "Custom design or choose one of our 400 standard designs.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d6c15f12077b8057af19ebfe92a94bc5.webp"
 				},
 				{
 					"title": "Stainless Steel Ice Cubes",
-					"body": "Stainless steel ice cubes keep your drinks perfectly chilled without diluting them, preserving the full flavor from the first sip to the last. Reusable and elegant, they are a premium upgrade for cocktails, juices, and everyday beverages."
+					"body": "Stainless steel ice cubes keep your drinks perfectly chilled without diluting them, preserving the full flavor from the first sip to the last. Reusable and elegant, they are a premium upgrade for cocktails, juices, and everyday beverages.",
+					"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/2fda4441a9015e493f175f049699c74b.webp"
 				}
 			]
 		},
 		"tiles": [
 			{
 				"title": "Custom Manufacturing",
-				"body": "We produce standard and custom designs to your specifications."
+				"body": "We produce standard and custom designs to your specifications.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d4b5d558c3534ecee4578b0e5092ab9b.webp"
 			},
 			{
 				"title": "Food-Safe Materials",
-				"body": "Made from high-quality stainless steel and certified materials."
+				"body": "Made from high-quality stainless steel and certified materials.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/d82f5a16864ffe5285ef38af31a874f5.webp"
 			},
 			{
 				"title": "B2C and B2B Solutions",
-				"body": "Perfect for individuals, bakeries, and resellers."
+				"body": "Perfect for individuals, bakeries, and resellers.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/370e0736b6d458a7a8d6069056d2ca52.webp"
 			},
 			{
 				"title": "Reliable EU Shipping",
-				"body": "Fast and secure delivery across Germany and Europe."
+				"body": "Fast and secure delivery across Germany and Europe.",
+				"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7071e024b3db8286c2ca636ace22e25e.webp"
 			}
 		],
 		"categories": {
@@ -469,19 +476,23 @@
 			"cards": [
 				{
 					"title": "Every detail counts",
-					"body": "Built with longevity in mind, our products are designed to withstand daily use while retaining a premium look and feel."
+					"body": "Built with longevity in mind, our products are designed to withstand daily use while retaining a premium look and feel.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8a39b77ebba3bc42670b340eb22c5143.webp"
 				},
 				{
 					"title": "High-Quality Material",
-					"body": "We use only the highest quality materials to guarantee first-class performance and a finish that stands apart."
+					"body": "We use only the highest quality materials to guarantee first-class performance and a finish that stands apart.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/85a6385b0c37693efaf74756d6b19917.webp"
 				},
 				{
 					"title": "Where craftsmanship meets perfection",
-					"body": "Built with a focus on durability, our products are made to withstand daily use while preserving a premium look and feel."
+					"body": "Built with a focus on durability, our products are made to withstand daily use while preserving a premium look and feel.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/99ac80fea5d57168b023da0fe7c4d8d2.webp"
 				},
 				{
 					"title": "Custom-Made to Your Requirements",
-					"body": "Every detail is carefully crafted by experienced hands, combining artistry and precision in each piece to meet your exact requirements."
+					"body": "Every detail is carefully crafted by experienced hands, combining artistry and precision in each piece to meet your exact requirements.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/20dac5dc13e12cf7455671c773bebfde.webp"
 				}
 			]
 		},
@@ -585,12 +596,17 @@
 		"heroCta": "Discover now",
 		"craft": {
 			"title": "Carefully crafted – designed for everyday life",
-			"body": "At astano®, we combine decades of experience with a passion for sustainable, high-quality household goods. From stainless steel kitchen utensils to silicone accessories and versatile household items, our mission is to develop products that offer lasting value, safety, and timeless design."
+			"body": "At astano®, we combine decades of experience with a passion for sustainable, high-quality household goods. From stainless steel kitchen utensils to silicone accessories and versatile household items, our mission is to develop products that offer lasting value, safety, and timeless design.",
+			"images": [
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/f13c1f8a3e61b6ec74e75336348e97c1.webp",
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/4790447c8a07ca6d26277a041b5ff754.webp"
+			]
 		},
 		"quality": {
 			"title": "Committed to quality, inspired by everyday life",
 			"body": "At astano®, we believe that the small moments in life deserve extraordinary products. That's why we develop household and kitchen utensils that combine modern craftsmanship, durable materials, and thoughtful functionality. Each product is designed to make everyday life easier and more enjoyable and is particularly durable – so you can feel the difference every time you use it.",
-			"cta": "Shop now"
+			"cta": "Shop now",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/70976941d9f736ae910eebba891bf8fc.webp"
 		},
 		"practical": {
 			"title": "Where craftsmanship meets practicality",
@@ -600,19 +616,23 @@
 		"cards": [
 			{
 				"title": "Built to last. Designed to impress.",
-				"body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel."
+				"body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7f3fbd7c9ad0d2d5644db2b73c8f15f5.webp"
 			},
 			{
 				"title": "High-Quality Materials",
-				"body": "We only use high-quality materials to ensure peak performance and a finish that stands out from the rest."
+				"body": "We only use high-quality materials to ensure peak performance and a finish that stands out from the rest.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/99ac80fea5d57168b023da0fe7c4d8d2.webp"
 			},
 			{
 				"title": "Every detail counts",
-				"body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel."
+				"body": "Durability is our top priority when manufacturing our products. They are designed to withstand daily use while maintaining a high-quality appearance and feel.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/c871464cf8c2371e98cb5a652762cbf8.webp"
 			},
 			{
 				"title": "Custom designs, specially designed for you",
-				"body": "Get a product that perfectly suits your needs. Each design is carefully tailored to your preferences and intended use."
+				"body": "Get a product that perfectly suits your needs. Each design is carefully tailored to your preferences and intended use.",
+				"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/ecede0c78afd2906e399c9944578d614.webp"
 			}
 		]
 	},
@@ -625,15 +645,18 @@
 			"cards": [
 				{
 					"title": "Premium materials",
-					"body": "We use high-quality stainless steel, durable plastics or approved materials – selected for their durability, safety and performance. All products undergo strict quality controls to ensure that they meet or exceed our internal standards."
+					"body": "We use high-quality stainless steel, durable plastics or approved materials – selected for their durability, safety and performance. All products undergo strict quality controls to ensure that they meet or exceed our internal standards.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/85a6385b0c37693efaf74756d6b19917.webp"
 				},
 				{
 					"title": "Precision and consistency",
-					"body": "Regardless of whether you choose one of our 400 standard cookie cutters or commission a custom-designed cookie cutter with a logo engraving – our manufacturing process ensures that every product is manufactured with the highest precision and attention to detail."
+					"body": "Regardless of whether you choose one of our 400 standard cookie cutters or commission a custom-designed cookie cutter with a logo engraving – our manufacturing process ensures that every product is manufactured with the highest precision and attention to detail.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/55ec2e2bb9f650aa5c21419f5a7e66d7.webp"
 				},
 				{
 					"title": "Functionality and user-friendliness",
-					"body": "Quality is not limited to appearance and technical data – it is reflected in everyday usability. The needs of the user are at the forefront of development: our baking utensils are designed to withstand frequent use, and our kitchen accessories are designed to be easy and safe to use."
+					"body": "Quality is not limited to appearance and technical data – it is reflected in everyday usability. The needs of the user are at the forefront of development: our baking utensils are designed to withstand frequent use, and our kitchen accessories are designed to be easy and safe to use.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/20dac5dc13e12cf7455671c773bebfde.webp"
 				}
 			]
 		},
@@ -657,12 +680,14 @@
 					"body": "Whether it is the production of standard articles or custom-designed individual pieces, we pay strict attention to compliance with specifications, tolerances and processing quality."
 				}
 			],
-			"cta": "Discover now"
+			"cta": "Discover now",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/dbe208fcf15cb62a4f0fdfceed9e8095.webp"
 		},
 		"promise": {
 			"title": "Our promise to you",
 			"body": "When you choose astano®, you are not just buying a product – you are investing in reliability, craftsmanship and long-term satisfaction. We commit to ensuring these standards every day, with every tool, bowl and cutter we manufacture.",
-			"cta": "Shop now"
+			"cta": "Shop now",
+			"image": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8eb62c5a01088bf69b786c23d08cb563.webp"
 		}
 	},
 	"custom": {
@@ -670,7 +695,11 @@
 		"intro": "Turn your ideas into unique, high-quality creations. From custom cookie cutters to personalized baking utensils, astano® brings your designs to life with precision, premium materials, and fast turnaround.",
 		"lead": {
 			"title": "Bring your ideas to life with astano®",
-			"body": "At astano®, every great product starts with a great idea—yours. Whether you're a hobby baker, a brand, a bakery, or a business looking for custom shapes, logo cutters, or personalized kitchen tools, we'll turn your vision into a perfectly crafted, high-quality product."
+			"body": "At astano®, every great product starts with a great idea—yours. Whether you're a hobby baker, a brand, a bakery, or a business looking for custom shapes, logo cutters, or personalized kitchen tools, we'll turn your vision into a perfectly crafted, high-quality product.",
+			"images": [
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/8db67061aca188113dfc73390c271bf5.webp",
+				"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/984c97fbe22df7fb6fc34855affffdb1.webp"
+			]
 		},
 		"how": {
 			"title": "How it works",
@@ -684,7 +713,8 @@
 					"body": "Our team turns your idea into a digital design for approval. You can request adjustments, shapes, or resizing."
 				},
 				{
-					"title": "Production begins"
+					"title": "Production begins",
+					"body": ""
 				},
 				{
 					"title": "Delivery to your doorstep",
@@ -697,19 +727,23 @@
 			"cards": [
 				{
 					"title": "Precision-crafted designs",
-					"body": "From simple symbols to detailed logo shapes, we manufacture every cutter and tool with clean edges, precise lines, and consistent results."
+					"body": "From simple symbols to detailed logo shapes, we manufacture every cutter and tool with clean edges, precise lines, and consistent results.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/059cb550ba41716e02f82d5778f22c9d.webp"
 				},
 				{
 					"title": "High-quality, food-safe materials",
-					"body": "All custom orders are made from high-quality stainless steel or certified food-safe materials—durable, safe, and designed for long-term use."
+					"body": "All custom orders are made from high-quality stainless steel or certified food-safe materials—durable, safe, and designed for long-term use.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/7bb2a9b165e11e85aaa7eada02e0be6d.webp"
 				},
 				{
 					"title": "Fast and hassle-free process",
-					"body": "Customization is easy with us. Share your idea, preview it, and we'll take care of production quickly and carefully."
+					"body": "Customization is easy with us. Share your idea, preview it, and we'll take care of production quickly and carefully.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/54161696b5cfc4c7c874f740f3d68fd4.webp"
 				},
 				{
 					"title": "Perfect for businesses and special occasions",
-					"body": "Custom-designed products are ideal for bakeries, corporate branding, weddings, themed parties, product launches, and more."
+					"body": "Custom-designed products are ideal for bakeries, corporate branding, weddings, themed parties, product launches, and more.",
+					"icon": "https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/83d5f68442f1c1873a7d2fe03ddf4a9f.webp"
 				}
 			]
 		},
@@ -770,7 +804,13 @@
 			"Custom manufacturing",
 			"Manual approval for quality control"
 		],
-		"cta": "Become a reseller"
+		"cta": "Become a reseller",
+		"cardImages": [
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/4023507731be631c0a66aee2d37f82b2.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/a0a32c70b47093e778b7a6bfc12e1a50.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/1438c50f50a049d5892f40196a394b8e.webp",
+			"https://dgxmkgxaydmeivbwoysg.supabase.co/storage/v1/object/public/astano-media/2026/08/c88b9399293736aae249c938469428fc.webp"
+		]
 	},
 	"quoteBasket": {
 		"title": "Quote request",

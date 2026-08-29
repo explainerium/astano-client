@@ -2,7 +2,6 @@ import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import { Link } from "@/i18n/navigation"
-import { DEALER_IMAGES } from "@/lib/pageMedia"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
@@ -24,6 +23,10 @@ export default async function DealersPage({ params }: { params: Promise<{ locale
 	const { locale } = await params
 	const t = await getTranslations({ locale, namespace: "dealers" })
 	const cards = t.raw("cards") as string[]
+	// A parallel array: the cards themselves are plain headings in the
+	// catalogue, and giving each one an object just to hang a picture on it
+	// would rewrite copy that reads perfectly well as it is.
+	const cardImages = t.raw("cardImages") as string[]
 
 	return (
 		<>
@@ -53,7 +56,7 @@ export default async function DealersPage({ params }: { params: Promise<{ locale
 							<article key={index} className="group relative isolate overflow-hidden">
 								{/* eslint-disable-next-line @next/next/no-img-element */}
 								<img
-									src={DEALER_IMAGES[index]}
+									src={cardImages[index]}
 									alt=""
 									loading="lazy"
 									className="aspect-[4/3.5] w-full object-cover transition-transform duration-500 group-hover:scale-105"

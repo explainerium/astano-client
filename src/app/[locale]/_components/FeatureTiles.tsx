@@ -1,7 +1,6 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { TILE_IMAGES } from "@/lib/pageMedia"
 
 /**
  * The four photographic tiles directly under the hero, edge to edge with no
@@ -9,7 +8,7 @@ import { TILE_IMAGES } from "@/lib/pageMedia"
  */
 export const FeatureTiles = () => {
 	const t = useTranslations("home")
-	const tiles = t.raw("tiles") as { title: string; body: string }[]
+	const tiles = t.raw("tiles") as { title: string; body: string; image: string }[]
 
 	return (
 		<section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
@@ -17,7 +16,7 @@ export const FeatureTiles = () => {
 				<article key={i} className="relative isolate min-h-[240px] overflow-hidden">
 					{/* eslint-disable-next-line @next/next/no-img-element */}
 					<img
-						src={TILE_IMAGES[i]}
+						src={tile.image}
 						alt=""
 						loading="lazy"
 						className="absolute inset-0 size-full object-cover"

@@ -1,7 +1,6 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { CUSTOM_ICONS } from "@/lib/pageMedia"
 
 /**
  * "Sonderanfertigungen" — heading on the left, intro paragraph on the right,
@@ -10,7 +9,7 @@ import { CUSTOM_ICONS } from "@/lib/pageMedia"
  */
 export const CustomMade = () => {
 	const t = useTranslations("home.custom")
-	const cards = t.raw("cards") as { title: string; body: string }[]
+	const cards = t.raw("cards") as { title: string; body: string; icon: string }[]
 
 	return (
 		<section className="mx-auto w-full max-w-[1400px] px-6 py-16">
@@ -25,7 +24,7 @@ export const CustomMade = () => {
 				{cards.map((card, i) => (
 					<article key={i} className="bg-muted p-6">
 						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img src={CUSTOM_ICONS[i]} alt="" loading="lazy" className="size-8 object-contain" />
+						<img src={card.icon} alt="" loading="lazy" className="size-8 object-contain" />
 						<h3 className="font-heading mt-5 text-base leading-snug font-semibold">
 							{card.title}
 						</h3>
