@@ -9,27 +9,40 @@ import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 
 type LinkHref = ComponentProps<typeof Link>["href"]
 
+/*
+ * The routes only. What each one is called lives in the catalogue under
+ * `nav.footer`, so the shop can rename a link without a deploy — these were a
+ * table of English and German right here, on the one navigation every page
+ * carries.
+ *
+ * Kept apart from the header's labels deliberately: the footer says "Heim"
+ * where the header says "Home", and spells out "Häufig gestellte Fragen" where
+ * the header says "FAQs". One shared key would have quietly rewritten one of
+ * them.
+ */
 const QUICKLINKS = [
-	{ href: "/" as const, en: "Home", de: "Heim" },
-	{ href: "/about" as const, en: "About us", de: "Über uns" },
-	{ href: "/quality" as const, en: "Quality", de: "Qualität" },
-	{ href: "/custom" as const, en: "Custom-made", de: "Sonderanfertigung" },
-	{ href: "/dealers" as const, en: "Dealers", de: "Händler" },
-	{ href: "/payment-shipping" as const, en: "Payment & shipping", de: "Zahlung & Versand" },
-	{ href: "/faqs" as const, en: "FAQs", de: "Häufig gestellte Fragen" },
-	{ href: "/contact" as const, en: "Contact", de: "Kontakt" },
-	{ href: "/products" as const, en: "Product range", de: "Produktangebot" },
+	{ href: "/" as const, key: "home" },
+	{ href: "/about" as const, key: "about" },
+	{ href: "/quality" as const, key: "quality" },
+	{ href: "/custom" as const, key: "custom" },
+	{ href: "/dealers" as const, key: "dealers" },
+	{ href: "/payment-shipping" as const, key: "paymentShipping" },
+	{ href: "/faqs" as const, key: "faqs" },
+	{ href: "/contact" as const, key: "contact" },
+	{ href: "/products" as const, key: "products" },
 ]
 
 /** The three legally required pages, as the live footer lists them. */
 const LEGAL = [
-	{ href: "/terms" as const, en: "Terms and conditions", de: "Allgemeine Geschäftsbedingungen" },
-	{ href: "/privacy" as const, en: "Privacy policy", de: "Datenschutzrichtlinie" },
-	{ href: "/imprint" as const, en: "Imprint", de: "Impressum" },
+	{ href: "/terms" as const, key: "terms" },
+	{ href: "/privacy" as const, key: "privacy" },
+	{ href: "/imprint" as const, key: "imprint" },
 ]
 
 export const SiteFooter = ({ locale }: { locale: string }) => {
 	const t = useTranslations("home.footer")
+	// The link labels, so the shop can rename one without a deploy.
+	const nav = useTranslations("nav.footer")
 	const pathname = usePathname()
 	const params = useParams()
 	const lang = locale === "de" ? "de" : "en"
@@ -95,7 +108,7 @@ export const SiteFooter = ({ locale }: { locale: string }) => {
 								<li key={index} className="flex items-start gap-2">
 									<span className="text-primary mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
 									<Link href={item.href} className="hover:text-primary transition-colors">
-										{item[lang]}
+										{nav(item.key)}
 									</Link>
 								</li>
 							))}
@@ -109,7 +122,7 @@ export const SiteFooter = ({ locale }: { locale: string }) => {
 								<li key={index} className="flex items-start gap-2">
 									<span className="text-primary mt-1.5 size-1.5 shrink-0 rounded-full bg-current" />
 									<Link href={item.href} className="hover:text-primary transition-colors">
-										{item[lang]}
+										{nav(item.key)}
 									</Link>
 								</li>
 							))}

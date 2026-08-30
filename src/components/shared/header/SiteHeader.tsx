@@ -42,16 +42,14 @@ const NAV = [
 	{ key: "contact", href: "/contact" as const },
 ]
 
-/** Labels the live header carries. */
-const NAV_LABEL: Record<string, { en: string; de: string }> = {
-	home: { en: "Home", de: "Home" },
-	products: { en: "Products", de: "Produkte" },
-	about: { en: "About us", de: "Über uns" },
-	quality: { en: "Quality", de: "Qualität" },
-	custom: { en: "Custom-made", de: "Sonderanfertigung" },
-	faqs: { en: "FAQs", de: "FAQs" },
-	contact: { en: "Contact", de: "Kontakt" },
-}
+/*
+ * The labels themselves live in the catalogue, under `nav.header`.
+ *
+ * They were a table of English and German right here, which meant the one part
+ * of the site every visitor reads on every page was the one part the shop could
+ * not change. The routes stay in code — a menu entry pointing somewhere new is
+ * a code change — but what it is called is the shop's.
+ */
 
 const IconLink = ({
 	href,
@@ -80,6 +78,8 @@ const IconLink = ({
 
 export const SiteHeader = ({ locale }: { locale: string }) => {
 	const t = useTranslations("home")
+	// The menu labels, so the shop can rename an entry without a deploy.
+	const nav = useTranslations("nav.header")
 	const lang = locale === "de" ? "de" : "en"
 	const [openCategories, setOpenCategories] = useState(false)
 
@@ -164,7 +164,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 							item.hasChildren ? (
 								<ProductsMenu
 									key={item.key}
-									label={NAV_LABEL[item.key][lang]}
+									label={nav(item.key)}
 									href={item.href as "/products"}
 									categories={categories}
 									isActive={pathname === item.href}
@@ -180,7 +180,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 										pathname === item.href && "border-b-2 border-current pb-0.5"
 									)}
 								>
-									{NAV_LABEL[item.key][lang]}
+									{nav(item.key)}
 								</Link>
 							)
 						)}
@@ -239,7 +239,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 												pathname === item.href && "text-primary"
 											)}
 										>
-											{NAV_LABEL[item.key][lang]}
+											{nav(item.key)}
 										</Link>
 
 										{item.hasChildren && (
@@ -247,7 +247,7 @@ export const SiteHeader = ({ locale }: { locale: string }) => {
 												type="button"
 												onClick={() => setOpenProducts((open) => !open)}
 												aria-expanded={openProducts}
-												aria-label={NAV_LABEL[item.key][lang]}
+												aria-label={nav(item.key)}
 												className="hover:text-primary p-2"
 											>
 												<ChevronDown

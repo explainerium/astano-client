@@ -29,19 +29,29 @@
 		"wakingUp": "Ihre Anfrage wird gesendet. Wenn unser Server pausiert war, kann das bis zu einer Minute dauern — bitte schließen Sie die Seite nicht."
 	},
 	"nav": {
-		"home": "Startseite",
-		"products": "Produkte",
-		"cart": "Warenkorb",
-		"checkout": "Kasse",
-		"quoteBasket": "Angebotsanfrage",
-		"wishlist": "Wunschliste",
-		"account": "Mein Konto",
-		"login": "Anmelden",
-		"logout": "Abmelden",
-		"register": "Konto erstellen",
-		"dealerRegistration": "Händler werden",
-		"language": "Sprache",
-		"contact": "Kontakt"
+		"header": {
+			"home": "Home",
+			"products": "Produkte",
+			"about": "Über uns",
+			"quality": "Qualität",
+			"custom": "Sonderanfertigung",
+			"faqs": "FAQs",
+			"contact": "Kontakt"
+		},
+		"footer": {
+			"home": "Heim",
+			"about": "Über uns",
+			"quality": "Qualität",
+			"custom": "Sonderanfertigung",
+			"dealers": "Händler",
+			"paymentShipping": "Zahlung & Versand",
+			"faqs": "Häufig gestellte Fragen",
+			"contact": "Kontakt",
+			"products": "Produktangebot",
+			"terms": "Allgemeine Geschäftsbedingungen",
+			"privacy": "Datenschutzrichtlinie",
+			"imprint": "Impressum"
+		}
 	},
 	"auth": {
 		"signIn": "Anmelden",
@@ -2419,13 +2429,14 @@
 			"Form fields": "Formularfelder",
 			"Shipping": "Versand",
 			"Terms": "Konditionen",
-			"Menu": "Menü",
 			"Site": "Website",
 			"Sign in": "Anmelden",
 			"Register": "Registrieren",
 			"Dealer application": "Händlerantrag",
 			"Password": "Passwort",
-			"Options": "Optionen"
+			"Options": "Optionen",
+			"Header menu": "Kopfzeilen-Menü",
+			"Footer links": "Fußzeilen-Links"
 		}
 	}
 }

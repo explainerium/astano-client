@@ -29,19 +29,29 @@
 		"wakingUp": "Sending your request. This can take up to a minute if our server has been idle — please don’t close the page."
 	},
 	"nav": {
-		"home": "Home",
-		"products": "Products",
-		"cart": "Cart",
-		"checkout": "Checkout",
-		"quoteBasket": "Quote request",
-		"wishlist": "Wishlist",
-		"account": "My account",
-		"login": "Sign in",
-		"logout": "Sign out",
-		"register": "Create account",
-		"dealerRegistration": "Become a dealer",
-		"language": "Language",
-		"contact": "Contact"
+		"header": {
+			"home": "Home",
+			"products": "Products",
+			"about": "About us",
+			"quality": "Quality",
+			"custom": "Custom-made",
+			"faqs": "FAQs",
+			"contact": "Contact"
+		},
+		"footer": {
+			"home": "Home",
+			"about": "About us",
+			"quality": "Quality",
+			"custom": "Custom-made",
+			"dealers": "Dealers",
+			"paymentShipping": "Payment & shipping",
+			"faqs": "FAQs",
+			"contact": "Contact",
+			"products": "Product range",
+			"terms": "Terms and conditions",
+			"privacy": "Privacy policy",
+			"imprint": "Imprint"
+		}
 	},
 	"auth": {
 		"signIn": "Sign in",

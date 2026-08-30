@@ -24,13 +24,15 @@ import { readAccessToken } from "@/utils/jwt"
  */
 
 /**
- * Internal route → the content group that holds its words.
+ * Internal route → the screen that edits its words.
  *
  * Internal, so this is one map rather than one per language: `usePathname` from
  * our own navigation resolves /uber-uns and /about to the same `/about`.
  *
- * Pages not listed have nothing editable behind them — a product page's words
- * are the product's, and the cart's are the shop's chrome rather than its copy.
+ * Every page whose words the shop may change is here, and nothing else. A page
+ * left out has nothing editable behind it — a product's name and description
+ * are the catalogue's and are edited under Products, and the cart's wording is
+ * the shop's chrome rather than its copy.
  */
 const GROUP_OF: Record<string, string> = {
 	"/": "home",
@@ -41,6 +43,20 @@ const GROUP_OF: Record<string, string> = {
 	"/faqs": "faq",
 	"/contact": "contact",
 	"/payment-shipping": "payment",
+
+	// The account pages share one group: what they have in common is the shop
+	// explaining itself, and it is a short screen rather than five.
+	"/login": "auth",
+	"/register": "auth",
+	"/dealer-registration": "auth",
+	"/forgot-password": "auth",
+	"/reset-password": "auth",
+
+	// The three documents have a screen of their own rather than a group, so
+	// they route to it by name.
+	"/imprint": "legal",
+	"/privacy": "legal",
+	"/terms": "legal",
 }
 
 /** Whether the cookie in this browser says ADMIN. Read, never verified. */
