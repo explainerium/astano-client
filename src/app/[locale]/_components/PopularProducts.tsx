@@ -28,6 +28,21 @@ export const PopularProducts = () => {
 
 	const products = data?.data ?? []
 
+	/**
+	 * Nothing chosen means nothing here — not a heading over an apology.
+	 *
+	 * "Noch keine Produkte veröffentlicht" was written when the strip was the
+	 * first twelve of the catalogue and empty meant the shop had no products at
+	 * all. The shop picks these by hand now, so empty means it picked none —
+	 * a state it can reach in one click from the dashboard, and one where a
+	 * heading, an empty band and a "view all products" button is a section that
+	 * reads as broken rather than as absent.
+	 *
+	 * Held until the fetch is done, so the section does not appear, vanish and
+	 * come back on every load.
+	 */
+	if (!isLoading && !products.length) return null
+
 	return (
 		<section className="mx-auto w-full max-w-[1400px] px-6 pb-16">
 			<h2 className="font-heading text-center text-3xl font-extrabold tracking-tight uppercase sm:text-4xl">
@@ -38,8 +53,6 @@ export const PopularProducts = () => {
 				<div className="text-muted-foreground flex items-center justify-center gap-2 py-20 text-sm">
 					<Loader2 className="size-4 animate-spin" />
 				</div>
-			) : !products.length ? (
-				<p className="text-muted-foreground py-16 text-center text-sm">{t("empty")}</p>
 			) : (
 				<div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
 					{products.map((product) => (

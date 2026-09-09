@@ -133,8 +133,14 @@ export interface AdminProduct {
 	taxStatus: TaxStatus
 	moq: number
 	sortOrder: number
-	/** Leads the home page. `sortOrder` above decides where in the strip. */
+	/** Leads the home page. Where in the strip is `topProductOrder`, not `sortOrder`. */
 	isTopProduct: boolean
+	/**
+	 * Its place in the home page's strip, 1 first. Null for a product nobody has
+	 * placed, which sorts behind the ones somebody has — the two are different
+	 * states and null is what says so.
+	 */
+	topProductOrder: number | null
 	/** Resolved for the requesting locale; `translations` carries all of them. */
 	name: string
 	slug: string
@@ -197,6 +203,11 @@ export interface AdminProductListParams {
 	visibility?: ProductVisibility
 	categoryId?: string
 	stockStatus?: StockStatus
+	/**
+	 * Only the products on the home page's strip. `"true"` or absent — there is
+	 * no "everything except the strip", which is not a list anybody asks for.
+	 */
+	top?: "true"
 	search?: string
 	page?: number
 	limit?: number
@@ -207,3 +218,32 @@ export interface AdminProductListParams {
 
 export type ProductSort = "created" | "updated" | "name" | "price"
 export type SortDirection = "asc" | "desc"
+
+/**
+ * One row of the home page's strip, as the picker draws it.
+ *
+ * Deliberately not an `AdminProduct`: the picker needs a name, a thumbnail and
+ * whether a customer would actually see it, and loading the full editor payload
+ * for twelve rows would carry prices, tiers, variants and attributes nothing on
+ * that screen reads.
+ */
+export interface TopProduct {
+	id: string
+	name: string
+	sku: string | null
+	image: ProductImage | null
+	status: ProductStatus
+	visibility: ProductVisibility
+	/**
+	 * Whether the storefront would actually show it. A ticked product that is a
+	 * draft, or hidden from the shop, sits in this list and appears nowhere —
+	 * so the row says so rather than letting the strip look broken.
+	 */
+	live: boolean
+}
+
+/** The strip, and how many rows it holds. */
+export interface TopProductsResponse {
+	data: TopProduct[]
+	limit: number
+}

@@ -30,7 +30,10 @@ const poppins = Poppins({
 export default function NotFound() {
 	return (
 		<html lang="de" className={`${mulish.variable} ${poppins.variable} h-full antialiased`}>
-			<body className="flex min-h-full flex-col">
+			{/* Extension attributes, as in the two real layouts. This page renders
+			    its own document, so it needs its own — see
+			    src/app/[locale]/layout.tsx for why. */}
+			<body className="flex min-h-full flex-col" suppressHydrationWarning>
 				<main className="flex flex-1 items-center justify-center px-6 py-24">
 					<div className="text-center">
 						<p className="font-heading text-primary text-sm font-semibold tracking-[0.2em] uppercase">

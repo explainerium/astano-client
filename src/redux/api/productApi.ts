@@ -1,5 +1,10 @@
 import type { IMeta } from "@/types"
-import type { AdminProduct, AdminProductListParams, ProductPayload } from "@/types/product"
+import type {
+	AdminProduct,
+	AdminProductListParams,
+	ProductPayload,
+	TopProductsResponse,
+} from "@/types/product"
 import { tagTypes } from "../tag-types"
 import { baseApi } from "./baseApi"
 
@@ -17,6 +22,32 @@ export const productApi = baseApi.injectEndpoints({
 		adminProduct: build.query<AdminProduct, string>({
 			query: (id) => ({ url: `/admin/products/${id}`, method: "GET" }),
 			providesTags: [tagTypes.product],
+		}),
+
+		/**
+		 * The home page's strip, in the order it appears there.
+		 *
+		 * Its own endpoint rather than `adminProducts({ top: "true" })`: that
+		 * answers "which products are ticked" out of the list's own ordering,
+		 * while this answers "what the page shows, in what order" — which is the
+		 * only question the picker is asking.
+		 */
+		topProducts: build.query<TopProductsResponse, void>({
+			query: () => ({ url: "/admin/products/top", method: "GET" }),
+			providesTags: [tagTypes.product],
+		}),
+
+		/**
+		 * Replaces the strip whole: these products, in this order.
+		 *
+		 * Not a diff. The screen holds an ordered list somebody dragged, and
+		 * sending "add this, move that" would mean rebuilding that order on both
+		 * sides and trusting them to agree. Anything ticked and absent from the
+		 * array is untucked by the same call.
+		 */
+		setTopProducts: build.mutation<TopProductsResponse, { productIds: string[] }>({
+			query: (data) => ({ url: "/admin/products/top", method: "PUT", data }),
+			invalidatesTags: [tagTypes.product],
 		}),
 
 		createProduct: build.mutation<AdminProduct, ProductPayload>({
@@ -56,6 +87,8 @@ export const productApi = baseApi.injectEndpoints({
 export const {
 	useAdminProductsQuery,
 	useAdminProductQuery,
+	useTopProductsQuery,
+	useSetTopProductsMutation,
 	useCreateProductMutation,
 	useUpdateProductMutation,
 	useDuplicateProductMutation,

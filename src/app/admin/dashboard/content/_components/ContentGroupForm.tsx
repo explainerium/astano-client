@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
@@ -64,9 +64,22 @@ const CATALOGUES: Record<string, unknown> = { de: deMessages, en: enMessages }
 export const ContentGroupForm = ({
 	data,
 	group,
+	sectionExtras,
 }: {
 	data: ContentResponse
 	group: string
+	/**
+	 * Anything that belongs under a section but is not a catalogue string,
+	 * keyed by the section's registry name.
+	 *
+	 * There is exactly one today — the home page's top products, which are the
+	 * catalogue itself rather than words about it and save through a different
+	 * API. Passing it in keeps this component what it has been: a form that
+	 * builds itself from the registry and knows nothing about any particular
+	 * page. Rendered at the foot of its section, so the screen still runs down
+	 * the page the way a visitor meets it.
+	 */
+	sectionExtras?: Record<string, ReactNode>
 }) => {
 	const t = useTranslations("admin")
 	const c = useTranslations("adminCommon")
@@ -251,6 +264,10 @@ export const ContentGroupForm = ({
 								))}
 							</Tabs>
 						)}
+
+						{/* Whatever this section owns that is not a string. Below the
+						    words, because the words are the heading it sits under. */}
+						{sectionExtras?.[section]}
 					</section>
 				)
 			})}

@@ -84,7 +84,29 @@ export default async function LocaleLayout({
 			lang={locale}
 			className={`${mulish.variable} ${poppins.variable} ${lato.variable} h-full antialiased`}
 		>
-			<body className="flex min-h-full flex-col">
+			{/*
+			 * Browser extensions write on this tag before React reaches it.
+			 *
+			 * Grammarly adds `data-gr-ext-installed` and
+			 * `data-new-gr-c-s-check-loaded`; password managers and translators
+			 * add their own. None of it is in the server's HTML, so hydration
+			 * finds attributes it did not render and warns — intermittently,
+			 * because whether the extension gets there first is a race.
+			 *
+			 * There is nothing to fix in the page: React says so itself in that
+			 * warning, and it leaves the attributes alone rather than trying to
+			 * patch them. The warning is also development-only. It is worth
+			 * silencing anyway, because a console that cries wolf on every load
+			 * is a console nobody reads the real mismatch out of.
+			 *
+			 * `suppressHydrationWarning` is exactly one level deep — this tag's
+			 * own attributes and text, and nothing inside it. Every component on
+			 * the page is still checked as before, so a genuine mismatch in the
+			 * app still shows up. It is not on `<html>`: nothing has been seen
+			 * touching that, and `lang` and `className` there are worth hearing
+			 * about if they ever disagree.
+			 */}
+			<body className="flex min-h-full flex-col" suppressHydrationWarning>
 				<NextIntlClientProvider messages={messages}>
 					<Providers>
 						{children}

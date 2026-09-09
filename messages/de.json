@@ -411,7 +411,8 @@
 		"verifyEmailNoToken": "Diesem Link fehlt der Bestätigungscode.",
 		"verifyEmailRetry": "Fordern Sie in Ihrem Profil einen neuen an und versuchen Sie es erneut.",
 		"verifyEmailToProfile": "Zu meinem Profil",
-		"invoiceFailed": "Die Rechnung konnte nicht geöffnet werden. Bitte versuchen Sie es erneut."
+		"invoiceFailed": "Die Rechnung konnte nicht geöffnet werden. Bitte versuchen Sie es erneut.",
+		"required": "Pflichtfeld"
 	},
 	"validation": {
 		"required": "Dieses Feld ist erforderlich.",
@@ -477,8 +478,7 @@
 		},
 		"popular": {
 			"heading": "Unsere beliebtesten Produkte",
-			"cta": "Alle Produkte anzeigen",
-			"empty": "Noch keine Produkte veröffentlicht."
+			"cta": "Alle Produkte anzeigen"
 		},
 		"custom": {
 			"heading": "Sonderanfertigungen",
@@ -1561,6 +1561,14 @@
 		"logoAndColours": "Logo &amp; Farben",
 		"lowerNumbersAppearFirstAmongSiblings": "Kleinere Zahlen erscheinen unter Gleichrangigen zuerst.",
 		"lowerNumbersAppearFirst": "Kleinere Zahlen erscheinen zuerst.",
+		"lowerNumbersAppearFirstInCategory": "Kleinere Zahlen erscheinen in der Kategorie-Übersicht zuerst. Nicht auf der Startseite — diese Reihenfolge wird unter Inhalte ▸ Startseite festgelegt.",
+		"topProductsBlurb": "Die Produkte unter „Unsere beliebtesten Produkte“ auf der Startseite, von links nach rechts. Zum Verschieben eine Zeile am Griff ziehen.",
+		"noTopProductsYet": "Keine Produkte ausgewählt. Der Abschnitt wird auf der Startseite ausgeblendet, bis eines hinzugefügt wird.",
+		"notVisibleOnTheSite": "Nicht sichtbar",
+		"beyondTheStrip": "Wird nicht gezeigt",
+		"addProduct": "Produkt hinzufügen",
+		"stripIsFull": "Startseite fasst {limit}",
+		"noProductsLeftToAdd": "Keine weiteren Produkte verfügbar.",
 		"lowerRunsFirstWhenSeveralRates": "Bei mehreren passenden Steuersätzen greift der kleinere Wert zuerst.",
 		"lowercaseWordsSeparatedByHyphens": "Kleinbuchstaben, Wörter mit Bindestrich getrennt",
 		"mainProduct": "Hauptprodukt",

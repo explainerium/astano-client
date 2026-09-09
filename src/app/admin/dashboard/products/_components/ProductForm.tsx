@@ -1142,13 +1142,16 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								]}
 							/>
 							{/*
-							 * The two halves of "top products", one above the other.
+							 * Whether this product is on the home page — and only that.
 							 *
-							 * The tick chooses whether this product is in the home page's
-							 * strip; the number below decides where in it. In that order
-							 * because the number means nothing on a product that is not in
-							 * the strip, and the other way round invites setting a position
-							 * for something that will never appear.
+							 * Where in the strip it sits used to be the number below, which
+							 * was wrong twice over: `sortOrder` is a category listing's
+							 * manual order, so a product pulled to the front of the home
+							 * page was pushed to the back of its category; and arranging a
+							 * row of twelve by opening twelve product pages and typing a
+							 * number into each is not a thing anybody can do. The order
+							 * lives on the Startseite content screen now, where all twelve
+							 * are visible at once and can be dragged.
 							 */}
 							<ProCheckbox
 								name="isTopProduct"
@@ -1159,7 +1162,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								name="sortOrder"
 								type="number"
 								label={t("sortOrder")}
-								description={t("lowerNumbersAppearFirst")}
+								description={t("lowerNumbersAppearFirstInCategory")}
 							/>
 
 						</div>

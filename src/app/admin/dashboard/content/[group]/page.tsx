@@ -1,5 +1,6 @@
 "use client"
 
+import type { ReactNode } from "react"
 import { useTranslations } from "next-intl"
 import { useParams } from "next/navigation"
 import { ExternalLink, Loader2 } from "lucide-react"
@@ -7,6 +8,7 @@ import { getPathname } from "@/i18n/navigation"
 import type { pathnames } from "@/i18n/routing"
 import { useContentQuery } from "@/redux/api/contentApi"
 import ContentGroupForm from "../_components/ContentGroupForm"
+import TopProductsPanel from "../_components/TopProductsPanel"
 import useContentText from "../_components/useContentText"
 
 /**
@@ -42,6 +44,23 @@ const PAGE_OF: Record<string, StaticPathKey> = {
 	shell: "/",
 	auth: "/login",
 	product: "/products",
+}
+
+/**
+ * What a section owns beyond its words, keyed by group and then by the
+ * section's own name in the registry.
+ *
+ * The Popular products section carried only a heading and a link label, while
+ * the thing it is a heading *for* — which twelve products appear under it —
+ * was reachable nowhere but the editor of each individual product. The shop
+ * asked for both halves in one place, so the picker is rendered inside the
+ * section it belongs to rather than bolted above or below the page.
+ *
+ * The key is the English section name from contentRegistry.ts, not its German
+ * translation: the registry is what the form iterates.
+ */
+const SECTION_EXTRAS: Record<string, Record<string, ReactNode>> = {
+	home: { "Popular products": <TopProductsPanel /> },
 }
 
 /**
@@ -115,7 +134,7 @@ export default function ContentGroupPage() {
 				)}
 			</div>
 
-			<ContentGroupForm data={data} group={group} />
+			<ContentGroupForm data={data} group={group} sectionExtras={SECTION_EXTRAS[group]} />
 		</div>
 	)
 }

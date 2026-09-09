@@ -56,7 +56,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 			 */
 			className={`admin-theme ${mulish.variable} ${poppins.variable} h-full overflow-hidden antialiased`}
 		>
-			<body className="flex h-full flex-col overflow-hidden">
+			{/* Extension attributes, same as the storefront's — the reasoning is
+			    written out in full in src/app/[locale]/layout.tsx. One level
+			    deep, so nothing inside the dashboard stops being checked. */}
+			<body className="flex h-full flex-col overflow-hidden" suppressHydrationWarning>
 				<NextIntlClientProvider locale={locale} messages={messages}>
 					<Providers>{children}</Providers>
 				</NextIntlClientProvider>

@@ -96,6 +96,7 @@ export default function ProductsPage() {
 		kind: filters.kind,
 		categoryId: filters.categoryId,
 		stockStatus: filters.stockStatus,
+		top: filters.top ? "true" : undefined,
 		page,
 		limit,
 		sort,

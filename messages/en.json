@@ -411,7 +411,8 @@
 		"verifyEmailNoToken": "This link is missing its confirmation code.",
 		"verifyEmailRetry": "Request a new one from your profile and try again.",
 		"verifyEmailToProfile": "Go to my profile",
-		"invoiceFailed": "Could not open the invoice. Please try again."
+		"invoiceFailed": "Could not open the invoice. Please try again.",
+		"required": "Required"
 	},
 	"validation": {
 		"required": "This field is required.",
@@ -477,8 +478,7 @@
 		},
 		"popular": {
 			"heading": "Our most popular products",
-			"cta": "View all products",
-			"empty": "No products published yet."
+			"cta": "View all products"
 		},
 		"custom": {
 			"heading": "Custom-Made Products",
@@ -1256,6 +1256,14 @@
 		"logoAndColours": "Logo &amp; colours",
 		"lowerNumbersAppearFirstAmongSiblings": "Lower numbers appear first among siblings.",
 		"lowerNumbersAppearFirst": "Lower numbers appear first.",
+		"lowerNumbersAppearFirstInCategory": "Lower numbers appear first in a category listing. Not the home page — that order is set under Content ▸ Home page.",
+		"topProductsBlurb": "The products under “Our most popular products” on the start page, left to right. Drag a row by its handle to move it.",
+		"noTopProductsYet": "No products chosen. The section is hidden on the start page until one is added.",
+		"notVisibleOnTheSite": "Not visible",
+		"beyondTheStrip": "Beyond the strip",
+		"addProduct": "Add product",
+		"stripIsFull": "The start page holds {limit}",
+		"noProductsLeftToAdd": "No products left to add.",
 		"lowerRunsFirstWhenSeveralRates": "Lower runs first when several rates match.",
 		"lowercaseWordsSeparatedByHyphens": "Lowercase words separated by hyphens",
 		"mainProduct": "Main product",

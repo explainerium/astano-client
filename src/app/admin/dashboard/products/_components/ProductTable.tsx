@@ -14,6 +14,7 @@ import {
 	Loader2,
 	Pencil,
 	Plus,
+	Star,
 	Trash2,
 	Upload,
 } from "lucide-react"
@@ -210,6 +211,8 @@ export interface ProductFilters {
 	kind?: ProductKind
 	categoryId?: string
 	stockStatus?: StockStatus
+	/** Only what leads the home page. See the Top-Produkte toggle in the toolbar. */
+	top?: boolean
 }
 
 /**
@@ -527,6 +530,24 @@ export const ProductTable = ({
 								<SelectItem value="OPTION">{t("option")}</SelectItem>
 							</SelectContent>
 						</Select>
+
+						{/*
+						 * A toggle, not a third "any / yes / no" dropdown.
+						 *
+						 * "Not a top product" is forty-four rows and nobody's question;
+						 * the only useful narrowing is down to the dozen on the home
+						 * page, which until now meant scanning fifty-six rows for a chip.
+						 */}
+						<Button
+							type="button"
+							variant={filters.top ? "default" : "outline"}
+							size="sm"
+							aria-pressed={Boolean(filters.top)}
+							onClick={() => onFiltersChange({ ...filters, top: filters.top ? undefined : true })}
+						>
+							<Star className={cn("size-4", filters.top && "fill-current")} />
+							{t("topProducts")}
+						</Button>
 					</div>
 				}
 				selectedCount={selected.size}
