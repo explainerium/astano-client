@@ -571,6 +571,12 @@ export const ProductTable = ({
 							<Link href="/admin/dashboard/products/import">
 								<Upload />{t("import")}</Link>
 						</Button>
+						{/* The ERP's price list is a second import with its own file and its
+						    own rules, so it gets its own door rather than an option on the
+						    product import that would be wrong for every other file. */}
+						<Button asChild variant="outline" size="lg">
+							<Link href="/admin/dashboard/products/import-prices">Import prices</Link>
+						</Button>
 						<Button size="lg" onClick={onCreate}>
 							<Plus />{t("newProduct")}</Button>
 					</div>
