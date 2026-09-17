@@ -15,6 +15,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import ProTextarea from "@/components/form/ProTextarea"
+import TranslateFields from "@/components/form/TranslateFields"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -260,6 +261,15 @@ export const CategoryForm = ({
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="space-y-4 pt-4">
+								{/* The translation's side only — see ProductForm. */}
+								{code === "en" && (
+									<TranslateFields
+										fields={[
+											{ from: "de.name", to: "en.name" },
+											{ from: "de.description", to: "en.description" },
+										]}
+									/>
+								)}
 								<ProInput name={`${code}.name`} label={t("name")} required={code === "de"} />
 								<ProInput
 									name={`${code}.slug`}

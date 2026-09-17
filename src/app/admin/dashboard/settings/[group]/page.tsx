@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useSettingsQuery } from "@/redux/api/settingApi"
+import AiKeyTestCard from "../_components/AiKeyTestCard"
 import MailServerTestCard from "../_components/MailServerTestCard"
 import SettingsGroupForm from "../_components/SettingsGroupForm"
 import useSettingText from "../_components/useSettingText"
@@ -65,6 +66,9 @@ export default function SettingsGroupPage() {
 
 			{/* Saving SMTP proves nothing. This is where you find out. */}
 			{group === "smtp" && <MailServerTestCard />}
+
+			{/* Same for a pasted API key: it looks right until it is used. */}
+			{group === "ai" && <AiKeyTestCard />}
 		</div>
 	)
 }

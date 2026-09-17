@@ -108,6 +108,7 @@ export const ProductTabsEditor = () => {
 									name={`tabs.${index}.translations.${position}.content`}
 									label={t("tabContent")}
 									height="14rem"
+									ai={{ kind: "content", locale: locale.code as "de" | "en" }}
 								/>
 							</TabsContent>
 						))}

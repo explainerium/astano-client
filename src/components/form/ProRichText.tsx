@@ -6,10 +6,13 @@ import { Controller, useFormContext } from "react-hook-form"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import { TableKit } from "@tiptap/extension-table"
+import { toast } from "sonner"
 import {
 	Bold,
 	Code,
 	Eraser,
+	Loader2,
+	Sparkles,
 	Heading1,
 	Heading2,
 	Heading3,
@@ -30,6 +33,8 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { richTextEditorClass } from "@/lib/richText"
+import { useAiStatusQuery, useGenerateTextMutation } from "@/redux/api/aiApi"
+import type { AiKind } from "@/types/ai"
 import FieldShell from "./FieldShell"
 
 /**
@@ -46,12 +51,29 @@ const HEADINGS = [
 	{ level: 4 as const, Icon: Heading4 },
 ]
 
+/**
+ * What the AI button knows about the field it is sitting in.
+ *
+ * Passed by the form rather than discovered here: this component is given a
+ * field name and nothing else, and a product's article number and attributes
+ * are exactly the context that stops a model inventing them.
+ */
+export interface AiFieldContext {
+	kind: AiKind
+	locale: "de" | "en"
+	name?: string
+	sku?: string
+	facts?: string[]
+}
+
 export interface ProRichTextProps {
 	name: string
 	label?: string
 	description?: string
 	required?: boolean
 	className?: string
+	/** Offers "write this for me". Omitted means no button at all. */
+	ai?: AiFieldContext
 	/**
 	 * How tall the writing area starts. It is a starting height, not a limit —
 	 * the field carries a resize grip, so what it ends up at is the writer's
@@ -105,6 +127,7 @@ export const ProRichText = ({
 	description,
 	required,
 	className,
+	ai,
 	height = "10rem",
 }: ProRichTextProps) => {
 	const { control } = useFormContext()
@@ -120,6 +143,7 @@ export const ProRichText = ({
 					description={description}
 					required={required}
 					className={className}
+					ai={ai}
 					height={height}
 					value={typeof field.value === "string" ? field.value : ""}
 					onChange={field.onChange}
@@ -137,6 +161,7 @@ const RichTextEditor = ({
 	description,
 	required,
 	className,
+	ai,
 	height,
 	value,
 	onChange,
@@ -152,6 +177,55 @@ const RichTextEditor = ({
 	const t = useTranslations("admin")
 	const [linkOpen, setLinkOpen] = useState(false)
 	const [linkDraft, setLinkDraft] = useState("")
+
+	/*
+	 * The assistant, when the shop has switched it on.
+	 *
+	 * The status query is cached across every field on the page, so a product
+	 * with four rich text boxes asks once. Skipped entirely where no `ai` context
+	 * was passed — a field that will never offer the button has no reason to ask
+	 * whether it could.
+	 */
+	const [briefOpen, setBriefOpen] = useState(false)
+	const [brief, setBrief] = useState("")
+	const { data: aiStatus } = useAiStatusQuery(undefined, { skip: !ai })
+	const [generateText, { isLoading: writing }] = useGenerateTextMutation()
+	const aiReady = Boolean(ai && aiStatus?.enabled && aiStatus.configured)
+
+	const write = async () => {
+		if (!ai || !editor) return
+
+		try {
+			const { text } = await generateText({
+				kind: ai.kind,
+				locale: ai.locale,
+				brief: brief.trim(),
+				name: ai.name,
+				sku: ai.sku,
+				facts: ai.facts,
+				// Rewrite rather than replace when there is already copy here. The
+				// alternative is a button that silently discards what somebody wrote.
+				existing: editor.isEmpty ? undefined : editor.getText(),
+			}).unwrap()
+
+			if (!text) {
+				toast.error(t("aiWroteNothing"))
+				return
+			}
+
+			// Appended at the cursor rather than over the document: the editor may
+			// have put the caret in the middle of an existing paragraph on purpose.
+			if (editor.isEmpty) editor.commands.setContent(text)
+			else editor.chain().focus().insertContent(text).run()
+
+			onChange(editor.isEmpty ? "" : editor.getHTML())
+			setBriefOpen(false)
+			setBrief("")
+		} catch (error) {
+			const message = (error as { data?: { message?: string } })?.data?.message
+			toast.error(message ?? t("aiCouldNotWriteThis"))
+		}
+	}
 
 	const editor = useEditor({
 		extensions: [
@@ -392,6 +466,26 @@ const RichTextEditor = ({
 						<Eraser className="size-4" />
 					</ToolbarButton>
 
+					{/* Only once the shop has switched the assistant on and stored a
+					    key — a button that always fails is worse than no button. */}
+					{aiReady && (
+						<>
+							<span className="bg-border mx-1 h-5 w-px" />
+							<ToolbarButton
+								label={t("aiWriteThisWithAi")}
+								active={briefOpen}
+								disabled={writing}
+								onClick={() => setBriefOpen((open) => !open)}
+							>
+								{writing ? (
+									<Loader2 className="size-4 animate-spin" />
+								) : (
+									<Sparkles className="size-4" />
+								)}
+							</ToolbarButton>
+						</>
+					)}
+
 					<span className="bg-border mx-1 h-5 w-px" />
 
 					<ToolbarButton
@@ -409,6 +503,45 @@ const RichTextEditor = ({
 						<Redo2 className="size-4" />
 					</ToolbarButton>
 				</div>
+
+				{/* Says what to write about. Empty is allowed — the product's name,
+				    article number and attributes travel with the request, and for a
+				    catalogue entry that is often the whole brief. */}
+				{aiReady && briefOpen && (
+					<div className="border-border bg-muted/40 flex items-center gap-2 border-b px-2 py-1.5">
+						<input
+							type="text"
+							autoFocus
+							value={brief}
+							placeholder={t("aiBriefPlaceholder")}
+							disabled={writing}
+							onChange={(event) => setBrief(event.target.value)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									event.preventDefault()
+									void write()
+								}
+								if (event.key === "Escape") setBriefOpen(false)
+							}}
+							className="border-input bg-background min-w-0 flex-1 rounded-md border px-2 py-1 text-sm outline-none"
+						/>
+						<button
+							type="button"
+							onClick={() => void write()}
+							disabled={writing}
+							className="text-primary px-2 py-1 text-sm font-medium disabled:opacity-50"
+						>
+							{writing ? t("aiWriting") : t("aiWrite")}
+						</button>
+						<button
+							type="button"
+							onClick={() => setBriefOpen(false)}
+							className="text-muted-foreground px-2 py-1 text-sm"
+						>
+							{t("cancel")}
+						</button>
+					</div>
+				)}
 
 				{/* An inline row rather than window.prompt, which is unstyled, blocks
 				    the tab, and is suppressed outright by some browsers. */}

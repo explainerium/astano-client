@@ -8,6 +8,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProRichText from "@/components/form/ProRichText"
 import ProSubmit from "@/components/form/ProSubmit"
+import TranslateFields from "@/components/form/TranslateFields"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { LegalDocument } from "@/content/legal"
 import { getPathname } from "@/i18n/navigation"
@@ -172,11 +173,30 @@ export const LegalContentForm = ({ shipped }: { shipped: Record<string, LegalDoc
 
 								{locales.map((locale) => (
 									<TabsContent key={locale} value={locale} className="space-y-4 pt-4">
+										{/* A document is long, and translating one by hand is the
+										    job nobody gets round to. Existing text is never
+										    overwritten — see TranslateFields. */}
+										{locale === "en" && (
+											<TranslateFields
+												fields={[
+													{
+														from: fieldName("title", page.slug, "de"),
+														to: fieldName("title", page.slug, "en"),
+													},
+													{
+														from: fieldName("body", page.slug, "de"),
+														to: fieldName("body", page.slug, "en"),
+														html: true,
+													},
+												]}
+											/>
+										)}
 										<ProInput name={fieldName("title", page.slug, locale)} label={t("pageTitle")} />
 										<ProRichText
 											name={fieldName("body", page.slug, locale)}
 											label={t("pageBody")}
 											description={t("editedHereReplacesTheShippedDocument")}
+											ai={{ kind: "content", locale: locale as "de" | "en" }}
 										/>
 									</TabsContent>
 								))}

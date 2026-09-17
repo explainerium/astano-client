@@ -16,6 +16,7 @@ import ProSubmit from "@/components/form/ProSubmit"
 import ValidationSummary from "./ValidationSummary"
 import ProPermalink from "@/components/form/ProPermalink"
 import ProRichText from "@/components/form/ProRichText"
+import TranslateFields from "@/components/form/TranslateFields"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -863,6 +864,18 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 
 					{EDITOR_LOCALES.map(({ code }) => (
 						<TabsContent key={code} value={code} className="space-y-4 pt-4">
+							{/* On the translation's side only: German is what this shop
+							    writes, and a button offering to fill it from the English
+							    it does not have yet would be backwards. */}
+							{code === "en" && (
+								<TranslateFields
+									fields={[
+										{ from: "de.name", to: "en.name" },
+										{ from: "de.shortDescription", to: "en.shortDescription", html: true },
+										{ from: "de.description", to: "en.description", html: true },
+									]}
+								/>
+							)}
 							<ProInput
 								name={`${code}.name`}
 								label={t("productName")}
@@ -877,17 +890,41 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 										: `${SITE_URL}/products/`
 								}
 							/>
+							{/*
+							 * The assistant is given what the record already knows — the
+							 * name in this language and the article number — so a
+							 * description cannot be written about the wrong product, and
+							 * whoever presses the button need not retype either.
+							 */}
 							<ProRichText
 								name={`${code}.shortDescription`}
 								label={t("shortDescription")}
 								description={t("theSummaryBesideTheGallery")}
 								height="6rem"
+								ai={{
+									kind: "productShort",
+									locale: code,
+									name: translationFor(product, code)?.name,
+									sku:
+										product?.variants.find((v) => v.isDefault)?.sku ??
+										product?.variants[0]?.sku ??
+										undefined,
+								}}
 							/>
 							<ProRichText
 								name={`${code}.description`}
 								label={t("description")}
 								description={t("theFullDescriptionTabOnThe")}
 								height="14rem"
+								ai={{
+									kind: "product",
+									locale: code,
+									name: translationFor(product, code)?.name,
+									sku:
+										product?.variants.find((v) => v.isDefault)?.sku ??
+										product?.variants[0]?.sku ??
+										undefined,
+								}}
 							/>
 						</TabsContent>
 					))}
