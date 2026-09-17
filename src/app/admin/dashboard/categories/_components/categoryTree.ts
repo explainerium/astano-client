@@ -5,13 +5,14 @@ import type { AdminCategory, CategoryNode } from "@/types/catalog"
  * Public URL of a category's archive page.
  *
  * Derived from the shared pathnames map rather than hardcoded, so renaming the
- * route in one place moves this link too. English, because the admin is
- * English-only — the German archive lives at /de/produkt-kategorie/…
+ * route in one place moves this link too. German, because that is the shop's
+ * own language and the slug the admin is looking at — the English archive lives
+ * under /en/.
  */
 export const storefrontCategoryUrl = (slug: string): string =>
 	getPathname({
 		href: { pathname: "/categories/[slug]", params: { slug } },
-		locale: "en",
+		locale: "de",
 	})
 
 /** The translation for a locale, or undefined. */
@@ -51,7 +52,7 @@ export const displayName = (
  * list anyway for the parent picker, and fetching the same data twice in two
  * shapes is how the two drift apart.
  */
-export const buildTree = (categories: AdminCategory[], locale = "en"): CategoryNode[] => {
+export const buildTree = (categories: AdminCategory[], locale = "de"): CategoryNode[] => {
 	const byId = new Map<string, CategoryNode>(
 		categories.map((c) => [c.id, { ...c, children: [], depth: 0 }])
 	)

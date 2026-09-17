@@ -39,9 +39,16 @@ import { descendantIds, translationFor } from "./categoryTree"
  * missing, so a category without it would render as whatever language happens
  * to exist.
  */
+/**
+ * German first, because German is the language this shop is written in.
+ *
+ * The order is the tab order and, through EDITOR_LOCALES[0], the tab that
+ * opens. English is the translation — a category may never have one, and the
+ * English site falls back to German rather than the other way round.
+ */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
@@ -75,12 +82,12 @@ const buildSchema = (t: T) =>
 	// for can never drift apart; never sent.
 	imagePreview: z.string(),
 	iconPreview: z.string(),
-	en: z.object({
-		name: z.string().trim().min(1, t("anEnglishNameIsRequired")),
+	de: z.object({
+		name: z.string().trim().min(1, t("aGermanNameIsRequired")),
 		slug: slugField(t),
 		description: z.string().trim(),
 	}),
-	de: z.object({
+	en: z.object({
 		name: z.string().trim(),
 		slug: slugField(t),
 		description: z.string().trim(),
@@ -143,7 +150,11 @@ export const CategoryForm = ({
 		...allCategories
 			.filter((c) => !excluded.has(c.id))
 			.map((c) => ({
-				label: translationFor(c, "en")?.name ?? c.translations[0]?.name ?? t("untitled"),
+				label:
+					translationFor(c, "de")?.name ??
+					translationFor(c, "en")?.name ??
+					c.translations[0]?.name ??
+					t("untitled"),
 				value: c.id,
 			}))
 			.sort((a, b) => a.label.localeCompare(b.label)),
@@ -210,11 +221,13 @@ export const CategoryForm = ({
 
 				<h1 className="mt-2 text-xl font-semibold">
 					{isEdit
-						? (translationFor(category, "en")?.name ?? t("editCategory"))
+						? (translationFor(category, "de")?.name ??
+							translationFor(category, "en")?.name ??
+							t("editCategory"))
 						: t("newCategory")}
 				</h1>
 				<p className="text-muted-foreground mt-1 text-sm">
-					{t("englishRequiredGermanOptional")}
+					{t("germanRequiredEnglishOptional")}
 				</p>
 			</div>
 
@@ -247,7 +260,7 @@ export const CategoryForm = ({
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="space-y-4 pt-4">
-								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "de"} />
 								<ProInput
 									name={`${code}.slug`}
 									label={t("slug")}

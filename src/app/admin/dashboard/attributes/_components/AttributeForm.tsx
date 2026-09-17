@@ -20,9 +20,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCreateAttributeMutation, useUpdateAttributeMutation } from "@/redux/api/attributeApi"
 import type { AdminAttribute, AttributePayload } from "@/types/attribute"
 
+/** German first: it is the language the catalogue is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 const CODE_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
@@ -42,14 +43,14 @@ const buildSchema = (t: T) =>
 	z.object({
 		code: codeField(t),
 		sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
-		en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
-		de: z.object({ name: z.string().trim() }),
+		de: z.object({ name: z.string().trim().min(1, t("aGermanNameIsRequired")) }),
+		en: z.object({ name: z.string().trim() }),
 		values: z.array(
 			z.object({
 				id: z.string().optional(),
 				code: codeField(t),
-				labelEn: z.string().trim().min(1, t("required")),
-				labelDe: z.string().trim(),
+				labelDe: z.string().trim().min(1, t("required")),
+				labelEn: z.string().trim(),
 			})
 		),
 	})
@@ -92,13 +93,13 @@ const ValuesEditor = () => {
 			<div className="flex items-center justify-between">
 				<div>
 					<p className="text-sm font-medium">{t("values")}</p>
-					<p className="text-muted-foreground text-xs">Order here is the order shoppers see. English is required.</p>
+					<p className="text-muted-foreground text-xs">Order here is the order shoppers see. German is required.</p>
 				</div>
 				<Button
 					type="button"
 					variant="outline"
 					size="sm"
-					onClick={() => append({ code: "", labelEn: "", labelDe: "" })}
+					onClick={() => append({ code: "", labelDe: "", labelEn: "" })}
 				>
 					<Plus />{t("addValue")}</Button>
 			</div>
@@ -114,13 +115,13 @@ const ValuesEditor = () => {
 					<GripVertical className="text-muted-foreground/50 mt-3 size-4 shrink-0" />
 					<ProInput name={`values.${index}.code`} placeholder="code" className="w-32" />
 					<ProInput
-						name={`values.${index}.labelEn`}
-						placeholder={t("labelEnglish")}
+						name={`values.${index}.labelDe`}
+						placeholder={t("labelDeutsch")}
 						className="flex-1"
 					/>
 					<ProInput
-						name={`values.${index}.labelDe`}
-						placeholder={t("labelDeutsch")}
+						name={`values.${index}.labelEn`}
+						placeholder={t("labelEnglish")}
 						className="flex-1"
 					/>
 					<Button
@@ -153,10 +154,10 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 			code: form.code.trim(),
 			sortOrder: form.sortOrder,
 			translations: [
-				{ locale: "en", name: form.en.name.trim() },
+				{ locale: "de", name: form.de.name.trim() },
 				// A locale with no name is not sent — an empty translation row
 				// would render as a blank attribute name.
-				...(form.de.name.trim() ? [{ locale: "de", name: form.de.name.trim() }] : []),
+				...(form.en.name.trim() ? [{ locale: "en", name: form.en.name.trim() }] : []),
 			],
 			values: form.values.map((value, index) => ({
 				...(value.id ? { id: value.id } : {}),
@@ -164,8 +165,8 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 				// Position is the order — no separate field to keep in step.
 				sortOrder: index,
 				translations: [
-					{ locale: "en", label: value.labelEn.trim() },
-					...(value.labelDe.trim() ? [{ locale: "de", label: value.labelDe.trim() }] : []),
+					{ locale: "de", label: value.labelDe.trim() },
+					...(value.labelEn.trim() ? [{ locale: "en", label: value.labelEn.trim() }] : []),
 				],
 			})),
 		}
@@ -192,7 +193,8 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 				backLabel={t("allAttributes")}
 				title={
 					isEdit
-						? ((translationFor(attribute.translations, "en") as { name?: string })?.name ??
+						? ((translationFor(attribute.translations, "de") as { name?: string })?.name ??
+							(translationFor(attribute.translations, "en") as { name?: string })?.name ??
 							attribute.code)
 						: t("newAttribute")
 				}
@@ -244,7 +246,7 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "de"} />
 							</TabsContent>
 						))}
 					</Tabs>

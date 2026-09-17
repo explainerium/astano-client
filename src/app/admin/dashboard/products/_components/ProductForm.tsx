@@ -44,9 +44,10 @@ import {
 	flattenTree,
 } from "../../categories/_components/categoryTree"
 
+/** German first: it is the language the catalogue is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 /** The dashboard translator, as a type these builders can take. */
@@ -108,7 +109,7 @@ const tierRow = (t: T) =>
 const localeBlock = (nameRequired: boolean, t: T) =>
 	z.object({
 		name: nameRequired
-			? z.string().trim().min(1, t("anEnglishNameIsRequired"))
+			? z.string().trim().min(1, t("aGermanNameIsRequired"))
 			: z.string().trim(),
 		slug: slugField(t),
 		shortDescription: z.string().trim(),
@@ -117,8 +118,8 @@ const localeBlock = (nameRequired: boolean, t: T) =>
 
 const buildSchema = (t: T) =>
 	z.object({
-	en: localeBlock(true, t),
-	de: localeBlock(false, t),
+	de: localeBlock(true, t),
+	en: localeBlock(false, t),
 
 	// General
 	status: z.enum(["DRAFT", "PUBLISHED", "ARCHIVED"]),
@@ -865,7 +866,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 							<ProInput
 								name={`${code}.name`}
 								label={t("productName")}
-								required={code === "en"}
+								required={code === "de"}
 							/>
 							<ProPermalink
 								name={`${code}.slug`}

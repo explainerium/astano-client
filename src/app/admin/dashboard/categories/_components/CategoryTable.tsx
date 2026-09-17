@@ -100,7 +100,10 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 		if (!isSearching) return tree
 		const needle = query.trim().toLowerCase()
 		return tree.filter((row) =>
-			[displayName(row), translationFor(row, "en")?.slug ?? ""].some((value) =>
+			[
+				displayName(row),
+				translationFor(row, "de")?.slug ?? translationFor(row, "en")?.slug ?? "",
+			].some((value) =>
 				value.toLowerCase().includes(needle)
 			)
 		)
@@ -243,7 +246,9 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 							)}
 
 							{rows.map((row) => {
-								const en = translationFor(row, "en")
+								// German first — it is the shop's own language, and the slug
+								// shown here is the one the German archive is served at.
+								const primary = translationFor(row, "de") ?? translationFor(row, "en")
 								const isSelected = selected.has(row.id)
 
 								return (
@@ -272,9 +277,9 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 													<CornerDownRight className="text-muted-foreground/60 size-3.5 shrink-0" />
 												)}
 
-												{en?.slug ? (
+												{primary?.slug ? (
 													<a
-														href={storefrontCategoryUrl(en.slug)}
+														href={storefrontCategoryUrl(primary.slug)}
 														target="_blank"
 														rel="noopener noreferrer"
 														className="group inline-flex items-center gap-1.5 font-medium hover:underline"
@@ -296,7 +301,7 @@ export const CategoryTable = ({ categories }: { categories: AdminCategory[] }) =
 										</TableCell>
 
 										<TableCell className="text-muted-foreground font-mono text-xs">
-											{en?.slug ?? "—"}
+											{primary?.slug ?? "—"}
 										</TableCell>
 
 										<TableCell className="text-right tabular-nums">

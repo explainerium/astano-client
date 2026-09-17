@@ -24,9 +24,10 @@ import {
 } from "@/redux/api/shippingApi"
 import type { ShippingZone, ShippingZonePayload } from "@/types/shipping"
 
+/** German first: it is the language this shop is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 /** The dashboard translator, as a type these builders can take. */
@@ -43,8 +44,8 @@ const buildSchema = (t: T) =>
 	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 	isActive: z.boolean(),
 	countries: z.array(z.string()).min(1, t("pickAtLeastOneCountry")),
-	en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
-	de: z.object({ name: z.string().trim() }),
+	de: z.object({ name: z.string().trim().min(1, t("aGermanNameIsRequired")) }),
+	en: z.object({ name: z.string().trim() }),
 })
 
 type FormValues = z.infer<ReturnType<typeof buildSchema>>
@@ -78,8 +79,8 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 			isActive: form.isActive,
 			countries: form.countries,
 			translations: [
-				{ locale: "en", name: form.en.name.trim() },
-				...(form.de.name.trim() ? [{ locale: "de", name: form.de.name.trim() }] : []),
+				{ locale: "de", name: form.de.name.trim() },
+				...(form.en.name.trim() ? [{ locale: "en", name: form.en.name.trim() }] : []),
 			],
 		}
 
@@ -147,7 +148,7 @@ export const ZoneForm = ({ zone }: { zone?: ShippingZone }) => {
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "de"} />
 							</TabsContent>
 						))}
 					</Tabs>

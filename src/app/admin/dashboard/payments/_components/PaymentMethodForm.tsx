@@ -38,9 +38,10 @@ import BankAccountsField from "./BankAccountsField"
  * buys nothing.
  */
 
+/** German first: it is the language this shop is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 /** The dashboard translator, as a type these builders can take. */
@@ -102,13 +103,13 @@ const buildSchema = (type: PaymentMethodType, t: T) =>
 	z
 		.object({
 		isActive: z.boolean(),
-		en: z.object({
-			title: z.string().trim().min(1, t("anEnglishTitleIsRequired")),
+		de: z.object({
+			title: z.string().trim().min(1, t("aGermanTitleIsRequired")),
 			description: z.string().trim().max(2000),
 			instructions: z.string().trim().max(4000),
 			conditionalNotice: z.string().trim().max(2000),
 		}),
-		de: z.object({
+		en: z.object({
 			title: z.string().trim(),
 			description: z.string().trim().max(2000),
 			instructions: z.string().trim().max(4000),
@@ -345,7 +346,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 			maxOrderTotal: form.maxOrderTotal.trim() || null,
 			conditionalAboveTotal: form.conditionalAboveTotal.trim() || null,
 			requiresValidatedVatId: form.requiresValidatedVatId,
-			translations: [block("en"), ...(form.de.title.trim() ? [block("de")] : [])],
+			translations: [block("de"), ...(form.en.title.trim() ? [block("en")] : [])],
 		}
 
 		try {
@@ -387,7 +388,7 @@ export const PaymentMethodForm = ({ method }: { method: PaymentMethod }) => {
 								name={`${code}.title`}
 								label={t("title")}
 								description={t("theNameShownAtCheckout")}
-								required={code === "en"}
+								required={code === "de"}
 							/>
 							<ProTextarea
 								name={`${code}.description`}

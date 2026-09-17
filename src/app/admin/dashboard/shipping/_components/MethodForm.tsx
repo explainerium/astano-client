@@ -30,9 +30,10 @@ import type {
 	ShippingMethodType,
 } from "@/types/shipping"
 
+/** German first: it is the language this shop is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 /** The dashboard translator, as a type these builders can take. */
@@ -70,11 +71,11 @@ const buildSchema = (t: T) =>
 		taxable: z.boolean(),
 		isActive: z.boolean(),
 		sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
-		en: z.object({
-			name: z.string().trim().min(1, t("anEnglishNameIsRequired")),
+		de: z.object({
+			name: z.string().trim().min(1, t("aGermanNameIsRequired")),
 			description: z.string().trim().max(500),
 		}),
-		de: z.object({
+		en: z.object({
 			name: z.string().trim(),
 			description: z.string().trim().max(500),
 		}),
@@ -331,17 +332,17 @@ export const MethodForm = ({
 			sortOrder: form.sortOrder,
 			translations: [
 				{
-					locale: "en",
-					name: form.en.name.trim(),
-					...(form.en.description.trim() ? { description: form.en.description.trim() } : {}),
+					locale: "de",
+					name: form.de.name.trim(),
+					...(form.de.description.trim() ? { description: form.de.description.trim() } : {}),
 				},
-				...(form.de.name.trim()
+				...(form.en.name.trim()
 					? [
 							{
-								locale: "de",
-								name: form.de.name.trim(),
-								...(form.de.description.trim()
-									? { description: form.de.description.trim() }
+								locale: "en",
+								name: form.en.name.trim(),
+								...(form.en.description.trim()
+									? { description: form.en.description.trim() }
 									: {}),
 							},
 						]
@@ -378,7 +379,13 @@ export const MethodForm = ({
 			<EditorHeader
 				backHref={zoneHref}
 				backLabel={zoneName}
-				title={isEdit ? (translationFor(method, "en")?.name ?? method.code) : t("newMethod")}
+				title={
+					isEdit
+						? (translationFor(method, "de")?.name ??
+							translationFor(method, "en")?.name ??
+							method.code)
+						: t("newMethod")
+				}
 				description={t("whatTheCustomerIsOfferedAt")}
 			/>
 
@@ -416,7 +423,7 @@ export const MethodForm = ({
 									name={`${code}.name`}
 									label={t("name")}
 									description={t("shownToTheCustomerAtCheckout")}
-									required={code === "en"}
+									required={code === "de"}
 								/>
 								<ProTextarea
 									name={`${code}.description`}

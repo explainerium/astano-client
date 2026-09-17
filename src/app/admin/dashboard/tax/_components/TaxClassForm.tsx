@@ -19,9 +19,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useCreateTaxClassMutation, useUpdateTaxClassMutation } from "@/redux/api/taxApi"
 import type { TaxClass, TaxClassPayload } from "@/types/tax"
 
+/** German first: it is the language this shop is written in. English is the translation. */
 const EDITOR_LOCALES = [
-	{ code: "en", label: "English" },
 	{ code: "de", label: "Deutsch" },
+	{ code: "en", label: "English" },
 ] as const
 
 /** The dashboard translator, as a type these builders can take. */
@@ -37,8 +38,8 @@ const buildSchema = (t: T) =>
 		.regex(/^[a-z0-9]+(?:[-_][a-z0-9]+)*$/, "Lowercase letters, digits, - or _"),
 	isDefault: z.boolean(),
 	sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
-	en: z.object({ name: z.string().trim().min(1, t("anEnglishNameIsRequired")) }),
-	de: z.object({ name: z.string().trim() }),
+	de: z.object({ name: z.string().trim().min(1, t("aGermanNameIsRequired")) }),
+	en: z.object({ name: z.string().trim() }),
 })
 
 type FormValues = z.infer<ReturnType<typeof buildSchema>>
@@ -69,10 +70,10 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 			isDefault: form.isDefault,
 			sortOrder: form.sortOrder,
 			translations: [
-				{ locale: "en", name: form.en.name.trim() },
+				{ locale: "de", name: form.de.name.trim() },
 				// A locale with no name is not sent — an empty translation row would
 				// render as a blank class name on that side of the admin.
-				...(form.de.name.trim() ? [{ locale: "de", name: form.de.name.trim() }] : []),
+				...(form.en.name.trim() ? [{ locale: "en", name: form.en.name.trim() }] : []),
 			],
 		}
 
@@ -138,7 +139,7 @@ export const TaxClassForm = ({ taxClass }: { taxClass?: TaxClass }) => {
 
 						{EDITOR_LOCALES.map(({ code }) => (
 							<TabsContent key={code} value={code} className="pt-4">
-								<ProInput name={`${code}.name`} label={t("name")} required={code === "en"} />
+								<ProInput name={`${code}.name`} label={t("name")} required={code === "de"} />
 							</TabsContent>
 						))}
 					</Tabs>
