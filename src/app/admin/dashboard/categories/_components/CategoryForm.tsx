@@ -87,11 +87,15 @@ const buildSchema = (t: T) =>
 		name: z.string().trim().min(1, t("aGermanNameIsRequired")),
 		slug: slugField(t),
 		description: z.string().trim(),
+		metaTitle: z.string().trim().max(200),
+		metaDescription: z.string().trim().max(500),
 	}),
 	en: z.object({
 		name: z.string().trim(),
 		slug: slugField(t),
 		description: z.string().trim(),
+		metaTitle: z.string().trim().max(200),
+		metaDescription: z.string().trim().max(500),
 	}),
 })
 
@@ -114,11 +118,15 @@ const toDefaults = (category?: AdminCategory): FormValues => ({
 		name: translationFor(category, "en")?.name ?? "",
 		slug: translationFor(category, "en")?.slug ?? "",
 		description: translationFor(category, "en")?.description ?? "",
+		metaTitle: translationFor(category, "en")?.metaTitle ?? "",
+		metaDescription: translationFor(category, "en")?.metaDescription ?? "",
 	},
 	de: {
 		name: translationFor(category, "de")?.name ?? "",
 		slug: translationFor(category, "de")?.slug ?? "",
 		description: translationFor(category, "de")?.description ?? "",
+		metaTitle: translationFor(category, "de")?.metaTitle ?? "",
+		metaDescription: translationFor(category, "de")?.metaDescription ?? "",
 	},
 })
 
@@ -175,6 +183,10 @@ export const CategoryForm = ({
 				name: entry.name.trim(),
 				...(entry.slug.trim() ? { slug: entry.slug.trim() } : {}),
 				...(entry.description.trim() ? { description: entry.description.trim() } : {}),
+				// Sent even when empty — clearing one has to mean "use the category
+				// name again", not "leave what was there".
+				metaTitle: entry.metaTitle.trim(),
+				metaDescription: entry.metaDescription.trim(),
 			})
 		}
 
@@ -276,7 +288,47 @@ export const CategoryForm = ({
 									label={t("slug")}
 									description={t("leaveEmptyToGenerateItFrom")}
 								/>
-								<ProTextarea name={`${code}.description`} label={t("description")} rows={3} />
+								{/*
+								 * A category description is a plain box, not the rich text
+								 * editor a product's is — so the assistant is asked for text
+								 * rather than HTML, and its button sits under the field
+								 * instead of in a toolbar that does not exist here.
+								 */}
+								<ProTextarea
+									name={`${code}.description`}
+									label={t("description")}
+									rows={3}
+									ai={{
+										kind: "category",
+										format: "text",
+										locale: code,
+										name: translationFor(category, code)?.name,
+									}}
+								/>
+
+								{/* What Google prints. Empty falls back to the category name
+								    and the shop's own description, as it does today. */}
+								<ProInput
+									name={`${code}.metaTitle`}
+									label={t("seoTitle")}
+									description={t("seoTitleHelp")}
+									ai={{
+										kind: "metaTitle",
+										locale: code,
+										name: translationFor(category, code)?.name,
+									}}
+								/>
+								<ProTextarea
+									name={`${code}.metaDescription`}
+									label={t("seoDescription")}
+									description={t("seoDescriptionHelp")}
+									rows={2}
+									ai={{
+										kind: "metaDescription",
+										locale: code,
+										name: translationFor(category, code)?.name,
+									}}
+								/>
 							</TabsContent>
 						))}
 					</Tabs>

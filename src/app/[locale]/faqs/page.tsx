@@ -11,8 +11,16 @@ interface FaqGroup {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "faq" })
-	return { title: t("title"), description: t("intro") }
+	// Empty means "use the heading below" — see the note on the About page.
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "faq" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	return {
+		title: seo("faq.title") || t("title"),
+		description: seo("faq.description") || t("intro"),
+	}
 }
 
 /**

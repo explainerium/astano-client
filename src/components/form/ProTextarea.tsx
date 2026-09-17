@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext } from "react-hook-form"
 import { Textarea } from "@/components/ui/textarea"
+import AiFieldButton, { type AiFieldContextPlain } from "./AiFieldButton"
 import FieldShell from "./FieldShell"
 
 export interface ProTextareaProps {
@@ -13,6 +14,8 @@ export interface ProTextareaProps {
 	disabled?: boolean
 	rows?: number
 	className?: string
+	/** Offers "write this for me" under the box. Omitted means no button. */
+	ai?: AiFieldContextPlain
 }
 
 export const ProTextarea = ({
@@ -24,6 +27,7 @@ export const ProTextarea = ({
 	disabled,
 	rows = 4,
 	className,
+	ai,
 }: ProTextareaProps) => {
 	const { control } = useFormContext()
 
@@ -50,6 +54,8 @@ export const ProTextarea = ({
 						aria-describedby={error ? `${name}-error` : description ? `${name}-description` : undefined}
 						value={field.value ?? ""}
 					/>
+
+					{ai && <AiFieldButton field={name} ai={ai} />}
 				</FieldShell>
 			)}
 		/>

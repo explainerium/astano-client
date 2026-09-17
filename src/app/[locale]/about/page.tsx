@@ -28,8 +28,23 @@ const Cta = ({
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "about" })
-	return { title: t("title"), description: t("intro") }
+	/*
+	 * The search title, falling back to the page's own heading.
+	 *
+	 * They were one string until the shop asked to edit its SEO, which meant
+	 * shortening a heading rewrote the Google result too. Empty here is the
+	 * normal state and means "use the heading", so nothing changed the day this
+	 * became editable.
+	 */
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "about" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	return {
+		title: seo("about.title") || t("title"),
+		description: seo("about.description") || t("intro"),
+	}
 }
 
 /**

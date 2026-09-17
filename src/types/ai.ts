@@ -3,7 +3,24 @@
 export type AiProvider = "anthropic" | "openai"
 
 /** Which field is being written, which decides the shape of the answer. */
-export type AiKind = "product" | "productShort" | "category" | "content"
+export type AiKind =
+	| "product"
+	| "productShort"
+	| "category"
+	| "content"
+	/** The blue line in a search result. */
+	| "metaTitle"
+	/** The two lines under it. */
+	| "metaDescription"
+
+/**
+ * Overrides the kind's usual shape.
+ *
+ * The same kind can sit in two different boxes — a category description is rich
+ * text on a product and a plain textarea on a category — so the caller says
+ * which it is filling rather than the kind carrying a second meaning.
+ */
+export type AiFormat = "html" | "text"
 
 /** Whether the editors should offer the button at all. Carries no key. */
 export interface AiStatus {
@@ -16,6 +33,8 @@ export interface AiStatus {
 
 export interface AiGenerateInput {
 	kind: AiKind
+	/** Defaults to whatever the kind usually returns. */
+	format?: AiFormat
 	locale: "de" | "en"
 	/** What the editor typed into the box. */
 	brief: string

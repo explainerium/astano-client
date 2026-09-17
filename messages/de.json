@@ -1,4 +1,15 @@
 {
+	"seo": {
+		"home": { "title": "", "description": "" },
+		"products": { "title": "", "description": "" },
+		"about": { "title": "", "description": "" },
+		"custom": { "title": "", "description": "" },
+		"quality": { "title": "", "description": "" },
+		"dealers": { "title": "", "description": "" },
+		"faq": { "title": "", "description": "" },
+		"contact": { "title": "", "description": "" },
+		"payment": { "title": "", "description": "" }
+	},
 	"site": {
 		"title": "astano®",
 		"description": "Maßgefertigte Backwerkzeuge aus Edelstahl, hergestellt in Deutschland."
@@ -1953,6 +1964,10 @@
 		"aiWriteThisWithAi": "Diesen Text mit KI schreiben",
 		"aiWriting": "Schreibt …",
 		"aiWroteNothing": "Die KI hat keinen Text zurückgegeben.",
+		"seoDescription": "Beschreibung im Suchergebnis",
+		"seoDescriptionHelp": "Die zwei Zeilen unter dem Link bei Google. Etwa 155 Zeichen. Leer heißt: die allgemeine Beschreibung des Shops.",
+		"seoTitle": "Titel im Suchergebnis",
+		"seoTitleHelp": "Die blaue Zeile bei Google. Etwa 60 Zeichen. Leer heißt: der Name oben.",
 		"aDesignFileIsRequired": "Eine Druckdatei wird erwartet",
 		"discountOverHundred": "Ein Rabatt kann nicht mehr als 100 % betragen.",
 		"atLeastOne": "Mindestens 1",

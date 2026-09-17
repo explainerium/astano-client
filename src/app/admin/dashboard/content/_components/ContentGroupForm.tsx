@@ -187,10 +187,32 @@ export const ContentGroupForm = ({
 			return <ContentListField key={name} name={name} label={label} definition={definition} />
 		}
 
+		/*
+		 * The assistant, given the field's own label as its subject.
+		 *
+		 * These boxes have no product behind them — "Slide 2 heading" is all the
+		 * context there is — so the label travels as the name and whatever the
+		 * editor types in the brief does the rest. Plain text either way: every
+		 * content value is a string the catalogue interpolates, not HTML.
+		 */
+		const ai = {
+			kind: "content" as const,
+			format: "text" as const,
+			locale: locale as "de" | "en",
+			name: label,
+		}
+
 		return definition.type === "textarea" ? (
-			<ProTextarea key={name} name={name} label={label} description={description} rows={4} />
+			<ProTextarea
+				key={name}
+				name={name}
+				label={label}
+				description={description}
+				rows={4}
+				ai={ai}
+			/>
 		) : (
-			<ProInput key={name} name={name} label={label} description={description} />
+			<ProInput key={name} name={name} label={label} description={description} ai={ai} />
 		)
 	}
 

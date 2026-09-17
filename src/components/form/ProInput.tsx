@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext } from "react-hook-form"
 import { Input } from "@/components/ui/input"
+import AiFieldButton, { type AiFieldContextPlain } from "./AiFieldButton"
 import FieldShell from "./FieldShell"
 
 export interface ProInputProps {
@@ -22,6 +23,8 @@ export interface ProInputProps {
 	 */
 	onBlurExtra?: () => void
 	className?: string
+	/** Offers "write this for me" under the box. Omitted means no button. */
+	ai?: AiFieldContextPlain
 }
 
 export const ProInput = ({
@@ -36,6 +39,7 @@ export const ProInput = ({
 	tabIndex,
 	onBlurExtra,
 	className,
+	ai,
 }: ProInputProps) => {
 	const { control } = useFormContext()
 
@@ -81,6 +85,8 @@ export const ProInput = ({
 							field.onChange(raw === "" ? undefined : event.target.valueAsNumber)
 						}}
 					/>
+
+					{ai && <AiFieldButton field={name} ai={ai} />}
 				</FieldShell>
 			)}
 		/>

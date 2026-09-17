@@ -13,6 +13,7 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
 import ProSubmit from "@/components/form/ProSubmit"
+import ProTextarea from "@/components/form/ProTextarea"
 import ValidationSummary from "./ValidationSummary"
 import ProPermalink from "@/components/form/ProPermalink"
 import ProRichText from "@/components/form/ProRichText"
@@ -115,6 +116,13 @@ const localeBlock = (nameRequired: boolean, t: T) =>
 		slug: slugField(t),
 		shortDescription: z.string().trim(),
 		description: z.string().trim(),
+		/*
+		 * The lengths search engines actually use. Longer is not refused by the
+		 * API either — it is simply cut off in the result, which is worth saying
+		 * on the field rather than enforcing silently here.
+		 */
+		metaTitle: z.string().trim().max(200),
+		metaDescription: z.string().trim().max(500),
 	})
 
 const buildSchema = (t: T) =>
@@ -431,6 +439,8 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 		slug: translationFor(product, locale)?.slug ?? "",
 		shortDescription: translationFor(product, locale)?.shortDescription ?? "",
 		description: translationFor(product, locale)?.description ?? "",
+		metaTitle: translationFor(product, locale)?.metaTitle ?? "",
+		metaDescription: translationFor(product, locale)?.metaDescription ?? "",
 	})
 
 	return {
@@ -623,6 +633,11 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 						? { shortDescription: block.shortDescription.trim() }
 						: {}),
 					...(block.description.trim() ? { description: block.description.trim() } : {}),
+					// Empty is sent as empty rather than omitted: clearing an SEO field
+					// has to mean "go back to the product name", and an omitted key
+					// would leave yesterday's title in the database for ever.
+					metaTitle: block.metaTitle.trim(),
+					metaDescription: block.metaDescription.trim(),
 				},
 			]
 		})
@@ -918,6 +933,41 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 								height="14rem"
 								ai={{
 									kind: "product",
+									locale: code,
+									name: translationFor(product, code)?.name,
+									sku:
+										product?.variants.find((v) => v.isDefault)?.sku ??
+										product?.variants[0]?.sku ??
+										undefined,
+								}}
+							/>
+
+							{/*
+							 * What Google prints. Left empty, the page falls back to the
+							 * product name and the shop's own description, which is what
+							 * every product does today — so these are an override, not a
+							 * field somebody now has to fill in 56 times.
+							 */}
+							<ProInput
+								name={`${code}.metaTitle`}
+								label={t("seoTitle")}
+								description={t("seoTitleHelp")}
+								ai={{
+									kind: "metaTitle",
+									locale: code,
+									name: translationFor(product, code)?.name,
+									sku:
+										product?.variants.find((v) => v.isDefault)?.sku ??
+										product?.variants[0]?.sku ??
+										undefined,
+								}}
+							/>
+							<ProTextarea
+								name={`${code}.metaDescription`}
+								label={t("seoDescription")}
+								description={t("seoDescriptionHelp")}
+								ai={{
+									kind: "metaDescription",
 									locale: code,
 									name: translationFor(product, code)?.name,
 									sku:

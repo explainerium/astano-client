@@ -1,4 +1,15 @@
 {
+	"seo": {
+		"home": { "title": "", "description": "" },
+		"products": { "title": "", "description": "" },
+		"about": { "title": "", "description": "" },
+		"custom": { "title": "", "description": "" },
+		"quality": { "title": "", "description": "" },
+		"dealers": { "title": "", "description": "" },
+		"faq": { "title": "", "description": "" },
+		"contact": { "title": "", "description": "" },
+		"payment": { "title": "", "description": "" }
+	},
 	"site": {
 		"title": "astano®",
 		"description": "Custom stainless-steel baking hardware, made in Germany."
@@ -1648,6 +1659,10 @@
 		"aiWriteThisWithAi": "Write this with AI",
 		"aiWriting": "Writing…",
 		"aiWroteNothing": "The assistant returned nothing.",
+		"seoDescription": "Search result description",
+		"seoDescriptionHelp": "The two lines under the link in Google. Around 155 characters. Empty uses the shop's own description.",
+		"seoTitle": "Search result title",
+		"seoTitleHelp": "The blue line in Google. Around 60 characters. Empty uses the name above.",
 		"aDesignFileIsRequired": "A design file is expected",
 		"discountOverHundred": "A discount cannot be more than 100 %.",
 		"atLeastOne": "At least 1",

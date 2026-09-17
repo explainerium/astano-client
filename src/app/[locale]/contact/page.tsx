@@ -6,8 +6,16 @@ import ContactForm from "./_components/ContactForm"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "contact" })
-	return { title: t("title"), description: t("intro") }
+	// Empty means "use the heading below" — see the note on the About page.
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "contact" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	return {
+		title: seo("contact.title") || t("title"),
+		description: seo("contact.description") || t("intro"),
+	}
 }
 
 /**

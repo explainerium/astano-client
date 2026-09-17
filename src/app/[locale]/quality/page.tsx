@@ -25,8 +25,16 @@ const Cta = ({ children }: { children: React.ReactNode }) => (
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "quality" })
-	return { title: t("title"), description: t("intro") }
+	// Empty means "use the heading below" — see the note on the About page.
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "quality" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	return {
+		title: seo("quality.title") || t("title"),
+		description: seo("quality.description") || t("intro"),
+	}
 }
 
 /**

@@ -6,8 +6,16 @@ import { Link } from "@/i18n/navigation"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "payment" })
-	return { title: t("title"), description: t("shipping.countries") }
+	// Empty means "use the heading and the delivery line" — see the About page.
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "payment" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	return {
+		title: seo("payment.title") || t("title"),
+		description: seo("payment.description") || t("shipping.countries"),
+	}
 }
 
 /**

@@ -37,7 +37,12 @@ export async function generateMetadata({
 	const category = await getCategory(slug, locale)
 	if (!category) return {}
 
-	return { title: category.name, description: category.description ?? undefined }
+	// The shop's own search title when it has written one, the category's name
+	// when it has not — the same rule the product page follows.
+	return {
+		title: category.metaTitle || category.name,
+		description: category.metaDescription || category.description || undefined,
+	}
 }
 
 /**

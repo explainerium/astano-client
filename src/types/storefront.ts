@@ -597,6 +597,9 @@ export interface PublicCategory {
 	slug: string
 	name: string
 	description?: string | null
+	/** What a search engine prints. Null falls back to the name and description. */
+	metaTitle?: string | null
+	metaDescription?: string | null
 	/** The banner. Optional — most categories have none. */
 	image?: PublicImage | null
 	/** A small mark for menus and filters, cropped for that job rather than resized. */

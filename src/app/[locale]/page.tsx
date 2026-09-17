@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+import { getTranslations } from "next-intl/server"
 import SiteFooter from "@/components/shared/footer/SiteFooter"
 import SiteHeader from "@/components/shared/header/SiteHeader"
 import CategoryGrid from "./_components/CategoryGrid"
@@ -26,6 +28,34 @@ import PopularProducts from "./_components/PopularProducts"
  * the auth pages already have their own shell, so hoisting these would put two
  * headers on /login. They move up as soon as a shop layout exists.
  */
+/**
+ * The home page's own search title, when the shop has written one.
+ *
+ * It had none: the page inherited the site title and description from the
+ * locale layout, which is a sensible default and not something anybody could
+ * edit. Both keys are empty until somebody fills them in, and an empty one is
+ * omitted here — so the layout's values stand exactly as they did before.
+ *
+ * `absolute`, because the layout appends the shop name to every other page's
+ * title, and the home page's title already is the shop.
+ */
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+	const { locale } = await params
+	const seo = await getTranslations({ locale, namespace: "seo" })
+
+	const title = seo("home.title")
+	const description = seo("home.description")
+
+	return {
+		...(title ? { title: { absolute: title } } : {}),
+		...(description ? { description } : {}),
+	}
+}
+
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
 

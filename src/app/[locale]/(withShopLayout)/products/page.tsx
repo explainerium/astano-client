@@ -3,8 +3,17 @@ import ProductListing from "./_components/ProductListing"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
 	const { locale } = await params
-	const t = await getTranslations({ locale, namespace: "shop" })
-	return { title: t("allProducts") }
+	const [t, seo] = await Promise.all([
+		getTranslations({ locale, namespace: "shop" }),
+		getTranslations({ locale, namespace: "seo" }),
+	])
+
+	// The archive had no description at all. Empty still means none, so this is
+	// a box the shop may fill rather than one it now has to.
+	return {
+		title: seo("products.title") || t("allProducts"),
+		description: seo("products.description") || undefined,
+	}
 }
 
 /**
