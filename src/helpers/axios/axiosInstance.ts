@@ -6,6 +6,7 @@ import axios, {
 import { AUTH_COOKIE, AUTH_COOKIE_MAX_AGE } from "@/constants/authKey"
 import type { IGenericErrorResponse, ResponseSuccessType } from "@/types"
 import { deleteCookie, getCookie, setCookie } from "@/utils/cookies"
+import { readAccessToken } from "@/utils/jwt"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1"
 
@@ -54,20 +55,50 @@ const refreshAccessToken = async (): Promise<string | null> => {
 		const { data } = await axios.post(
 			`${API_URL}/auth/refresh`,
 			{},
-			{ withCredentials: true }
+			{ withCredentials: true, timeout: 60_000 }
 		)
 		const token: string | undefined = data?.data?.accessToken
 		if (!token) return null
 
 		setCookie(AUTH_COOKIE, token, AUTH_COOKIE_MAX_AGE)
 		return token
-	} catch {
+	} catch (error) {
+		/*
+		 * Only a refusal ends the session.
+		 *
+		 * This used to clear the cookie on any failure, which was harmless while
+		 * a refresh only ran after a 401. SessionKeeper now refreshes ahead of
+		 * time, and a laptop waking without its Wi-Fi yet, or the API waking from
+		 * sleep, would have signed the user out for a network blip. No answer at
+		 * all leaves the cookie alone; the next attempt can still succeed.
+		 */
+		if (!axios.isAxiosError(error) || !error.response) return null
+
+		// Another tab may have rotated the token a moment ago, in which case
+		// this refusal is about the old one and the cookie already holds a
+		// good one. Keep that rather than signing both tabs out.
+		const current = getCookie(AUTH_COOKIE)
+		if (readAccessToken(current)) return current ?? null
+
 		// The refresh token is spent or revoked. Clear the stale access cookie
 		// so the proxy guard sends the user to sign in rather than looping.
 		deleteCookie(AUTH_COOKIE)
 		return null
 	}
 }
+
+/**
+ * Trade the refresh cookie for a new access token, once at a time.
+ *
+ * Shared by the 401 retry below, SessionKeeper and the sign-in page, so a page
+ * that trips all three at the same moment still sends one request: the API
+ * rotates refresh tokens, and a second request carrying the old one would be
+ * refused.
+ */
+export const refreshSession = (): Promise<string | null> =>
+	(refreshInFlight ??= refreshAccessToken().finally(() => {
+		refreshInFlight = null
+	}))
 
 instance.interceptors.response.use(
 	(response) => {
@@ -119,10 +150,7 @@ instance.interceptors.response.use(
 		if (shouldRefresh) {
 			config._retried = true
 
-			refreshInFlight ??= refreshAccessToken().finally(() => {
-				refreshInFlight = null
-			})
-			const token = await refreshInFlight
+			const token = await refreshSession()
 
 			if (token) {
 				config.headers.Authorization = `Bearer ${token}`

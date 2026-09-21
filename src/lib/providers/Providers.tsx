@@ -5,6 +5,7 @@ import { Provider as ReduxProvider } from "react-redux"
 import { Toaster } from "sonner"
 import { store } from "@/redux/store"
 import MoneyFormatProvider from "./MoneyFormatProvider"
+import SessionKeeper from "./SessionKeeper"
 
 /**
  * Client-side providers, mounted once per root layout.
@@ -24,6 +25,9 @@ export const Providers = ({ children }: { children: ReactNode }) => (
 		    separators. Inside the Redux provider because it reads them from the
 		    API; before the children so prices format correctly on first paint. */}
 		<MoneyFormatProvider />
+		{/* Renders nothing — renews the access token before it runs out, so a
+		    page navigation never meets an expired one. */}
+		<SessionKeeper />
 		{children}
 		{/*
 		 * Pinned rather than left to the default: sonner is the one component

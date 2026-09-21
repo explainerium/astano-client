@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -10,7 +10,9 @@ import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
 import SubmitStatus from "@/components/form/SubmitStatus"
+import { AUTH_COOKIE } from "@/constants/authKey"
 import { isStaff } from "@/constants/role"
+import { refreshSession } from "@/helpers/axios/axiosInstance"
 import { hardNavigate } from "@/lib/hardNavigate"
 import { holdForNavigation } from "@/lib/holdForNavigation"
 import { Link, getPathname } from "@/i18n/navigation"
@@ -19,7 +21,9 @@ import { useAppDispatch } from "@/redux/hooks"
 import { NETWORK_ERROR } from "@/services/actions/apiFetch"
 import userLogin from "@/services/actions/userLogin"
 import type { Locale } from "@/i18n/routing"
-import type { IGenericErrorResponse, UserStatus } from "@/types"
+import type { IGenericErrorResponse, UserRole, UserStatus } from "@/types"
+import { getCookie } from "@/utils/cookies"
+import { decodeToken, readAccessToken } from "@/utils/jwt"
 
 /**
  * Only same-origin paths are followed.
@@ -51,10 +55,55 @@ export const LoginForm = () => {
 	// API lets a PENDING dealer sign in precisely so they can read this.
 	const [blockedStatus, setBlockedStatus] = useState<UserStatus | null>(null)
 
+	// Set while an expired session is being renewed instead of asking for the
+	// password again — see the effect below.
+	const [resuming, setResuming] = useState(false)
+
 	const schema = z.object({
 		email: z.string().min(1, tv("required")).email(tv("email")),
 		password: z.string().min(1, tv("required")),
 	})
+
+	const landingFor = (role: UserRole): string =>
+		safeRedirect(searchParams.get("redirect")) ??
+		(isStaff(role)
+			? "/admin/dashboard"
+			: getPathname({ href: "/account", locale: locale as Locale }))
+
+	/*
+	 * Renew rather than ask again, when that is all it takes.
+	 *
+	 * The proxy sends anyone whose access token has expired here, and it cannot
+	 * renew one itself — the refresh cookie belongs to the API's domain, not
+	 * this one. The browser can. So a visitor who arrives with an *expired*
+	 * token (never a missing one: signing out deletes it) is signed back in
+	 * from the refresh cookie and sent on to where they were going. Only if
+	 * that is refused do they see the form.
+	 */
+	useEffect(() => {
+		const stale = getCookie(AUTH_COOKIE)
+		if (!stale || readAccessToken(stale) || !decodeToken(stale)) return
+
+		let cancelled = false
+		const resume = async () => {
+			setResuming(true)
+			const token = await refreshSession()
+			const user = token ? readAccessToken(token) : null
+			if (cancelled) return
+			if (user?.status === "ACTIVE") {
+				hardNavigate(landingFor(user.role))
+				return
+			}
+			setResuming(false)
+		}
+		void resume()
+
+		return () => {
+			cancelled = true
+		}
+		// Once, on arrival: this is about how the visitor got here.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [])
 
 	const onSubmit = async (values: LoginValues) => {
 		try {
@@ -96,11 +145,7 @@ export const LoginForm = () => {
 			 * The dashboard is outside `[locale]` and takes no prefix, so it is used
 			 * as written.
 			 */
-			const target =
-				safeRedirect(searchParams.get("redirect")) ??
-				(isStaff(user.role)
-					? "/admin/dashboard"
-					: getPathname({ href: "/account", locale: locale as Locale }))
+			const target = landingFor(user.role)
 
 			/*
 			 * A full page load, always.
@@ -126,6 +171,14 @@ export const LoginForm = () => {
 					: (failure?.message ?? te("genericTitle"))
 			)
 		}
+	}
+
+	if (resuming) {
+		return (
+			<p className="text-muted-foreground py-6 text-center text-sm" aria-live="polite">
+				{t("resumingSession")}
+			</p>
+		)
 	}
 
 	if (blockedStatus) {

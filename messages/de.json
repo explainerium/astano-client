@@ -68,6 +68,7 @@
 	"auth": {
 		"signIn": "Anmelden",
 		"signInSubtitle": "Melden Sie sich an, um Ihre Preise und Bestellungen zu sehen.",
+		"resumingSession": "Sie werden wieder angemeldet…",
 		"createAccount": "Konto erstellen",
 		"createAccountSubtitle": "Schneller bestellen und Ihre Bestellungen verfolgen.",
 		"passwordHint": "Mindestens 8 Zeichen.",

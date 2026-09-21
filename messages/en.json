@@ -68,6 +68,7 @@
 	"auth": {
 		"signIn": "Sign in",
 		"signInSubtitle": "Sign in to see your prices and order history.",
+		"resumingSession": "Signing you back in…",
 		"createAccount": "Create account",
 		"createAccountSubtitle": "Check out faster and follow your orders.",
 		"passwordHint": "At least 8 characters.",
