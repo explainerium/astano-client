@@ -888,6 +888,8 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 										{ from: "de.name", to: "en.name" },
 										{ from: "de.shortDescription", to: "en.shortDescription", html: true },
 										{ from: "de.description", to: "en.description", html: true },
+										{ from: "de.metaTitle", to: "en.metaTitle" },
+										{ from: "de.metaDescription", to: "en.metaDescription" },
 									]}
 								/>
 							)}
@@ -1012,7 +1014,10 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				>
 					<div
 						ref={tabStripRef}
-						className="grid scroll-mt-4 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start"
+						// w-full: a vertical Tabs root is a flex row, and without it this
+						// grid is only as wide as its content — the Options panel, with
+						// one short row in it, shrank to a third of the card.
+						className="grid w-full scroll-mt-4 lg:grid-cols-[220px_minmax(0,1fr)] lg:items-start"
 					>
 						{/* The column keeps its rule for the full height of the panel
 						    beside it; the list inside it is what sticks. */}

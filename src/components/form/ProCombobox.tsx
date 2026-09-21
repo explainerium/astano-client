@@ -15,6 +15,15 @@ export interface ProComboboxOption {
 	/** Extra terms that should match this option but are not shown. */
 	keywords?: string[]
 	disabled?: boolean
+	/** A short muted note at the end of the row — an article number, say. */
+	hint?: string
+	/** Which of the `groups` this option belongs to. */
+	groups?: string[]
+}
+
+export interface ProComboboxGroup {
+	value: string
+	label: string
 }
 
 export interface ProComboboxProps {
@@ -32,6 +41,20 @@ export interface ProComboboxProps {
 	 */
 	multiple?: boolean
 	className?: string
+	/**
+	 * Chips under the search box that narrow the list to one group, with an
+	 * "all" chip first. A long list of similar names — "… für Ausstechformen"
+	 * forty times — is found by what it belongs to before it is found by name.
+	 */
+	groups?: ProComboboxGroup[]
+	/** The chip that is on when the list opens. Absent means "all". */
+	defaultGroup?: string
+	/** Label of the "all" chip. */
+	allGroupsLabel?: string
+	/** Extra classes for the popover — a wider list than the trigger, say. */
+	contentClassName?: string
+	/** Extra classes for the list — a taller one, say. */
+	listClassName?: string
 }
 
 /**
@@ -69,6 +92,11 @@ export const ProCombobox = ({
 	disabled,
 	multiple = false,
 	className,
+	groups,
+	defaultGroup,
+	allGroupsLabel,
+	contentClassName,
+	listClassName,
 }: ProComboboxProps) => {
 	const { control } = useFormContext()
 	const t = useTranslations("common")
@@ -76,6 +104,7 @@ export const ProCombobox = ({
 	const [open, setOpen] = useState(false)
 	const [query, setQuery] = useState("")
 	const [highlighted, setActiveIndex] = useState(0)
+	const [group, setGroup] = useState<string | null>(null)
 
 	const listId = useId()
 	const optionId = (index: number) => `${listId}-option-${index}`
@@ -84,14 +113,17 @@ export const ProCombobox = ({
 	const listRef = useRef<HTMLUListElement>(null)
 
 	const filtered = useMemo(() => {
-		if (!query.trim()) return options
+		const inGroup = group
+			? options.filter((option) => option.groups?.includes(group))
+			: options
+		if (!query.trim()) return inGroup
 		const needle = fold(query.trim())
-		return options.filter((option) =>
+		return inGroup.filter((option) =>
 			[option.label, option.value, ...(option.keywords ?? [])].some((term) =>
 				fold(term).includes(needle)
 			)
 		)
-	}, [options, query])
+	}, [options, query, group])
 
 	/*
 	 * Clamped on read, not stored clamped.
@@ -198,6 +230,9 @@ export const ProCombobox = ({
 								setOpen(next)
 								if (!next) setQuery("")
 								else {
+									// Every opening starts from the chip the caller chose,
+									// not from wherever the last visit left it.
+									setGroup(defaultGroup ?? null)
 									// Open on the current choice rather than the top.
 									const index = filtered.findIndex((o) => isChosen(o))
 									setActiveIndex(index >= 0 ? index : 0)
@@ -224,14 +259,19 @@ export const ProCombobox = ({
 											"text-muted-foreground"
 									)}
 								>
-									{triggerLabel}
+									{/* Truncated, with the whole name on hover: a long
+									    choice in a narrow trigger otherwise pushes the
+									    chevron out of the box. */}
+									<span className="min-w-0 truncate" title={triggerLabel}>
+										{triggerLabel}
+									</span>
 									<ChevronsUpDownIcon className="opacity-50" />
 								</Button>
 							</PopoverTrigger>
 
 							<PopoverContent
 								align="start"
-								className="w-(--radix-popover-trigger-width) p-0"
+								className={cn("w-(--radix-popover-trigger-width) p-0", contentClassName)}
 								onOpenAutoFocus={(event) => {
 									// Focus the search box, not the first option.
 									event.preventDefault()
@@ -260,13 +300,45 @@ export const ProCombobox = ({
 									/>
 								</div>
 
+								{!!groups?.length && (
+									<div className="flex flex-wrap gap-1.5 border-b p-2">
+										{[{ value: null, label: allGroupsLabel ?? t("all") }, ...groups].map(
+											(chip) => {
+												const on = group === chip.value
+												return (
+													<button
+														key={chip.value ?? "all"}
+														type="button"
+														aria-pressed={on}
+														// Mouse down, so focus stays in the search box and
+														// the arrow keys keep working after a chip.
+														onMouseDown={(event) => {
+															event.preventDefault()
+															setGroup(chip.value)
+															setActiveIndex(0)
+														}}
+														className={cn(
+															"rounded-full border px-2.5 py-1 text-xs transition-colors",
+															on
+																? "border-primary bg-primary text-primary-foreground"
+																: "text-muted-foreground hover:bg-muted"
+														)}
+													>
+														{chip.label}
+													</button>
+												)
+											}
+										)}
+									</div>
+								)}
+
 								<ul
 									ref={listRef}
 									id={listId}
 									role="listbox"
 									aria-label={label}
 									aria-multiselectable={multiple || undefined}
-									className="max-h-64 overflow-y-auto p-1"
+									className={cn("max-h-64 overflow-y-auto p-1", listClassName)}
 								>
 									{filtered.map((option, index) => {
 										const isActive = index === activeIndex
@@ -299,7 +371,12 @@ export const ProCombobox = ({
 														isSelected ? "opacity-100" : "opacity-0"
 													)}
 												/>
-												{option.label}
+												<span className="min-w-0 flex-1">{option.label}</span>
+												{option.hint && (
+													<span className="text-muted-foreground shrink-0 text-xs tabular-nums">
+														{option.hint}
+													</span>
+												)}
 											</li>
 										)
 									})}

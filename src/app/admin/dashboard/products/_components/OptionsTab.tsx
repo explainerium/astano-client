@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
-import ProCombobox from "@/components/form/ProCombobox"
+import ProCombobox, { type ProComboboxGroup } from "@/components/form/ProCombobox"
 import { Button } from "@/components/ui/button"
+import { useAdminCategoriesQuery } from "@/redux/api/categoryApi"
 import { useAdminProductsQuery } from "@/redux/api/productApi"
+import { pickTranslation } from "@/lib/pickTranslation"
 import { cn } from "@/lib/utils"
 
 /**
@@ -45,6 +47,51 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 	// itself — attaching a product to itself would recurse forever.
 	const { data: result } = useAdminProductsQuery({ kind: "OPTION", limit: 200 })
 	const optionProducts = (result?.data ?? []).filter((p) => p.id !== currentProductId)
+
+	/*
+	 * The categories the options are filed under, as chips in the picker.
+	 *
+	 * Taken from the options themselves rather than from `isOptionCategory`,
+	 * so a chip never leads to an empty list and an option filed somewhere
+	 * unexpected still has a chip that finds it.
+	 */
+	const { data: categories = [] } = useAdminCategoriesQuery()
+	const groups = useMemo<ProComboboxGroup[]>(() => {
+		const used = new Set(optionProducts.flatMap((p) => p.categoryIds))
+		return categories
+			.filter((category) => used.has(category.id))
+			.map((category) => ({
+				value: category.id,
+				label: pickTranslation(category.translations)?.name ?? category.id,
+			}))
+			.sort((a, b) => a.label.localeCompare(b.label, "de"))
+	}, [categories, optionProducts])
+
+	/*
+	 * The chip that is on when the picker opens: the option category that
+	 * belongs to this product's own category. Every option category here sits
+	 * under the main category it serves ("Edelstahl Eiswürfel › … Optionen"),
+	 * so an ice-cube product opens on the ice-cube options and nobody has to
+	 * press a chip first. More than one match, or none, opens on all of them.
+	 */
+	const productCategoryIds = useWatch({ control, name: "categoryIds" }) as string[] | undefined
+	const defaultGroup = useMemo(() => {
+		const own = new Set(productCategoryIds ?? [])
+		const matches = categories.filter(
+			(category) =>
+				groups.some((g) => g.value === category.id) &&
+				(own.has(category.id) || (category.parentId && own.has(category.parentId)))
+		)
+		return matches.length === 1 ? matches[0].id : undefined
+	}, [categories, groups, productCategoryIds])
+
+	const pickerOptions = optionProducts.map((product) => ({
+		value: product.id,
+		label: product.name,
+		hint: product.variants[0]?.sku ?? undefined,
+		keywords: [product.variants[0]?.sku ?? ""],
+		groups: product.categoryIds,
+	}))
 
 	const takenIds = new Set((rows ?? []).map((r) => r?.optionProductId).filter(Boolean))
 
@@ -140,12 +187,20 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 							<ProCombobox
 								name={`options.${index}.optionProductId`}
 								className="min-w-0 flex-1"
-								options={optionProducts.map((product) => ({
-									value: product.id,
-									label: product.name,
-									keywords: [product.variants[0]?.sku ?? ""],
-									disabled: takenIds.has(product.id) && product.id !== chosenId,
+								options={pickerOptions.map((option) => ({
+									...option,
+									disabled: takenIds.has(option.value) && option.value !== chosenId,
 								}))}
+								groups={groups}
+								defaultGroup={defaultGroup}
+								/*
+								 * Wider and taller than the row's own box: the row is
+								 * half the tab, and the names are long and alike, so
+								 * a list the width of the trigger cut every one of
+								 * them to "Paperbag fü…".
+								 */
+								contentClassName="w-[min(36rem,calc(100vw-2rem))] min-w-(--radix-popover-trigger-width)"
+								listClassName="max-h-[min(24rem,50vh)]"
 							/>
 
 							<Button

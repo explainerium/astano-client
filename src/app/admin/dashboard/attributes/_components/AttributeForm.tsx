@@ -5,7 +5,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useFieldArray, useFormContext } from "react-hook-form"
+import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
 import { GripVertical, Plus, Trash2 } from "lucide-react"
 import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
@@ -14,6 +14,7 @@ import EditorHeader from "@/components/dashboard/shell/EditorHeader"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
+import TranslateFields from "@/components/form/TranslateFields"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -140,6 +141,36 @@ const ValuesEditor = () => {
 	)
 }
 
+/**
+ * "Fill from German" for the whole attribute: its name and every value's label.
+ *
+ * Here and not in the product editor, although that is where the client met
+ * the untranslated labels. An attribute is shared — "Material → Edelstahl" is
+ * one record however many products show it — so translating it from a product
+ * would change every other product carrying it, through a Save button that
+ * does not save attributes at all. Translated once here, it is English
+ * everywhere.
+ *
+ * Outside the language tabs, because the values it fills sit outside them too.
+ */
+const TranslateAttribute = () => {
+	const { control } = useFormContext<FormValues>()
+	const values = useWatch({ control, name: "values" }) ?? []
+
+	return (
+		<TranslateFields
+			className="self-start"
+			fields={[
+				{ from: "de.name", to: "en.name" },
+				...values.map((_, index) => ({
+					from: `values.${index}.labelDe`,
+					to: `values.${index}.labelEn`,
+				})),
+			]}
+		/>
+	)
+}
+
 export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => {
 	const t = useTranslations("admin")
 	const router = useRouter()
@@ -208,7 +239,8 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 				defaultValues={toDefaults(attribute)}
 				className="space-y-6"
 			>
-				<div className="bg-card space-y-6 rounded-lg border p-5">
+				<div className="bg-card flex flex-col space-y-6 rounded-lg border p-5">
+					<TranslateAttribute />
 					<div className="grid gap-4 sm:grid-cols-2">
 						<ProInput
 							name="code"

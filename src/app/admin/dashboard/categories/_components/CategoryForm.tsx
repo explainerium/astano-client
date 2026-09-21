@@ -279,6 +279,8 @@ export const CategoryForm = ({
 										fields={[
 											{ from: "de.name", to: "en.name" },
 											{ from: "de.description", to: "en.description" },
+											{ from: "de.metaTitle", to: "en.metaTitle" },
+											{ from: "de.metaDescription", to: "en.metaDescription" },
 										]}
 									/>
 								)}

@@ -24,6 +24,7 @@
 		"search": "Search",
 		"select": "Select…",
 		"noResults": "No matches found.",
+		"all": "All",
 		"resultCount": "{count, plural, =0 {No results} one {# result} other {# results}}",
 		"close": "Close",
 		"back": "Back",
