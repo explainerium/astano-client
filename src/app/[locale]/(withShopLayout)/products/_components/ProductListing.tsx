@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { useRouter, useSearchParams } from "next/navigation"
 import ProductCard from "@/app/[locale]/_components/ProductCard"
@@ -11,6 +11,7 @@ import Pagination from "@/app/[locale]/_components/Pagination"
 import { useShopProductsQuery } from "@/redux/api/storefrontApi"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import type { PublicProduct, PublicProductListParams } from "@/types/storefront"
+import { rememberCategory } from "@/lib/lastCategory"
 import { cn } from "@/lib/utils"
 import ShopFilters from "./ShopFilters"
 
@@ -58,6 +59,13 @@ export const ProductListing = ({ category = null }: { category?: string | null }
 	const t = useTranslations("shop")
 	const router = useRouter()
 	const searchParams = useSearchParams()
+
+	// Where the product page's breadcrumb leads back to. The whole shop clears
+	// it, so a product reached from there shows its own first category instead
+	// of one the visitor left three pages ago.
+	useEffect(() => {
+		rememberCategory(category)
+	}, [category])
 
 	const search = searchParams.get("q") ?? ""
 	const sort = (searchParams.get("sort") as PublicProductListParams["sort"]) ?? "default"

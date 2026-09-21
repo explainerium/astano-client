@@ -29,7 +29,13 @@ export interface PublicProduct {
 	moq: number
 	featuredImage: PublicImage | null
 	images: PublicImage[]
-	categories: { id: string; name: string; slug: string }[]
+	categories: {
+		id: string
+		name: string
+		slug: string
+		/** The categories above this one, outermost first — the breadcrumb's trail. */
+		parents?: { id: string; name: string; slug: string }[]
+	}[]
 	/** The variant a listing card acts on — wishlist, quick view. */
 	defaultVariantId: string | null
 	/** The "from X" range shown on listings. Null when quote-only. */

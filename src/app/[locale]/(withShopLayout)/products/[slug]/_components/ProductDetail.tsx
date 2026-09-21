@@ -23,6 +23,7 @@ import {
 	usePriceConfigurationMutation,
 	useShopProductQuery,
 } from "@/redux/api/storefrontApi"
+import { useLastCategory } from "@/lib/lastCategory"
 import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
@@ -123,6 +124,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const [quickView, setQuickView] = useState<PublicProductDetail["options"][number] | null>(null)
 	const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null)
 	const [attaching, setAttaching] = useState(false)
+
+	/** The category the visitor was browsing before this page, if any. */
+	const lastCategory = useLastCategory()
 
 	useEffect(() => {
 		const timer = setTimeout(() => setPricedQuantity(quantity), REPRICE_DELAY_MS)
@@ -628,18 +632,63 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		</>
 	)
 
+	/*
+	 * The way back: the category the visitor came from when this product is in
+	 * it, otherwise the product's most specific one — the deepest, so the
+	 * sandwich cutter reached from a search leads to "Brot/Sandwich Ausstecher"
+	 * rather than the broader category it also sits in. It used to be "All
+	 * products / name" and nothing between, so leaving a product meant starting
+	 * the shop again.
+	 */
+	const crumbCategory =
+		product.categories.find((category) => category.slug === lastCategory) ??
+		product.categories.reduce<(typeof product.categories)[number] | undefined>(
+			(deepest, category) =>
+				!deepest || (category.parents?.length ?? 0) > (deepest.parents?.length ?? 0)
+					? category
+					: deepest,
+			undefined
+		)
+	const crumbs = crumbCategory ? [...(crumbCategory.parents ?? []), crumbCategory] : []
+
+	/*
+	 * The main picture first, then the gallery — WooCommerce's order, and the
+	 * picture the listing card showed. The two are chosen separately in the
+	 * editor, and a product whose main picture was not also in its gallery
+	 * opened on a different picture and never showed the main one at all.
+	 */
+	const galleryImages = product.featuredImage
+		? [
+				product.featuredImage,
+				...product.images.filter((image) => image.id !== product.featuredImage?.id),
+			]
+		: product.images
+
 	return (
 		<div className="mx-auto w-full max-w-[1400px] px-6 py-12">
-			<nav className="text-muted-foreground mb-8 text-sm">
+			<nav aria-label={t("breadcrumb")} className="text-muted-foreground mb-8 text-sm">
 				<Link href="/products" className="hover:text-primary transition-colors">
 					{t("allProducts")}
 				</Link>
+				{crumbs.map((category) => (
+					<span key={category.id}>
+						<span className="mx-2">/</span>
+						<Link
+							href={{ pathname: "/categories/[slug]", params: { slug: category.slug } }}
+							className="hover:text-primary transition-colors"
+						>
+							{category.name}
+						</Link>
+					</span>
+				))}
 				<span className="mx-2">/</span>
-				<span className="text-foreground">{product.name}</span>
+				<span className="text-foreground" aria-current="page">
+					{product.name}
+				</span>
 			</nav>
 
 			<div className="grid gap-12 lg:grid-cols-2">
-				<ProductGallery images={product.images} alt={product.name} />
+				<ProductGallery images={galleryImages} alt={product.name} />
 
 				<div>
 					<h1 className="font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
@@ -648,7 +697,17 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 					{!!product.categories.length && (
 						<p className="text-muted-foreground mt-2 text-sm">
-							{product.categories.map((category) => category.name).join(", ")}
+							{product.categories.map((category, index) => (
+								<span key={category.id}>
+									{index > 0 && ", "}
+									<Link
+										href={{ pathname: "/categories/[slug]", params: { slug: category.slug } }}
+										className="hover:text-primary transition-colors"
+									>
+										{category.name}
+									</Link>
+								</span>
+							))}
 						</p>
 					)}
 
