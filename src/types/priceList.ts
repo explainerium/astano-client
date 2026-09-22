@@ -38,6 +38,8 @@ export interface PriceListReport {
 	articlesMatched: number
 	/** Articles in the file this shop does not sell. Ignored, not an error. */
 	articlesNotInShop: string[]
+	/** The articles the import was limited to; empty when it took the whole file. */
+	onlySkus: string[]
 	laddersWritten: Partial<Record<PriceRole, number>>
 	rungsWritten: number
 	quoteOnlyProducts: string[]

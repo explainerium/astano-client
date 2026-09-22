@@ -20,6 +20,7 @@ import {
 	useAddConfigurationToCartMutation,
 	useAddToCartMutation,
 	useAddToQuoteBasketMutation,
+	useAddConfigurationToQuoteBasketMutation,
 	usePriceConfigurationMutation,
 	useShopProductQuery,
 } from "@/redux/api/storefrontApi"
@@ -195,9 +196,15 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const [addToCart, cartState] = useAddToCartMutation()
 	const [addConfigurationToCart, configureState] = useAddConfigurationToCartMutation()
 	const [addToQuoteBasket, quoteState] = useAddToQuoteBasketMutation()
+	const [addConfigurationToQuoteBasket, quoteConfigureState] =
+		useAddConfigurationToQuoteBasketMutation()
 
 	const busy =
-		cartState.isLoading || configureState.isLoading || quoteState.isLoading || attaching
+		cartState.isLoading ||
+		configureState.isLoading ||
+		quoteState.isLoading ||
+		quoteConfigureState.isLoading ||
+		attaching
 	const belowMoq = quantity < minQuantity
 
 	/**
@@ -216,6 +223,18 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	}
 
 	/**
+	 * How many of an option the configuration orders.
+	 *
+	 * One set to follow the main product takes its quantity — the client asked
+	 * for this on 22 September, because customers typed other numbers for an
+	 * engraving that has to go on every cutter, and those enquiries could not be
+	 * quoted. The server applies the same rule. Any other option is what was
+	 * typed, floored at its own minimum.
+	 */
+	const unitsFor = (option: PublicProductDetail["options"][number], typed: number) =>
+		option.followsMainQuantity ? quantity : Math.max(typed, option.startQuantity)
+
+	/**
 	 * The configuration as the API takes it — variant ids and quantities.
 	 *
 	 * Quantities are floored at each option's own minimum, which is the floor the
@@ -228,9 +247,12 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			[...chosenOptions].flatMap(([id, units]) => {
 				const option = product?.options.find((o) => o.id === id)
 				if (!option?.variantId) return []
-				return [{ variantId: option.variantId, quantity: Math.max(units, option.startQuantity) }]
+				// Written out rather than through `unitsFor`, which is a new function
+				// every render and would defeat the memo.
+				const ordered = option.followsMainQuantity ? quantity : Math.max(units, option.startQuantity)
+				return [{ variantId: option.variantId, quantity: ordered }]
 			}),
-		[chosenOptions, product]
+		[chosenOptions, product, quantity]
 	)
 
 	/**
@@ -286,7 +308,8 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 */
 	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
 		const option = product?.options.find((o) => o.id === id)
-		return !!option && chosenQuantity < option.startQuantity
+		// A following option is short when the main quantity is under its minimum.
+		return !!option && (option.followsMainQuantity ? quantity : chosenQuantity) < option.startQuantity
 	})
 
 	/**
@@ -314,7 +337,22 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 
 		try {
 			if (product.quoteOnly) {
-				await addToQuoteBasket({ variantId: variant.id, quantity }).unwrap()
+				/*
+				 * With the options that were ticked, when the configurator button was
+				 * the one pressed. This sent the product alone, so an enquiry
+				 * configured with an engraving and a box reached staff without either
+				 * and nobody could tell.
+				 */
+				if (withOptions && selection.length) {
+					setAttaching(true)
+					await addConfigurationToQuoteBasket({
+						variantId: variant.id,
+						quantity,
+						options: selection,
+					}).unwrap()
+				} else {
+					await addToQuoteBasket({ variantId: variant.id, quantity }).unwrap()
+				}
 				setAdded({
 					name: product.name,
 					image: product.featuredImage?.srcset.thumb ?? product.featuredImage?.url ?? null,
@@ -432,9 +470,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				{
 					id: option.id,
 					name: option.name,
-					// The floor the server applies, so this is the quantity that will
-					// actually be ordered rather than the one that was typed.
-					quantity: Math.max(units, option.startQuantity),
+					// The quantity the server will actually record — the main
+					// product's for an option that follows it, otherwise what was
+					// typed, floored at the option's minimum.
+					quantity: unitsFor(option, units),
 					total: formatMoney(configuredOptionTotal(option)),
 				},
 			]
@@ -486,11 +525,14 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			<button
 				type="button"
 				onClick={() => void handleAdd(true)}
-				disabled={busy || belowMoq || optionBelowMoq || !variant?.inStock}
+				// Stock does not stop an enquiry — nothing is reserved by asking.
+				disabled={busy || belowMoq || optionBelowMoq || (!product.quoteOnly && !variant?.inStock)}
 				className="bg-primary text-primary-foreground mt-5 inline-flex w-full items-center justify-center gap-2 px-6 py-3.5 text-xs font-semibold tracking-widest uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
 			>
 				{busy && <Loader2 className="size-4 animate-spin" />}
-				{t("addWithOptions")}
+				{/* An inquiry product goes to the inquiry basket, and says so —
+				    the client asked for the two buttons to read differently. */}
+				{product.quoteOnly ? t("addToQuote") : t("addWithOptions")}
 			</button>
 
 			{feedback && !feedback.ok && (
@@ -921,7 +963,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						<div className={cn("mb-5 flex gap-3 rounded-lg border p-4 text-sm", ACCENT.softBorder, ACCENT.soft, ACCENT.text)}>
 							<Info className="mt-0.5 shrink-0" />
 							<div className="space-y-1.5">
-								<p>{t("optionsIntro")}</p>
+								<p>{product.quoteOnly ? t("optionsIntroQuote") : t("optionsIntro")}</p>
 								<p className="font-medium">{t("optionsTierHint")}</p>
 							</div>
 						</div>
@@ -938,7 +980,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 						<ul className="grid items-start gap-2 sm:grid-cols-2">
 							{product.options.map((option) => {
 								const chosen = chosenOptions.has(option.id)
-								const optionQuantity = chosenOptions.get(option.id) ?? option.startQuantity
+								const optionQuantity = option.followsMainQuantity
+									? quantity
+									: (chosenOptions.get(option.id) ?? option.startQuantity)
 								const optionBelowMoq = chosen && optionQuantity < option.startQuantity
 
 								/**
@@ -1100,6 +1144,17 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 														<span className="text-muted-foreground text-xs">
 															{t("optionQuantity")}
 														</span>
+														{option.followsMainQuantity ? (
+															// No field: this option is ordered in the main
+															// product's quantity, and saying so is clearer than a
+															// stepper that cannot be moved.
+															<span className="text-sm">
+																<span className="font-semibold tabular-nums">{quantity}</span>{" "}
+																<span className="text-muted-foreground text-xs">
+																	{t("optionFollowsMain")}
+																</span>
+															</span>
+														) : (
 														<div className="flex items-center border bg-white">
 															<button
 																type="button"
@@ -1131,6 +1186,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 																<Plus className="size-3.5" />
 															</button>
 														</div>
+														)}
 
 														{/* A ticked option shows what the API says the line comes
 														    to; an untouched one shows the unit price it resolved,

@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils"
  */
 export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) => {
 	const t = useTranslations("admin")
-	const { control } = useFormContext()
+	const { control, register } = useFormContext()
 	const { fields, append, remove, move } = useFieldArray({ control, name: "options" })
 	const rows = useWatch({ control, name: "options" }) as
 		| { optionProductId?: string }[]
@@ -103,6 +103,8 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 			// renumbers from the row order — dragging is what decides this now.
 			sortOrder: fields.length,
 			preselected: false,
+			followsMainQuantity: false,
+			discountPercent: null,
 		})
 
 	return (
@@ -151,7 +153,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 								endDrag()
 							}}
 							className={cn(
-								"flex items-center gap-2 rounded-lg border p-3 transition-all",
+								"flex flex-wrap items-center gap-2 rounded-lg border p-3 transition-all",
 								// The one being carried fades and lifts, so it reads as
 								// picked up rather than merely selected.
 								isDragging && "border-primary scale-[0.98] opacity-40",
@@ -213,6 +215,26 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 							>
 								<Trash2 />
 							</Button>
+
+							{/*
+							 * Whether the customer chooses this option's quantity or it
+							 * simply takes the product's. The client asked for it on
+							 * 22 September: an engraving that goes on every cutter was
+							 * being ordered in some other number, and those enquiries
+							 * could not be quoted. Under the picker, indented to line up
+							 * with it, so it reads as a setting of this row.
+							 */}
+							<label className="flex basis-full cursor-pointer items-start gap-2 pl-11 text-xs">
+								<input
+									type="checkbox"
+									{...register(`options.${index}.followsMainQuantity`)}
+									className="mt-0.5 shrink-0"
+								/>
+								<span>
+									<span className="font-medium">{t("optionFollowsMain")}</span>
+									<span className="text-muted-foreground block">{t("optionFollowsMainHelp")}</span>
+								</span>
+							</label>
 						</div>
 					)
 				})}

@@ -30,15 +30,12 @@ export const Sidebar = () => {
 
 	return (
 		<aside className="bg-card border-border hidden w-60 shrink-0 flex-col border-r lg:flex">
-			<Link href="/admin/dashboard" className="flex items-center gap-2.5 px-6 py-6">
-				<span className="bg-primary flex size-7 items-center justify-center rounded-lg">
-					<span className="grid grid-cols-2 gap-[3px]">
-						{Array.from({ length: 4 }, (_, i) => (
-							<span key={i} className="bg-primary-foreground size-[5px]" />
-						))}
-					</span>
-				</span>
-				<span className="font-heading text-lg font-semibold tracking-tight">astano</span>
+			{/* The shop's own logo, where a placeholder mark and the name set in
+			    type used to be — the client asked for it on 22 September. A plain
+			    img: it is a small, already-sized PNG in public/brand. */}
+			<Link href="/admin/dashboard" className="flex items-center px-6 py-5" aria-label="astano">
+				{/* eslint-disable-next-line @next/next/no-img-element */}
+				<img src="/brand/astano-logo.png" alt="astano" width={109} height={56} className="h-14 w-auto" />
 			</Link>
 
 			<nav className="flex-1 overflow-y-auto px-3 pb-6">

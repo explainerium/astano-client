@@ -237,6 +237,11 @@ const buildSchema = (t: T) =>
 			groupLabel: z.string().trim().max(120),
 			sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
 			preselected: z.boolean(),
+			/// Ordered in this product's quantity; the customer types none for it.
+			followsMainQuantity: z.boolean(),
+			/// No input for it, but carried through untouched — a save rewrites
+			/// every option row, and leaving it out cleared a stored discount.
+			discountPercent: z.string().nullable(),
 		})
 	),
 })
@@ -513,6 +518,11 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 			groupLabel: option.groupLabel ?? "",
 			sortOrder: option.sortOrder ?? index,
 			preselected: option.preselected ?? false,
+			followsMainQuantity: option.followsMainQuantity ?? false,
+			discountPercent:
+				option.discountPercent === null || option.discountPercent === undefined
+					? null
+					: String(option.discountPercent),
 		})),
 	}
 }
@@ -776,6 +786,8 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					sortOrder: index,
 					groupLabel: o.groupLabel.trim() || null,
 					preselected: o.preselected,
+					followsMainQuantity: o.followsMainQuantity,
+					discountPercent: o.discountPercent,
 				})),
 			variants: [
 				{

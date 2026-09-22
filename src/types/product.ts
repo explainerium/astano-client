@@ -110,6 +110,8 @@ export interface ProductOptionInput {
 	groupLabel?: string | null
 	preselected: boolean
 	discountPercent?: string | null
+	/** Ordered in the main product's quantity; the customer types none for it. */
+	followsMainQuantity?: boolean
 }
 
 /** What the admin list and detail both return. */

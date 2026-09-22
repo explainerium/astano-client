@@ -138,7 +138,7 @@
 	},
 	"shop": {
 		"addToCart": "In den Warenkorb",
-		"addToQuote": "In den Anfragekorb",
+		"addToQuote": "In den Anfragekorb legen",
 		"priceOnRequest": "Preis auf Anfrage",
 		"quantity": "Menge",
 		"minimumOrder": "Mindestbestellmenge: {quantity}",
@@ -223,6 +223,8 @@
 		"optionBelowMoq": "Eine Option liegt unter ihrer Mindestbestellmenge.",
 		"optionsIntro": "Optionen sind Erweiterungen zu diesem Produkt — Verpackung, Gravur, Beschichtung. Wählen Sie die gewünschten aus und geben Sie je eine Menge an; alles wird gemeinsam in den Warenkorb gelegt.",
 		"optionsTierHint": "Stückpreise der Optionen ändern sich nach Eingabe der jeweiligen Menge auf die niedrigeren Staffelpreise!",
+		"optionsIntroQuote": "Optionen sind Erweiterungen zu diesem Produkt — Verpackung, Gravur, Beschichtung. Wählen Sie die gewünschten aus und geben Sie je eine Menge an; alles wird gemeinsam in den Anfragekorb gelegt, und wir senden Ihnen ein Angebot.",
+		"optionFollowsMain": "wie beim Hauptprodukt",
 		"optionsSelectedCount": "{count, plural, =0 {keine ausgewählt} one {# ausgewählt} other {# ausgewählt}}",
 		"optionsHide": "Optionen ausblenden",
 		"optionsShow": "Optionen einblenden",
@@ -234,6 +236,7 @@
 	},
 	"cart": {
 		"title": "Warenkorb",
+		"followsMain": "Menge wie beim Produkt",
 		"empty": "Ihr Warenkorb ist leer.",
 		"continueShopping": "Weiter einkaufen",
 		"product": "Produkt",
@@ -400,7 +403,7 @@
 		"outOfStock": "Nicht auf Lager",
 		"priceOnRequest": "Preis auf Anfrage",
 		"addToCart": "In den Warenkorb",
-		"addToQuote": "In den Anfragekorb",
+		"addToQuote": "In den Anfragekorb legen",
 		"addedToCart": "Zum Warenkorb hinzugefügt.",
 		"addFailed": "Das konnte nicht hinzugefügt werden.",
 		"vatNumberNote": "Eine Änderung bedeutet, dass sie erneut über VIES geprüft werden muss.",
@@ -838,6 +841,7 @@
 	},
 	"quoteBasket": {
 		"title": "Angebotsanfrage",
+		"followsMain": "Stück – wie beim Produkt darüber",
 		"intro": "Sagen Sie uns, was Sie brauchen – wir melden uns mit einem Preis.",
 		"empty": "Ihre Angebotsanfrage ist leer.",
 		"continueShopping": "Produkte ansehen",
@@ -1157,7 +1161,11 @@
 			},
 			"email__headerImage": {
 				"label": "URL des Kopf-Logos",
-				"help": "Erscheint oben in jeder E-Mail. Muss eine vollständige https://-Adresse sein — ein Postfach kann keinen Pfad Ihrer eigenen Website auflösen. Leer lassen, um stattdessen den Firmennamen zu drucken."
+				"help": "Leer lassen, um das astano-Logo zu verwenden. Für ein anderes Logo die vollständige https://-Adresse einer PNG- oder JPG-Datei einfügen — Outlook für Windows zeigt kein WebP an, und in diesem Format speichert die Mediathek."
+			},
+			"email__headerBackgroundColour": {
+				"label": "Kopfbereich-Hintergrund",
+				"help": "Hinter dem Logo oben in jeder E-Mail. Das astano-Logo ist schwarz – bitte hell lassen."
 			},
 			"email__baseColour": {
 				"label": "Schaltflächenfarbe",
@@ -1369,6 +1377,13 @@
 		"addBand": "Staffel hinzufügen",
 		"addMethod": "Versandart hinzufügen",
 		"addOption": "Option hinzufügen",
+		"optionFollowsMain": "Menge vom Hauptprodukt übernehmen",
+		"priceImportOnlyTitle": "Nur bestimmte Artikel (optional)",
+		"priceImportOnlyHelp": "Artikelnummern, durch Komma oder Leerzeichen getrennt – z. B. nur 1-FSI1-L zum Testen. Leer lassen, um alle Artikel der Datei zu importieren.",
+		"priceImportLimitedTo": "Nur diese Artikel: {skus}. Alle anderen Zeilen der Datei werden ignoriert.",
+		"priceImportNoneMatched": "Keiner dieser Artikel wurde in Datei und Shop gefunden: {skus}. Stimmt die Artikelnummer im Produkt (SKU) mit der im ERP überein?",
+		"priceImportStaysOnRequest": "Mindestens ein Produkt steht auf „Preis auf Anfrage“. Die Preise werden gespeichert, aber im Shop erst angezeigt, wenn Sie im Produkt „Preis auf Anfrage“ abwählen.",
+		"optionFollowsMainHelp": "Der Kunde gibt keine eigene Menge ein – die Option wird immer in der Menge des Hauptprodukts bestellt bzw. angefragt.",
 		"addPrivateNote": "Interne Notiz hinzufügen",
 		"addRate": "Steuersatz hinzufügen",
 		"addRow": "Zeile hinzufügen",

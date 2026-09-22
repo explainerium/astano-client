@@ -240,12 +240,11 @@ export const ProductCard = ({
 						<p className="text-muted-foreground text-sm">—</p>
 					)}
 
+					{/* Both lead to the product page, where the quantity, its minimum and
+					    any options are chosen. The inquiry one used to open the inquiry
+					    basket directly — empty, because nothing had been put in it. */}
 					<Link
-						href={
-							product.quoteOnly
-								? "/quote-basket"
-								: { pathname: "/products/[slug]", params: { slug: product.slug } }
-						}
+						href={{ pathname: "/products/[slug]", params: { slug: product.slug } }}
 						className="bg-primary text-primary-foreground mt-3 block px-4 py-2.5 text-center text-xs font-semibold tracking-wide uppercase transition-opacity hover:opacity-90"
 					>
 						{product.quoteOnly ? t("addToQuote") : t("addToCart")}

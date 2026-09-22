@@ -249,6 +249,18 @@ export const storefrontApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.quote],
 		}),
 
+		/**
+		 * An inquiry product with the options ticked in the configurator, in one
+		 * request — the inquiry-basket twin of `addConfigurationToCart`.
+		 */
+		addConfigurationToQuoteBasket: build.mutation<
+			QuoteBasketView,
+			{ variantId: string; quantity: number; options: { variantId: string; quantity: number }[] }
+		>({
+			query: (data) => ({ url: "/quotes/basket/configuration", method: "POST", data }),
+			invalidatesTags: [tagTypes.quote],
+		}),
+
 		setQuoteItemFiles: build.mutation<ArtworkFile[], { id: string; assetIds: string[] }>({
 			query: ({ id, assetIds }) => ({
 				url: `/quotes/basket/items/${id}/files`,
@@ -572,6 +584,7 @@ export const {
 
 	useQuoteBasketQuery,
 	useAddToQuoteBasketMutation,
+	useAddConfigurationToQuoteBasketMutation,
 	useUpdateQuoteItemMutation,
 	useRemoveQuoteItemMutation,
 	useClearQuoteBasketMutation,

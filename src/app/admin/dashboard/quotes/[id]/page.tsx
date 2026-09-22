@@ -112,7 +112,11 @@ const PricingForm = ({ quote }: { quote: Quote }) => {
 					<TableBody>
 						{quote.items.map((item, index) => (
 							<TableRow key={item.id}>
-								<TableCell>
+								{/* An option the customer asked for with the product above it —
+								    indented, so the enquiry reads as "this cutter, with this
+								    engraving" rather than two unrelated lines. */}
+								<TableCell className={item.parentItemId ? "pl-8" : undefined}>
+									{item.parentItemId && <span className="text-muted-foreground">+ </span>}
 									<span className="font-medium">{item.name}</span>
 									{item.note && (
 										<p className="text-muted-foreground mt-0.5 text-xs">{item.note}</p>

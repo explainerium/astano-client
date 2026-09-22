@@ -15,6 +15,8 @@ export type QuoteMessageAuthor = "CUSTOMER" | "STAFF" | string
 
 export interface QuoteItem {
 	id: string
+	/** The product line this option was requested with; null for a product. */
+	parentItemId?: string | null
 	sku: string
 	name: string
 	attributes: unknown

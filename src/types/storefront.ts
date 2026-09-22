@@ -90,6 +90,11 @@ export interface PublicOption {
 	/** Options start at their own MOQ, not at 1. */
 	startQuantity: number
 	discountPercent: string | null
+	/**
+	 * Ordered in exactly the main product's quantity. The page offers no
+	 * quantity field for it, and the server enforces the same.
+	 */
+	followsMainQuantity: boolean
 	image: PublicImage | null
 	unitPrice: string | null
 	/**
@@ -226,6 +231,8 @@ export interface CartLine {
 	artwork: ArtworkRules
 	/** Required by the product but not yet supplied. Blocks checkout, not the cart. */
 	artworkMissing: boolean
+	/** An option ordered in its parent's quantity: no stepper of its own. */
+	followsMain?: boolean
 	/** Add-ons attached to this line (§4.6). Never present on an option itself. */
 	options?: Omit<CartLine, "options">[]
 }
@@ -262,6 +269,10 @@ export interface QuoteBasketLine {
 	files: ArtworkFile[]
 	artwork: ArtworkRules
 	artworkMissing: boolean
+	/** An option ordered in its product's quantity: no stepper of its own. */
+	followsMain?: boolean
+	/** Options configured with this product. Never present on an option itself. */
+	options?: Omit<QuoteBasketLine, "options">[]
 }
 
 export interface QuoteBasketView {
@@ -521,6 +532,8 @@ export interface QuoteMessage {
 
 export interface QuoteItem {
 	id: string
+	/** The product line this option was requested with; null for a product. */
+	parentItemId?: string | null
 	sku: string | null
 	name: string
 	attributes: { id: string; label: string }[]

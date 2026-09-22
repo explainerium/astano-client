@@ -27,11 +27,19 @@ export const priceListApi = baseApi.injectEndpoints({
 			}),
 		}),
 
-		runPriceListImport: build.mutation<PriceListReport, { file: File; delimiter?: string; dryRun: boolean }>({
-			query: ({ file, delimiter, dryRun }) => ({
+		runPriceListImport: build.mutation<
+			PriceListReport,
+			/** `onlySkus`: article numbers to limit the import to, as typed. Empty = all. */
+			{ file: File; delimiter?: string; dryRun: boolean; onlySkus?: string }
+		>({
+			query: ({ file, delimiter, dryRun, onlySkus }) => ({
 				url: "/admin/pricing/price-list/import",
 				method: "POST",
-				data: form(file, { dryRun: String(dryRun), ...(delimiter ? { delimiter } : {}) }),
+				data: form(file, {
+					dryRun: String(dryRun),
+					...(delimiter ? { delimiter } : {}),
+					...(onlySkus?.trim() ? { onlySkus: onlySkus.trim() } : {}),
+				}),
 				// A hundred ladders is a hundred small transactions, and the database
 				// is in Paris. Well past the 60s default, as the product import is.
 				timeout: 15 * 60 * 1000,

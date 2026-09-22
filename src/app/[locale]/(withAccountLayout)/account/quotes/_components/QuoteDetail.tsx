@@ -87,9 +87,13 @@ export const QuoteDetail = ({ id }: { id: string }) => {
 				<h3 className="font-heading mb-4 text-lg font-semibold">{t("orderItems")}</h3>
 				<ul className="divide-y border-y">
 					{quote.items.map((item) => (
-						<li key={item.id} className="flex gap-4 py-4">
+						// An option asked for with the product above is indented under it.
+						<li key={item.id} className={cn("flex gap-4 py-4", item.parentItemId && "pl-6")}>
 							<div className="min-w-0 flex-1">
-								<p className="font-medium">{item.name}</p>
+								<p className="font-medium">
+									{item.parentItemId && <span className="text-muted-foreground">+ </span>}
+									{item.name}
+								</p>
 								{item.sku && <p className="text-muted-foreground text-xs">{item.sku}</p>}
 								<p className="text-muted-foreground mt-1 text-sm">{item.quantity} ×</p>
 								{item.note && (

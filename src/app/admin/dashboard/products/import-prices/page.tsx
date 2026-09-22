@@ -35,6 +35,7 @@ const Stat = ({ label, value, tone }: { label: string; value: number | string; t
 )
 
 const ReportView = ({ report }: { report: PriceListReport }) => {
+	const t = useTranslations("admin")
 	const [showAll, setShowAll] = useState(false)
 
 	// Ladders with a note first: eight of this catalogue's dealer ladders start
@@ -56,6 +57,30 @@ const ReportView = ({ report }: { report: PriceListReport }) => {
 					tone={report.unreadableRows ? "text-destructive" : undefined}
 				/>
 			</div>
+
+			{/* Limited to a few articles — say which, and say plainly when none of
+			    them matched, because an empty report otherwise reads as "done". */}
+			{report.onlySkus.length > 0 && (
+				<p
+					className={cn(
+						"rounded-lg border p-4 text-sm",
+						report.articlesMatched === 0 && "border-destructive/40 bg-destructive/5 text-destructive"
+					)}
+				>
+					{report.articlesMatched === 0
+						? t("priceImportNoneMatched", { skus: report.onlySkus.join(", ") })
+						: t("priceImportLimitedTo", { skus: report.onlySkus.join(", ") })}
+				</p>
+			)}
+
+			{/* The one thing an import cannot change, said where it will be read:
+			    a product on request keeps hiding its price after this. */}
+			{report.ladders.some((ladder) => ladder.quoteOnly) && (
+				<p className="border-amber-300 bg-amber-50 text-amber-900 flex items-start gap-2 rounded-lg border p-4 text-sm">
+					<TriangleAlert className="mt-0.5 size-4 shrink-0" />
+					{t("priceImportStaysOnRequest")}
+				</p>
+			)}
 
 			<div className="bg-accent-soft space-y-1 rounded-lg border p-4 text-sm">
 				<p>
@@ -123,6 +148,12 @@ export default function ImportPricesPage() {
 	const [analysis, setAnalysis] = useState<PriceListAnalysis | null>(null)
 	const [preview, setPreview] = useState<PriceListReport | null>(null)
 	const [result, setResult] = useState<PriceListReport | null>(null)
+	/**
+	 * Article numbers to limit the import to — "1-FSI1-L" to try one product
+	 * first, which is what the client asked for on 22 September. Empty imports
+	 * every article in the file, as before.
+	 */
+	const [onlySkus, setOnlySkus] = useState("")
 
 	const [analyse, { isLoading: analysing }] = useAnalysePriceListMutation()
 	const [runImport, { isLoading: running }] = useRunPriceListImportMutation()
@@ -145,7 +176,7 @@ export default function ImportPricesPage() {
 		if (!file || !analysis) return
 
 		try {
-			const report = await runImport({ file, delimiter: analysis.delimiter, dryRun }).unwrap()
+			const report = await runImport({ file, delimiter: analysis.delimiter, dryRun, onlySkus }).unwrap()
 
 			if (dryRun) {
 				setPreview(report)
@@ -230,6 +261,24 @@ export default function ImportPricesPage() {
 
 			{analysis && (
 				<>
+					<Panel title={t("priceImportOnlyTitle")}>
+						<label className="block space-y-1.5">
+							<span className="text-muted-foreground block text-xs">{t("priceImportOnlyHelp")}</span>
+							<input
+								type="text"
+								value={onlySkus}
+								onChange={(event) => {
+									setOnlySkus(event.target.value)
+									// A preview of a different selection is not a preview of this one.
+									setPreview(null)
+									setResult(null)
+								}}
+								placeholder="1-FSI1-L"
+								className="border-input focus-visible:border-ring w-full max-w-md rounded-md border bg-transparent px-3 py-2 font-mono text-sm outline-none"
+							/>
+						</label>
+					</Panel>
+
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<Button asChild variant="ghost">
 							<Link href="/admin/dashboard/products">{t("cancel")}</Link>

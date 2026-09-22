@@ -12,6 +12,7 @@ import {
 	useRemoveQuoteItemMutation,
 	useUpdateQuoteItemMutation,
 } from "@/redux/api/storefrontApi"
+import type { QuoteBasketLine } from "@/types/storefront"
 import { cn } from "@/lib/utils"
 import QuoteLineArtwork from "./QuoteLineArtwork"
 import QuoteSubmitForm from "./QuoteSubmitForm"
@@ -52,6 +53,115 @@ export const QuoteBasketView = () => {
 			setError(apiMessage(caught) ?? t("submitFailed"))
 		}
 	}
+
+	/**
+	 * One line — a product, or an option configured with one.
+	 *
+	 * An option is drawn under its product, smaller and indented, so an enquiry
+	 * for a cutter with an engraving reads as one thing rather than two.
+	 */
+	const lineBody = (line: Omit<QuoteBasketLine, "options">, nested = false) => (
+		<div className={cn("flex", nested ? "gap-4" : "gap-5")}>
+			<Link
+				href={{ pathname: "/products/[slug]", params: { slug: line.slug } }}
+				className={cn("bg-muted shrink-0 overflow-hidden", nested ? "size-16" : "size-24")}
+			>
+				{line.image ? (
+					// eslint-disable-next-line @next/next/no-img-element
+					<img
+						src={line.image.url}
+						alt={line.name}
+						loading="lazy"
+						className="size-full object-contain"
+					/>
+				) : null}
+			</Link>
+
+			<div className="min-w-0 flex-1">
+				<Link
+					href={{ pathname: "/products/[slug]", params: { slug: line.slug } }}
+					className="hover:text-primary font-medium transition-colors"
+				>
+					{line.name}
+				</Link>
+
+				{!!line.attributes.length && (
+					<p className="text-muted-foreground mt-0.5 text-sm">
+						{line.attributes.map((a) => a.label).join(" · ")}
+					</p>
+				)}
+				{line.sku && <p className="text-muted-foreground mt-0.5 text-xs">{line.sku}</p>}
+
+				<div className="mt-3 flex flex-wrap items-center gap-4">
+					{line.followsMain ? (
+						// Ordered in the product's quantity: changing the product
+						// above changes this, so there is nothing to set here.
+						<p className="text-sm">
+							<span className="font-semibold tabular-nums">{line.quantity}</span>{" "}
+							<span className="text-muted-foreground">{t("followsMain")}</span>
+						</p>
+					) : (
+						<QuantityStepper
+							value={line.quantity}
+							min={line.moq > 0 ? line.moq : 1}
+							disabled={busy}
+							onCommit={(quantity) =>
+								void run(() => updateItem({ id: line.id, quantity }).unwrap())
+							}
+						/>
+					)}
+
+					<button
+						type="button"
+						onClick={() => void run(() => removeItem(line.id).unwrap())}
+						disabled={busy}
+						className="text-muted-foreground hover:text-destructive ml-auto inline-flex items-center gap-1.5 text-sm transition-colors"
+					>
+						<Trash2 className="size-4" />
+						<span className="sr-only sm:not-sr-only">{t("remove")}</span>
+					</button>
+				</div>
+
+				{line.belowMoq && (
+					<p className="text-destructive mt-2 text-sm">
+						{t("belowMoq", { quantity: line.moq })}
+					</p>
+				)}
+
+				<QuoteLineArtwork
+					itemId={line.id}
+					files={line.files}
+					artwork={line.artwork}
+					missing={line.artworkMissing}
+				/>
+
+				<label className="mt-3 block">
+					<span className="sr-only">{t("note")}</span>
+					<input
+						type="text"
+						value={noteDrafts[line.id] ?? line.note ?? ""}
+						placeholder={t("notePlaceholder")}
+						disabled={busy}
+						onChange={(event) =>
+							setNoteDrafts((current) => ({ ...current, [line.id]: event.target.value }))
+						}
+						onBlur={() => {
+							const draft = noteDrafts[line.id]
+							if (draft === undefined || draft === (line.note ?? "")) return
+							void run(() =>
+								updateItem({
+									id: line.id,
+									quantity: line.quantity,
+									note: draft,
+								}).unwrap()
+							)
+						}}
+						className="focus:border-primary w-full border px-3 py-2 text-sm outline-none"
+					/>
+				</label>
+			</div>
+		</div>
+	)
 
 	if (sent) {
 		return (
@@ -148,97 +258,15 @@ export const QuoteBasketView = () => {
 				<ul className={cn("divide-y border-y", busy && "opacity-60 transition-opacity")}>
 					{basket.items.map((line) => (
 						<li key={line.id} className="py-6">
-							<div className="flex gap-5">
-								<Link
-									href={{ pathname: "/products/[slug]", params: { slug: line.slug } }}
-									className="bg-muted size-24 shrink-0 overflow-hidden"
-								>
-									{line.image ? (
-										// eslint-disable-next-line @next/next/no-img-element
-										<img
-											src={line.image.url}
-											alt={line.name}
-											loading="lazy"
-											className="size-full object-contain"
-										/>
-									) : null}
-								</Link>
+							{lineBody(line)}
 
-								<div className="min-w-0 flex-1">
-									<Link
-										href={{ pathname: "/products/[slug]", params: { slug: line.slug } }}
-										className="hover:text-primary font-medium transition-colors"
-									>
-										{line.name}
-									</Link>
-
-									{!!line.attributes.length && (
-										<p className="text-muted-foreground mt-0.5 text-sm">
-											{line.attributes.map((a) => a.label).join(" · ")}
-										</p>
-									)}
-									{line.sku && <p className="text-muted-foreground mt-0.5 text-xs">{line.sku}</p>}
-
-									<div className="mt-3 flex flex-wrap items-center gap-4">
-										<QuantityStepper
-											value={line.quantity}
-											min={line.moq > 0 ? line.moq : 1}
-											disabled={busy}
-											onCommit={(quantity) =>
-												void run(() => updateItem({ id: line.id, quantity }).unwrap())
-											}
-										/>
-
-										<button
-											type="button"
-											onClick={() => void run(() => removeItem(line.id).unwrap())}
-											disabled={busy}
-											className="text-muted-foreground hover:text-destructive ml-auto inline-flex items-center gap-1.5 text-sm transition-colors"
-										>
-											<Trash2 className="size-4" />
-											<span className="sr-only sm:not-sr-only">{t("remove")}</span>
-										</button>
-									</div>
-
-									{line.belowMoq && (
-										<p className="text-destructive mt-2 text-sm">
-											{t("belowMoq", { quantity: line.moq })}
-										</p>
-									)}
-
-									<QuoteLineArtwork
-										itemId={line.id}
-										files={line.files}
-										artwork={line.artwork}
-										missing={line.artworkMissing}
-									/>
-
-									<label className="mt-3 block">
-										<span className="sr-only">{t("note")}</span>
-										<input
-											type="text"
-											value={noteDrafts[line.id] ?? line.note ?? ""}
-											placeholder={t("notePlaceholder")}
-											disabled={busy}
-											onChange={(event) =>
-												setNoteDrafts((current) => ({ ...current, [line.id]: event.target.value }))
-											}
-											onBlur={() => {
-												const draft = noteDrafts[line.id]
-												if (draft === undefined || draft === (line.note ?? "")) return
-												void run(() =>
-													updateItem({
-														id: line.id,
-														quantity: line.quantity,
-														note: draft,
-													}).unwrap()
-												)
-											}}
-											className="focus:border-primary w-full border px-3 py-2 text-sm outline-none"
-										/>
-									</label>
-								</div>
-							</div>
+							{!!line.options?.length && (
+								<ul className="mt-4 ml-6 space-y-5 border-l pl-5 sm:ml-12">
+									{line.options.map((option) => (
+										<li key={option.id}>{lineBody(option, true)}</li>
+									))}
+								</ul>
+							)}
 						</li>
 					))}
 				</ul>
