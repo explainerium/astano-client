@@ -31,7 +31,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 	const { control, register } = useFormContext()
 	const { fields, append, remove, move } = useFieldArray({ control, name: "options" })
 	const rows = useWatch({ control, name: "options" }) as
-		| { optionProductId?: string }[]
+		| { optionProductId?: string; followsMainQuantity?: boolean }[]
 		| undefined
 
 	/** The row being dragged, and the one it is currently over. */
@@ -104,6 +104,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 			sortOrder: fields.length,
 			preselected: false,
 			followsMainQuantity: false,
+			unitsPerOption: 1,
 			discountPercent: null,
 		})
 
@@ -235,6 +236,27 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 									<span className="text-muted-foreground block">{t("optionFollowsMainHelp")}</span>
 								</span>
 							</label>
+
+							{/*
+							 * How many of the product one of this option covers.
+							 *
+							 * The client, 23 September: a single pack is one per ice cube,
+							 * but a set box holds four — "they want 100 sets. This is 400
+							 * ice cubes and 100 boxes." Shown only once the option follows
+							 * the quantity, because that is the only time it is read.
+							 */}
+							{rows?.[index]?.followsMainQuantity && (
+								<label className="flex basis-full items-center gap-2 pl-11 text-xs">
+									<span className="text-muted-foreground">{t("optionUnitsPer")}</span>
+									<input
+										type="number"
+										min={1}
+										{...register(`options.${index}.unitsPerOption`, { valueAsNumber: true })}
+										className="border-input focus-visible:border-ring w-20 rounded-md border bg-transparent px-2 py-1 text-sm outline-none"
+									/>
+									<span className="text-muted-foreground">{t("optionUnitsPerHelp")}</span>
+								</label>
+							)}
 						</div>
 					)
 				})}

@@ -225,6 +225,7 @@
 		"optionsTierHint": "Stückpreise der Optionen ändern sich nach Eingabe der jeweiligen Menge auf die niedrigeren Staffelpreise!",
 		"optionsIntroQuote": "Optionen sind Erweiterungen zu diesem Produkt — Verpackung, Gravur, Beschichtung. Wählen Sie die gewünschten aus und geben Sie je eine Menge an; alles wird gemeinsam in den Anfragekorb gelegt, und wir senden Ihnen ein Angebot.",
 		"optionFollowsMain": "wie beim Hauptprodukt",
+		"optionPerUnits": "1 je {units} Stück",
 		"optionsSelectedCount": "{count, plural, =0 {keine ausgewählt} one {# ausgewählt} other {# ausgewählt}}",
 		"optionsHide": "Optionen ausblenden",
 		"optionsShow": "Optionen einblenden",
@@ -237,6 +238,7 @@
 	"cart": {
 		"title": "Warenkorb",
 		"followsMain": "Menge wie beim Produkt",
+		"followsMainPer": "1 je {units} Stück",
 		"empty": "Ihr Warenkorb ist leer.",
 		"continueShopping": "Weiter einkaufen",
 		"product": "Produkt",
@@ -842,6 +844,7 @@
 	"quoteBasket": {
 		"title": "Angebotsanfrage",
 		"followsMain": "Stück – wie beim Produkt darüber",
+		"followsMainPer": "Stück – 1 je {units} Stück des Produkts darüber",
 		"intro": "Sagen Sie uns, was Sie brauchen – wir melden uns mit einem Preis.",
 		"empty": "Ihre Angebotsanfrage ist leer.",
 		"continueShopping": "Produkte ansehen",
@@ -1378,6 +1381,8 @@
 		"addMethod": "Versandart hinzufügen",
 		"addOption": "Option hinzufügen",
 		"optionFollowsMain": "Menge vom Hauptprodukt übernehmen",
+		"optionUnitsPer": "1 Option je",
+		"optionUnitsPerHelp": "Stück des Hauptprodukts – z. B. 4 für eine 4er-Verpackung: 400 Stück ergeben 100 Verpackungen. Aufgerundet.",
 		"priceImportOnlyTitle": "Nur bestimmte Artikel (optional)",
 		"priceImportOnlyHelp": "Artikelnummern, durch Komma oder Leerzeichen getrennt – z. B. nur 1-FSI1-L zum Testen. Leer lassen, um alle Artikel der Datei zu importieren.",
 		"priceImportLimitedTo": "Nur diese Artikel: {skus}. Alle anderen Zeilen der Datei werden ignoriert.",

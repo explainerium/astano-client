@@ -27,6 +27,7 @@ import {
 import { useLastCategory } from "@/lib/lastCategory"
 import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
+import { followingQuantity } from "@/lib/followQuantity"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
 import type { ConfiguredBundle, PublicProductDetail } from "@/types/storefront"
@@ -232,7 +233,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * typed, floored at its own minimum.
 	 */
 	const unitsFor = (option: PublicProductDetail["options"][number], typed: number) =>
-		option.followsMainQuantity ? quantity : Math.max(typed, option.startQuantity)
+		option.followsMainQuantity
+			? followingQuantity(quantity, option.unitsPerOption)
+			: Math.max(typed, option.startQuantity)
 
 	/**
 	 * The configuration as the API takes it — variant ids and quantities.
@@ -249,7 +252,9 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				if (!option?.variantId) return []
 				// Written out rather than through `unitsFor`, which is a new function
 				// every render and would defeat the memo.
-				const ordered = option.followsMainQuantity ? quantity : Math.max(units, option.startQuantity)
+				const ordered = option.followsMainQuantity
+					? followingQuantity(quantity, option.unitsPerOption)
+					: Math.max(units, option.startQuantity)
 				return [{ variantId: option.variantId, quantity: ordered }]
 			}),
 		[chosenOptions, product, quantity]
@@ -308,8 +313,14 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 */
 	const optionBelowMoq = [...chosenOptions].some(([id, chosenQuantity]) => {
 		const option = product?.options.find((o) => o.id === id)
-		// A following option is short when the main quantity is under its minimum.
-		return !!option && (option.followsMainQuantity ? quantity : chosenQuantity) < option.startQuantity
+		// A following option is short when the number it works out at — one per
+		// cutter, or one box per four — is under its own minimum.
+		return (
+			!!option &&
+			(option.followsMainQuantity
+				? followingQuantity(quantity, option.unitsPerOption)
+				: chosenQuantity) < option.startQuantity
+		)
 	})
 
 	/**
@@ -981,7 +992,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							{product.options.map((option) => {
 								const chosen = chosenOptions.has(option.id)
 								const optionQuantity = option.followsMainQuantity
-									? quantity
+									? followingQuantity(quantity, option.unitsPerOption)
 									: (chosenOptions.get(option.id) ?? option.startQuantity)
 								const optionBelowMoq = chosen && optionQuantity < option.startQuantity
 
@@ -1149,9 +1160,13 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 															// product's quantity, and saying so is clearer than a
 															// stepper that cannot be moved.
 															<span className="text-sm">
-																<span className="font-semibold tabular-nums">{quantity}</span>{" "}
+																<span className="font-semibold tabular-nums">
+																	{optionQuantity}
+																</span>{" "}
 																<span className="text-muted-foreground text-xs">
-																	{t("optionFollowsMain")}
+																	{option.unitsPerOption > 1
+																		? t("optionPerUnits", { units: option.unitsPerOption })
+																		: t("optionFollowsMain")}
 																</span>
 															</span>
 														) : (

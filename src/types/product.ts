@@ -112,6 +112,8 @@ export interface ProductOptionInput {
 	discountPercent?: string | null
 	/** Ordered in the main product's quantity; the customer types none for it. */
 	followsMainQuantity?: boolean
+	/** How many of the main product one of these covers — 4 for a box of four. */
+	unitsPerOption?: number
 }
 
 /** What the admin list and detail both return. */

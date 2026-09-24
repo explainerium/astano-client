@@ -95,6 +95,8 @@ export interface PublicOption {
 	 * quantity field for it, and the server enforces the same.
 	 */
 	followsMainQuantity: boolean
+	/** How many of the main product one of these covers — 4 for a box of four. */
+	unitsPerOption: number
 	image: PublicImage | null
 	unitPrice: string | null
 	/**
@@ -233,6 +235,8 @@ export interface CartLine {
 	artworkMissing: boolean
 	/** An option ordered in its parent's quantity: no stepper of its own. */
 	followsMain?: boolean
+	/** How many of the parent one of these covers — 4 for a box of four. */
+	followsPerUnits?: number
 	/** Add-ons attached to this line (§4.6). Never present on an option itself. */
 	options?: Omit<CartLine, "options">[]
 }
@@ -271,6 +275,8 @@ export interface QuoteBasketLine {
 	artworkMissing: boolean
 	/** An option ordered in its product's quantity: no stepper of its own. */
 	followsMain?: boolean
+	/** How many of the product one of these covers — 4 for a box of four. */
+	followsPerUnits?: number
 	/** Options configured with this product. Never present on an option itself. */
 	options?: Omit<QuoteBasketLine, "options">[]
 }

@@ -239,6 +239,8 @@ const buildSchema = (t: T) =>
 			preselected: z.boolean(),
 			/// Ordered in this product's quantity; the customer types none for it.
 			followsMainQuantity: z.boolean(),
+			/// How many of the main product one of this option covers.
+			unitsPerOption: z.number({ message: t("enterANumber") }).int().min(1),
 			/// No input for it, but carried through untouched — a save rewrites
 			/// every option row, and leaving it out cleared a stored discount.
 			discountPercent: z.string().nullable(),
@@ -519,6 +521,7 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 			sortOrder: option.sortOrder ?? index,
 			preselected: option.preselected ?? false,
 			followsMainQuantity: option.followsMainQuantity ?? false,
+			unitsPerOption: option.unitsPerOption ?? 1,
 			discountPercent:
 				option.discountPercent === null || option.discountPercent === undefined
 					? null
@@ -787,6 +790,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					groupLabel: o.groupLabel.trim() || null,
 					preselected: o.preselected,
 					followsMainQuantity: o.followsMainQuantity,
+					unitsPerOption: o.unitsPerOption,
 					discountPercent: o.discountPercent,
 				})),
 			variants: [

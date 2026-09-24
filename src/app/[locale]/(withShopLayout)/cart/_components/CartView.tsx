@@ -105,7 +105,14 @@ export const CartView = () => {
 				<span className="text-xs">
 					{option.quantity} × {formatMoney(option.unitPrice) ?? "—"}
 					{/* Changing the product's quantity changes this one too. */}
-					{option.followsMain && <> · {t("followsMain")}</>}
+					{option.followsMain && (
+						<>
+							{" · "}
+							{(option.followsPerUnits ?? 1) > 1
+								? t("followsMainPer", { units: option.followsPerUnits ?? 1 })
+								: t("followsMain")}
+						</>
+					)}
 				</span>
 			</span>
 			<span className="font-medium">{formatMoney(option.lineTotal)}</span>
