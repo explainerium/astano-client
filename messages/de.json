@@ -226,6 +226,7 @@
 		"optionsIntroQuote": "Optionen sind Erweiterungen zu diesem Produkt — Verpackung, Gravur, Beschichtung. Wählen Sie die gewünschten aus und geben Sie je eine Menge an; alles wird gemeinsam in den Anfragekorb gelegt, und wir senden Ihnen ein Angebot.",
 		"optionFollowsMain": "wie beim Hauptprodukt",
 		"optionPerUnits": "1 je {units} Stück",
+		"quantityPacked": "Die Menge wird auf {quantity} Stück erhöht, damit die gewählten Verpackungen vollständig gefüllt sind.",
 		"optionsSelectedCount": "{count, plural, =0 {keine ausgewählt} one {# ausgewählt} other {# ausgewählt}}",
 		"optionsHide": "Optionen ausblenden",
 		"optionsShow": "Optionen einblenden",

@@ -226,6 +226,7 @@
 		"optionsIntroQuote": "Options are extras for this product — packaging, engraving, coating. Tick the ones you want and set a quantity for each; everything goes into your inquiry basket together, and we send you a quote.",
 		"optionFollowsMain": "same as the main product",
 		"optionPerUnits": "1 per {units} pcs",
+		"quantityPacked": "The quantity is raised to {quantity} pieces so the chosen packaging comes out full.",
 		"optionsSelectedCount": "{count, plural, =0 {none selected} one {# selected} other {# selected}}",
 		"optionsHide": "Hide options",
 		"optionsShow": "Show options",

@@ -27,7 +27,7 @@ import {
 import { useLastCategory } from "@/lib/lastCategory"
 import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
-import { followingQuantity } from "@/lib/followQuantity"
+import { followingQuantity, packedMainQuantity } from "@/lib/followQuantity"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
 import type { ConfiguredBundle, PublicProductDetail } from "@/types/storefront"
@@ -232,9 +232,27 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	 * quoted. The server applies the same rule. Any other option is what was
 	 * typed, floored at its own minimum.
 	 */
+	/**
+	 * The quantity actually ordered: what was typed, raised so the chosen packs
+	 * come out whole.
+	 *
+	 * The client, 25 September: a hundred ice cubes with a box of six is
+	 * seventeen boxes, which hold a hundred and two — so a hundred cubes leave
+	 * one box four short. The API raises the same number on its own; this is
+	 * what the page shows and sends.
+	 */
+	const packedQuantity = useMemo(() => {
+		const sizes = [...chosenOptions].flatMap(([id]) => {
+			const option = product?.options.find((o) => o.id === id)
+			return option?.followsMainQuantity ? [option.unitsPerOption] : []
+		})
+
+		return packedMainQuantity(quantity, sizes)
+	}, [chosenOptions, product, quantity])
+
 	const unitsFor = (option: PublicProductDetail["options"][number], typed: number) =>
 		option.followsMainQuantity
-			? followingQuantity(quantity, option.unitsPerOption)
+			? followingQuantity(packedQuantity, option.unitsPerOption)
 			: Math.max(typed, option.startQuantity)
 
 	/**
@@ -253,11 +271,11 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				// Written out rather than through `unitsFor`, which is a new function
 				// every render and would defeat the memo.
 				const ordered = option.followsMainQuantity
-					? followingQuantity(quantity, option.unitsPerOption)
+					? followingQuantity(packedQuantity, option.unitsPerOption)
 					: Math.max(units, option.startQuantity)
 				return [{ variantId: option.variantId, quantity: ordered }]
 			}),
-		[chosenOptions, product, quantity]
+		[chosenOptions, product, packedQuantity]
 	)
 
 	/**
@@ -281,7 +299,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		// Debounced for the same reason the quantity refetch is: ticking through
 		// six options should not be six round trips.
 		const timer = setTimeout(() => {
-			void priceConfiguration({ variantId: variant.id, quantity, options: selection })
+			void priceConfiguration({ variantId: variant.id, quantity: packedQuantity, options: selection })
 				.unwrap()
 				.then((result) => {
 					if (!cancelled) setConfigured(result)
@@ -296,7 +314,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			cancelled = true
 			clearTimeout(timer)
 		}
-	}, [variant, quantity, selection, product?.options.length, priceConfiguration])
+	}, [variant, packedQuantity, selection, product?.options.length, priceConfiguration])
 
 	/** What the API says one ticked option comes to. Null until it has answered. */
 	const configuredOptionTotal = (option: PublicProductDetail["options"][number]) =>
@@ -318,7 +336,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		return (
 			!!option &&
 			(option.followsMainQuantity
-				? followingQuantity(quantity, option.unitsPerOption)
+				? followingQuantity(packedQuantity, option.unitsPerOption)
 				: chosenQuantity) < option.startQuantity
 		)
 	})
@@ -346,6 +364,10 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		if (withOptions && optionBelowMoq) return
 		setFeedback(null)
 
+		// The article on its own is bought in the quantity that was typed; the
+		// configuration is bought in the one that fills its packs.
+		const ordered = withOptions && selection.length ? packedQuantity : quantity
+
 		try {
 			if (product.quoteOnly) {
 				/*
@@ -358,7 +380,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 					setAttaching(true)
 					await addConfigurationToQuoteBasket({
 						variantId: variant.id,
-						quantity,
+						quantity: packedQuantity,
 						options: selection,
 					}).unwrap()
 				} else {
@@ -367,7 +389,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				setAdded({
 					name: product.name,
 					image: product.featuredImage?.srcset.thumb ?? product.featuredImage?.url ?? null,
-					quantity,
+					quantity: ordered,
 					quote: true,
 				})
 				return
@@ -388,7 +410,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				setAttaching(true)
 				await addConfigurationToCart({
 					variantId: variant.id,
-					quantity,
+					quantity: packedQuantity,
 					options: selection,
 				}).unwrap()
 			} else {
@@ -398,7 +420,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 			setAdded({
 				name: product.name,
 				image: product.featuredImage?.srcset.thumb ?? product.featuredImage?.url ?? null,
-				quantity,
+				quantity: ordered,
 				quote: false,
 			})
 
@@ -469,7 +491,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		{
 			id: variant?.id ?? product.id,
 			name: product.name,
-			quantity,
+			quantity: packedQuantity,
 			// The configuration's own figure for the article once options are
 			// priced, and the plain one until they are.
 			total: formatMoney(configured?.main.lineTotal) ?? lineTotal,
@@ -515,6 +537,21 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 					</li>
 				))}
 			</ul>
+
+			{/*
+			 * Why the number went up.
+			 *
+			 * The client, 25 September: a hundred ice cubes and a box of six is
+			 * seventeen boxes, which hold a hundred and two. The shop raises the
+			 * cubes rather than shipping a box four short — and says so, because a
+			 * quantity that changes itself without a word is worse than the
+			 * arithmetic it saves.
+			 */}
+			{packedQuantity !== quantity && (
+				<p className={cn("mt-3 rounded-md p-3 text-xs", ACCENT.soft, ACCENT.text)}>
+					{t("quantityPacked", { quantity: packedQuantity })}
+				</p>
+			)}
 
 			<div className="mt-4 flex justify-between gap-4 border-t pt-3">
 				<span className="font-heading text-base font-semibold">{t("total")}</span>
@@ -992,7 +1029,7 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							{product.options.map((option) => {
 								const chosen = chosenOptions.has(option.id)
 								const optionQuantity = option.followsMainQuantity
-									? followingQuantity(quantity, option.unitsPerOption)
+									? followingQuantity(packedQuantity, option.unitsPerOption)
 									: (chosenOptions.get(option.id) ?? option.startQuantity)
 								const optionBelowMoq = chosen && optionQuantity < option.startQuantity
 
