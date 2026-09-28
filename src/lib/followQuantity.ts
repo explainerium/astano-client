@@ -38,3 +38,40 @@ export const packedMainQuantity = (mainQuantity: number, packSizes: number[]): n
 
 	return Math.ceil(mainQuantity / step) * step
 }
+
+/** How one following option is counted — the API's `FollowRule`. */
+export interface FollowRule {
+	unitsPerOption: number
+	/** Option product ids whose ordered quantities this option adds up. */
+	countsOptions: string[]
+}
+
+/**
+ * Every following option's quantity: boxes from the main quantity, then prints
+ * from the boxes — one per chosen box, whatever its size. The client, 28
+ * September: 100 cubes in boxes of two is 50 prints; in boxes of four, 25.
+ *
+ * The API's twin is `domain/bundle/followQuantity.ts`, and the two must agree.
+ * A print with no box under it comes to 0, which the page reads as "cannot be
+ * ordered yet".
+ */
+export const followerQuantities = (
+	mainQuantity: number,
+	followers: { id: string; productId: string; rule: FollowRule }[]
+): Map<string, number> => {
+	const result = new Map<string, number>()
+	const boxes = followers.filter((f) => !f.rule.countsOptions.length)
+
+	for (const box of boxes) {
+		result.set(box.id, followingQuantity(mainQuantity, box.rule.unitsPerOption))
+	}
+
+	for (const counter of followers.filter((f) => f.rule.countsOptions.length)) {
+		const counted = boxes
+			.filter((box) => counter.rule.countsOptions.includes(box.productId))
+			.reduce((sum, box) => sum + (result.get(box.id) ?? 0), 0)
+		result.set(counter.id, counted)
+	}
+
+	return result
+}

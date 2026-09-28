@@ -108,9 +108,11 @@ export const CartView = () => {
 					{option.followsMain && (
 						<>
 							{" · "}
-							{(option.followsPerUnits ?? 1) > 1
-								? t("followsMainPer", { units: option.followsPerUnits ?? 1 })
-								: t("followsMain")}
+							{option.followsBoxes
+								? t("followsBoxes")
+								: (option.followsPerUnits ?? 1) > 1
+									? t("followsMainPer", { units: option.followsPerUnits ?? 1 })
+									: t("followsMain")}
 						</>
 					)}
 				</span>

@@ -114,6 +114,8 @@ export interface ProductOptionInput {
 	followsMainQuantity?: boolean
 	/** How many of the main product one of these covers — 4 for a box of four. */
 	unitsPerOption?: number
+	/** Count the boxes instead: once per box chosen among these option products. */
+	countsOptionProductIds?: string[]
 }
 
 /** What the admin list and detail both return. */

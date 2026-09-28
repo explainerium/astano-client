@@ -27,7 +27,7 @@ import {
 import { useLastCategory } from "@/lib/lastCategory"
 import useMoney from "@/lib/useMoney"
 import { formatWeight, weightUnitOf } from "@/lib/units"
-import { followingQuantity, packedMainQuantity } from "@/lib/followQuantity"
+import { followerQuantities, packedMainQuantity } from "@/lib/followQuantity"
 import { usePublicSettingsQuery } from "@/redux/api/settingApi"
 import { cn } from "@/lib/utils"
 import type { ConfiguredBundle, PublicProductDetail } from "@/types/storefront"
@@ -244,16 +244,45 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 	const packedQuantity = useMemo(() => {
 		const sizes = [...chosenOptions].flatMap(([id]) => {
 			const option = product?.options.find((o) => o.id === id)
-			return option?.followsMainQuantity ? [option.unitsPerOption] : []
+			// A print on the box is not a box: it fills nothing.
+			return option?.followsMainQuantity && !option.countsOptionProductIds?.length
+				? [option.unitsPerOption]
+				: []
 		})
 
 		return packedMainQuantity(quantity, sizes)
 	}, [chosenOptions, product, quantity])
 
+	/**
+	 * What every following option comes to — boxes from the cubes, prints from
+	 * the boxes.
+	 *
+	 * The client, 28 September: a hundred cubes in boxes of two is fifty boxes
+	 * and fifty prints; in boxes of four, twenty-five and twenty-five. Only the
+	 * ticked boxes count, but every print is worked out, ticked or not, so an
+	 * unticked one can say how many boxes it would go on.
+	 */
+	const followed = useMemo(
+		() =>
+			followerQuantities(
+				packedQuantity,
+				(product?.options ?? [])
+					.filter(
+						(o) =>
+							o.followsMainQuantity &&
+							(o.countsOptionProductIds?.length || chosenOptions.has(o.id))
+					)
+					.map((o) => ({
+						id: o.id,
+						productId: o.id,
+						rule: { unitsPerOption: o.unitsPerOption, countsOptions: o.countsOptionProductIds ?? [] },
+					}))
+			),
+		[chosenOptions, product, packedQuantity]
+	)
+
 	const unitsFor = (option: PublicProductDetail["options"][number], typed: number) =>
-		option.followsMainQuantity
-			? followingQuantity(packedQuantity, option.unitsPerOption)
-			: Math.max(typed, option.startQuantity)
+		option.followsMainQuantity ? (followed.get(option.id) ?? 0) : Math.max(typed, option.startQuantity)
 
 	/**
 	 * The configuration as the API takes it — variant ids and quantities.
@@ -271,11 +300,13 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 				// Written out rather than through `unitsFor`, which is a new function
 				// every render and would defeat the memo.
 				const ordered = option.followsMainQuantity
-					? followingQuantity(packedQuantity, option.unitsPerOption)
+					? (followed.get(option.id) ?? 0)
 					: Math.max(units, option.startQuantity)
-				return [{ variantId: option.variantId, quantity: ordered }]
+				// A print with no box to go on is not sent: the API would refuse the
+				// whole configuration, and the price would stop updating with it.
+				return ordered > 0 ? [{ variantId: option.variantId, quantity: ordered }] : []
 			}),
-		[chosenOptions, product, packedQuantity]
+		[chosenOptions, product, followed]
 	)
 
 	/**
@@ -335,9 +366,8 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 		// cutter, or one box per four — is under its own minimum.
 		return (
 			!!option &&
-			(option.followsMainQuantity
-				? followingQuantity(packedQuantity, option.unitsPerOption)
-				: chosenQuantity) < option.startQuantity
+			(option.followsMainQuantity ? (followed.get(option.id) ?? 0) : chosenQuantity) <
+				option.startQuantity
 		)
 	})
 
@@ -1029,9 +1059,22 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 							{product.options.map((option) => {
 								const chosen = chosenOptions.has(option.id)
 								const optionQuantity = option.followsMainQuantity
-									? followingQuantity(packedQuantity, option.unitsPerOption)
+									? (followed.get(option.id) ?? 0)
 									: (chosenOptions.get(option.id) ?? option.startQuantity)
 								const optionBelowMoq = chosen && optionQuantity < option.startQuantity
+
+								/*
+								 * A print on the box: available only on a box, and only
+								 * from its own minimum in boxes. The client, 28 September:
+								 * "this option for printing is only available over 500
+								 * sets (500 boxes)." Not ticked yet, it cannot be; ticked,
+								 * and the boxes drop, it stays and says why the order is
+								 * blocked.
+								 */
+								const countsBoxes = option.followsMainQuantity && !!option.countsOptionProductIds?.length
+								const boxesMissing = countsBoxes && optionQuantity === 0
+								const boxesShort = countsBoxes && !boxesMissing && optionQuantity < option.startQuantity
+								const unavailable = !chosen && (boxesMissing || boxesShort)
 
 								/**
 								 * What this option costs at the quantity chosen.
@@ -1071,10 +1114,16 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 												: "hover:border-neutral-400 hover:shadow-sm"
 										)}
 									>
-										<label className="flex cursor-pointer items-center gap-4 p-4">
+										<label
+											className={cn(
+												"flex items-center gap-4 p-4",
+												unavailable ? "cursor-not-allowed" : "cursor-pointer"
+											)}
+										>
 											<input
 												type="checkbox"
 												checked={chosen}
+												disabled={unavailable}
 												onChange={(event) =>
 													setChosenOptions((current) => {
 														const next = new Map(current)
@@ -1153,6 +1202,20 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 														{t("minimumOrder", { quantity: option.startQuantity })}
 													</span>
 												)}
+												{boxesMissing ? (
+													<span className="text-muted-foreground block text-xs">
+														{t("optionNeedsBox")}
+													</span>
+												) : (
+													boxesShort && (
+														<span className="text-muted-foreground block text-xs">
+															{t("optionBoxesBelowMoq", {
+																moq: option.startQuantity,
+																boxes: optionQuantity,
+															})}
+														</span>
+													)
+												)}
 											</span>
 
 											<span className="shrink-0 text-right">
@@ -1201,9 +1264,11 @@ export const ProductDetail = ({ slug }: { slug: string }) => {
 																	{optionQuantity}
 																</span>{" "}
 																<span className="text-muted-foreground text-xs">
-																	{option.unitsPerOption > 1
-																		? t("optionPerUnits", { units: option.unitsPerOption })
-																		: t("optionFollowsMain")}
+																	{countsBoxes
+																		? t("optionPerBox")
+																		: option.unitsPerOption > 1
+																			? t("optionPerUnits", { units: option.unitsPerOption })
+																			: t("optionFollowsMain")}
 																</span>
 															</span>
 														) : (

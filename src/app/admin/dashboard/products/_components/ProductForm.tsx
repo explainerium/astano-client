@@ -241,6 +241,8 @@ const buildSchema = (t: T) =>
 			followsMainQuantity: z.boolean(),
 			/// How many of the main product one of this option covers.
 			unitsPerOption: z.number({ message: t("enterANumber") }).int().min(1),
+			/// Count the boxes instead — a print, one per chosen box.
+			countsOptionProductIds: z.array(z.string()),
 			/// No input for it, but carried through untouched — a save rewrites
 			/// every option row, and leaving it out cleared a stored discount.
 			discountPercent: z.string().nullable(),
@@ -522,6 +524,7 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 			preselected: option.preselected ?? false,
 			followsMainQuantity: option.followsMainQuantity ?? false,
 			unitsPerOption: option.unitsPerOption ?? 1,
+			countsOptionProductIds: option.countsOptionProductIds ?? [],
 			discountPercent:
 				option.discountPercent === null || option.discountPercent === undefined
 					? null
@@ -791,6 +794,13 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					preselected: o.preselected,
 					followsMainQuantity: o.followsMainQuantity,
 					unitsPerOption: o.unitsPerOption,
+					// Only boxes still on this product: a row removed since it was
+					// ticked would otherwise be counted by nothing, silently.
+					countsOptionProductIds: o.followsMainQuantity
+						? o.countsOptionProductIds.filter((id) =>
+								form.options.some((other) => other.optionProductId === id && other !== o)
+							)
+						: [],
 					discountPercent: o.discountPercent,
 				})),
 			variants: [

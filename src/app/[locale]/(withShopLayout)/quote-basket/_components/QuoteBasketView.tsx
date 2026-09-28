@@ -99,9 +99,11 @@ export const QuoteBasketView = () => {
 						<p className="text-sm">
 							<span className="font-semibold tabular-nums">{line.quantity}</span>{" "}
 							<span className="text-muted-foreground">
-								{(line.followsPerUnits ?? 1) > 1
-									? t("followsMainPer", { units: line.followsPerUnits ?? 1 })
-									: t("followsMain")}
+								{line.followsBoxes
+									? t("followsBoxes")
+									: (line.followsPerUnits ?? 1) > 1
+										? t("followsMainPer", { units: line.followsPerUnits ?? 1 })
+										: t("followsMain")}
 							</span>
 						</p>
 					) : (

@@ -28,10 +28,10 @@ import { cn } from "@/lib/utils"
  */
 export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) => {
 	const t = useTranslations("admin")
-	const { control, register } = useFormContext()
+	const { control, register, setValue } = useFormContext()
 	const { fields, append, remove, move } = useFieldArray({ control, name: "options" })
 	const rows = useWatch({ control, name: "options" }) as
-		| { optionProductId?: string; followsMainQuantity?: boolean }[]
+		| { optionProductId?: string; followsMainQuantity?: boolean; countsOptionProductIds?: string[] }[]
 		| undefined
 
 	/** The row being dragged, and the one it is currently over. */
@@ -105,6 +105,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 			preselected: false,
 			followsMainQuantity: false,
 			unitsPerOption: 1,
+			countsOptionProductIds: [],
 			discountPercent: null,
 		})
 
@@ -245,7 +246,7 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 							 * ice cubes and 100 boxes." Shown only once the option follows
 							 * the quantity, because that is the only time it is read.
 							 */}
-							{rows?.[index]?.followsMainQuantity && (
+							{rows?.[index]?.followsMainQuantity && !rows?.[index]?.countsOptionProductIds?.length && (
 								<label className="flex basis-full items-center gap-2 pl-11 text-xs">
 									<span className="text-muted-foreground">{t("optionUnitsPer")}</span>
 									<input
@@ -256,6 +257,47 @@ export const OptionsTab = ({ currentProductId }: { currentProductId?: string }) 
 									/>
 									<span className="text-muted-foreground">{t("optionUnitsPerHelp")}</span>
 								</label>
+							)}
+
+							{/*
+							 * Or counted from the boxes, not the product.
+							 *
+							 * The client, 28 September: a print on the box is one per
+							 * box — "If he selects the 4pcs box it is only 25 boxes and
+							 * the printing also should be 25." Ticking the boxes it goes
+							 * on replaces the number above, which is why that hides.
+							 */}
+							{rows?.[index]?.followsMainQuantity && (rows?.length ?? 0) > 1 && (
+								<div className="basis-full space-y-1 pl-11 text-xs">
+									<span className="text-muted-foreground">{t("optionCountsBoxes")}</span>
+									<div className="flex flex-wrap gap-x-4 gap-y-1">
+										{(rows ?? [])
+											.filter((other, otherIndex) => otherIndex !== index && other?.optionProductId)
+											.map((other) => {
+												const id = other.optionProductId!
+												const counted = rows?.[index]?.countsOptionProductIds ?? []
+												return (
+													<label key={id} className="flex cursor-pointer items-center gap-1.5">
+														<input
+															type="checkbox"
+															checked={counted.includes(id)}
+															onChange={(event) =>
+																setValue(
+																	`options.${index}.countsOptionProductIds`,
+																	event.target.checked
+																		? [...counted, id]
+																		: counted.filter((c) => c !== id),
+																	{ shouldDirty: true }
+																)
+															}
+														/>
+														{optionProducts.find((p) => p.id === id)?.name ?? id}
+													</label>
+												)
+											})}
+									</div>
+									<span className="text-muted-foreground block">{t("optionCountsBoxesHelp")}</span>
+								</div>
 							)}
 						</div>
 					)

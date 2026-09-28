@@ -97,6 +97,11 @@ export interface PublicOption {
 	followsMainQuantity: boolean
 	/** How many of the main product one of these covers — 4 for a box of four. */
 	unitsPerOption: number
+	/**
+	 * Counted from the boxes instead: once per box chosen among these options
+	 * (their `id`s). A print on the box. Empty: counted from the main quantity.
+	 */
+	countsOptionProductIds: string[]
 	image: PublicImage | null
 	unitPrice: string | null
 	/**
@@ -237,6 +242,8 @@ export interface CartLine {
 	followsMain?: boolean
 	/** How many of the parent one of these covers — 4 for a box of four. */
 	followsPerUnits?: number
+	/** Counted from the boxes: a print on the box, one per box. */
+	followsBoxes?: boolean
 	/** Add-ons attached to this line (§4.6). Never present on an option itself. */
 	options?: Omit<CartLine, "options">[]
 }
@@ -277,6 +284,8 @@ export interface QuoteBasketLine {
 	followsMain?: boolean
 	/** How many of the product one of these covers — 4 for a box of four. */
 	followsPerUnits?: number
+	/** Counted from the boxes: a print on the box, one per box. */
+	followsBoxes?: boolean
 	/** Options configured with this product. Never present on an option itself. */
 	options?: Omit<QuoteBasketLine, "options">[]
 }
