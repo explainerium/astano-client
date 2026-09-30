@@ -2,7 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl"
 import { useState } from "react"
-import { Download, Loader2 } from "lucide-react"
+import { Check, Clock, Download, Loader2 } from "lucide-react"
 import Toolbar from "@/components/dashboard/shell/Toolbar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -21,7 +21,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table"
-import { useNewsletterSubscribersQuery } from "@/redux/api/inboxApi"
+import { useCleverReachStatusQuery } from "@/redux/api/cleverReachApi"
+import {
+	useNewsletterCountsQuery,
+	useNewsletterSubscribersQuery,
+	useUnsubscribeSubscriberMutation,
+} from "@/redux/api/inboxApi"
+import { cn } from "@/lib/utils"
 import type { NewsletterSubscriber, SubscriptionStatus } from "@/types/inbox"
 
 const ANY = "__any__"
@@ -75,6 +81,81 @@ const exportCsv = (rows: NewsletterSubscriber[]) => {
 	URL.revokeObjectURL(url)
 }
 
+/**
+ * Whether CleverReach has this address, as far as the shop knows.
+ *
+ * Only a confirmed or unsubscribed row is ever sent, so a pending one shows a
+ * dash rather than "waiting" — it is not waiting for anything but its owner.
+ * With the connection off, nothing is sent and nothing is waiting.
+ */
+const CleverReachMark = ({
+	subscriber,
+	connected,
+}: {
+	subscriber: NewsletterSubscriber
+	connected: boolean
+}) => {
+	const t = useTranslations("admin")
+
+	if (subscriber.status === "PENDING" || !subscriber.confirmedAt) {
+		return <span className="text-muted-foreground">—</span>
+	}
+	if (subscriber.syncedAt) {
+		return (
+			<span className="text-positive inline-flex items-center gap-1 text-xs" title={subscriber.syncedAt}>
+				<Check className="size-3.5" />
+				{t("cleverReachSynced")}
+			</span>
+		)
+	}
+	if (!connected) return <span className="text-muted-foreground">—</span>
+
+	return (
+		<span className="text-muted-foreground inline-flex items-center gap-1 text-xs">
+			<Clock className="size-3.5" />
+			{t("cleverReachWaiting")}
+		</span>
+	)
+}
+
+/**
+ * Take somebody off the list, in two clicks.
+ *
+ * Inline rather than a browser confirm(), which blocks the page and cannot be
+ * styled; and two steps because it cannot be undone from here — a way back
+ * would need the person's own confirmation.
+ */
+const UnsubscribeButton = ({ id }: { id: string }) => {
+	const t = useTranslations("admin")
+	const [asking, setAsking] = useState(false)
+	const [unsubscribe, { isLoading }] = useUnsubscribeSubscriberMutation()
+
+	if (!asking) {
+		return (
+			<Button variant="ghost" size="sm" onClick={() => setAsking(true)}>
+				{t("unsubscribeSubscriber")}
+			</Button>
+		)
+	}
+
+	return (
+		<span className="inline-flex items-center gap-1">
+			<Button
+				variant="destructive"
+				size="sm"
+				disabled={isLoading}
+				onClick={() => unsubscribe(id).finally(() => setAsking(false))}
+			>
+				{isLoading && <Loader2 className="size-3.5 animate-spin" />}
+				{t("unsubscribeConfirm")}
+			</Button>
+			<Button variant="ghost" size="sm" disabled={isLoading} onClick={() => setAsking(false)}>
+				{t("cancel")}
+			</Button>
+		</span>
+	)
+}
+
 export default function NewsletterPage() {
 	const t = useTranslations("admin")
 	const locale = useLocale()
@@ -87,12 +168,46 @@ export default function NewsletterPage() {
 		limit: PER_PAGE,
 	})
 
+	const { data: counts } = useNewsletterCountsQuery()
+	const { data: cleverReach } = useCleverReachStatusQuery()
+	const connected = !!cleverReach?.enabled
+
 	const subscribers = data?.data ?? []
 	const meta = data?.meta
 	const confirmedOnPage = subscribers.filter((s) => s.status === "CONFIRMED").length
 
 	return (
 		<div className="space-y-4">
+			{/*
+			 * The three numbers people open this page for. Each is also a filter:
+			 * clicking "Bestätigt" shows exactly the people it counts, and clicking
+			 * it again shows everyone.
+			 */}
+			<div className="grid gap-3 sm:grid-cols-3">
+				{(Object.keys(STATUS_CHIP) as SubscriptionStatus[]).map((value) => (
+					<button
+						key={value}
+						type="button"
+						aria-pressed={status === value}
+						onClick={() => {
+							setStatus(status === value ? undefined : value)
+							setPage(1)
+						}}
+						className={cn(
+							"bg-card rounded-lg border p-4 text-left transition-colors hover:border-neutral-400",
+							status === value && "border-primary ring-primary/20 ring-2"
+						)}
+					>
+						<span className="text-muted-foreground block text-xs font-medium tracking-wide uppercase">
+							{t(STATUS_CHIP[value].labelKey)}
+						</span>
+						<span className="font-heading mt-1 block text-2xl font-bold tabular-nums">
+							{counts ? counts[value] : "–"}
+						</span>
+					</button>
+				))}
+			</div>
+
 			<Toolbar
 				filters={
 					<Select
@@ -154,10 +269,12 @@ export default function NewsletterPage() {
 									t("signedUp"),
 									t("subscriberConfirmed"),
 									t("status"),
+									"CleverReach",
+									"",
 								].map(
 										(head) => (
 											<TableHead
-												key={head}
+												key={head || "actions"}
 												className="text-muted-foreground text-xs font-medium tracking-wide uppercase"
 											>
 												{head}
@@ -170,7 +287,7 @@ export default function NewsletterPage() {
 							<TableBody>
 								{!subscribers.length && (
 									<TableRow className="hover:bg-transparent">
-										<TableCell colSpan={7} className="h-40 text-center">
+										<TableCell colSpan={9} className="h-40 text-center">
 											<p className="text-muted-foreground text-sm">{t("noSubscribersYetTheyArriveFrom")}</p>
 										</TableCell>
 									</TableRow>
@@ -197,6 +314,14 @@ export default function NewsletterPage() {
 												<Badge variant="outline" className={chip.className}>
 													{t(chip.labelKey)}
 												</Badge>
+											</TableCell>
+											<TableCell>
+												<CleverReachMark subscriber={subscriber} connected={connected} />
+											</TableCell>
+											<TableCell className="text-right">
+												{subscriber.status !== "UNSUBSCRIBED" && (
+													<UnsubscribeButton id={subscriber.id} />
+												)}
 											</TableCell>
 										</TableRow>
 									)

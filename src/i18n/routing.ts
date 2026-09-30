@@ -112,6 +112,11 @@ export const pathnames = {
 	 * two in step. See VERIFY_PATH in backend account.service.ts.
 	 */
 	"/verify-email": { en: "/verify-email", de: "/e-mail-bestaetigen" },
+	/**
+	 * Where a newsletter confirmation link lands. The backend composes it too —
+	 * keep in step with PATHS in backend config/shopLinks.ts.
+	 */
+	"/newsletter/confirm": { en: "/newsletter/confirm", de: "/newsletter/bestaetigen" },
 } as const
 
 export const routing = defineRouting({

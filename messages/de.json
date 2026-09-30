@@ -1070,6 +1070,10 @@
 				"title": "Rechnungen",
 				"blurb": "Wie Rechnungen nummeriert und abgeschlossen werden."
 			},
+			"cleverreach": {
+				"title": "CleverReach",
+				"blurb": "Wohin bestätigte Newsletter-Abonnenten gesendet werden. Der Shop behält seine eigene Liste; sie wird für Mailings nach CleverReach kopiert."
+			},
 			"smtp": {
 				"title": "Mailserver",
 				"blurb": "Das Konto, über das der Shop versendet. Ohne diese Angaben wird keine E-Mail verschickt."
@@ -1153,6 +1157,22 @@
 			"smtp__user": {
 				"label": "Benutzername",
 				"help": "Meist die vollständige E-Mail-Adresse oder der Login, den Ihr Anbieter auf seiner SMTP-Seite anzeigt."
+			},
+			"cleverreach__enabled": {
+				"label": "Abonnenten an CleverReach senden",
+				"help": "Aus: Der Shop sammelt und bestätigt Abonnenten weiterhin, es verlässt aber nichts den Shop."
+			},
+			"cleverreach__clientId": {
+				"label": "Client ID",
+				"help": "Aus CleverReach → Konto → Extras → REST API → Ihre App. Nicht die Kundennummer, mit der Sie sich anmelden."
+			},
+			"cleverreach__clientSecret": {
+				"label": "Client Secret",
+				"help": "Aus derselben App. Wird verschlüsselt gespeichert und nie wieder angezeigt. Leer lassen, um das bisherige zu behalten."
+			},
+			"cleverreach__groupId": {
+				"label": "Gruppen-ID",
+				"help": "Die CleverReach-Liste, in die Abonnenten kommen. Mit „Verbindung testen“ unten sehen Sie Ihre Gruppen und können eine wählen."
 			},
 			"smtp__password": {
 				"label": "Passwort",
@@ -2253,6 +2273,10 @@
 		"subscriberConfirmed": "Bestätigt",
 		"subscriberUnconfirmed": "Unbestätigt",
 		"subscriberUnsubscribed": "Abgemeldet",
+		"cleverReachSynced": "Übertragen",
+		"cleverReachWaiting": "Wartet",
+		"unsubscribeSubscriber": "Abmelden",
+		"unsubscribeConfirm": "Wirklich abmelden",
 		"source": "Quelle",
 		"signedUp": "Angemeldet",
 		"couldNotLoadSubscribers": "Die Abonnenten konnten nicht geladen werden.",
@@ -2503,5 +2527,15 @@
 			"Header menu": "Kopfzeilen-Menü",
 			"Footer links": "Fußzeilen-Links"
 		}
+	},
+	"newsletterConfirm": {
+		"title": "Newsletter-Anmeldung bestätigen",
+		"working": "Ihre Anmeldung wird bestätigt…",
+		"done": "Vielen Dank, Ihre Anmeldung ist bestätigt",
+		"doneBody": "Sie erhalten ab jetzt unseren Newsletter. Abmelden können Sie sich jederzeit über den Link in jeder Ausgabe.",
+		"failedTitle": "Dieser Link hat nicht funktioniert",
+		"failed": "Dieser Bestätigungslink ist ungültig oder wurde bereits verwendet.",
+		"noToken": "Diesem Link fehlt der Bestätigungscode.",
+		"toShop": "Zum Shop"
 	}
 }

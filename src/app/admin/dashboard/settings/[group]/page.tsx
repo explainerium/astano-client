@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { useSettingsQuery } from "@/redux/api/settingApi"
 import AiKeyTestCard from "../_components/AiKeyTestCard"
+import CleverReachCard from "../_components/CleverReachCard"
 import MailServerTestCard from "../_components/MailServerTestCard"
 import SettingsGroupForm from "../_components/SettingsGroupForm"
 import useSettingText from "../_components/useSettingText"
@@ -69,6 +70,9 @@ export default function SettingsGroupPage() {
 
 			{/* Same for a pasted API key: it looks right until it is used. */}
 			{group === "ai" && <AiKeyTestCard />}
+
+			{/* The login test doubles as the group picker. */}
+			{group === "cleverreach" && <CleverReachCard />}
 		</div>
 	)
 }

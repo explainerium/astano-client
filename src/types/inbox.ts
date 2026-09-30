@@ -40,6 +40,8 @@ export interface NewsletterSubscriber {
 	/** Where they signed up — footer, checkout, and so on. */
 	source: string | null
 	confirmedAt: string | null
+	/** When CleverReach last heard about this address. Null: not yet, or never. */
+	syncedAt?: string | null
 	createdAt: string
 }
 

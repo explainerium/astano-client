@@ -1944,6 +1944,10 @@
 		"subscriberConfirmed": "Confirmed",
 		"subscriberUnconfirmed": "Unconfirmed",
 		"subscriberUnsubscribed": "Unsubscribed",
+		"cleverReachSynced": "Sent",
+		"cleverReachWaiting": "Waiting",
+		"unsubscribeSubscriber": "Unsubscribe",
+		"unsubscribeConfirm": "Really unsubscribe",
 		"source": "Source",
 		"signedUp": "Signed up",
 		"couldNotLoadSubscribers": "Could not load subscribers.",
@@ -2028,5 +2032,15 @@
 		"moveDown": "Move down",
 		"noItemsYet": "No items yet. This section will appear empty on the site.",
 		"itemCount": "{count, plural, =0 {no items} one {# item} other {# items}}"
+	},
+	"newsletterConfirm": {
+		"title": "Confirm newsletter subscription",
+		"working": "Confirming your subscription…",
+		"done": "Thank you, your subscription is confirmed",
+		"doneBody": "You will receive our newsletter from now on. You can unsubscribe at any time with the link in every issue.",
+		"failedTitle": "This link did not work",
+		"failed": "This confirmation link is invalid or has already been used.",
+		"noToken": "This link is missing its confirmation code.",
+		"toShop": "To the shop"
 	}
 }

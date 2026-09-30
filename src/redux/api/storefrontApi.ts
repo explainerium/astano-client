@@ -516,6 +516,15 @@ export const storefrontApi = baseApi.injectEndpoints({
 		}),
 
 		/**
+		 * The link in that email. Unauthenticated — the token is the consent.
+		 * A refusal carries the API's own sentence, in the visitor's language.
+		 */
+		confirmNewsletter: build.mutation<unknown, string>({
+			query: (token) => ({ url: "/newsletter/confirm", method: "GET", params: { token } }),
+			invalidatesTags: [tagTypes.newsletter],
+		}),
+
+		/**
 		 * The contact form. `website` is the honeypot — the API answers 201 to a
 		 * bot exactly as it does to a person, because telling a spammer their
 		 * submission was binned only teaches them to try again.
@@ -591,5 +600,6 @@ export const {
 	useSubmitQuoteMutation,
 
 	useSubscribeNewsletterMutation,
+	useConfirmNewsletterMutation,
 	useSubmitContactMutation,
 } = storefrontApi
