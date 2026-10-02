@@ -8,7 +8,6 @@ import { ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { z } from "zod"
 import ProCheckbox from "@/components/form/ProCheckbox"
-import ProCombobox from "@/components/form/ProCombobox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSelect from "@/components/form/ProSelect"
@@ -36,6 +35,7 @@ import OptionsTab from "./OptionsTab"
 import ProductImages from "./ProductImages"
 import ProductTabsEditor from "./ProductTabsEditor"
 import QuantityPricing from "./QuantityPricing"
+import CategoryPicker from "./CategoryPicker"
 import { SITE_URL } from "@/lib/siteUrl"
 import { holdForNavigation } from "@/lib/holdForNavigation"
 import { cn } from "@/lib/utils"
@@ -1290,12 +1290,7 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 					<section className="bg-card rounded-lg border">
 						<h2 className="font-heading border-b px-4 py-3 text-sm font-semibold">{t("categories")}</h2>
 						<div className="p-4">
-							<ProCombobox
-								name="categoryIds"
-								multiple
-								options={categoryOptions}
-								placeholder={t("noCategories")}
-							/>
+							<CategoryPicker options={categoryOptions} />
 						</div>
 					</section>
 

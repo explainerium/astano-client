@@ -38,6 +38,32 @@ export const attributeApi = baseApi.injectEndpoints({
 			invalidatesTags: [tagTypes.attribute, tagTypes.product],
 		}),
 
+		/**
+		 * A value typed into a product rather than picked from the list. It joins
+		 * the attribute's list; a label the attribute already has comes back as
+		 * that value instead of a twin.
+		 */
+		addAttributeValue: build.mutation<
+			{ id: string; code: string; label: string; created: boolean },
+			{ attributeId: string; label: string }
+		>({
+			query: ({ attributeId, label }) => ({
+				url: `/attributes/${attributeId}/values`,
+				method: "POST",
+				data: { label },
+			}),
+			invalidatesTags: [tagTypes.attribute],
+		}),
+
+		/**
+		 * An attribute typed into a product by name — the code is made from it.
+		 * A name already in use comes back as that attribute instead of a twin.
+		 */
+		addAttributeByName: build.mutation<{ id: string; created: boolean }, string>({
+			query: (name) => ({ url: "/attributes/quick", method: "POST", data: { name } }),
+			invalidatesTags: [tagTypes.attribute],
+		}),
+
 		/** Removing a single value, without rewriting the whole attribute. */
 		deleteAttributeValue: build.mutation<void, string>({
 			query: (id) => ({ url: `/attributes/values/${id}`, method: "DELETE" }),
@@ -48,6 +74,8 @@ export const attributeApi = baseApi.injectEndpoints({
 
 export const {
 	useAdminAttributesQuery,
+	useAddAttributeValueMutation,
+	useAddAttributeByNameMutation,
 	useCreateAttributeMutation,
 	useUpdateAttributeMutation,
 	useDuplicateAttributeMutation,

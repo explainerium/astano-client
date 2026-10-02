@@ -6,9 +6,12 @@ import { Plus, Trash2 } from "lucide-react"
 import ProCheckbox from "@/components/form/ProCheckbox"
 import { pickTranslation } from "@/lib/pickTranslation"
 import ProCombobox from "@/components/form/ProCombobox"
-import ProSelect from "@/components/form/ProSelect"
 import { Button } from "@/components/ui/button"
-import { useAdminAttributesQuery } from "@/redux/api/attributeApi"
+import {
+	useAddAttributeByNameMutation,
+	useAddAttributeValueMutation,
+	useAdminAttributesQuery,
+} from "@/redux/api/attributeApi"
 import type { AdminAttribute } from "@/types/attribute"
 
 const nameOf = (attribute: AdminAttribute) =>
@@ -38,6 +41,39 @@ export const AttributesTab = () => {
 		| undefined
 
 	const { data: attributes = [] } = useAdminAttributesQuery()
+	const [addValue] = useAddAttributeValueMutation()
+	const [addAttribute] = useAddAttributeByNameMutation()
+
+	/*
+	 * An attribute that does not exist yet, typed by name. Without it a missing
+	 * "Wandstärke" meant leaving a half-filled product for the Attributes page
+	 * and coming back.
+	 */
+	const createAttribute = async (name: string) => {
+		try {
+			return (await addAttribute(name).unwrap()).id
+		} catch {
+			return null
+		}
+	}
+
+	/*
+	 * A value that is not in the list yet, typed straight in.
+	 *
+	 * The client, 1 October: "Is it possible to make also a free text for the
+	 * product attributes, not only choosing from the list?" It joins the
+	 * attribute's list rather than living on this product alone, so the next
+	 * product finds it and it can still build variants. The English label
+	 * starts as the same words and can be corrected under Attributes.
+	 */
+	const createValue = (attributeId: string) => async (label: string) => {
+		try {
+			const value = await addValue({ attributeId, label }).unwrap()
+			return value.id
+		} catch {
+			return null
+		}
+	}
 
 	// An attribute may only be added once — a second row for the same one would
 	// produce contradictory visible/variation flags for the same rows.
@@ -54,7 +90,7 @@ export const AttributesTab = () => {
 					type="button"
 					variant="outline"
 					size="sm"
-					disabled={attributes.length === 0 || takenIds.size >= attributes.length}
+					// Never disabled for want of attributes: a new one can be typed in.
 					onClick={() =>
 						append({
 							attributeId: "",
@@ -86,10 +122,13 @@ export const AttributesTab = () => {
 				return (
 					<div key={field.id} className="space-y-4 rounded-lg border p-4">
 						<div className="flex items-start gap-3">
-							<ProSelect
+							<ProCombobox
 								name={`attributes.${index}.attributeId`}
 								label={t("attribute")}
 								className="flex-1"
+								searchPlaceholder={t("searchOrTypeNewAttribute")}
+								onCreate={createAttribute}
+								createLabel={(text) => t("addNewAttribute", { name: text })}
 								options={attributes.map((attribute) => ({
 									label: nameOf(attribute),
 									value: attribute.id,
@@ -116,6 +155,9 @@ export const AttributesTab = () => {
 									label={t("values")}
 									multiple
 									placeholder={t("noValuesSelected")}
+									searchPlaceholder={t("searchOrTypeNewValue")}
+									onCreate={createValue(chosen.id)}
+									createLabel={(text) => t("addNewValue", { value: text })}
 									options={chosen.values.map((value) => ({
 										value: value.id,
 										label: labelOf(chosen, value.id),

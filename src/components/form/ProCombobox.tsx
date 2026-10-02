@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react"
 import { Controller, useFormContext } from "react-hook-form"
-import { CheckIcon, ChevronsUpDownIcon, SearchIcon } from "lucide-react"
+import { CheckIcon, ChevronsUpDownIcon, Loader2, PlusIcon, SearchIcon } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -55,6 +55,14 @@ export interface ProComboboxProps {
 	contentClassName?: string
 	/** Extra classes for the list — a taller one, say. */
 	listClassName?: string
+	/**
+	 * Lets the search text become a new option when nothing matches it exactly.
+	 * Resolves to the option's value, which is then chosen like any other; null
+	 * leaves the selection alone. Absent: the list is closed, as before.
+	 */
+	onCreate?: (text: string) => Promise<string | null>
+	/** The row that offers it — "Add “…”". */
+	createLabel?: (text: string) => string
 }
 
 /**
@@ -97,6 +105,8 @@ export const ProCombobox = ({
 	allGroupsLabel,
 	contentClassName,
 	listClassName,
+	onCreate,
+	createLabel,
 }: ProComboboxProps) => {
 	const { control } = useFormContext()
 	const t = useTranslations("common")
@@ -105,6 +115,7 @@ export const ProCombobox = ({
 	const [query, setQuery] = useState("")
 	const [highlighted, setActiveIndex] = useState(0)
 	const [group, setGroup] = useState<string | null>(null)
+	const [creating, setCreating] = useState(false)
 
 	const listId = useId()
 	const optionId = (index: number) => `${listId}-option-${index}`
@@ -179,6 +190,38 @@ export const ProCombobox = ({
 					setQuery("")
 				}
 
+				/*
+				 * Offered only when the text is not already an option — typing
+				 * "Kupfer" with "Kupfer" in the list should pick it, not make a twin.
+				 */
+				const typed = query.trim()
+				const canCreate =
+					!!onCreate &&
+					!!typed &&
+					// Keywords too: an indented label ("— Herzen") is still "Herzen".
+					!options.some((option) =>
+						[option.label, ...(option.keywords ?? [])].some((term) => fold(term.trim()) === fold(typed))
+					)
+
+				const create = async () => {
+					if (!onCreate || !canCreate || creating) return
+					setCreating(true)
+					try {
+						const value = await onCreate(typed)
+						if (value) {
+							if (multiple) {
+								if (!values.includes(value)) field.onChange([...values, value])
+							} else {
+								field.onChange(value)
+								setOpen(false)
+							}
+							setQuery("")
+						}
+					} finally {
+						setCreating(false)
+					}
+				}
+
 				const triggerLabel = multiple
 					? values.length === 0
 						? (placeholder ?? t("select"))
@@ -212,6 +255,8 @@ export const ProCombobox = ({
 						event.preventDefault()
 						const option = filtered[activeIndex]
 						if (option) choose(option)
+						// Nothing in the list: Enter adds what was typed.
+						else if (canCreate) void create()
 					}
 				}
 
@@ -381,12 +426,34 @@ export const ProCombobox = ({
 										)
 									})}
 
-									{!filtered.length && (
+									{!filtered.length && !canCreate && (
 										<li className="text-muted-foreground px-2 py-6 text-center text-sm">
 											{t("noResults")}
 										</li>
 									)}
 								</ul>
+
+								{canCreate && (
+									<button
+										type="button"
+										disabled={creating}
+										// Mouse down, like the options: focus stays in the search box.
+										onMouseDown={(event) => {
+											event.preventDefault()
+											void create()
+										}}
+										className="text-primary hover:bg-muted flex w-full items-center gap-2 border-t px-3 py-2 text-left text-sm font-medium disabled:opacity-60"
+									>
+										{creating ? (
+											<Loader2 className="size-4 shrink-0 animate-spin" />
+										) : (
+											<PlusIcon className="size-4 shrink-0" />
+										)}
+										<span className="min-w-0 truncate">
+											{createLabel ? createLabel(typed) : `+ ${typed}`}
+										</span>
+									</button>
+								)}
 
 								{/* Announced to screen readers as the list narrows; silent to
 								    everyone else. */}
