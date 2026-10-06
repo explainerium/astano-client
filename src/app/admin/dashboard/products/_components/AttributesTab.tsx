@@ -1,9 +1,11 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { useEffect, useRef } from "react"
 import { useFieldArray, useFormContext, useWatch } from "react-hook-form"
-import { Plus, Trash2 } from "lucide-react"
+import { List, Plus, Trash2, Type } from "lucide-react"
 import ProCheckbox from "@/components/form/ProCheckbox"
+import ProInput from "@/components/form/ProInput"
 import { pickTranslation } from "@/lib/pickTranslation"
 import ProCombobox from "@/components/form/ProCombobox"
 import { Button } from "@/components/ui/button"
@@ -24,6 +26,173 @@ const labelOf = (attribute: AdminAttribute, valueId: string) => {
 	)
 }
 
+interface RowValues {
+	attributeId?: string
+	mode?: "list" | "text"
+}
+
+/**
+ * One attribute on the product: its values from the list, or text typed for
+ * this product alone.
+ *
+ * The client, 6 October: "Abmessungen" — 600 products, nearly every one its
+ * own size. Each size saved as a list value would sit in every other product's
+ * dropdown, unused. Typed here, it stays on this product and a mistake is
+ * corrected in the box. Which way an attribute starts is set on the attribute
+ * ("Start products with free text"); either way each product can switch.
+ */
+const AttributeRow = ({
+	index,
+	attributes,
+	takenIds,
+	onRemove,
+	createAttribute,
+	createValue,
+}: {
+	index: number
+	attributes: AdminAttribute[]
+	takenIds: Set<string | undefined>
+	onRemove: () => void
+	createAttribute: (name: string) => Promise<string | null>
+	createValue: (attributeId: string) => (label: string) => Promise<string | null>
+}) => {
+	const t = useTranslations("admin")
+	const { control, setValue } = useFormContext()
+	const row = useWatch({ control, name: `attributes.${index}` }) as RowValues | undefined
+
+	const chosenId = row?.attributeId
+	const chosen = attributes.find((a) => a.id === chosenId)
+	const mode = row?.mode ?? "list"
+
+	/*
+	 * A newly chosen attribute starts the way it is set to start. Only on a
+	 * change of choice — never on the first render, which is a saved product
+	 * loading with its own mode — and a change of attribute drops the old
+	 * attribute's values, which mean nothing on the new one.
+	 */
+	const previousId = useRef(chosenId)
+	useEffect(() => {
+		if (previousId.current === chosenId) return
+		previousId.current = chosenId
+		if (!chosen) return
+
+		setValue(`attributes.${index}.mode`, chosen.freeText ? "text" : "list")
+		setValue(`attributes.${index}.attributeValueIds`, [])
+		setValue(`attributes.${index}.isVariation`, false)
+	}, [chosen, chosenId, index, setValue])
+
+	const switchTo = (next: "list" | "text") => {
+		setValue(`attributes.${index}.mode`, next, { shouldDirty: true })
+		// Typed text cannot build variants: there is no shared value to match on.
+		if (next === "text") setValue(`attributes.${index}.isVariation`, false, { shouldDirty: true })
+	}
+
+	return (
+		<div className="space-y-4 rounded-lg border p-4">
+			<div className="flex items-start gap-3">
+				<ProCombobox
+					name={`attributes.${index}.attributeId`}
+					label={t("attribute")}
+					className="flex-1"
+					searchPlaceholder={t("searchOrTypeNewAttribute")}
+					onCreate={createAttribute}
+					createLabel={(text) => t("addNewAttribute", { name: text })}
+					options={attributes.map((attribute) => ({
+						label: nameOf(attribute),
+						value: attribute.id,
+						// Still selectable if it is this row's own choice.
+						disabled: takenIds.has(attribute.id) && attribute.id !== chosenId,
+					}))}
+				/>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className="text-muted-foreground hover:text-destructive mt-7"
+					aria-label={t("removeNumbered", { thing: t("attributeWord"), index: index + 1 })}
+					onClick={onRemove}
+				>
+					<Trash2 />
+				</Button>
+			</div>
+
+			{chosen && (
+				<>
+					<div className="flex flex-wrap items-center gap-2">
+						<Button
+							type="button"
+							size="sm"
+							variant={mode === "list" ? "default" : "outline"}
+							aria-pressed={mode === "list"}
+							onClick={() => switchTo("list")}
+						>
+							<List />
+							{t("attributeFromList")}
+						</Button>
+						<Button
+							type="button"
+							size="sm"
+							variant={mode === "text" ? "default" : "outline"}
+							aria-pressed={mode === "text"}
+							onClick={() => switchTo("text")}
+						>
+							<Type />
+							{t("attributeFreeText")}
+						</Button>
+						<p className="text-muted-foreground text-xs">
+							{mode === "text" ? t("attributeFreeTextHint") : t("attributeFromListHint")}
+						</p>
+					</div>
+
+					{mode === "list" ? (
+						<ProCombobox
+							name={`attributes.${index}.attributeValueIds`}
+							label={t("values")}
+							multiple
+							placeholder={t("noValuesSelected")}
+							searchPlaceholder={t("searchOrTypeNewValue")}
+							onCreate={createValue(chosen.id)}
+							createLabel={(text) => t("addNewValue", { value: text })}
+							options={chosen.values.map((value) => ({
+								value: value.id,
+								label: labelOf(chosen, value.id),
+								keywords: [value.code],
+							}))}
+						/>
+					) : (
+						<div className="grid gap-3 sm:grid-cols-2">
+							<ProInput
+								name={`attributes.${index}.textDe`}
+								label={t("valueGerman")}
+								placeholder="z. B. 120 x 80 x 15 mm"
+							/>
+							<ProInput
+								name={`attributes.${index}.textEn`}
+								label={t("valueEnglish")}
+								description={t("valueEnglishFallback")}
+							/>
+						</div>
+					)}
+
+					<div className="grid gap-3 sm:grid-cols-2">
+						<ProCheckbox
+							name={`attributes.${index}.isVisible`}
+							label={t("visibleOnTheProductPage")}
+						/>
+						{mode === "list" && (
+							<ProCheckbox
+								name={`attributes.${index}.isVariation`}
+								label={t("usedForVariations")}
+								description={t("eachValueBecomesASeparateVersion")}
+							/>
+						)}
+					</div>
+				</>
+			)}
+		</div>
+	)
+}
+
 /**
  * The product's Attributes tab, as WooCommerce arranges it: pick an attribute,
  * choose its values, then decide per product whether it is visible and whether
@@ -36,9 +205,7 @@ export const AttributesTab = () => {
 	const t = useTranslations("admin")
 	const { control } = useFormContext()
 	const { fields, append, remove } = useFieldArray({ control, name: "attributes" })
-	const rows = useWatch({ control, name: "attributes" }) as
-		| { attributeId?: string }[]
-		| undefined
+	const rows = useWatch({ control, name: "attributes" }) as RowValues[] | undefined
 
 	const { data: attributes = [] } = useAdminAttributesQuery()
 	const [addValue] = useAddAttributeValueMutation()
@@ -64,7 +231,8 @@ export const AttributesTab = () => {
 	 * product attributes, not only choosing from the list?" It joins the
 	 * attribute's list rather than living on this product alone, so the next
 	 * product finds it and it can still build variants. The English label
-	 * starts as the same words and can be corrected under Attributes.
+	 * starts as the same words and can be corrected under Attributes. Text for
+	 * this product alone is the row's "Free text" switch.
 	 */
 	const createValue = (attributeId: string) => async (label: string) => {
 		try {
@@ -94,7 +262,10 @@ export const AttributesTab = () => {
 					onClick={() =>
 						append({
 							attributeId: "",
+							mode: "list",
 							attributeValueIds: [],
+							textDe: "",
+							textEn: "",
 							isVisible: true,
 							isVariation: false,
 						})
@@ -115,72 +286,17 @@ export const AttributesTab = () => {
 				</p>
 			)}
 
-			{fields.map((field, index) => {
-				const chosenId = rows?.[index]?.attributeId
-				const chosen = attributes.find((a) => a.id === chosenId)
-
-				return (
-					<div key={field.id} className="space-y-4 rounded-lg border p-4">
-						<div className="flex items-start gap-3">
-							<ProCombobox
-								name={`attributes.${index}.attributeId`}
-								label={t("attribute")}
-								className="flex-1"
-								searchPlaceholder={t("searchOrTypeNewAttribute")}
-								onCreate={createAttribute}
-								createLabel={(text) => t("addNewAttribute", { name: text })}
-								options={attributes.map((attribute) => ({
-									label: nameOf(attribute),
-									value: attribute.id,
-									// Still selectable if it is this row's own choice.
-									disabled: takenIds.has(attribute.id) && attribute.id !== chosenId,
-								}))}
-							/>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className="text-muted-foreground hover:text-destructive mt-7"
-								aria-label={t("removeNumbered", { thing: t("attributeWord"), index: index + 1 })}
-								onClick={() => remove(index)}
-							>
-								<Trash2 />
-							</Button>
-						</div>
-
-						{chosen && (
-							<>
-								<ProCombobox
-									name={`attributes.${index}.attributeValueIds`}
-									label={t("values")}
-									multiple
-									placeholder={t("noValuesSelected")}
-									searchPlaceholder={t("searchOrTypeNewValue")}
-									onCreate={createValue(chosen.id)}
-									createLabel={(text) => t("addNewValue", { value: text })}
-									options={chosen.values.map((value) => ({
-										value: value.id,
-										label: labelOf(chosen, value.id),
-										keywords: [value.code],
-									}))}
-								/>
-
-								<div className="grid gap-3 sm:grid-cols-2">
-									<ProCheckbox
-										name={`attributes.${index}.isVisible`}
-										label={t("visibleOnTheProductPage")}
-									/>
-									<ProCheckbox
-										name={`attributes.${index}.isVariation`}
-										label={t("usedForVariations")}
-										description={t("eachValueBecomesASeparateVersion")}
-									/>
-								</div>
-							</>
-						)}
-					</div>
-				)
-			})}
+			{fields.map((field, index) => (
+				<AttributeRow
+					key={field.id}
+					index={index}
+					attributes={attributes}
+					takenIds={takenIds}
+					onRemove={() => remove(index)}
+					createAttribute={createAttribute}
+					createValue={createValue}
+				/>
+			))}
 		</div>
 	)
 }

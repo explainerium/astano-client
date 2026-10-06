@@ -100,6 +100,12 @@ export type ProductVariantPatch = Partial<ProductVariantInput>
 export interface ProductAttributeInput {
 	attributeId: string
 	attributeValueIds: string[]
+	/**
+	 * Typed for this product alone instead of values from the list — per
+	 * language, German enough. Present means typed; `attributeValueIds` is
+	 * then empty and `isVariation` false.
+	 */
+	text?: { locale: string; value: string }[]
 	isVisible: boolean
 	isVariation: boolean
 }

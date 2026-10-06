@@ -208,7 +208,11 @@ const buildSchema = (t: T) =>
 	attributes: z.array(
 		z.object({
 			attributeId: z.string(),
+			/** From the attribute's list, or typed for this product alone. */
+			mode: z.enum(["list", "text"]),
 			attributeValueIds: z.array(z.string()),
+			textDe: z.string(),
+			textEn: z.string(),
 			isVisible: z.boolean(),
 			isVariation: z.boolean(),
 		})
@@ -495,7 +499,10 @@ const toDefaults = (product?: AdminProduct): FormValues => {
 
 		attributes: (product?.attributes ?? []).map((attribute) => ({
 			attributeId: attribute.attributeId,
+			mode: attribute.text ? ("text" as const) : ("list" as const),
 			attributeValueIds: attribute.attributeValueIds,
+			textDe: attribute.text?.find((t) => t.locale === "de")?.value ?? "",
+			textEn: attribute.text?.find((t) => t.locale === "en")?.value ?? "",
 			isVisible: attribute.isVisible,
 			isVariation: attribute.isVariation,
 		})),
@@ -754,13 +761,31 @@ export const ProductForm = ({ product }: { product?: AdminProduct }) => {
 				// A half-filled row — an attribute chosen but no values yet — is
 				// dropped rather than rejected, so an abandoned row cannot block a
 				// save of everything else.
-				.filter((a) => a.attributeId && a.attributeValueIds.length > 0)
-				.map((a) => ({
-					attributeId: a.attributeId,
-					attributeValueIds: a.attributeValueIds,
-					isVisible: a.isVisible,
-					isVariation: a.isVariation,
-				})),
+				.filter((a) =>
+					a.mode === "text"
+						? a.attributeId && (a.textDe.trim() || a.textEn.trim())
+						: a.attributeId && a.attributeValueIds.length > 0
+				)
+				.map((a) =>
+					a.mode === "text"
+						? {
+								attributeId: a.attributeId,
+								attributeValueIds: [],
+								text: [
+									{ locale: "de", value: a.textDe.trim() },
+									{ locale: "en", value: a.textEn.trim() },
+								].filter((t) => t.value),
+								isVisible: a.isVisible,
+								// Variants need a value other products share.
+								isVariation: false,
+							}
+						: {
+								attributeId: a.attributeId,
+								attributeValueIds: a.attributeValueIds,
+								isVisible: a.isVisible,
+								isVariation: a.isVariation,
+							}
+				),
 			/*
 			 * A tab with no heading in any language is nothing — the strip has no
 			 * label to draw. Within a tab, a language with no heading is dropped

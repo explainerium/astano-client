@@ -14,6 +14,7 @@ import {
 	Loader2,
 	Pencil,
 	Plus,
+	RotateCcw,
 	Star,
 	Trash2,
 	Upload,
@@ -287,6 +288,8 @@ export const ProductTable = ({
 	products,
 	filters,
 	onFiltersChange,
+	hasFilters,
+	onResetFilters,
 	statusCounts,
 	meta,
 	isFetching,
@@ -305,6 +308,9 @@ export const ProductTable = ({
 	products: AdminProduct[]
 	filters: ProductFilters
 	onFiltersChange: (filters: ProductFilters) => void
+	/** Whether anything narrows the list, and how to undo all of it at once. */
+	hasFilters?: boolean
+	onResetFilters?: () => void
 	statusCounts: StatusCounts
 	/** Absent while the first page is still loading. */
 	meta?: IMeta
@@ -548,6 +554,14 @@ export const ProductTable = ({
 							<Star className={cn("size-4", filters.top && "fill-current")} />
 							{t("topProducts")}
 						</Button>
+
+						{/* The filters are remembered now, so one that is still on has to be easy to see and to drop. */}
+						{hasFilters && onResetFilters && (
+							<Button type="button" variant="ghost" size="sm" onClick={onResetFilters}>
+								<RotateCcw className="size-4" />
+								{t("resetFilters")}
+							</Button>
+						)}
 					</div>
 				}
 				selectedCount={selected.size}
@@ -642,7 +656,7 @@ export const ProductTable = ({
 								<TableRow className="hover:bg-transparent">
 									<TableCell colSpan={12} className="h-40 text-center">
 										<p className="text-muted-foreground text-sm">
-											{filters.search || filters.status || filters.kind
+											{hasFilters
 												? t("nothingMatchesTheseFilters")
 												: t("noProductsYet")}
 										</p>

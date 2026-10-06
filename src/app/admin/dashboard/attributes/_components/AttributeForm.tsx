@@ -11,6 +11,7 @@ import { holdForNavigation } from "@/lib/holdForNavigation"
 import { toast } from "sonner"
 import { z } from "zod"
 import EditorHeader from "@/components/dashboard/shell/EditorHeader"
+import ProCheckbox from "@/components/form/ProCheckbox"
 import ProForm from "@/components/form/ProForm"
 import ProInput from "@/components/form/ProInput"
 import ProSubmit from "@/components/form/ProSubmit"
@@ -27,29 +28,25 @@ const EDITOR_LOCALES = [
 	{ code: "en", label: "English" },
 ] as const
 
-const CODE_PATTERN = /^[a-z0-9]+(?:[-_][a-z0-9]+)*$/
-
 /** The dashboard translator, as a type these builders can take. */
 type T = (key: string, values?: Record<string, string | number | Date>) => string
 
-const codeField = (t: T) =>
-	z
-		.string()
-		.trim()
-		.min(1, t("required"))
-		.max(60)
-		.regex(CODE_PATTERN, t("codePattern"))
-
+/*
+ * No code boxes. The client, 6 October, read the value code as a "short
+ * description" — extra work, and every umlaut in it an error. The server makes
+ * a code from the German label instead, as it already did for anything typed
+ * into a product, and a code once made is never changed from here: the
+ * storefront's filter links carry it.
+ */
 const buildSchema = (t: T) =>
 	z.object({
-		code: codeField(t),
 		sortOrder: z.number({ message: t("enterANumber") }).int().min(0),
+		freeText: z.boolean(),
 		de: z.object({ name: z.string().trim().min(1, t("aGermanNameIsRequired")) }),
 		en: z.object({ name: z.string().trim() }),
 		values: z.array(
 			z.object({
 				id: z.string().optional(),
-				code: codeField(t),
 				labelDe: z.string().trim().min(1, t("required")),
 				labelEn: z.string().trim(),
 			})
@@ -62,14 +59,13 @@ const translationFor = (rows: { locale: string }[] | undefined, locale: string) 
 	rows?.find((r) => r.locale === locale)
 
 const toDefaults = (attribute?: AdminAttribute): FormValues => ({
-	code: attribute?.code ?? "",
 	sortOrder: attribute?.sortOrder ?? 0,
+	freeText: attribute?.freeText ?? false,
 	en: { name: (translationFor(attribute?.translations, "en") as { name?: string })?.name ?? "" },
 	de: { name: (translationFor(attribute?.translations, "de") as { name?: string })?.name ?? "" },
 	values:
 		attribute?.values.map((value) => ({
 			id: value.id,
-			code: value.code,
 			labelEn: (translationFor(value.translations, "en") as { label?: string })?.label ?? "",
 			labelDe: (translationFor(value.translations, "de") as { label?: string })?.label ?? "",
 		})) ?? [],
@@ -100,7 +96,7 @@ const ValuesEditor = () => {
 					type="button"
 					variant="outline"
 					size="sm"
-					onClick={() => append({ code: "", labelDe: "", labelEn: "" })}
+					onClick={() => append({ labelDe: "", labelEn: "" })}
 				>
 					<Plus />{t("addValue")}</Button>
 			</div>
@@ -114,7 +110,6 @@ const ValuesEditor = () => {
 			{fields.map((field, index) => (
 				<div key={field.id} className="flex items-start gap-2">
 					<GripVertical className="text-muted-foreground/50 mt-3 size-4 shrink-0" />
-					<ProInput name={`values.${index}.code`} placeholder="code" className="w-32" />
 					<ProInput
 						name={`values.${index}.labelDe`}
 						placeholder={t("labelDeutsch")}
@@ -182,8 +177,8 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 
 	const onSubmit = async (form: FormValues) => {
 		const payload: AttributePayload = {
-			code: form.code.trim(),
 			sortOrder: form.sortOrder,
+			freeText: form.freeText,
 			translations: [
 				{ locale: "de", name: form.de.name.trim() },
 				// A locale with no name is not sent — an empty translation row
@@ -192,7 +187,6 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 			],
 			values: form.values.map((value, index) => ({
 				...(value.id ? { id: value.id } : {}),
-				code: value.code.trim(),
 				// Position is the order — no separate field to keep in step.
 				sortOrder: index,
 				translations: [
@@ -242,14 +236,14 @@ export const AttributeForm = ({ attribute }: { attribute?: AdminAttribute }) => 
 				<div className="bg-card flex flex-col space-y-6 rounded-lg border p-5">
 					<TranslateAttribute />
 					<div className="grid gap-4 sm:grid-cols-2">
-						<ProInput
-							name="code"
-							label={t("code")}
-							description={t("usedInternallyAndInUrlsCannot")}
-							required
-						/>
 						<ProInput name="sortOrder" type="number" label={t("sortOrder")} />
 					</div>
+
+					<ProCheckbox
+						name="freeText"
+						label={t("attributeStartsFreeText")}
+						description={t("attributeStartsFreeTextDescription")}
+					/>
 
 					{/* No "used for variations" here, deliberately.
 					    WooCommerce asks that on the product, not on the attribute —
